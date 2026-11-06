@@ -1,0 +1,55 @@
+@startuml
+title UML sequence behaviour — Sign in with email and password
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Visitor" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "SignInPage" as page
+  participant "HttpAuthService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "AuthController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "SignInCommandHandler" as handler
+  participant "IPasswordHasher" as hasher
+  participant "ITokenService" as tokens
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> page : Enter email and password, press "Sign in"
+page -> page : Show busy state on the button
+page -> client : signIn(email, password)
+client -> ctrl : POST /api/auth/sign-in
+ctrl -> handler : Send SignInCommand (ValidationBehavior runs first, L2-001 AC2)
+handler -> db : Load User by normalised email
+db --> handler : User or none
+alt user found and password verifies
+  handler -> hasher : Verify(hash, password)
+  hasher --> handler : true
+  handler -> tokens : Issue(user, member)
+  tokens --> handler : SessionDto
+  handler --> ctrl : SessionDto
+  ctrl --> client : 200 SessionDto
+  client --> page : Signed in
+  page --> actor : "Signed in", "Welcome back, Maya", then the calendar (L2-001 AC4)
+else no user or wrong password
+  handler --> ctrl : Unauthorized, code invalid_credentials
+  ctrl --> client : 401 ProblemDetails
+  client --> page : Failure
+  page --> actor : "Email or password doesn't match" (L2-001 AC3)
+end
+@enduml

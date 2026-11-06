@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alert and banner — Greenlit design system</title>
+<meta name="description" content="An alert keeps a message on the page until the situation changes: four tones, an optional dismiss button and actions, and a full-width banner form for page-level and connection status.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">Greenlit DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details><summary>Components · Actions</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/segmented-control.html">Segmented control</a></li>
+    </ul></details>
+    <details><summary>Components · Inputs</summary><ul>
+      <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/counter.html">Counter</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+    </ul></details>
+    <details><summary>Components · Navigation</summary><ul>
+      <li><a href="../components/app-nav.html">App navigation</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb and back link</a></li>
+      <li><a href="../components/pagination.html">Pagination</a></li>
+      <li><a href="../components/period-nav.html">Period navigation</a></li>
+      <li><a href="../components/settings-nav.html">Settings navigation</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+    </ul></details>
+    <details><summary>Components · Containers and overlays</summary><ul>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/divider.html">Divider</a></li>
+      <li><a href="../components/drawer.html">Drawer</a></li>
+      <li><a href="../components/layout-primitives.html">Layout primitives</a></li>
+      <li><a href="../components/tooltip.html">Tooltip</a></li>
+    </ul></details>
+    <details><summary>Components · Data display</summary><ul>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/badge.html">Badge and status</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/member-list.html">Member list</a></li>
+      <li><a href="../components/request-row.html">Request row</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+    </ul></details>
+    <details><summary>Components · Feedback</summary><ul>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress-bar.html">Progress bar</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/spinner.html">Spinner</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+    </ul></details>
+    <details><summary>Components · Sheet and brand</summary><ul>
+      <li><a href="../components/legend.html">Legend</a></li>
+      <li><a href="../components/logo-lockup.html">Logo lockup</a></li>
+      <li><a href="../components/month-mini.html">Month mini</a></li>
+      <li><a href="../components/selection-bar.html">Selection bar</a></li>
+      <li><a href="../components/sheet-cell.html">Sheet cell</a></li>
+      <li><a href="../components/team-grid.html">Team grid</a></li>
+      <li><a href="../components/year-grid.html">Year grid</a></li>
+    </ul></details>
+    <details><summary>Patterns</summary><ul>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/data-tables-and-lists.html">Data tables and lists</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/navigation-and-page-structure.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/sheet-interaction.html">Sheet interaction</a></li>
+    </ul></details>
+  </nav>
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Component · Feedback</p>
+      <h1>Alert and banner</h1>
+      <p class="ds-lead">An alert keeps a message on the page until the situation changes: four tones, an optional dismiss button and actions, and a full-width banner form for page-level and connection status.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span><span class="ds-pill">Since v1.0</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#variants">Variants</a></li><li><a href="#sizes">Sizes</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#theming">Theming</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don&#x27;t</a></li><li><a href="#tokens">Tokens</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>Use an <b>alert</b> for a message that belongs to a region of the page and that the person may need to act on or re-read: "Two members have no allowance set", "Only managers can change team settings". Use the <b>banner</b> form (<code>.alert.banner</code>) when the message concerns the whole page or the whole app: connection state ("You’re offline"), a failed save of a settings page, or a saved-confirmation that should stay visible.</p>
+<p>It is not a toast (<a href="toast.html">toast</a> is transient and for results), not a field message (<a href="inline-message.html">inline message</a>) and not a blocking decision (<a href="dialog.html">dialog</a>). Do not stack more than one banner; replace the older message instead.</p>
+    </section>
+    <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
+<div class="ds-anatomy">
+    <figure class="ds-anatomy__figure">
+      <div class="alert alert--warning"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div class="alert__body"><div class="alert__title">Two members have no allowance set</div><div>Their days won’t be counted until you set one.</div><div class="alert__actions"><a href="settings-nav.html">Open settings</a></div></div><button class="close" type="button" aria-label="Dismiss"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <span class="ds-callout" style="left: 3%; top: 22%;" aria-hidden="true">1</span>
+      <span class="ds-callout" style="left: 30%; top: 20%;" aria-hidden="true">2</span>
+      <span class="ds-callout" style="left: 40%; top: 48%;" aria-hidden="true">3</span>
+      <span class="ds-callout" style="left: 30%; top: 76%;" aria-hidden="true">4</span>
+      <span class="ds-callout" style="left: 94%; top: 22%;" aria-hidden="true">5</span>
+      <span class="ds-callout" style="left: 1%; top: 50%;" aria-hidden="true">6</span>
+    </figure>
+    <ol class="ds-anatomy__list">
+      <li><div><b>Tone icon</b><small>Info, success, warning or danger glyph in <code>--alert-icon</code>, <code>aria-hidden</code>.</small></div></li>
+      <li><div><b>Title</b><small>A short sentence stating the situation (<code>.alert__title</code>, label weight).</small></div></li>
+      <li><div><b>Text</b><small>Optional explanation and consequence, regular weight.</small></div></li>
+      <li><div><b>Actions (optional)</b><small>Links or buttons in <code>.alert__actions</code>, inheriting the alert colour and underlined as links.</small></div></li>
+      <li><div><b>Dismiss (optional)</b><small>A <code>.close</code> button; omitted when the alert resolves itself.</small></div></li>
+      <li><div><b>Tone bar</b><small>4px left border in the tone's border colour; with the icon and title it is redundant, never the only cue.</small></div></li>
+    </ol>
+  </div>
+    </section>
+    <section class="ds-section" id="variants"><h2><a href="#variants">Variants</a></h2>
+<p>Tone is set by four component tokens (<code>--alert-bg</code>, <code>--alert-fg</code>, <code>--alert-border</code>, <code>--alert-icon</code>) that each tone class overrides. Info is the default.</p>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div style="display: flex; flex-direction: column; gap: var(--space-3); width: 100%;"><div class="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div class="alert__body"><div class="alert__title">2027 UK bank holidays are ready</div><div>Review them and add the ones your team observes.</div></div></div><div class="alert alert--success"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><div class="alert__body"><div class="alert__title">Team settings saved</div><div>Everyone sees the new settings straight away.</div></div><button class="close" type="button" aria-label="Dismiss"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="alert alert--warning"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div class="alert__body"><div class="alert__title">Two members have no allowance set</div><div>Set their allowance to count their days.</div></div></div><div class="alert alert--danger" role="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div class="alert__body"><div class="alert__title">We couldn’t save your settings</div><div>Nothing was changed. Check your connection and try again.</div><div class="alert__actions"><button type="button">Try again</button></div></div></div></div></div>
+  <div class="ds-example__caption"><span><code>.alert</code> (info), <code>.alert--success</code>, <code>.alert--warning</code>, <code>.alert--danger</code>. A danger alert that appears after an action gets <code>role="alert"</code>.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;display: flex; flex-direction: column; gap: var(--space-3); width: 100%;&quot;&gt;&lt;div class=&quot;alert&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;M12 11v5M12 8h.01&quot;/&gt;&lt;/svg&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;2027 UK bank holidays are ready&lt;/div&gt;&lt;div&gt;Review them and add the ones your team observes.&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;alert alert--success&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;m8 12 3 3 5-6&quot;/&gt;&lt;/svg&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;Team settings saved&lt;/div&gt;&lt;div&gt;Everyone sees the new settings straight away.&lt;/div&gt;&lt;/div&gt;&lt;button class=&quot;close&quot; type=&quot;button&quot; aria-label=&quot;Dismiss&quot;&gt;&lt;svg class=&quot;icon icon--sm&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;alert alert--warning&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M12 4 3 20h18z&quot;/&gt;&lt;path d=&quot;M12 10v4M12 17h.01&quot;/&gt;&lt;/svg&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;Two members have no allowance set&lt;/div&gt;&lt;div&gt;Set their allowance to count their days.&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;alert alert--danger&quot; role=&quot;alert&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;M12 8v5M12 16h.01&quot;/&gt;&lt;/svg&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;We couldn’t save your settings&lt;/div&gt;&lt;div&gt;Nothing was changed. Check your connection and try again.&lt;/div&gt;&lt;div class=&quot;alert__actions&quot;&gt;&lt;button type=&quot;button&quot;&gt;Try again&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>With actions</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="alert alert--warning"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div class="alert__body"><div class="alert__title">Your connection is unstable</div><div>Changes may take longer to save.</div><div class="alert__actions"><button type="button">Check again</button><a href="#top">What this means</a></div></div></div></div>
+  <div class="ds-example__caption"><span>Up to two actions: the first is the recovery, the second is a link to learn more. Actions inherit the alert colour so contrast is guaranteed.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;alert alert--warning&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M12 4 3 20h18z&quot;/&gt;&lt;path d=&quot;M12 10v4M12 17h.01&quot;/&gt;&lt;/svg&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;Your connection is unstable&lt;/div&gt;&lt;div&gt;Changes may take longer to save.&lt;/div&gt;&lt;div class=&quot;alert__actions&quot;&gt;&lt;button type=&quot;button&quot;&gt;Check again&lt;/button&gt;&lt;a href=&quot;#top&quot;&gt;What this means&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Banner</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div style="display: flex; flex-direction: column; gap: var(--space-3); width: 100%;"><div class="alert alert--warning banner"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 3l18 18M9 5a6 6 0 0 1 10 4 4 4 0 0 1 2 6M6 18a4 4 0 0 1 0-8"/></svg><div class="alert__body"><div class="alert__title">You’re offline</div><div>You can look at the calendar, but changes can’t be saved until you’re back.</div></div></div><div class="alert alert--success banner"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><div class="alert__body"><div class="alert__title">You’re back online</div><div>Your changes are saved.</div></div><button class="close" type="button" aria-label="Dismiss"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="alert banner"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5"/></svg><div class="alert__body"><div class="alert__title">Reconnecting…</div><div>Hang on while we check your connection.</div></div></div><div class="alert alert--danger banner" role="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div class="alert__body"><div class="alert__title">We couldn’t sync the latest changes</div><div>Check your connection and try again.</div><div class="alert__actions"><button type="button">Try again</button></div></div></div></div></div>
+  <div class="ds-example__caption"><span><code>.banner</code> removes the radius and side borders, centres the content and runs edge to edge at the top of the page, above the top bar. The offline banner swaps the tone icon for <code>cloud-off</code> or <code>refresh</code>.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;display: flex; flex-direction: column; gap: var(--space-3); width: 100%;&quot;&gt;&lt;div class=&quot;alert alert--warning banner&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M3 3l18 18M9 5a6 6 0 0 1 10 4 4 4 0 0 1 2 6M6 18a4 4 0 0 1 0-8&quot;/&gt;&lt;/svg&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;You’re offline&lt;/div&gt;&lt;div&gt;You can look at the calendar, but changes can’t be saved until you’re back.&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;alert alert--success banner&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;m8 12 3 3 5-6&quot;/&gt;&lt;/svg&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;You’re back online&lt;/div&gt;&lt;div&gt;Your changes are saved.&lt;/div&gt;&lt;/div&gt;&lt;button class=&quot;close&quot; type=&quot;button&quot; aria-label=&quot;Dismiss&quot;&gt;&lt;svg class=&quot;icon icon--sm&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;alert banner&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5&quot;/&gt;&lt;/svg&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;Reconnecting…&lt;/div&gt;&lt;div&gt;Hang on while we check your connection.&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;alert alert--danger banner&quot; role=&quot;alert&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;M12 8v5M12 16h.01&quot;/&gt;&lt;/svg&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;We couldn’t sync the latest changes&lt;/div&gt;&lt;div&gt;Check your connection and try again.&lt;/div&gt;&lt;div class=&quot;alert__actions&quot;&gt;&lt;button type=&quot;button&quot;&gt;Try again&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Banner with a spinner</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="alert banner"><span class="spinner " role="status" aria-label="Checking connection"></span><div class="alert__body"><div class="alert__title">Reconnecting…</div><div>Hang on while we check your connection.</div></div></div></div>
+  <div class="ds-example__caption"><span><code>.banner .spinner</code> shrinks the <a href="spinner.html">spinner</a> to 1rem so it can replace the icon while an operation runs. The shipped offline mock uses the <code>refresh</code> icon instead.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;alert banner&quot;&gt;&lt;span class=&quot;spinner &quot; role=&quot;status&quot; aria-label=&quot;Checking connection&quot;&gt;&lt;/span&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;Reconnecting…&lt;/div&gt;&lt;div&gt;Hang on while we check your connection.&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+    </section>
+    <section class="ds-section" id="sizes"><h2><a href="#sizes">Sizes</a></h2>
+<p>There is one size. An alert fills its container (card, form column or page); the banner fills the viewport. Body text wraps and the dismiss button hangs at the top right, so long messages never push it off screen. Keep the title to one line and the whole message to two sentences; anything longer belongs on its own page.</p>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<p>An alert is either <b>visible</b> or gone; it has no hover or loading state of its own. The states that matter are whether it can be dismissed, whether it resolves itself, and how it is announced.</p>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Tone</th><th scope="col">Dismissible</th><th scope="col">Persistent (no dismiss)</th><th scope="col">Announced as alert</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Warning</th><td><div class="alert alert--warning"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div class="alert__body"><div class="alert__title">Two members have no allowance set</div></div><button class="close" type="button" aria-label="Dismiss"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div></td><td><div class="alert alert--warning"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div class="alert__body"><div class="alert__title">Only managers can change team settings</div></div></div></td><td>—</td></tr>
+      <tr><th scope="row">Danger</th><td>—</td><td><div class="alert alert--danger"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div class="alert__body"><div class="alert__title">We couldn’t save your settings</div></div></div></td><td><div class="alert alert--danger" role="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div class="alert__body"><div class="alert__title">We couldn’t save your settings</div></div></div></td></tr>
+    </tbody>
+  </table></div>
+<h3>Both themes</h3>
+<div class="ds-themes">
+  <div data-theme="light"><div class="ds-example__canvas"><div style="display: flex; flex-direction: column; gap: var(--space-3); width: 100%;"><div class="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div class="alert__body"><div class="alert__title">Reconnecting…</div><div>Hang on while we check your connection.</div></div></div><div class="alert alert--success"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><div class="alert__body"><div class="alert__title">Team settings saved</div></div><button class="close" type="button" aria-label="Dismiss"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="alert alert--warning"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div class="alert__body"><div class="alert__title">Your connection is unstable</div></div></div><div class="alert alert--danger" role="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div class="alert__body"><div class="alert__title">We couldn’t save your settings</div></div></div></div></div></div>
+  <div data-theme="dark"><div class="ds-example__canvas"><div style="display: flex; flex-direction: column; gap: var(--space-3); width: 100%;"><div class="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div class="alert__body"><div class="alert__title">Reconnecting…</div><div>Hang on while we check your connection.</div></div></div><div class="alert alert--success"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><div class="alert__body"><div class="alert__title">Team settings saved</div></div><button class="close" type="button" aria-label="Dismiss"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="alert alert--warning"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div class="alert__body"><div class="alert__title">Your connection is unstable</div></div></div><div class="alert alert--danger" role="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div class="alert__body"><div class="alert__title">We couldn’t save your settings</div></div></div></div></div></div>
+</div>
+<ul>
+  <li><b>Persistent</b> alerts have no dismiss button. They leave when their cause does: the offline banner when the connection returns (painting stays disabled meanwhile), the read-only notice for non-managers when the role changes.</li>
+  <li><b>Dismissed</b> alerts are removed from the DOM and not shown again for the same cause in the session. Move focus to the next logical control if the dismiss button had it.</li>
+  <li><b>Success</b> alerts are dismissible and replaced by the next message; they do not time out. Use a <a href="toast.html">toast</a> if you want a transient confirmation.</li>
+  <li>Alerts are static: no entrance animation, so nothing changes under <code>prefers-reduced-motion</code>.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<ul>
+  <li>The alert is a flex row with <code>--space-3</code> gap and <code>--space-4</code> padding at every width; the body wraps, the icon and dismiss button keep their size.</li>
+  <li>The <code>.banner</code> body is a wrapping row (<code>--space-4</code> gap): title and text sit side by side on wide screens and stack on a phone, centred.</li>
+  <li>Banners sit above the <a href="top-bar.html">top bar</a> in the page flow, so they push the page down rather than overlapping; do not make them sticky on phones.</li>
+  <li>Actions wrap under the text; each stays at least 24px tall (<code>--target-min</code>) with a gap of <code>--space-3</code>.</li>
+  <li>At 360px a banner of title plus one sentence takes about four lines; shorten the copy before shrinking the type.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="theming"><h2><a href="#theming">Theming</a></h2>
+<p>Every tone reads four semantic tokens in the pattern <code>--color-{tone}-bg|fg|border|icon</code> and exposes them through the component tokens <code>--alert-bg</code>, <code>--alert-fg</code>, <code>--alert-border</code> and <code>--alert-icon</code>. Dark mode swaps the tint to the 950 step with a 200–300 foreground, so contrast holds in both themes without a component override. To add a tone, define the four semantic tokens and a modifier that sets the four component tokens.</p>
+<pre><code>.alert--brand {
+  --alert-bg: var(--color-accent-subtle);
+  --alert-fg: var(--color-fg-accent);
+  --alert-border: var(--color-accent);
+  --alert-icon: var(--color-fg-accent);
+}</code></pre>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<h3>Role and pattern</h3>
+<p>ARIA <b>status</b> and <b>alert</b> roles (WAI-ARIA live-region guidance; the APG alert pattern). A static alert present at load needs no role: it is read in order. An alert that appears in response to an action gets <code>role="alert"</code> (assertive) when it reports a failure, or sits inside a <code>role="status"</code> container for neutral updates. Do not add <code>role="alert"</code> to alerts that exist at page load: they would be announced twice.</p>
+<h3>Keyboard</h3>
+<table class="ds-table ds-keys"><thead><tr><th scope="col">Key</th><th scope="col">Action</th></tr></thead><tbody>
+    <tr><td><kbd>Tab</kbd></td><td>Moves through the actions and the dismiss button in DOM order. The alert itself is not focusable.</td></tr>
+    <tr><td><kbd>Enter</kbd>, <kbd>Space</kbd></td><td>Activates the focused action or the dismiss button.</td></tr>
+    <tr><td><kbd>Esc</kbd></td><td>No effect. An alert is not modal; do not bind Esc to dismiss it.</td></tr>
+  </tbody></table>
+<h3>Focus</h3>
+<p>Actions and the dismiss button use the shared ring. Actions inherit the alert colour, so the ring keeps its own colour (<code>--color-focus-ring</code>) against the tinted surface. Do not move focus to an alert when it appears; announcing it through the live region is enough. The one exception is a form-level error summary, which receives focus on submit (see <a href="inline-message.html">inline message</a>).</p>
+<h3>Labelling</h3>
+<p>The title is the first thing a screen reader speaks. The tone must be present in words: write "We couldn’t save your settings", not "Error". The icon is decorative and <code>aria-hidden</code>. The dismiss button is named "Dismiss" (add the subject when several alerts are visible: "Dismiss: Team settings saved").</p>
+<h3>Contrast</h3>
+<div class="ds-example__canvas ds-example__canvas--stack" style="padding: 0; gap: var(--space-2);">
+  <div class="ds-pair"><span>Info text on info background</span><span class="ds-pair__ratio" data-contrast="--color-info-fg|--color-info-bg" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Success text on success background</span><span class="ds-pair__ratio" data-contrast="--color-success-fg|--color-success-bg" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Warning text on warning background</span><span class="ds-pair__ratio" data-contrast="--color-warning-fg|--color-warning-bg" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Danger text on danger background</span><span class="ds-pair__ratio" data-contrast="--color-danger-fg|--color-danger-bg" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Danger icon on danger background</span><span class="ds-pair__ratio" data-contrast="--color-danger-icon|--color-danger-bg" data-min="3"></span></div>
+  <div class="ds-pair"><span>Danger border on page surface</span><span class="ds-pair__ratio" data-contrast="--color-danger-border|--color-bg-surface" data-min="1.5"></span></div>
+</div>
+<h3>Motion</h3>
+<p>Alerts do not animate; they appear and disappear. The connection banner's spinner or refresh icon is the only moving element, and a spinner keeps turning under <code>prefers-reduced-motion</code> because it is a status indicator (see <a href="spinner.html">spinner</a>). Do not auto-dismiss alerts: a message the person has not read in time would be lost (WCAG 2.2.1).</p>
+<h3>Touch</h3>
+<p>The dismiss button is <code>--target-min</code> square with a negative margin that keeps the alert compact; actions are text buttons with 8px or more between them. Neither requires a gesture, and the alert never blocks the sheet underneath.</p>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul>
+  <li><b>Title</b>: state the situation in one short sentence: "You’re offline", "Two members have no allowance set", "Only managers can change team settings".</li>
+  <li><b>Text</b>: the consequence, then the way forward: "You can look at the calendar, but changes can’t be saved until you’re back."</li>
+  <li><b>Errors</b>: say what failed and what is safe: "We couldn’t save your settings. Nothing was changed." Never "Error", never a status code alone.</li>
+  <li><b>Actions</b>: verbs, at most two. Recovery first ("Try again"), explanation second ("What this means").</li>
+  <li>Use curly apostrophes and the product's words: team, member, day, holiday, manager. Reconnecting states end in an ellipsis ("Reconnecting…").</li>
+</ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don&#x27;t</a></h2>
+<div class="ds-dodont">
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="alert alert--danger" role="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div class="alert__body"><div class="alert__title">We couldn’t save your settings</div><div>Nothing was changed. Check your connection and try again.</div><div class="alert__actions"><button type="button">Try again</button></div></div></div></div><figcaption>Names the failure, reassures, and offers recovery.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="alert alert--danger"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div class="alert__body"><div class="alert__title">Error</div><div>Something went wrong.</div></div></div></div><figcaption>A bare word as the title and no way forward.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="alert alert--warning banner"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 3l18 18M9 5a6 6 0 0 1 10 4 4 4 0 0 1 2 6M6 18a4 4 0 0 1 0-8"/></svg><div class="alert__body"><div class="alert__title">You’re offline</div><div>You can look at the calendar, but changes can’t be saved until you’re back.</div></div></div></div><figcaption>A persistent banner with no dismiss: it leaves when the connection returns.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="alert alert--warning banner"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 3l18 18M9 5a6 6 0 0 1 10 4 4 4 0 0 1 2 6M6 18a4 4 0 0 1 0-8"/></svg><div class="alert__body"><div class="alert__title">You’re offline</div><div>Close this when you’ve read it.</div></div><button class="close" type="button" aria-label="Dismiss"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div></div><figcaption>Dismissing hides a state that still blocks saving.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div class="alert__body"><div class="alert__title">2027 UK bank holidays are ready</div><div>Review them and add the ones your team observes.</div><div class="alert__actions"><a href="settings-nav.html">Open settings</a></div></div></div></div><figcaption>One alert for one situation.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div style="display: flex; flex-direction: column; gap: var(--space-3); width: 100%;"><div class="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div class="alert__body"><div class="alert__title">Holidays ready</div></div></div><div class="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div class="alert__body"><div class="alert__title">Holidays ready</div></div></div><div class="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div class="alert__body"><div class="alert__title">Holidays ready</div></div></div></div></div><figcaption>Repeating the same alert hides the page.</figcaption></figure>
+</div>
+    </section>
+    <section class="ds-section" id="tokens"><h2><a href="#tokens">Tokens</a></h2>
+<div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th scope="col">Part</th><th scope="col">Token</th><th scope="col">Light</th><th scope="col">Dark</th></tr></thead>
+    <tbody>
+      <tr><td>Info</td><td><code>--color-info-bg</code> <code>--color-info-fg</code> <code>--color-info-border</code> <code>--color-info-icon</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-info-bg" data-swatch></i><span data-token="--color-info-bg"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-info-fg" data-swatch></i><span data-token="--color-info-fg"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-info-border" data-swatch></i><span data-token="--color-info-border"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-info-icon" data-swatch></i><span data-token="--color-info-icon"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-info-bg" data-swatch></i><span data-token="--color-info-bg"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-info-fg" data-swatch></i><span data-token="--color-info-fg"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-info-border" data-swatch></i><span data-token="--color-info-border"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-info-icon" data-swatch></i><span data-token="--color-info-icon"></span></span></td></tr>
+      <tr><td>Success</td><td><code>--color-success-bg</code> <code>--color-success-fg</code> <code>--color-success-border</code> <code>--color-success-icon</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-success-bg" data-swatch></i><span data-token="--color-success-bg"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-success-fg" data-swatch></i><span data-token="--color-success-fg"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-success-border" data-swatch></i><span data-token="--color-success-border"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-success-icon" data-swatch></i><span data-token="--color-success-icon"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-success-bg" data-swatch></i><span data-token="--color-success-bg"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-success-fg" data-swatch></i><span data-token="--color-success-fg"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-success-border" data-swatch></i><span data-token="--color-success-border"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-success-icon" data-swatch></i><span data-token="--color-success-icon"></span></span></td></tr>
+      <tr><td>Warning</td><td><code>--color-warning-bg</code> <code>--color-warning-fg</code> <code>--color-warning-border</code> <code>--color-warning-icon</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-warning-bg" data-swatch></i><span data-token="--color-warning-bg"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-warning-fg" data-swatch></i><span data-token="--color-warning-fg"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-warning-border" data-swatch></i><span data-token="--color-warning-border"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-warning-icon" data-swatch></i><span data-token="--color-warning-icon"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-warning-bg" data-swatch></i><span data-token="--color-warning-bg"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-warning-fg" data-swatch></i><span data-token="--color-warning-fg"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-warning-border" data-swatch></i><span data-token="--color-warning-border"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-warning-icon" data-swatch></i><span data-token="--color-warning-icon"></span></span></td></tr>
+      <tr><td>Danger</td><td><code>--color-danger-bg</code> <code>--color-danger-fg</code> <code>--color-danger-border</code> <code>--color-danger-icon</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-danger-bg" data-swatch></i><span data-token="--color-danger-bg"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-danger-fg" data-swatch></i><span data-token="--color-danger-fg"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-danger-border" data-swatch></i><span data-token="--color-danger-border"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-danger-icon" data-swatch></i><span data-token="--color-danger-icon"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-danger-bg" data-swatch></i><span data-token="--color-danger-bg"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-danger-fg" data-swatch></i><span data-token="--color-danger-fg"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-danger-border" data-swatch></i><span data-token="--color-danger-border"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-danger-icon" data-swatch></i><span data-token="--color-danger-icon"></span></span></td></tr>
+      <tr><td>Padding / gap</td><td><code>--space-4</code> <code>--space-3</code></td><td colspan="2"><span data-token="--space-4"></span> <span data-token="--space-3"></span></td></tr>
+      <tr><td>Radius</td><td><code>--radius-md</code></td><td colspan="2"><span data-token="--radius-md"></span></td></tr>
+      <tr><td>Title font</td><td><code>--text-label</code></td><td colspan="2"><span data-token="--text-label"></span></td></tr>
+      <tr><td>Dismiss target</td><td><code>--target-min</code></td><td colspan="2"><span data-token="--target-min"></span></td></tr>
+    </tbody>
+  </table></div>
+    </section>
+    <section class="ds-section" id="code"><h2><a href="#code">Code</a></h2>
+<pre><code>&lt;div class=&quot;alert alert--warning&quot; role=&quot;status&quot;&gt;
+  &lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;…&lt;/svg&gt;
+  &lt;div class=&quot;alert__body&quot;&gt;
+    &lt;div class=&quot;alert__title&quot;&gt;Two members have no allowance set&lt;/div&gt;
+    &lt;div&gt;Their days won’t be counted until you set one.&lt;/div&gt;
+    &lt;div class=&quot;alert__actions&quot;&gt;&lt;a href=&quot;/settings&quot;&gt;Open settings&lt;/a&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;button class=&quot;close&quot; type=&quot;button&quot; aria-label=&quot;Dismiss&quot;&gt;…&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;alert alert--warning banner&quot;&gt;… You’re offline …&lt;/div&gt;</code></pre>
+<table class="ds-table"><thead><tr><th scope="col">Class / attribute</th><th scope="col">Effect</th></tr></thead><tbody>
+    <tr><td><code>.alert</code></td><td>Base, info tone: flex row, tinted surface, 4px tone bar.</td></tr>
+    <tr><td><code>.alert--success</code> <code>--warning</code> <code>--danger</code></td><td>Override the four <code>--alert-*</code> tokens.</td></tr>
+    <tr><td><code>.banner</code></td><td>Full-width, square, centred; body becomes a wrapping row.</td></tr>
+    <tr><td><code>.alert__body</code> <code>__title</code> <code>__actions</code></td><td>Text column, title and action row.</td></tr>
+    <tr><td><code>.close</code></td><td>Dismiss button; requires <code>aria-label</code>.</td></tr>
+    <tr><td><code>role="alert"</code></td><td>Add to alerts inserted after an action that report failure.</td></tr>
+    <tr><td><code>.banner .spinner</code></td><td>Shrinks a spinner to 1rem for reconnecting states.</td></tr>
+  </tbody></table>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<p>Extracted from these mocks:</p>
+<ul><li><a href="../../mocks/notifications/offline-banner/persistent.html">notifications/offline-banner/persistent</a> (offline, no dismiss)</li><li><a href="../../mocks/notifications/offline-banner/info.html">notifications/offline-banner/info</a> (reconnecting)</li><li><a href="../../mocks/notifications/offline-banner/success.html">notifications/offline-banner/success</a> (back online)</li><li><a href="../../mocks/notifications/offline-banner/warning.html">notifications/offline-banner/warning</a> (unstable connection)</li><li><a href="../../mocks/notifications/offline-banner/danger.html">notifications/offline-banner/danger</a> (sync failed, role alert)</li><li><a href="../../mocks/notifications/settings-banner/success.html">notifications/settings-banner/success</a> (saved, dismissible)</li><li><a href="../../mocks/notifications/settings-banner/warning.html">notifications/settings-banner/warning</a> (missing allowance)</li><li><a href="../../mocks/notifications/settings-banner/danger.html">notifications/settings-banner/danger</a> (save failed)</li><li><a href="../../mocks/notifications/settings-banner/persistent.html">notifications/settings-banner/persistent</a> (read-only notice)</li><li><a href="../../mocks/notifications/settings-banner/info.html">notifications/settings-banner/info</a> (holidays ready)</li></ul>
+<p>Drift fixed during extraction: The mocks put the banner's spinner rule in <code>components.css</code> but ship the <code>refresh</code> icon instead; both are documented. The dismiss <code>.close</code> button and <code>.alert__actions</code> are not given a focus colour of their own, so they rely on the shared ring.</p>
+    </section>
+    <footer class="ds-footer"><span>Greenlit design system · extracted from <a href="../../mocks/index.html">docs/mocks</a></span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

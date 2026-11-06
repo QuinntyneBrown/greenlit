@@ -1,0 +1,28 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Sign in
+
+Person(visitor, "Visitor", "A person who is not signed in")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(page, "SignInPage", "Angular page", "Sign-in form and states")
+  Component(auth, "HttpAuthService", "AUTH_SERVICE implementation", "Calls the auth endpoints")
+  Component(store, "SessionStore", "Angular service", "Holds the session token")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "AuthController", "ASP.NET Core controller", "POST /api/auth/sign-in")
+  Component(handler, "SignInCommandHandler", "MediatR handler", "Verifies credentials")
+  Component(hasher, "IPasswordHasher", "Application abstraction", "Verifies password hashes")
+  Component(tokens, "ITokenService", "Application abstraction", "Issues the JWT")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Users")
+}
+
+Rel(visitor, page, "Enters email and password")
+Rel(page, auth, "signIn()")
+Rel(auth, ctrl, "POST /api/auth/sign-in", "JSON/HTTPS")
+Rel(auth, store, "Stores token")
+Rel(ctrl, handler, "Sends SignInCommand")
+Rel(handler, db, "Loads user by email", "EF Core")
+Rel(handler, hasher, "Verifies password")
+Rel(handler, tokens, "Issues session")
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Manage the account
+
+class User <<exists>> {
+  +Guid Id
+  +string Email
+  +string DisplayName
+  +string PasswordHash
+  +UserRole Role
+  +DateTimeOffset CreatedUtc
+}
+enum UserRole <<exists>> {
+  Member
+  Manager
+  Admin
+}
+User --> UserRole : has
+
+class UpdateProfileCommand <<new>> {
+  +string DisplayName
+  +string Email
+}
+class ChangePasswordCommand <<new>> {
+  +string CurrentPassword
+  +string NewPassword
+  +string ConfirmPassword
+}
+class AccountDto <<new>> {
+  +string DisplayName
+  +string Email
+}
+class UpdateProfileCommandHandler <<new>>
+class ChangePasswordCommandHandler <<new>>
+UpdateProfileCommandHandler ..> UpdateProfileCommand : handles
+UpdateProfileCommandHandler --> User : updates
+ChangePasswordCommandHandler ..> ChangePasswordCommand : handles
+ChangePasswordCommandHandler --> User : updates PasswordHash
+@enduml

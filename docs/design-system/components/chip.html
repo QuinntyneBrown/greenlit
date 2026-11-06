@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chip — Greenlit design system</title>
+<meta name="description" content="A compact pill that filters or toggles: pick the working days, narrow the list to who is out, remove a selected item.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">Greenlit DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details><summary>Components · Actions</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/segmented-control.html">Segmented control</a></li>
+    </ul></details>
+    <details><summary>Components · Inputs</summary><ul>
+      <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/counter.html">Counter</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+    </ul></details>
+    <details><summary>Components · Navigation</summary><ul>
+      <li><a href="../components/app-nav.html">App navigation</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb and back link</a></li>
+      <li><a href="../components/pagination.html">Pagination</a></li>
+      <li><a href="../components/period-nav.html">Period navigation</a></li>
+      <li><a href="../components/settings-nav.html">Settings navigation</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+    </ul></details>
+    <details><summary>Components · Containers and overlays</summary><ul>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/divider.html">Divider</a></li>
+      <li><a href="../components/drawer.html">Drawer</a></li>
+      <li><a href="../components/layout-primitives.html">Layout primitives</a></li>
+      <li><a href="../components/tooltip.html">Tooltip</a></li>
+    </ul></details>
+    <details><summary>Components · Data display</summary><ul>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/badge.html">Badge and status</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/member-list.html">Member list</a></li>
+      <li><a href="../components/request-row.html">Request row</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+    </ul></details>
+    <details><summary>Components · Feedback</summary><ul>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress-bar.html">Progress bar</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/spinner.html">Spinner</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+    </ul></details>
+    <details><summary>Components · Sheet and brand</summary><ul>
+      <li><a href="../components/legend.html">Legend</a></li>
+      <li><a href="../components/logo-lockup.html">Logo lockup</a></li>
+      <li><a href="../components/month-mini.html">Month mini</a></li>
+      <li><a href="../components/selection-bar.html">Selection bar</a></li>
+      <li><a href="../components/sheet-cell.html">Sheet cell</a></li>
+      <li><a href="../components/team-grid.html">Team grid</a></li>
+      <li><a href="../components/year-grid.html">Year grid</a></li>
+    </ul></details>
+    <details><summary>Patterns</summary><ul>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/data-tables-and-lists.html">Data tables and lists</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/navigation-and-page-structure.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/sheet-interaction.html">Sheet interaction</a></li>
+    </ul></details>
+  </nav>
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Component · Data display</p>
+      <h1>Chip</h1>
+      <p class="ds-lead">A compact pill that filters or toggles: pick the working days, narrow the list to who is out, remove a selected item.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span><span class="ds-pill">Since v1.0</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#variants">Variants</a></li><li><a href="#sizes">Sizes</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#theming">Theming</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don&#x27;t</a></li><li><a href="#tokens">Tokens</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>A <b>chip</b> is a small pressable pill. Greenlit uses it in two ways: as a <b>toggle</b> (<code>aria-pressed</code>) such as the seven working-day chips in the Work week settings and the Edit working days dialog, and as a <b>filter</b> that narrows a list. A chip can also be <b>removable</b>, with a trailing close button.</p>
+<p>A choice of exactly one among two to four options is a <a href="segmented-control.html">segmented control</a>; one among many is a <a href="radio-group.html">radio group</a> or <a href="select.html">select</a>; an on/off setting with its own label is a <a href="switch.html">switch</a> or <a href="checkbox.html">checkbox</a>. Status labels that cannot be pressed are <a href="badge.html">badges</a>. A chip never submits or navigates: that is a <a href="button.html">button</a> or <a href="link.html">link</a>.</p>
+    </section>
+    <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
+<div class="ds-anatomy">
+    <figure class="ds-anatomy__figure">
+      <span class="chip">Out this week<button class="remove" type="button" aria-label="Remove filter: Out this week"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span>
+      <span class="ds-callout" style="left: 34%; top: 20%;" aria-hidden="true">1</span>
+      <span class="ds-callout" style="left: 86%; top: 20%;" aria-hidden="true">2</span>
+      <span class="ds-callout" style="left: 50%; top: 90%;" aria-hidden="true">3</span>
+    </figure>
+    <ol class="ds-anatomy__list">
+      <li><div><b>Label</b><small>Label type, one to three words. It is the accessible name.</small></div></li>
+      <li><div><b>Remove button (optional)</b><small><code>.remove</code>: a 20px circle with a close icon; <code>aria-label</code> names what is removed.</small></div></li>
+      <li><div><b>Container</b><small>Pill, 1px strong border, surface fill; 32px tall (<code>--control-height-sm</code>); selected fills with the accent tint.</small></div></li>
+    </ol>
+  </div>
+    </section>
+    <section class="ds-section" id="variants"><h2><a href="#variants">Variants</a></h2>
+<h3>Filter chips</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><button class="chip" type="button" aria-pressed="true">All members</button><button class="chip" type="button" aria-pressed="false">Out this week</button><button class="chip" type="button" aria-pressed="false">Requested</button></div>
+  <div class="ds-example__caption"><span>Press to filter; <code>aria-pressed</code> carries the on/off state. The selected chip changes fill, border and text colour, and the on/off state is also exposed in the accessibility tree.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;button class=&quot;chip&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;All members&lt;/button&gt;&lt;button class=&quot;chip&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Out this week&lt;/button&gt;&lt;button class=&quot;chip&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Requested&lt;/button&gt;</code></pre></details>
+</div>
+<h3>Day chips</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><button class="chip chip--day" type="button" aria-pressed="true">Mon</button><button class="chip chip--day" type="button" aria-pressed="true">Tue</button><button class="chip chip--day" type="button" aria-pressed="true">Wed</button><button class="chip chip--day" type="button" aria-pressed="true">Thu</button><button class="chip chip--day" type="button" aria-pressed="true">Fri</button><button class="chip chip--day" type="button" aria-pressed="false">Sat</button><button class="chip chip--day" type="button" aria-pressed="false">Sun</button></div>
+  <div class="ds-example__caption"><span><code>.chip--day</code>: a 48px-wide, medium-radius chip used for the working-days group. Group them in a <code>role="group"</code> with a label.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Mon&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Tue&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Wed&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Thu&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Fri&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Sat&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Sun&lt;/button&gt;</code></pre></details>
+</div>
+<h3>Removable chips</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><span class="chip">Out this week<button class="remove" type="button" aria-label="Remove filter: Out this week"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span><span class="chip">Requested<button class="remove" type="button" aria-label="Remove filter: Requested"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span></div>
+  <div class="ds-example__caption"><span>The remove button is a separate control inside the chip. The chip itself is a <code>&lt;span&gt;</code>, not pressable, so there is no nested interactive element.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;span class=&quot;chip&quot;&gt;Out this week&lt;button class=&quot;remove&quot; type=&quot;button&quot; aria-label=&quot;Remove filter: Out this week&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/span&gt;&lt;span class=&quot;chip&quot;&gt;Requested&lt;button class=&quot;remove&quot; type=&quot;button&quot; aria-label=&quot;Remove filter: Requested&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/span&gt;</code></pre></details>
+</div>
+<h3>With icon</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><button class="chip" type="button" aria-pressed="false"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Dev Patel</button></div>
+  <div class="ds-example__caption"><span>A leading icon is decorative (<code>aria-hidden</code>) and never replaces the label.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;button class=&quot;chip&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;8&quot; r=&quot;4&quot;/&gt;&lt;path d=&quot;M4 21a8 8 0 0 1 16 0&quot;/&gt;&lt;/svg&gt;Dev Patel&lt;/button&gt;</code></pre></details>
+</div>
+    </section>
+    <section class="ds-section" id="sizes"><h2><a href="#sizes">Sizes</a></h2>
+<p>Chips have one height, <code>--control-height-sm</code> (32px), which keeps them in line with small buttons. Day chips are 48px wide and 32px tall.</p>
+<div class="ds-example">
+  <div class="ds-example__canvas"><button class="chip" type="button" aria-pressed="false">Out this week</button><button class="chip chip--day" type="button" aria-pressed="true">Mon</button></div>
+  <div class="ds-example__caption"><span>Standard chip sizes to its label with 12px horizontal padding; <code>.chip--day</code> sets <code>min-width: 3rem</code> so seven weekday chips align in a row.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;button class=&quot;chip&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Out this week&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Mon&lt;/button&gt;</code></pre></details>
+</div>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<p>Pointer and focus states are forced with <code>data-state</code>; pages get them from <code>:hover</code> and <code>:focus-visible</code>. Selection is the real <code>aria-pressed</code> / <code>aria-selected</code> attribute (or <code>data-state="selected"</code> for static pages).</p>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Variant</th><th scope="col">Default</th><th scope="col">Hover</th><th scope="col">Focus</th><th scope="col">Active</th><th scope="col">Disabled</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Filter, off</th><td><button class="chip " type="button" aria-pressed="false">Out this week</button></td><td><button class="chip " type="button" data-state="hover" aria-pressed="false">Out this week</button></td><td><button class="chip " type="button" data-state="focus" aria-pressed="false">Out this week</button></td><td>—</td><td><button class="chip " type="button" aria-pressed="false" disabled>Out this week</button></td></tr>
+      <tr><th scope="row">Filter, on</th><td><button class="chip " type="button" aria-pressed="true">Out this week</button></td><td><button class="chip " type="button" data-state="hover" aria-pressed="true">Out this week</button></td><td><button class="chip " type="button" data-state="focus" aria-pressed="true">Out this week</button></td><td>—</td><td><button class="chip " type="button" aria-pressed="true" disabled>Out this week</button></td></tr>
+      <tr><th scope="row">Day, off</th><td><button class="chip chip--day" type="button" aria-pressed="false">Sat</button></td><td><button class="chip chip--day" type="button" data-state="hover" aria-pressed="false">Sat</button></td><td><button class="chip chip--day" type="button" data-state="focus" aria-pressed="false">Sat</button></td><td>—</td><td><button class="chip chip--day" type="button" aria-pressed="false" disabled>Sat</button></td></tr>
+      <tr><th scope="row">Day, on</th><td><button class="chip chip--day" type="button" aria-pressed="true">Mon</button></td><td><button class="chip chip--day" type="button" data-state="hover" aria-pressed="true">Mon</button></td><td><button class="chip chip--day" type="button" data-state="focus" aria-pressed="true">Mon</button></td><td>—</td><td><button class="chip chip--day" type="button" aria-pressed="true" disabled>Mon</button></td></tr>
+    </tbody>
+  </table></div>
+<h3>Selected and disabled</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><button class="chip chip--day" type="button" aria-pressed="true">Mon</button><button class="chip chip--day" type="button" aria-pressed="true">Tue</button><button class="chip chip--day" type="button" aria-pressed="true">Wed</button><button class="chip chip--day" type="button" aria-pressed="false">Thu</button><button class="chip chip--day" type="button" aria-pressed="false">Fri</button><button class="chip chip--day" type="button" aria-pressed="false">Sat</button><button class="chip chip--day" type="button" aria-pressed="false">Sun</button><button class="chip chip--day" type="button" aria-pressed="true" disabled>Fri</button></div>
+  <div class="ds-example__caption"><span>Selected chips use <code>--color-accent-subtle</code>, <code>--color-accent</code> border and <code>--color-fg-accent</code> text. A disabled chip keeps the same look because the kit has no disabled style (see drift); explain why in text next to it.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Mon&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Tue&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Wed&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Thu&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Fri&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Sat&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Sun&lt;/button&gt;&lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot; disabled&gt;Fri&lt;/button&gt;</code></pre></details>
+</div>
+<h3>Both themes</h3>
+<div class="ds-themes">
+  <div data-theme="light"><div class="ds-example__canvas"><button class="chip" type="button" aria-pressed="true">All members</button><button class="chip" type="button" aria-pressed="false">Out this week</button><button class="chip" type="button" aria-pressed="false">Requested</button><button class="chip chip--day" type="button" aria-pressed="true">Mon</button><button class="chip chip--day" type="button" aria-pressed="true">Tue</button><button class="chip chip--day" type="button" aria-pressed="false">Wed</button><button class="chip chip--day" type="button" aria-pressed="false">Thu</button><button class="chip chip--day" type="button" aria-pressed="false">Fri</button><button class="chip chip--day" type="button" aria-pressed="false">Sat</button><button class="chip chip--day" type="button" aria-pressed="false">Sun</button></div></div>
+  <div data-theme="dark"><div class="ds-example__canvas"><button class="chip" type="button" aria-pressed="true">All members</button><button class="chip" type="button" aria-pressed="false">Out this week</button><button class="chip" type="button" aria-pressed="false">Requested</button><button class="chip chip--day" type="button" aria-pressed="true">Mon</button><button class="chip chip--day" type="button" aria-pressed="true">Tue</button><button class="chip chip--day" type="button" aria-pressed="false">Wed</button><button class="chip chip--day" type="button" aria-pressed="false">Thu</button><button class="chip chip--day" type="button" aria-pressed="false">Fri</button><button class="chip chip--day" type="button" aria-pressed="false">Sat</button><button class="chip chip--day" type="button" aria-pressed="false">Sun</button></div></div>
+</div>
+<ul>
+  <li><b>Active</b> (pressed down) has no style of its own; the selected fill on release is the feedback.</li>
+  <li><b>Loading</b> does not apply: a chip changes immediately and applies its filter, or it is a <a href="button.html">button</a>.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<ul>
+  <li>Chips sit in a <code>.cluster</code> (flex-wrap with 8px gaps), so a row of filters wraps onto a second line rather than scrolling.</li>
+  <li>Seven day chips need 7 × 48px plus gaps (about 400px). At 360px they wrap to two rows; keep them in a group whose wrapping order stays Mon to Sun.</li>
+  <li>A long label never truncates inside a chip; shorten it. Chips never exceed their container width.</li>
+  <li>The chip is 32px tall at every width. In a touch-first context, keep at least 8px between chips so each target has clear space (WCAG 2.5.8 spacing).</li>
+</ul>
+    </section>
+    <section class="ds-section" id="theming"><h2><a href="#theming">Theming</a></h2>
+<p>A chip reads <code>--color-border-strong</code>, <code>--color-bg-surface</code> and <code>--color-fg-default</code> at rest, <code>--color-bg-subtle</code> on hover, and the accent trio (<code>--color-accent-subtle</code>, <code>--color-accent</code>, <code>--color-fg-accent</code>) when selected. In dark theme the accent tint is a deep green with light text, so the pressed state keeps 4.5:1.</p>
+<pre><code>/* A chip that shows a sheet status colour when selected */
+.chip[data-status][aria-pressed="true"] { background: var(--status-bg); color: var(--color-on-status); border-color: var(--status-bg); }</code></pre>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<h3>Role and pattern</h3>
+<p>A toggle <code>&lt;button type="button"&gt;</code> with <code>aria-pressed</code>, per the <a href="https://www.w3.org/WAI/ARIA/apg/patterns/button/">APG button pattern</a> (toggle button). A set of related chips lives in a <code>role="group"</code> with <code>aria-label</code>. For a single-choice filter that behaves like tabs or a listbox, use <code>aria-selected</code> on the proper widget role instead.</p>
+<h3>Keyboard</h3>
+<table class="ds-table ds-keys"><thead><tr><th scope="col">Key</th><th scope="col">Action</th></tr></thead><tbody>
+    <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Moves between chips (each is a tab stop).</td></tr>
+    <tr><td><kbd>Space</kbd>, <kbd>Enter</kbd></td><td>Toggles the pressed state.</td></tr>
+    <tr><td><kbd>Space</kbd>/<kbd>Enter</kbd> on a remove button</td><td>Removes the chip; move focus to the next chip, or the group, never to the page top.</td></tr>
+  </tbody></table>
+<h3>Focus</h3>
+<p>The shared ring on <code>:focus-visible</code>. The chip radius is full, so the ring follows the pill. On a removable chip, the focus lands on the close button, not on the label.</p>
+<h3>Labelling</h3>
+<p>The visible label is the name; <code>aria-pressed</code> adds "toggle button, pressed". Do not change the label when pressed ("Show out" to "Hide out"), because the state is exposed already. A remove button names the thing removed: "Remove filter: Out this week". The selected state is also visible: fill, border and text colour all change, not a colour alone, and the day chips print the weekday.</p>
+<h3>Contrast</h3>
+<div class="ds-example__canvas ds-example__canvas--stack" style="padding: 0; gap: var(--space-2);">
+  <div class="ds-pair"><span>Label on chip</span><span class="ds-pair__ratio" data-contrast="--color-fg-default|--color-bg-surface" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Label on hovered chip</span><span class="ds-pair__ratio" data-contrast="--color-fg-default|--color-bg-subtle" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Selected label on tint</span><span class="ds-pair__ratio" data-contrast="--color-fg-accent|--color-accent-subtle" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Chip border on surface</span><span class="ds-pair__ratio" data-contrast="--color-border-strong|--color-bg-surface" data-min="3"></span></div>
+  <div class="ds-pair"><span>Selected border on surface</span><span class="ds-pair__ratio" data-contrast="--color-accent|--color-bg-surface" data-min="3"></span></div>
+</div>
+<h3>Motion</h3>
+<p>Background transitions over <code>--duration-fast</code>; reduced-motion removes it. Removing a chip does not animate.</p>
+<h3>Touch</h3>
+<p>32px high with 8px gaps clears WCAG 2.5.8 (24px). The remove button inside is 20px with a larger hit area from the chip padding; prefer a visible "Clear filters" button on touch-first screens.</p>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul>
+  <li>Labels are nouns or short noun phrases in sentence case: "Out this week", "Requested".</li>
+  <li>Day chips use three-letter weekdays: Mon, Tue, Wed. Do not mix with single letters.</li>
+  <li>A group of chips needs a visible or hidden group label ("Working days").</li>
+  <li>Do not put counts in the chip unless the filter list shows the same count: "Requested · 3".</li>
+  <li>Removable chips are for a handful of items. For many, use a list with a remove action.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don&#x27;t</a></h2>
+<div class="ds-dodont">
+  <figure class="ds-do"><div class="ds-example__canvas"><div role="group" aria-label="Working days" class="cluster" style="gap: var(--space-2);"><button class="chip chip--day" type="button" aria-pressed="true">Mon</button><button class="chip chip--day" type="button" aria-pressed="true">Tue</button><button class="chip chip--day" type="button" aria-pressed="false">Wed</button><button class="chip chip--day" type="button" aria-pressed="false">Thu</button><button class="chip chip--day" type="button" aria-pressed="false">Fri</button><button class="chip chip--day" type="button" aria-pressed="false">Sat</button><button class="chip chip--day" type="button" aria-pressed="false">Sun</button></div></div><figcaption>A labelled group of toggles with a pressed state that is exposed to assistive technology.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="cluster" style="gap: var(--space-2);"><span class="chip chip--day" style="background: var(--color-accent-subtle);">Mon</span><span class="chip chip--day">Tue</span></div></div><figcaption>Spans styled as chips: colour is the only state and there is no keyboard access.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><span class="chip">Out this week<button class="remove" type="button" aria-label="Remove filter: Out this week"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span></div><figcaption>A remove button that names what it removes.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><span class="chip">Out this week<button class="remove" type="button" aria-label="Close"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span></div><figcaption>"Close" does not say close what. In a row of chips every button sounds the same.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><button class="chip" type="button" aria-pressed="true">Out this week</button></div><figcaption>The label stays the same when pressed; the state is the attribute.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><button class="chip" type="button" aria-pressed="true">Show everyone</button></div><figcaption>A label that flips with the state plus aria-pressed: "Show everyone, pressed" is a contradiction.</figcaption></figure>
+</div>
+    </section>
+    <section class="ds-section" id="tokens"><h2><a href="#tokens">Tokens</a></h2>
+<div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th scope="col">Part</th><th scope="col">Token</th><th scope="col">Light</th><th scope="col">Dark</th></tr></thead>
+    <tbody>
+      <tr><td>Container border / fill</td><td><code>--color-border-strong</code> <code>--color-bg-surface</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-border-strong" data-swatch></i><span data-token="--color-border-strong"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-surface" data-swatch></i><span data-token="--color-bg-surface"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-border-strong" data-swatch></i><span data-token="--color-border-strong"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-surface" data-swatch></i><span data-token="--color-bg-surface"></span></span></td></tr>
+      <tr><td>Hover fill</td><td><code>--color-bg-subtle</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-subtle" data-swatch></i><span data-token="--color-bg-subtle"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-subtle" data-swatch></i><span data-token="--color-bg-subtle"></span></span></td></tr>
+      <tr><td>Selected fill / border / text</td><td><code>--color-accent-subtle</code> <code>--color-accent</code> <code>--color-fg-accent</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-accent-subtle" data-swatch></i><span data-token="--color-accent-subtle"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-accent" data-swatch></i><span data-token="--color-accent"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-fg-accent" data-swatch></i><span data-token="--color-fg-accent"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-accent-subtle" data-swatch></i><span data-token="--color-accent-subtle"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-accent" data-swatch></i><span data-token="--color-accent"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-fg-accent" data-swatch></i><span data-token="--color-fg-accent"></span></span></td></tr>
+      <tr><td>Remove hover</td><td><code>--color-bg-subtle-hover</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-subtle-hover" data-swatch></i><span data-token="--color-bg-subtle-hover"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-subtle-hover" data-swatch></i><span data-token="--color-bg-subtle-hover"></span></span></td></tr>
+      <tr><td>Height</td><td><code>--control-height-sm</code></td><td colspan="2"><span data-token="--control-height-sm"></span></td></tr>
+      <tr><td>Padding / gap</td><td><code>--space-3</code> <code>--space-1</code></td><td colspan="2"><span data-token="--space-3"></span> <span data-token="--space-1"></span></td></tr>
+      <tr><td>Radius</td><td><code>--radius-full</code> <code>--radius-md</code></td><td colspan="2"><span data-token="--radius-full"></span> <span data-token="--radius-md"></span></td></tr>
+      <tr><td>Label type</td><td><code>--text-label</code></td><td colspan="2"><span data-token="--text-label"></span></td></tr>
+      <tr><td>Transition</td><td><code>--duration-fast</code> <code>--ease-standard</code></td><td colspan="2"><span data-token="--duration-fast"></span> <span data-token="--ease-standard"></span></td></tr>
+    </tbody>
+  </table></div>
+    </section>
+    <section class="ds-section" id="code"><h2><a href="#code">Code</a></h2>
+<pre><code>&lt;div role=&quot;group&quot; aria-label=&quot;Working days&quot; class=&quot;cluster&quot;&gt;
+  &lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Mon&lt;/button&gt;
+  &lt;button class=&quot;chip chip--day&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Sat&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;span class=&quot;chip&quot;&gt;Out this week
+  &lt;button class=&quot;remove&quot; type=&quot;button&quot; aria-label=&quot;Remove filter: Out this week&quot;&gt;
+    &lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;…&lt;/svg&gt;&lt;/button&gt;&lt;/span&gt;</code></pre>
+<table class="ds-table"><thead><tr><th scope="col">Class / attribute</th><th scope="col">Effect</th></tr></thead><tbody>
+    <tr><td><code>.chip</code></td><td>Pill button, 32px tall.</td></tr>
+    <tr><td><code>.chip--day</code></td><td>Wider, medium-radius chip for weekdays.</td></tr>
+    <tr><td><code>aria-pressed="true"</code> <code>aria-selected="true"</code> <code>data-state="selected"</code></td><td>Selected look.</td></tr>
+    <tr><td><code>.chip .remove</code></td><td>Trailing close button.</td></tr>
+    <tr><td><code>disabled</code></td><td>Not focusable; no visual change in the kit.</td></tr>
+    <tr><td><code>data-state="hover|focus"</code></td><td>Documentation only.</td></tr>
+  </tbody></table>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<p>Extracted from these mocks:</p>
+<ul><li><a href="../../mocks/pages/settings/default.html">pages/settings/default</a> (Working days group of seven day chips)</li><li><a href="../../mocks/dialogs/edit-working-days/default.html">dialogs/edit-working-days/default</a> (day chips in the dialog)</li><li><a href="../../mocks/dialogs/add-holiday/default.html">dialogs/add-holiday/default</a> (day chips in a dialog)</li><li><a href="../../mocks/dialogs/edit-working-days/busy.html">dialogs/edit-working-days/busy</a> (disabled day chips while saving)</li></ul>
+<p>Drift fixed during extraction: Only <code>.chip--day</code> is used by the mocks; the filter and removable forms are kit components for the calendar's filtering. <b>Gap:</b> <code>.chip:disabled</code> has no style, so the mock's disabled day chips look enabled (busy dialogs rely on the dialog's own loading cue). <code>.chip:focus-visible</code> relies on the global ring rather than a chip rule. <code>.chip[data-state="selected"]</code> exists but no real page uses it.</p>
+    </section>
+    <footer class="ds-footer"><span>Greenlit design system · extracted from <a href="../../mocks/index.html">docs/mocks</a></span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

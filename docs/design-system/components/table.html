@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Table — Greenlit design system</title>
+<meta name="description" content="Tables compare the same facts across people: allowance, days used, days left. Sticky header, numeric columns, optional sort and row actions, loading and empty versions.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">Greenlit DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details><summary>Components · Actions</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/segmented-control.html">Segmented control</a></li>
+    </ul></details>
+    <details><summary>Components · Inputs</summary><ul>
+      <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/counter.html">Counter</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+    </ul></details>
+    <details><summary>Components · Navigation</summary><ul>
+      <li><a href="../components/app-nav.html">App navigation</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb and back link</a></li>
+      <li><a href="../components/pagination.html">Pagination</a></li>
+      <li><a href="../components/period-nav.html">Period navigation</a></li>
+      <li><a href="../components/settings-nav.html">Settings navigation</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+    </ul></details>
+    <details><summary>Components · Containers and overlays</summary><ul>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/divider.html">Divider</a></li>
+      <li><a href="../components/drawer.html">Drawer</a></li>
+      <li><a href="../components/layout-primitives.html">Layout primitives</a></li>
+      <li><a href="../components/tooltip.html">Tooltip</a></li>
+    </ul></details>
+    <details><summary>Components · Data display</summary><ul>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/badge.html">Badge and status</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/member-list.html">Member list</a></li>
+      <li><a href="../components/request-row.html">Request row</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+    </ul></details>
+    <details><summary>Components · Feedback</summary><ul>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress-bar.html">Progress bar</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/spinner.html">Spinner</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+    </ul></details>
+    <details><summary>Components · Sheet and brand</summary><ul>
+      <li><a href="../components/legend.html">Legend</a></li>
+      <li><a href="../components/logo-lockup.html">Logo lockup</a></li>
+      <li><a href="../components/month-mini.html">Month mini</a></li>
+      <li><a href="../components/selection-bar.html">Selection bar</a></li>
+      <li><a href="../components/sheet-cell.html">Sheet cell</a></li>
+      <li><a href="../components/team-grid.html">Team grid</a></li>
+      <li><a href="../components/year-grid.html">Year grid</a></li>
+    </ul></details>
+    <details><summary>Patterns</summary><ul>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/data-tables-and-lists.html">Data tables and lists</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/navigation-and-page-structure.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/sheet-interaction.html">Sheet interaction</a></li>
+    </ul></details>
+  </nav>
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Component · Data display</p>
+      <h1>Table</h1>
+      <p class="ds-lead">Tables compare the same facts across people: allowance, days used, days left. Sticky header, numeric columns, optional sort and row actions, loading and empty versions.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span><span class="ds-pill">Since v1.0</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#variants">Variants</a></li><li><a href="#sizes">Sizes</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#theming">Theming</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don&#x27;t</a></li><li><a href="#tokens">Tokens</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>Use a <b>table</b> when readers scan down a column to compare values for several members: the year page's allowance summary is the model. Each row is one <b>member</b>; each column is one fact about them. A table is a real <code>&lt;table&gt;</code> with a caption and column headers, so assistive technology can announce "Left, column 5" while a reader moves across cells.</p>
+<p>The month <i>sheet</i> is not a table component: it is the <a href="team-grid.html">team grid</a>, which uses its own cells and keyboard model. A list of things that each need a few lines and actions (requests, members) is a <a href="list.html">list</a> or a <a href="request-row.html">request row</a>, which reflow on a phone where a table can only scroll.</p>
+    </section>
+    <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
+<div class="ds-anatomy">
+    <figure class="ds-anatomy__figure">
+      <div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Row state</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Left</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead><tbody><tr data-state="hover"><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">AR</span>Ana Ruiz</span></td><td class="num">6</td><td><span class="row-actions"><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Edit Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m5 3 14 7-6 2-2 6z"/></svg></button><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Remove Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></span></td></tr></tbody></table></div>
+      <span class="ds-callout" style="left: 2%; top: 4%;" aria-hidden="true">1</span>
+      <span class="ds-callout" style="left: 40%; top: 20%;" aria-hidden="true">2</span>
+      <span class="ds-callout" style="left: 12%; top: 62%;" aria-hidden="true">3</span>
+      <span class="ds-callout" style="left: 86%; top: 62%;" aria-hidden="true">4</span>
+    </figure>
+    <ol class="ds-anatomy__list">
+      <li><div><b>Wrap</b><small><code>.table-wrap</code> clips the radius, draws the border and scrolls horizontally when the table is wider than its container.</small></div></li>
+      <li><div><b>Column header</b><small><code>&lt;th scope="col"&gt;</code> on a sunken background, label type, sticky. <code>.num</code> right-aligns numeric columns.</small></div></li>
+      <li><div><b>Name cell</b><small>The member: avatar plus name, a link when it opens the person page.</small></div></li>
+      <li><div><b>Row actions</b><small><code>.row-actions</code>: icon buttons revealed on hover or focus. A summary table instead ends with a <code>.usage-bar</code> whose <code>role="img"</code> label carries the numbers.</small></div></li>
+    </ol>
+  </div>
+    </section>
+    <section class="ds-section" id="variants"><h2><a href="#variants">Variants</a></h2>
+<p>One table, with a handful of cell conventions. The class on the table is <code>.table</code>; <code>.summary-table</code> only switches off wrapping and sizes the usage column.</p>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="table-wrap" style="position: relative;"><table class="table summary-table"><caption class="visually-hidden">Allowance in 2026</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Allowance</th><th scope="col" class="num">Used</th><th scope="col" class="num">Requested</th><th scope="col" class="num">Left</th><th scope="col"><span class="visually-hidden">Usage</span></th></tr></thead><tbody><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">AR</span>Ana Ruiz</span></td><td class="num">28</td><td class="num">17</td><td class="num">5</td><td class="num" style="font-weight: var(--font-weight-semibold);">6</td><td class="usage-cell"><div class="usage-bar" role="img" aria-label="17 of 28 days taken, 5 requested"><span class="usage-bar__seg" data-status="confirmed" style="--value: 60.7%"></span><span class="usage-bar__seg" data-status="requested" style="--value: 17.9%"></span></div></td></tr><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">MC</span>Maya Chen</span></td><td class="num">25</td><td class="num">20</td><td class="num">0</td><td class="num" style="font-weight: var(--font-weight-semibold);">5</td><td class="usage-cell"><div class="usage-bar" role="img" aria-label="20 of 25 days taken, 0 requested"><span class="usage-bar__seg" data-status="confirmed" style="--value: 80.0%"></span><span class="usage-bar__seg" data-status="requested" style="--value: 0.0%"></span></div></td></tr><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">FM</span>Finn Murphy</span></td><td class="num">23</td><td class="num">5</td><td class="num">0</td><td class="num" style="font-weight: var(--font-weight-semibold);">18</td><td class="usage-cell"><div class="usage-bar" role="img" aria-label="5 of 23 days taken, 0 requested"><span class="usage-bar__seg" data-status="confirmed" style="--value: 21.7%"></span><span class="usage-bar__seg" data-status="requested" style="--value: 0.0%"></span></div></td></tr><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">DP</span>Dev Patel</span></td><td class="num">20</td><td class="num">16</td><td class="num">6</td><td class="num" style="font-weight: var(--font-weight-semibold);">-2</td><td class="usage-cell"><div class="usage-bar" role="img" aria-label="16 of 20 days taken, 6 requested"><span class="usage-bar__seg" data-status="confirmed" style="--value: 80.0%"></span><span class="usage-bar__seg" data-status="requested" style="--value: 30.0%"></span></div></td></tr></tbody></table></div></div>
+  <div class="ds-example__caption"><span>Summary table: avatar and name, numeric columns (<code>.num</code>, tabular figures), then a usage bar. The bar never carries the numbers alone: its label and the columns beside it say the same thing.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;table-wrap&quot; style=&quot;position: relative;&quot;&gt;&lt;table class=&quot;table summary-table&quot;&gt;&lt;caption class=&quot;visually-hidden&quot;&gt;Allowance in 2026&lt;/caption&gt;&lt;thead&gt;&lt;tr&gt;&lt;th scope=&quot;col&quot;&gt;Person&lt;/th&gt;&lt;th scope=&quot;col&quot; class=&quot;num&quot;&gt;Allowance&lt;/th&gt;&lt;th scope=&quot;col&quot; class=&quot;num&quot;&gt;Used&lt;/th&gt;&lt;th scope=&quot;col&quot; class=&quot;num&quot;&gt;Requested&lt;/th&gt;&lt;th scope=&quot;col&quot; class=&quot;num&quot;&gt;Left&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;&lt;span class=&quot;visually-hidden&quot;&gt;Usage&lt;/span&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;&lt;span class=&quot;cluster&quot; style=&quot;gap: var(--space-2); flex-wrap: nowrap;&quot;&gt;&lt;span class=&quot;avatar avatar--sm&quot; aria-hidden=&quot;true&quot;&gt;AR&lt;/span&gt;Ana Ruiz&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;28&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;17&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;5&lt;/td&gt;&lt;td class=&quot;num&quot; style=&quot;font-weight: var(--font-weight-semibold);&quot;&gt;6&lt;/td&gt;&lt;td class=&quot;usage-cell&quot;&gt;&lt;div class=&quot;usage-bar&quot; role=&quot;img&quot; aria-label=&quot;17 of 28 days taken, 5 requested&quot;&gt;&lt;span class=&quot;usage-bar__seg&quot; data-status=&quot;confirmed&quot; style=&quot;--value: 60.7%&quot;&gt;&lt;/span&gt;&lt;span class=&quot;usage-bar__seg&quot; data-status=&quot;requested&quot; style=&quot;--value: 17.9%&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span class=&quot;cluster&quot; style=&quot;gap: var(--space-2); flex-wrap: nowrap;&quot;&gt;&lt;span class=&quot;avatar avatar--sm&quot; aria-hidden=&quot;true&quot;&gt;MC&lt;/span&gt;Maya Chen&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;25&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;20&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;0&lt;/td&gt;&lt;td class=&quot;num&quot; style=&quot;font-weight: var(--font-weight-semibold);&quot;&gt;5&lt;/td&gt;&lt;td class=&quot;usage-cell&quot;&gt;&lt;div class=&quot;usage-bar&quot; role=&quot;img&quot; aria-label=&quot;20 of 25 days taken, 0 requested&quot;&gt;&lt;span class=&quot;usage-bar__seg&quot; data-status=&quot;confirmed&quot; style=&quot;--value: 80.0%&quot;&gt;&lt;/span&gt;&lt;span class=&quot;usage-bar__seg&quot; data-status=&quot;requested&quot; style=&quot;--value: 0.0%&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span class=&quot;cluster&quot; style=&quot;gap: var(--space-2); flex-wrap: nowrap;&quot;&gt;&lt;span class=&quot;avatar avatar--sm&quot; aria-hidden=&quot;true&quot;&gt;FM&lt;/span&gt;Finn Murphy&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;23&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;5&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;0&lt;/td&gt;&lt;td class=&quot;num&quot; style=&quot;font-weight: var(--font-weight-semibold);&quot;&gt;18&lt;/td&gt;&lt;td class=&quot;usage-cell&quot;&gt;&lt;div class=&quot;usage-bar&quot; role=&quot;img&quot; aria-label=&quot;5 of 23 days taken, 0 requested&quot;&gt;&lt;span class=&quot;usage-bar__seg&quot; data-status=&quot;confirmed&quot; style=&quot;--value: 21.7%&quot;&gt;&lt;/span&gt;&lt;span class=&quot;usage-bar__seg&quot; data-status=&quot;requested&quot; style=&quot;--value: 0.0%&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span class=&quot;cluster&quot; style=&quot;gap: var(--space-2); flex-wrap: nowrap;&quot;&gt;&lt;span class=&quot;avatar avatar--sm&quot; aria-hidden=&quot;true&quot;&gt;DP&lt;/span&gt;Dev Patel&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;20&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;16&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;6&lt;/td&gt;&lt;td class=&quot;num&quot; style=&quot;font-weight: var(--font-weight-semibold);&quot;&gt;-2&lt;/td&gt;&lt;td class=&quot;usage-cell&quot;&gt;&lt;div class=&quot;usage-bar&quot; role=&quot;img&quot; aria-label=&quot;16 of 20 days taken, 6 requested&quot;&gt;&lt;span class=&quot;usage-bar__seg&quot; data-status=&quot;confirmed&quot; style=&quot;--value: 80.0%&quot;&gt;&lt;/span&gt;&lt;span class=&quot;usage-bar__seg&quot; data-status=&quot;requested&quot; style=&quot;--value: 30.0%&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Row actions</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Members with row actions</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Left</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead><tbody><tr data-state="hover"><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">AR</span>Ana Ruiz</span></td><td class="num">6</td><td><span class="row-actions"><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Edit Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m5 3 14 7-6 2-2 6z"/></svg></button><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Remove Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></span></td></tr><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">MC</span>Maya Chen</span></td><td class="num">5</td><td><span class="row-actions"><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Edit Maya Chen"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m5 3 14 7-6 2-2 6z"/></svg></button><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Remove Maya Chen"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></span></td></tr></tbody></table></div></div>
+  <div class="ds-example__caption"><span><code>.row-actions</code> are hidden until the row is hovered or contains focus, and always shown on devices without hover (<code>@media (hover: none)</code>). Icon buttons carry the member's name in their label.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;table-wrap&quot; style=&quot;position: relative;&quot;&gt;&lt;table class=&quot;table&quot;&gt;&lt;caption class=&quot;visually-hidden&quot;&gt;Members with row actions&lt;/caption&gt;&lt;thead&gt;&lt;tr&gt;&lt;th scope=&quot;col&quot;&gt;Person&lt;/th&gt;&lt;th scope=&quot;col&quot; class=&quot;num&quot;&gt;Left&lt;/th&gt;&lt;th scope=&quot;col&quot;&gt;&lt;span class=&quot;visually-hidden&quot;&gt;Actions&lt;/span&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;&lt;span class=&quot;cluster&quot; style=&quot;gap: var(--space-2); flex-wrap: nowrap;&quot;&gt;&lt;span class=&quot;avatar avatar--sm&quot; aria-hidden=&quot;true&quot;&gt;AR&lt;/span&gt;Ana Ruiz&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;6&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;row-actions&quot;&gt;&lt;button class=&quot;btn btn--icon btn--ghost btn--sm&quot; type=&quot;button&quot; aria-label=&quot;Edit Ana Ruiz&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;m5 3 14 7-6 2-2 6z&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;button class=&quot;btn btn--icon btn--ghost btn--sm&quot; type=&quot;button&quot; aria-label=&quot;Remove Ana Ruiz&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span class=&quot;cluster&quot; style=&quot;gap: var(--space-2); flex-wrap: nowrap;&quot;&gt;&lt;span class=&quot;avatar avatar--sm&quot; aria-hidden=&quot;true&quot;&gt;MC&lt;/span&gt;Maya Chen&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;5&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;row-actions&quot;&gt;&lt;button class=&quot;btn btn--icon btn--ghost btn--sm&quot; type=&quot;button&quot; aria-label=&quot;Edit Maya Chen&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;m5 3 14 7-6 2-2 6z&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;button class=&quot;btn btn--icon btn--ghost btn--sm&quot; type=&quot;button&quot; aria-label=&quot;Remove Maya Chen&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Sortable columns</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Sort header, ascending</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num" aria-sort="ascending"><button type="button">Days left</button></th></tr></thead><tbody><tr><td>Ana Ruiz</td><td class="num">6</td></tr></tbody></table></div></div>
+  <div class="ds-example__caption"><span>A header that sorts holds a <code>&lt;button&gt;</code> inside the <code>&lt;th&gt;</code> and sets <code>aria-sort</code>; the arrow glyph is drawn by CSS from the attribute.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;table-wrap&quot; style=&quot;position: relative;&quot;&gt;&lt;table class=&quot;table&quot;&gt;&lt;caption class=&quot;visually-hidden&quot;&gt;Sort header, ascending&lt;/caption&gt;&lt;thead&gt;&lt;tr&gt;&lt;th scope=&quot;col&quot;&gt;Person&lt;/th&gt;&lt;th scope=&quot;col&quot; class=&quot;num&quot; aria-sort=&quot;ascending&quot;&gt;&lt;button type=&quot;button&quot;&gt;Days left&lt;/button&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;Ana Ruiz&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;6&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;</code></pre></details>
+</div>
+    </section>
+    <section class="ds-section" id="sizes" data-na="A table has one density. Spacing comes from the cell padding tokens; a denser variant is a new design decision, not a size."><h2><a href="#sizes">Sizes</a></h2>
+      <p class="ds-na">Not applicable: A table has one density. Spacing comes from the cell padding tokens; a denser variant is a new design decision, not a size.</p>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<p>Row states are shown with <code>data-state</code>; real pages use <code>:hover</code> and <code>aria-selected</code>. The row actions fade in with the hover state.</p>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Part</th><th scope="col">Default</th><th scope="col">Hover</th><th scope="col">Selected</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Row</th><td><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Row state</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Left</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead><tbody><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">AR</span>Ana Ruiz</span></td><td class="num">6</td><td><span class="row-actions"><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Edit Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m5 3 14 7-6 2-2 6z"/></svg></button><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Remove Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></span></td></tr></tbody></table></div></td><td><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Row state</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Left</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead><tbody><tr data-state="hover"><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">AR</span>Ana Ruiz</span></td><td class="num">6</td><td><span class="row-actions"><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Edit Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m5 3 14 7-6 2-2 6z"/></svg></button><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Remove Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></span></td></tr></tbody></table></div></td><td><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Row state</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Left</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead><tbody><tr aria-selected="true"><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">AR</span>Ana Ruiz</span></td><td class="num">6</td><td><span class="row-actions"><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Edit Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m5 3 14 7-6 2-2 6z"/></svg></button><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Remove Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></span></td></tr></tbody></table></div></td></tr>
+    </tbody>
+  </table></div>
+<h3>Sorting</h3>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Part</th><th scope="col">Unsorted</th><th scope="col">Ascending</th><th scope="col">Descending</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Sortable header</th><td><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Sort header, unsorted</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num"><button type="button">Left</button></th></tr></thead><tbody><tr><td>Ana Ruiz</td><td class="num">6</td></tr></tbody></table></div></td><td><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Sort header, ascending</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num" aria-sort="ascending"><button type="button">Left</button></th></tr></thead><tbody><tr><td>Ana Ruiz</td><td class="num">6</td></tr></tbody></table></div></td><td><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Sort header, descending</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num" aria-sort="descending"><button type="button">Left</button></th></tr></thead><tbody><tr><td>Ana Ruiz</td><td class="num">6</td></tr></tbody></table></div></td></tr>
+    </tbody>
+  </table></div>
+<h3>Loading</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="table-wrap" style="position: relative;"><table class="table" aria-busy="true"><caption class="visually-hidden">Allowance in 2026, loading</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Allowance</th><th scope="col" class="num">Left</th></tr></thead><tbody><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="skeleton skeleton--circle" aria-hidden="true" style="width: var(--space-8); height: var(--space-8);"></span><span class="skeleton skeleton--text" aria-hidden="true" style="width: var(--space-16);"></span></span></td><td class="num"><span class="skeleton skeleton--text" aria-hidden="true" style="width: var(--space-16);"></span></td><td class="num"><span class="skeleton skeleton--text" aria-hidden="true" style="width: var(--space-16);"></span></td></tr><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="skeleton skeleton--circle" aria-hidden="true" style="width: var(--space-8); height: var(--space-8);"></span><span class="skeleton skeleton--text" aria-hidden="true" style="width: var(--space-16);"></span></span></td><td class="num"><span class="skeleton skeleton--text" aria-hidden="true" style="width: var(--space-16);"></span></td><td class="num"><span class="skeleton skeleton--text" aria-hidden="true" style="width: var(--space-16);"></span></td></tr><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="skeleton skeleton--circle" aria-hidden="true" style="width: var(--space-8); height: var(--space-8);"></span><span class="skeleton skeleton--text" aria-hidden="true" style="width: var(--space-16);"></span></span></td><td class="num"><span class="skeleton skeleton--text" aria-hidden="true" style="width: var(--space-16);"></span></td><td class="num"><span class="skeleton skeleton--text" aria-hidden="true" style="width: var(--space-16);"></span></td></tr></tbody></table></div></div>
+  <div class="ds-example__caption"><span>The table keeps its caption and headers and sets <code>aria-busy="true"</code>; each cell shows a <a href="skeleton.html">skeleton</a>. Skeletons are <code>aria-hidden</code>.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;table-wrap&quot; style=&quot;position: relative;&quot;&gt;&lt;table class=&quot;table&quot; aria-busy=&quot;true&quot;&gt;&lt;caption class=&quot;visually-hidden&quot;&gt;Allowance in 2026, loading&lt;/caption&gt;&lt;thead&gt;&lt;tr&gt;&lt;th scope=&quot;col&quot;&gt;Person&lt;/th&gt;&lt;th scope=&quot;col&quot; class=&quot;num&quot;&gt;Allowance&lt;/th&gt;&lt;th scope=&quot;col&quot; class=&quot;num&quot;&gt;Left&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;&lt;span class=&quot;cluster&quot; style=&quot;gap: var(--space-2); flex-wrap: nowrap;&quot;&gt;&lt;span class=&quot;skeleton skeleton--circle&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-8); height: var(--space-8);&quot;&gt;&lt;/span&gt;&lt;span class=&quot;skeleton skeleton--text&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-16);&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;&lt;span class=&quot;skeleton skeleton--text&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-16);&quot;&gt;&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;&lt;span class=&quot;skeleton skeleton--text&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-16);&quot;&gt;&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span class=&quot;cluster&quot; style=&quot;gap: var(--space-2); flex-wrap: nowrap;&quot;&gt;&lt;span class=&quot;skeleton skeleton--circle&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-8); height: var(--space-8);&quot;&gt;&lt;/span&gt;&lt;span class=&quot;skeleton skeleton--text&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-16);&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;&lt;span class=&quot;skeleton skeleton--text&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-16);&quot;&gt;&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;&lt;span class=&quot;skeleton skeleton--text&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-16);&quot;&gt;&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span class=&quot;cluster&quot; style=&quot;gap: var(--space-2); flex-wrap: nowrap;&quot;&gt;&lt;span class=&quot;skeleton skeleton--circle&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-8); height: var(--space-8);&quot;&gt;&lt;/span&gt;&lt;span class=&quot;skeleton skeleton--text&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-16);&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;&lt;span class=&quot;skeleton skeleton--text&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-16);&quot;&gt;&lt;/span&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;&lt;span class=&quot;skeleton skeleton--text&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-16);&quot;&gt;&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Empty</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Allowance in 2026</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Allowance</th><th scope="col" class="num">Left</th></tr></thead><tbody></tbody></table><div class="empty empty--compact"><h3 class="empty__title">No members yet</h3><p class="empty__text">Invite your team and their allowances will appear here.</p><div class="empty__actions"><button class="btn btn--primary btn--sm" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Invite member</button></div></div></div></div>
+  <div class="ds-example__caption"><span>No rows: keep the headers, then an <a href="empty-state.html">empty state</a> that says why and what to do.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;table-wrap&quot; style=&quot;position: relative;&quot;&gt;&lt;table class=&quot;table&quot;&gt;&lt;caption class=&quot;visually-hidden&quot;&gt;Allowance in 2026&lt;/caption&gt;&lt;thead&gt;&lt;tr&gt;&lt;th scope=&quot;col&quot;&gt;Person&lt;/th&gt;&lt;th scope=&quot;col&quot; class=&quot;num&quot;&gt;Allowance&lt;/th&gt;&lt;th scope=&quot;col&quot; class=&quot;num&quot;&gt;Left&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;div class=&quot;empty empty--compact&quot;&gt;&lt;h3 class=&quot;empty__title&quot;&gt;No members yet&lt;/h3&gt;&lt;p class=&quot;empty__text&quot;&gt;Invite your team and their allowances will appear here.&lt;/p&gt;&lt;div class=&quot;empty__actions&quot;&gt;&lt;button class=&quot;btn btn--primary btn--sm&quot; type=&quot;button&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M12 5v14M5 12h14&quot;/&gt;&lt;/svg&gt;Invite member&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Both themes</h3>
+<div class="ds-themes">
+  <div data-theme="light"><div class="ds-example__canvas" style="padding: 0;"><div class="table-wrap" style="position: relative;"><table class="table summary-table"><caption class="visually-hidden">Allowance in 2026</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Allowance</th><th scope="col" class="num">Used</th><th scope="col" class="num">Requested</th><th scope="col" class="num">Left</th><th scope="col"><span class="visually-hidden">Usage</span></th></tr></thead><tbody><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">AR</span>Ana Ruiz</span></td><td class="num">28</td><td class="num">17</td><td class="num">5</td><td class="num" style="font-weight: var(--font-weight-semibold);">6</td><td class="usage-cell"><div class="usage-bar" role="img" aria-label="17 of 28 days taken, 5 requested"><span class="usage-bar__seg" data-status="confirmed" style="--value: 60.7%"></span><span class="usage-bar__seg" data-status="requested" style="--value: 17.9%"></span></div></td></tr><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">MC</span>Maya Chen</span></td><td class="num">25</td><td class="num">20</td><td class="num">0</td><td class="num" style="font-weight: var(--font-weight-semibold);">5</td><td class="usage-cell"><div class="usage-bar" role="img" aria-label="20 of 25 days taken, 0 requested"><span class="usage-bar__seg" data-status="confirmed" style="--value: 80.0%"></span><span class="usage-bar__seg" data-status="requested" style="--value: 0.0%"></span></div></td></tr></tbody></table></div></div></div>
+  <div data-theme="dark"><div class="ds-example__canvas" style="padding: 0;"><div class="table-wrap" style="position: relative;"><table class="table summary-table"><caption class="visually-hidden">Allowance in 2026</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Allowance</th><th scope="col" class="num">Used</th><th scope="col" class="num">Requested</th><th scope="col" class="num">Left</th><th scope="col"><span class="visually-hidden">Usage</span></th></tr></thead><tbody><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">AR</span>Ana Ruiz</span></td><td class="num">28</td><td class="num">17</td><td class="num">5</td><td class="num" style="font-weight: var(--font-weight-semibold);">6</td><td class="usage-cell"><div class="usage-bar" role="img" aria-label="17 of 28 days taken, 5 requested"><span class="usage-bar__seg" data-status="confirmed" style="--value: 60.7%"></span><span class="usage-bar__seg" data-status="requested" style="--value: 17.9%"></span></div></td></tr><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">MC</span>Maya Chen</span></td><td class="num">25</td><td class="num">20</td><td class="num">0</td><td class="num" style="font-weight: var(--font-weight-semibold);">5</td><td class="usage-cell"><div class="usage-bar" role="img" aria-label="20 of 25 days taken, 0 requested"><span class="usage-bar__seg" data-status="confirmed" style="--value: 80.0%"></span><span class="usage-bar__seg" data-status="requested" style="--value: 0.0%"></span></div></td></tr></tbody></table></div></div></div>
+</div>
+<ul>
+  <li><b>Selected</b> (<code>aria-selected="true"</code> on the row) tints the row with <code>--color-accent-subtle</code>; use it only in tables that really have selection, not to highlight "this is you".</li>
+  <li><b>Focus</b> shows on the controls inside cells (links, buttons), never on the row itself.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<ul>
+  <li>The table is never reflowed into cards: <code>.table-wrap</code> scrolls horizontally (<code>overflow-x: auto</code>) and the page itself never does. At 360px the usage column (min 9rem) is the one that scrolls away first.</li>
+  <li>The header is <code>position: sticky</code> inside the wrap; give the wrap a max-height when the table is long.</li>
+  <li><code>.summary-table</code> sets <code>white-space: nowrap</code> so names and numbers never wrap awkwardly.</li>
+  <li><code>@media (hover: none)</code> shows row actions permanently, since touch has no hover.</li>
+  <li>For a phone-first list of requests or members, use <a href="request-row.html">request row</a> or <a href="member-list.html">member list</a>, which reflow.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="theming"><h2><a href="#theming">Theming</a></h2>
+<p>The table reads surface tokens only: <code>--color-bg-surface</code> for cells, <code>--color-bg-surface-sunken</code> for the header, <code>--color-border-default</code> for rules, <code>--color-bg-subtle</code> and <code>--color-accent-subtle</code> for hover and selection. Usage-bar segments take their colour from the sheet's status tokens through <code>--status-bg</code>, so confirmed and requested look the same here as on the sheet in either theme.</p>
+<pre><code>/* Denser table for a settings screen, no new component */
+.table--dense th, .table--dense td { padding-block: var(--space-2); }</code></pre>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<h3>Role and pattern</h3>
+<p>Native <code>&lt;table&gt;</code> semantics, not the ARIA grid pattern: the table is read-only and its interactive parts are ordinary links and buttons. Sortable columns follow the <a href="https://www.w3.org/WAI/ARIA/apg/patterns/table/examples/sortable-table/">APG sortable table</a> example: a button inside the column header with <code>aria-sort</code> on the <code>&lt;th&gt;</code>.</p>
+<h3>Keyboard</h3>
+<table class="ds-table ds-keys"><thead><tr><th scope="col">Key</th><th scope="col">Action</th></tr></thead><tbody>
+    <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Moves through the links and buttons in cells in reading order. The table itself is not a tab stop.</td></tr>
+    <tr><td><kbd>Enter</kbd>, <kbd>Space</kbd> on a sort header</td><td>Sorts by the column, cycling ascending, descending. Focus stays on the header button.</td></tr>
+    <tr><td><kbd>Enter</kbd> on a name link</td><td>Opens the member's page.</td></tr>
+    <tr><td>Screen-reader table commands</td><td>Move by cell and row with the header announced, because of <code>scope="col"</code>.</td></tr>
+  </tbody></table>
+<h3>Focus</h3>
+<p>Links and buttons inside cells show the shared focus ring. Row actions that are hidden at rest become visible as soon as focus enters the row (<code>:focus-within</code>), so a keyboard user never tabs onto an invisible control.</p>
+<h3>Labelling</h3>
+<p>Every table has a <code>&lt;caption&gt;</code> (visually hidden when the page heading already says it) and every header cell is <code>&lt;th scope="col"&gt;</code>. An icon-only column gets a visually hidden header ("Actions", "Usage"). Usage bars are <code>role="img"</code> with a label such as "17 of 28 days taken, 5 requested", and the numbers also sit in their own columns, so colour is never the only carrier. Icon buttons in rows name the member: "Remove Ana Ruiz".</p>
+<h3>Contrast</h3>
+<div class="ds-example__canvas ds-example__canvas--stack" style="padding: 0; gap: var(--space-2);">
+  <div class="ds-pair"><span>Cell text on surface</span><span class="ds-pair__ratio" data-contrast="--color-fg-default|--color-bg-surface" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Header label on sunken header</span><span class="ds-pair__ratio" data-contrast="--color-fg-muted|--color-bg-surface-sunken" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Cell text on hovered row</span><span class="ds-pair__ratio" data-contrast="--color-fg-default|--color-bg-subtle" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Cell text on selected row</span><span class="ds-pair__ratio" data-contrast="--color-fg-default|--color-accent-subtle" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Confirmed segment on bar track (decorative; the day counts beside the bar carry the data)</span><span class="ds-pair__ratio" data-contrast="--color-status-confirmed|--color-bg-subtle-hover" data-min="1.5"></span></div>
+</div>
+<h3>Motion</h3>
+<p>Row actions fade in over <code>--duration-fast</code>. Under <code>prefers-reduced-motion</code> the duration tokens collapse and they simply appear. Skeletons stop shimmering.</p>
+<h3>Touch</h3>
+<p>Row action buttons are small (32px) and 8px apart; on touch they are always visible, never behind a hover. A name link spans the full text height. Where a row needs larger targets, use a list.</p>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul>
+  <li>Column labels are nouns in sentence case: "Allowance", "Used", "Left". Units go in the label or caption, not in every cell.</li>
+  <li>Right-align numbers (<code>.num</code>) and use whole days: "11", not "11.0 days".</li>
+  <li>Name the table in the caption with the period: "Allowance in 2026".</li>
+  <li>A real zero is "0"; an unknown value is an en dash.</li>
+  <li>Sort order is stated in text near the table ("Sorted by days left"), not only by the header arrow.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don&#x27;t</a></h2>
+<div class="ds-dodont">
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Row with named action</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Left</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead><tbody><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">AR</span>Ana Ruiz</span></td><td class="num">6</td><td><span class="row-actions"><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Edit Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m5 3 14 7-6 2-2 6z"/></svg></button><button class="btn btn--icon btn--ghost btn--sm" type="button" aria-label="Remove Ana Ruiz"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></span></td></tr></tbody></table></div></div><figcaption>Row action buttons name the member, so a screen-reader list of buttons is unambiguous.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Rows with repeated action</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Left</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead><tbody><tr><td>Ana Ruiz</td><td class="num">6</td><td><span class="row-actions"><button class="btn btn--ghost btn--sm" type="button">Remove</button></span></td></tr><tr><td>Maya Chen</td><td class="num">5</td><td><span class="row-actions"><button class="btn btn--ghost btn--sm" type="button">Remove</button></span></td></tr></tbody></table></div></div><figcaption>Identical "Remove" buttons in every row. Out of context, nobody knows whose.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="table-wrap" style="position: relative;"><table class="table summary-table"><caption class="visually-hidden">Allowance in 2026</caption><thead><tr><th scope="col">Person</th><th scope="col" class="num">Allowance</th><th scope="col" class="num">Used</th><th scope="col" class="num">Requested</th><th scope="col" class="num">Left</th><th scope="col"><span class="visually-hidden">Usage</span></th></tr></thead><tbody><tr><td><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">AR</span>Ana Ruiz</span></td><td class="num">28</td><td class="num">17</td><td class="num">5</td><td class="num" style="font-weight: var(--font-weight-semibold);">6</td><td class="usage-cell"><div class="usage-bar" role="img" aria-label="17 of 28 days taken, 5 requested"><span class="usage-bar__seg" data-status="confirmed" style="--value: 60.7%"></span><span class="usage-bar__seg" data-status="requested" style="--value: 17.9%"></span></div></td></tr></tbody></table></div></div><figcaption>Numbers sit in right-aligned columns next to the bar, so the bar can be a summary.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="table-wrap" style="position: relative;"><table class="table"><caption class="visually-hidden">Colour only</caption><thead><tr><th scope="col">Person</th><th scope="col"><span class="visually-hidden">Usage</span></th></tr></thead><tbody><tr><td>Ana Ruiz</td><td class="usage-cell"><div class="usage-bar"><span class="usage-bar__seg" data-status="confirmed" style="--value: 61%"></span></div></td></tr></tbody></table></div></div><figcaption>A bar with no label and no numbers: the amount is only visible, not readable.</figcaption></figure>
+</div>
+    </section>
+    <section class="ds-section" id="tokens"><h2><a href="#tokens">Tokens</a></h2>
+<div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th scope="col">Part</th><th scope="col">Token</th><th scope="col">Light</th><th scope="col">Dark</th></tr></thead>
+    <tbody>
+      <tr><td>Wrap border / surface</td><td><code>--color-border-default</code> <code>--color-bg-surface</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-border-default" data-swatch></i><span data-token="--color-border-default"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-surface" data-swatch></i><span data-token="--color-bg-surface"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-border-default" data-swatch></i><span data-token="--color-border-default"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-surface" data-swatch></i><span data-token="--color-bg-surface"></span></span></td></tr>
+      <tr><td>Wrap radius</td><td><code>--radius-lg</code></td><td colspan="2"><span data-token="--radius-lg"></span></td></tr>
+      <tr><td>Header background / label</td><td><code>--color-bg-surface-sunken</code> <code>--color-fg-muted</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-surface-sunken" data-swatch></i><span data-token="--color-bg-surface-sunken"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-fg-muted" data-swatch></i><span data-token="--color-fg-muted"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-surface-sunken" data-swatch></i><span data-token="--color-bg-surface-sunken"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-fg-muted" data-swatch></i><span data-token="--color-fg-muted"></span></span></td></tr>
+      <tr><td>Row hover / selected</td><td><code>--color-bg-subtle</code> <code>--color-accent-subtle</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-subtle" data-swatch></i><span data-token="--color-bg-subtle"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-accent-subtle" data-swatch></i><span data-token="--color-accent-subtle"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-subtle" data-swatch></i><span data-token="--color-bg-subtle"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-accent-subtle" data-swatch></i><span data-token="--color-accent-subtle"></span></span></td></tr>
+      <tr><td>Cell padding</td><td><code>--space-3</code> <code>--space-4</code></td><td colspan="2"><span data-token="--space-3"></span> <span data-token="--space-4"></span></td></tr>
+      <tr><td>Cell type</td><td><code>--text-body-sm</code></td><td colspan="2"><span data-token="--text-body-sm"></span></td></tr>
+      <tr><td>Header type</td><td><code>--text-label</code></td><td colspan="2"><span data-token="--text-label"></span></td></tr>
+      <tr><td>Usage bar track</td><td><code>--color-bg-subtle-hover</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-subtle-hover" data-swatch></i><span data-token="--color-bg-subtle-hover"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-subtle-hover" data-swatch></i><span data-token="--color-bg-subtle-hover"></span></span></td></tr>
+      <tr><td>Usage segments</td><td><code>--color-status-confirmed</code> <code>--color-status-requested</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-status-confirmed" data-swatch></i><span data-token="--color-status-confirmed"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-status-requested" data-swatch></i><span data-token="--color-status-requested"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-status-confirmed" data-swatch></i><span data-token="--color-status-confirmed"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-status-requested" data-swatch></i><span data-token="--color-status-requested"></span></span></td></tr>
+      <tr><td>Row action fade</td><td><code>--duration-fast</code> <code>--ease-standard</code></td><td colspan="2"><span data-token="--duration-fast"></span> <span data-token="--ease-standard"></span></td></tr>
+    </tbody>
+  </table></div>
+    </section>
+    <section class="ds-section" id="code"><h2><a href="#code">Code</a></h2>
+<pre><code>&lt;div class=&quot;table-wrap&quot; style=&quot;position: relative;&quot;&gt;
+  &lt;table class=&quot;table summary-table&quot;&gt;
+    &lt;caption class=&quot;visually-hidden&quot;&gt;Allowance in 2026&lt;/caption&gt;
+    &lt;thead&gt;&lt;tr&gt;
+      &lt;th scope=&quot;col&quot;&gt;Person&lt;/th&gt;
+      &lt;th scope=&quot;col&quot; class=&quot;num&quot; aria-sort=&quot;ascending&quot;&gt;&lt;button type=&quot;button&quot;&gt;Left&lt;/button&gt;&lt;/th&gt;
+      &lt;th scope=&quot;col&quot;&gt;&lt;span class=&quot;visually-hidden&quot;&gt;Usage&lt;/span&gt;&lt;/th&gt;
+    &lt;/tr&gt;&lt;/thead&gt;
+    &lt;tbody&gt;&lt;tr&gt;
+      &lt;td&gt;Ana Ruiz&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;6&lt;/td&gt;
+      &lt;td class=&quot;usage-cell&quot;&gt;&lt;div class=&quot;usage-bar&quot; role=&quot;img&quot; aria-label=&quot;17 of 28 days taken, 5 requested&quot;&gt;
+        &lt;span class=&quot;usage-bar__seg&quot; data-status=&quot;confirmed&quot; style=&quot;--value: 60.7%&quot;&gt;&lt;/span&gt;
+        &lt;span class=&quot;usage-bar__seg&quot; data-status=&quot;requested&quot; style=&quot;--value: 17.9%&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;/td&gt;
+    &lt;/tr&gt;&lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</code></pre>
+<table class="ds-table"><thead><tr><th scope="col">Class / attribute</th><th scope="col">Effect</th></tr></thead><tbody>
+    <tr><td><code>.table-wrap</code></td><td>Border, radius, horizontal scroll.</td></tr>
+    <tr><td><code>.table</code></td><td>Table type, padding, sticky header, hover.</td></tr>
+    <tr><td><code>.num</code></td><td>On <code>th</code>/<code>td</code>: right-aligned tabular figures.</td></tr>
+    <tr><td><code>tr[aria-selected="true"]</code></td><td>Selected row tint.</td></tr>
+    <tr><td><code>th[aria-sort]</code></td><td>Sort header; arrow drawn for <code>ascending</code> / <code>descending</code>.</td></tr>
+    <tr><td><code>.row-actions</code></td><td>Hidden until row hover or focus; always shown without hover.</td></tr>
+    <tr><td><code>.summary-table</code> <code>.usage-cell</code></td><td>No wrapping; usage column width.</td></tr>
+    <tr><td><code>.usage-bar</code> <code>.usage-bar__seg</code></td><td>Stacked segments; width from <code>--value</code>, colour from <code>data-status</code>.</td></tr>
+    <tr><td><code>aria-busy="true"</code></td><td>On the table while loading.</td></tr>
+  </tbody></table>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<p>Extracted from these mocks:</p>
+<ul><li><a href="../../mocks/pages/year/default.html">pages/year/default</a> (allowance summary table with usage bars)</li><li><a href="../../mocks/pages/year/sorted.html">pages/year/sorted</a> (sort toggle and re-ordered rows)</li><li><a href="../../mocks/pages/year/loading.html">pages/year/loading</a> (skeleton rows)</li><li><a href="../../mocks/pages/year/empty.html">pages/year/empty</a> (empty state)</li><li><a href="../../mocks/pages/year/member.html">pages/year/member</a> (member view of the same table)</li></ul>
+<p>Drift fixed during extraction: <b>Gap:</b> <code>.table-wrap</code> has overflow but no <code>position: relative</code>, so the absolutely positioned <code>.visually-hidden</code> header spans escape the clip and widen the page at 360px; these examples add <code>position: relative</code> inline, and the real fix is one declaration on <code>.table-wrap</code>. <code>th[aria-sort]</code></code> and <code>.row-actions</code> exist in the kit CSS but no mock uses them: the year page sorts with an <code>aria-pressed</code> toggle button above the table ("Sort by days left"). Both are documented; the toggle is what ships today. The selected-row style is likewise documented from the CSS only. In <code>.table th[aria-sort] button</code> the <code>all: unset</code> also removes the default focus outline source, so the shared <code>:focus-visible</code> ring is what keeps it visible.</p>
+    </section>
+    <footer class="ds-footer"><span>Greenlit design system · extracted from <a href="../../mocks/index.html">docs/mocks</a></span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

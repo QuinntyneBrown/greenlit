@@ -1,0 +1,12 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Reset a forgotten password
+
+Person(visitor, "Visitor", "A person who is not signed in")
+System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacation spreadsheet")
+System_Ext(email, "Email provider", "Delivers invitation, reset and notification emails")
+
+Rel(visitor, greenlit, "Resets password with")
+Rel(greenlit, email, "Sends email via", "SMTP <TO SUPPLY>")
+@enduml

@@ -1,0 +1,52 @@
+@startuml
+title UML sequence behaviour — Join the team from an invitation
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Invitee" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "AcceptInvitePage" as page
+  participant "HttpInvitationService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "InvitationsController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "GetInvitationQueryHandler" as get
+  participant "AcceptInvitationCommandHandler" as accept
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> page : Open invitation link
+page -> client : get(token)
+client -> ctrl : GET /api/invitations/{token}
+ctrl -> get : Send GetInvitationQuery
+get -> db : Load Invitation, Team, manager
+alt open
+  ctrl --> client : 200 team name, manager, email
+  page --> actor : "Join Design team", email pre-filled (L2-004 AC1, AC2)
+  actor -> page : Name, password, confirmation, "Join the team"
+  page -> client : accept(token, name, password)
+  client -> ctrl : POST /api/invitations/{token}/accept
+  ctrl -> accept : Send AcceptInvitationCommand
+  accept -> db : Create User, set TeamMember.UserId, stamp AcceptedUtc
+  accept --> ctrl : SessionDto
+  ctrl --> client : 200 SessionDto
+  page --> actor : Calendar, own row keeps its days (L2-004 AC5)
+else expired or accepted
+  ctrl --> client : 410 ProblemDetails, code invitation_expired
+  page --> actor : "This invitation has expired" (L2-004 AC4)
+end
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Manage the account
+
+Person(person, "Team user", "A manager or member of a team")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(page, "AccountPage", "Angular page", "Profile, password, sign out")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "AccountController", "ASP.NET Core controller", "/api/account")
+  Component(profile, "UpdateProfileCommandHandler", "MediatR handler", "Saves the profile")
+  Component(pwd, "ChangePasswordCommandHandler", "MediatR handler", "Changes the password")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Users")
+}
+
+Rel(person, page, "Edits")
+Rel(page, ctrl, "GET/PUT /api/account", "JSON/HTTPS")
+Rel(ctrl, profile, "Sends UpdateProfileCommand")
+Rel(ctrl, pwd, "Sends ChangePasswordCommand")
+Rel(profile, db, "Updates user", "EF Core")
+Rel(pwd, db, "Updates hash", "EF Core")
+@enduml

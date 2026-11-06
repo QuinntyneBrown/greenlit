@@ -1,0 +1,25 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Accept an invitation
+
+Person(invitee, "Invitee", "A person invited to a team by email")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(page, "AcceptInvitePage", "Angular page", "Join form and expired state")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "InvitationsController", "ASP.NET Core controller", "/api/invitations/{token}")
+  Component(get, "GetInvitationQueryHandler", "MediatR handler", "Reads the invitation")
+  Component(accept, "AcceptInvitationCommandHandler", "MediatR handler", "Creates the account")
+  Component(tokens, "ITokenService", "Application abstraction", "Issues the session")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Invitations, users, members")
+}
+
+Rel(invitee, page, "Opens link")
+Rel(page, ctrl, "GET then POST accept", "JSON/HTTPS")
+Rel(ctrl, get, "Sends GetInvitationQuery")
+Rel(ctrl, accept, "Sends AcceptInvitationCommand")
+Rel(get, db, "Reads", "EF Core")
+Rel(accept, db, "Writes user and member", "EF Core")
+Rel(accept, tokens, "Issues session")
+@enduml

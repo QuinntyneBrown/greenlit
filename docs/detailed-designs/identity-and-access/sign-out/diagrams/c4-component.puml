@@ -1,0 +1,24 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Use the account menu and sign out
+
+Person(person, "Team user", "A manager or member of a team")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(menu, "UserMenu", "gl-user-menu", "Account menu")
+  Component(dialog, "SignOutDialog", "CDK Dialog", "Confirms sign-out")
+  Component(store, "SessionStore", "Angular service", "Session token and return URL")
+  Component(expired, "SessionExpiredPage", "Angular page", "Sign in again")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "AuthController", "ASP.NET Core controller", "POST /api/auth/sign-out")
+  Component(jwt, "JwtBearer authentication", "ASP.NET Core middleware", "Rejects expired tokens")
+}
+
+Rel(person, menu, "Opens")
+Rel(menu, dialog, "Opens on Sign out")
+Rel(dialog, ctrl, "POST /api/auth/sign-out", "JSON/HTTPS")
+Rel(dialog, store, "Clears session")
+Rel(jwt, store, "401 session_expired")
+Rel(store, expired, "Navigates with return URL")
+@enduml

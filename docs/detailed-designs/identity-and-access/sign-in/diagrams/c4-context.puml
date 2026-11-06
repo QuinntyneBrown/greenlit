@@ -1,0 +1,10 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Sign in
+
+Person(visitor, "Visitor", "A person who is not signed in")
+System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacation spreadsheet")
+
+Rel(visitor, greenlit, "Signs in to")
+@enduml

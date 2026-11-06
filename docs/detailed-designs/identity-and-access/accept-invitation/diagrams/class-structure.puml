@@ -1,0 +1,59 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Accept an invitation
+
+class User <<exists>> {
+  +Guid Id
+  +string Email
+  +string DisplayName
+  +string PasswordHash
+  +UserRole Role
+  +DateTimeOffset CreatedUtc
+}
+enum UserRole <<exists>> {
+  Member
+  Manager
+  Admin
+}
+User --> UserRole : has
+
+class TeamMember <<exists>> {
+  +Guid Id
+  +Guid TeamId
+  +string Name
+  +string? Email
+  +Guid? UserId
+  +int SortOrder
+}
+class Invitation <<new>> {
+  +Guid Id
+  +Guid TeamMemberId
+  +string Email
+  +string TokenHash
+  +DateTimeOffset SentUtc
+  +DateTimeOffset ExpiresUtc
+  +DateTimeOffset? AcceptedUtc
+  +IsOpen(now: DateTimeOffset): bool
+}
+class AcceptInvitationCommand <<new>> {
+  +string Token
+  +string Name
+  +string Password
+  +string ConfirmPassword
+}
+class AcceptInvitationCommandHandler <<new>>
+TeamMember "1" --> "*" Invitation : invited by
+TeamMember --> User : UserId once accepted
+AcceptInvitationCommandHandler ..> AcceptInvitationCommand : handles
+AcceptInvitationCommandHandler --> Invitation : accepts
+AcceptInvitationCommandHandler ..> User : creates
+@enduml

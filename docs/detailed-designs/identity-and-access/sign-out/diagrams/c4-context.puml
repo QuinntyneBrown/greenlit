@@ -1,0 +1,10 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Use the account menu and sign out
+
+Person(person, "Team user", "A manager or member of a team")
+System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacation spreadsheet")
+
+Rel(person, greenlit, "Signs out of")
+@enduml

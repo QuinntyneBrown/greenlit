@@ -1,0 +1,52 @@
+@startuml
+title UML sequence behaviour — Request a reset link
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Visitor" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "ForgotPasswordPage" as page
+  participant "HttpAuthService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "AuthController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "RequestPasswordResetCommandHandler" as handler
+  participant "IEmailSender" as mail
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+participant "Email provider" as email
+actor -> page : Enter email, press "Send reset link"
+page -> client : requestPasswordReset(email)
+client -> ctrl : POST /api/auth/password-reset
+ctrl -> handler : Send RequestPasswordResetCommand
+handler -> db : Load User by email
+opt account exists
+  handler -> db : Save PasswordResetToken (hash, expires in 1 hour)
+  handler -> mail : Send reset link
+  mail -> email : Deliver
+  email --> mail : Accepted or failed
+end
+alt sent, or no account
+  handler --> ctrl : Accepted
+  ctrl --> client : 202
+  page --> actor : "Check your email", link works for one hour (L2-002 AC2)
+else delivery failed
+  ctrl --> client : 503 ProblemDetails, code email_failed
+  page --> actor : "We couldn't send the email" (L2-002 AC3)
+end
+@enduml

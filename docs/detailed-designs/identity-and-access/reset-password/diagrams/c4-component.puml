@@ -1,0 +1,30 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Reset a forgotten password
+
+Person(visitor, "Visitor", "A person who is not signed in")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(forgot, "ForgotPasswordPage", "Angular page", "Requests a link")
+  Component(reset, "ResetPasswordPage", "Angular page", "Sets the new password")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "AuthController", "ASP.NET Core controller", "Password-reset endpoints")
+  Component(req, "RequestPasswordResetCommandHandler", "MediatR handler", "Issues and emails a token")
+  Component(conf, "ResetPasswordCommandHandler", "MediatR handler", "Consumes the token")
+  Component(mail, "IEmailSender", "Application abstraction", "Sends the reset email")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Users, reset tokens")
+}
+System_Ext(email, "Email provider", "Delivers invitation, reset and notification emails")
+
+Rel(visitor, forgot, "Enters email")
+Rel(visitor, reset, "Opens link, enters password")
+Rel(forgot, ctrl, "POST /api/auth/password-reset", "JSON/HTTPS")
+Rel(reset, ctrl, "POST /api/auth/password-reset/confirm", "JSON/HTTPS")
+Rel(ctrl, req, "Sends RequestPasswordResetCommand")
+Rel(ctrl, conf, "Sends ResetPasswordCommand")
+Rel(req, mail, "Sends link")
+Rel(req, db, "Saves token hash", "EF Core")
+Rel(conf, db, "Reads token, updates user", "EF Core")
+Rel(mail, email, "Delivers", "SMTP <TO SUPPLY>")
+@enduml

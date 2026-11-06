@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accessibility — Greenlit design system</title>
+<meta name="description" content="The WCAG 2.2 AA commitments the system makes, how to test them, and what every component page must document.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">Greenlit DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details><summary>Components · Actions</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/segmented-control.html">Segmented control</a></li>
+    </ul></details>
+    <details><summary>Components · Inputs</summary><ul>
+      <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/counter.html">Counter</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+    </ul></details>
+    <details><summary>Components · Navigation</summary><ul>
+      <li><a href="../components/app-nav.html">App navigation</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb and back link</a></li>
+      <li><a href="../components/pagination.html">Pagination</a></li>
+      <li><a href="../components/period-nav.html">Period navigation</a></li>
+      <li><a href="../components/settings-nav.html">Settings navigation</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+    </ul></details>
+    <details><summary>Components · Containers and overlays</summary><ul>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/divider.html">Divider</a></li>
+      <li><a href="../components/drawer.html">Drawer</a></li>
+      <li><a href="../components/layout-primitives.html">Layout primitives</a></li>
+      <li><a href="../components/tooltip.html">Tooltip</a></li>
+    </ul></details>
+    <details><summary>Components · Data display</summary><ul>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/badge.html">Badge and status</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/member-list.html">Member list</a></li>
+      <li><a href="../components/request-row.html">Request row</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+    </ul></details>
+    <details><summary>Components · Feedback</summary><ul>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress-bar.html">Progress bar</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/spinner.html">Spinner</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+    </ul></details>
+    <details><summary>Components · Sheet and brand</summary><ul>
+      <li><a href="../components/legend.html">Legend</a></li>
+      <li><a href="../components/logo-lockup.html">Logo lockup</a></li>
+      <li><a href="../components/month-mini.html">Month mini</a></li>
+      <li><a href="../components/selection-bar.html">Selection bar</a></li>
+      <li><a href="../components/sheet-cell.html">Sheet cell</a></li>
+      <li><a href="../components/team-grid.html">Team grid</a></li>
+      <li><a href="../components/year-grid.html">Year grid</a></li>
+    </ul></details>
+    <details><summary>Patterns</summary><ul>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/data-tables-and-lists.html">Data tables and lists</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/navigation-and-page-structure.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/sheet-interaction.html">Sheet interaction</a></li>
+    </ul></details>
+  </nav>
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Foundation · Accessibility</p>
+      <h1>Accessibility</h1>
+      <p class="ds-lead">The WCAG 2.2 AA commitments the system makes, how to test them, and what every component page must document.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#commitments">Commitments</a></li><li><a href="#testing">Testing procedure</a></li><li><a href="#contract">Component contract</a></li><li><a href="#tokens">Tokens</a></li></ul>
+    </header>
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>Accessibility is part of the design language, not a layer on top. The commitments below are verified by the checkers in this folder and by the e2e suite.</p>
+    </section>
+    <section class="ds-section" id="commitments"><h2><a href="#commitments">Commitments</a></h2>
+<ul class="ds-checklist"><li><b>1.4.1 Use of colour:</b> no state is carried by colour alone; the sheet's cells carry ✓ … ? and accessible names.</li><li><b>1.4.3 / 1.4.11 Contrast:</b> text 4.5:1 (3:1 large), UI edges and focus rings 3:1; every pair is in <code>contrast-pairs.json</code> and checked in both themes.</li><li><b>1.4.4 / 1.4.10 Resize and reflow:</b> rem sizes, 200% zoom works, no two-dimensional scroll at 360px except inside data cards.</li><li><b>1.4.12 Text spacing:</b> no fixed-height text containers.</li><li><b>2.1.1 Keyboard:</b> every interaction, including painting days and selecting ranges, has a keyboard path.</li><li><b>2.4.7 / 2.4.11 Focus visible and not obscured:</b> one ring everywhere; sticky bars never cover the focused element.</li><li><b>2.5.8 Target size:</b> 24px minimum, 44px for comfortable touch.</li><li><b>3.3.1 / 3.3.3 Errors:</b> errors are text, linked to the field, and say what to do.</li><li><b>4.1.2 Name, role, value:</b> native elements first; ARIA only where a pattern needs it (grid, radiogroup, dialog).</li><li><b>4.1.3 Status messages:</b> toasts and inline results are announced through live regions without moving focus.</li><li><b>Motion:</b> <code>prefers-reduced-motion</code> is honoured through tokens.</li></ul>
+    </section>
+    <section class="ds-section" id="testing"><h2><a href="#testing">Testing procedure</a></h2>
+<ul>
+  <li>Tab through the page: order matches reading order, the ring is always visible, nothing is trapped except an open dialog.</li>
+  <li>Operate the sheet with the keyboard only: arrows, Space, Shift+arrows, Esc.</li>
+  <li>Run the contrast checker after any token change.</li>
+  <li>Read a page with a screen reader (NVDA or VoiceOver): every cell announces day, date and status.</li>
+  <li>Switch to dark and to forced colors; zoom to 200%; test at 360px.</li>
+  <li>Playwright asserts roles and accessible names through page objects, so a lost name fails a test.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="contract"><h2><a href="#contract">Component contract</a></h2>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Section</th><th scope="col">Every component documents</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Pattern</th><td>The WAI-ARIA APG pattern or native element it follows</td></tr>
+      <tr><th scope="row">Keyboard</th><td>A key map</td></tr>
+      <tr><th scope="row">Focus</th><td>Where focus goes on open, close, error</td></tr>
+      <tr><th scope="row">Labelling</th><td>How the accessible name is made</td></tr>
+      <tr><th scope="row">Contrast</th><td>Live ratios for its token pairs</td></tr>
+      <tr><th scope="row">Motion and touch</th><td>Reduced-motion behaviour and target sizes</td></tr>
+    </tbody>
+  </table></div>
+    </section>
+    <section class="ds-section" id="tokens"><h2><a href="#tokens">Tokens</a></h2>
+<p>Target sizes and the focus ring are accessibility tokens.</p><div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th scope="col">Token</th><th scope="col">Light</th><th scope="col">Dark</th></tr></thead>
+    <tbody>
+      <tr><td><code data-tokenname="--target-min">--target-min</code></td><td colspan="2"><span data-token="--target-min"></span></td></tr>
+      <tr><td><code data-tokenname="--target-comfortable">--target-comfortable</code></td><td colspan="2"><span data-token="--target-comfortable"></span></td></tr>
+      <tr><td><code data-tokenname="--focus-ring-width">--focus-ring-width</code></td><td colspan="2"><span data-token="--focus-ring-width"></span></td></tr>
+      <tr><td><code data-tokenname="--focus-ring-offset">--focus-ring-offset</code></td><td colspan="2"><span data-token="--focus-ring-offset"></span></td></tr>
+    </tbody>
+  </table></div>
+    </section>
+    <footer class="ds-footer"><span>Greenlit design system · extracted from <a href="../../mocks/index.html">docs/mocks</a></span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

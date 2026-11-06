@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avatar — Greenlit design system</title>
+<meta name="description" content="A round badge with a member&#x27;s initials (or photo) that makes rows and menus recognisable at a glance. Four sizes, a stacked group, and the compact version in the team grid.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">Greenlit DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details><summary>Components · Actions</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/segmented-control.html">Segmented control</a></li>
+    </ul></details>
+    <details><summary>Components · Inputs</summary><ul>
+      <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/counter.html">Counter</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+    </ul></details>
+    <details><summary>Components · Navigation</summary><ul>
+      <li><a href="../components/app-nav.html">App navigation</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb and back link</a></li>
+      <li><a href="../components/pagination.html">Pagination</a></li>
+      <li><a href="../components/period-nav.html">Period navigation</a></li>
+      <li><a href="../components/settings-nav.html">Settings navigation</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+    </ul></details>
+    <details><summary>Components · Containers and overlays</summary><ul>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/divider.html">Divider</a></li>
+      <li><a href="../components/drawer.html">Drawer</a></li>
+      <li><a href="../components/layout-primitives.html">Layout primitives</a></li>
+      <li><a href="../components/tooltip.html">Tooltip</a></li>
+    </ul></details>
+    <details><summary>Components · Data display</summary><ul>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/badge.html">Badge and status</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/member-list.html">Member list</a></li>
+      <li><a href="../components/request-row.html">Request row</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+    </ul></details>
+    <details><summary>Components · Feedback</summary><ul>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress-bar.html">Progress bar</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/spinner.html">Spinner</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+    </ul></details>
+    <details><summary>Components · Sheet and brand</summary><ul>
+      <li><a href="../components/legend.html">Legend</a></li>
+      <li><a href="../components/logo-lockup.html">Logo lockup</a></li>
+      <li><a href="../components/month-mini.html">Month mini</a></li>
+      <li><a href="../components/selection-bar.html">Selection bar</a></li>
+      <li><a href="../components/sheet-cell.html">Sheet cell</a></li>
+      <li><a href="../components/team-grid.html">Team grid</a></li>
+      <li><a href="../components/year-grid.html">Year grid</a></li>
+    </ul></details>
+    <details><summary>Patterns</summary><ul>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/data-tables-and-lists.html">Data tables and lists</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/navigation-and-page-structure.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/sheet-interaction.html">Sheet interaction</a></li>
+    </ul></details>
+  </nav>
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Component · Data display</p>
+      <h1>Avatar</h1>
+      <p class="ds-lead">A round badge with a member's initials (or photo) that makes rows and menus recognisable at a glance. Four sizes, a stacked group, and the compact version in the team grid.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span><span class="ds-pill">Since v1.0</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#variants">Variants</a></li><li><a href="#sizes">Sizes</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#theming">Theming</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don&#x27;t</a></li><li><a href="#tokens">Tokens</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>An <b>avatar</b> identifies a <b>member</b> next to their name: in the team grid's name column, a request row, the member list, the top bar's account button. It is a recognition aid, never the only identifier: the name is always in text beside it, so the avatar is decorative and hidden from assistive technology.</p>
+<p>Avatars show the member's initials by default (two letters, first and last name). A photo is allowed where one exists. Do not use an avatar to show status, and do not use colour to tell members apart; the sheet uses colour only for day status. A <i>count</i> of people is a <a href="badge.html">badge</a> or a number, not an avatar.</p>
+    </section>
+    <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
+<div class="ds-anatomy">
+    <figure class="ds-anatomy__figure">
+      <span class="avatar avatar--xl" aria-hidden="true">AR</span>
+      <span class="ds-callout" style="left: 50%; top: 50%;" aria-hidden="true">1</span>
+      <span class="ds-callout" style="left: 95%; top: 5%;" aria-hidden="true">2</span>
+    </figure>
+    <ol class="ds-anatomy__list">
+      <li><div><b>Initials</b><small>One or two capital letters in label type; scale with the size modifier.</small></div></li>
+      <li><div><b>Disc</b><small><code>--radius-full</code>, subtle fill with muted text, clips the optional <code>&lt;img&gt;</code> with <code>overflow: hidden</code>.</small></div></li>
+    </ol>
+  </div>
+    </section>
+    <section class="ds-section" id="variants"><h2><a href="#variants">Variants</a></h2>
+<p>The same disc in four contexts.</p>
+<div class="ds-example">
+  <div class="ds-example__canvas"><span class="avatar" aria-hidden="true">AR</span><span class="avatar" aria-hidden="true">MC</span><span class="avatar"><img alt="Photo of Ben Okafor" width="40" height="40" src="data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2740%27 height=%2740%27%3E%3Crect width=%2740%27 height=%2740%27 fill=%27%23888%27/%3E%3C/svg%3E"></span></div>
+  <div class="ds-example__caption"><span>Initials, and a photo. The photo fills the disc with <code>object-fit: cover</code> and carries a real <code>alt</code> only when the avatar stands alone; beside a name use <code>alt=""</code>.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;span class=&quot;avatar&quot; aria-hidden=&quot;true&quot;&gt;AR&lt;/span&gt;&lt;span class=&quot;avatar&quot; aria-hidden=&quot;true&quot;&gt;MC&lt;/span&gt;&lt;span class=&quot;avatar&quot;&gt;&lt;img alt=&quot;Photo of Ben Okafor&quot; width=&quot;40&quot; height=&quot;40&quot; src=&quot;data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2740%27 height=%2740%27%3E%3Crect width=%2740%27 height=%2740%27 fill=%27%23888%27/%3E%3C/svg%3E&quot;&gt;&lt;/span&gt;</code></pre></details>
+</div>
+<h3>Group</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="avatar-group" role="group" aria-label="Out this week: Ana Ruiz, Maya Chen, Dev Patel"><span class="avatar" aria-hidden="true">AR</span><span class="avatar" aria-hidden="true">MC</span><span class="avatar" aria-hidden="true">DP</span></div></div>
+  <div class="ds-example__caption"><span><code>.avatar-group</code> overlaps avatars by <code>--space-2</code> with a surface-coloured ring so edges stay legible. Give the group a label that lists the people; individual discs are hidden.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;avatar-group&quot; role=&quot;group&quot; aria-label=&quot;Out this week: Ana Ruiz, Maya Chen, Dev Patel&quot;&gt;&lt;span class=&quot;avatar&quot; aria-hidden=&quot;true&quot;&gt;AR&lt;/span&gt;&lt;span class=&quot;avatar&quot; aria-hidden=&quot;true&quot;&gt;MC&lt;/span&gt;&lt;span class=&quot;avatar&quot; aria-hidden=&quot;true&quot;&gt;DP&lt;/span&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Grid name</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="grid-name" style="position: static;"><span class="avatar" aria-hidden="true">AR</span><span class="grid-name__text"><a href="#">Ana Ruiz</a> <span class="grid-name__you">(you)</span></span></div></div>
+  <div class="ds-example__caption"><span>In the <a href="team-grid.html">team grid</a>, <code>.grid-name .avatar</code> shrinks to 1.5rem so a row stays one cell tall. The name is the link; <code>.grid-name__you</code> marks the signed-in member.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;grid-name&quot; style=&quot;position: static;&quot;&gt;&lt;span class=&quot;avatar&quot; aria-hidden=&quot;true&quot;&gt;AR&lt;/span&gt;&lt;span class=&quot;grid-name__text&quot;&gt;&lt;a href=&quot;#&quot;&gt;Ana Ruiz&lt;/a&gt; &lt;span class=&quot;grid-name__you&quot;&gt;(you)&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Account button</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><button class="avatar-btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Account menu for Maya Chen"><span class="avatar avatar--sm" aria-hidden="true">MC</span><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></div>
+  <div class="ds-example__caption"><span><code>.avatar-btn</code> wraps a small avatar and a chevron into the top bar's <a href="menu.html">menu</a> trigger. The button takes the name; the avatar is decorative.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;button class=&quot;avatar-btn&quot; type=&quot;button&quot; aria-haspopup=&quot;menu&quot; aria-expanded=&quot;false&quot; aria-label=&quot;Account menu for Maya Chen&quot;&gt;&lt;span class=&quot;avatar avatar--sm&quot; aria-hidden=&quot;true&quot;&gt;MC&lt;/span&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;m6 9 6 6 6-6&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;</code></pre></details>
+</div>
+    </section>
+    <section class="ds-section" id="sizes"><h2><a href="#sizes">Sizes</a></h2>
+<p>Pick the size from the row it sits in, not from the importance of the member.</p>
+<div class="ds-example">
+  <div class="ds-example__canvas"><span class="avatar avatar--sm" aria-hidden="true">AR</span><span class="avatar" aria-hidden="true">MC</span><span class="avatar avatar--lg" aria-hidden="true">DP</span><span class="avatar avatar--xl" aria-hidden="true">FM</span></div>
+  <div class="ds-example__caption"><span>Small 32px (tables, lists, menus), medium 40px (default), large 56px, extra large 64px (person page header). The team grid uses a 24px variant through <code>.grid-name .avatar</code>.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;span class=&quot;avatar avatar--sm&quot; aria-hidden=&quot;true&quot;&gt;AR&lt;/span&gt;&lt;span class=&quot;avatar&quot; aria-hidden=&quot;true&quot;&gt;MC&lt;/span&gt;&lt;span class=&quot;avatar avatar--lg&quot; aria-hidden=&quot;true&quot;&gt;DP&lt;/span&gt;&lt;span class=&quot;avatar avatar--xl&quot; aria-hidden=&quot;true&quot;&gt;FM&lt;/span&gt;</code></pre></details>
+</div>
+<ul>
+  <li><b>Sizes:</b> <code>.avatar--sm</code> 2rem / <code>--font-size-xs</code>; default 2.5rem; <code>.avatar--lg</code> 3.5rem / <code>--font-size-lg</code>; <code>.avatar--xl</code> 4rem / <code>--font-size-xl</code>.</li>
+  <li>Initials are two letters at every size; only the person header may show a first name beside it.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<p>The avatar itself is static: no hover, focus, selected, loading or disabled state. Interactive behaviour belongs to its wrapper.</p>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Wrapper</th><th scope="col">Default</th><th scope="col">Hover</th><th scope="col">Focus</th><th scope="col">Expanded</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Account button</th><td><button class="avatar-btn" type="button" aria-label="Account menu for Maya Chen"><span class="avatar avatar--sm" aria-hidden="true">MC</span><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></td><td><button class="avatar-btn" type="button" data-state="hover" aria-label="Account menu for Maya Chen"><span class="avatar avatar--sm" aria-hidden="true">MC</span><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></td><td><button class="avatar-btn" type="button" data-state="focus" aria-label="Account menu for Maya Chen"><span class="avatar avatar--sm" aria-hidden="true">MC</span><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></td><td><button class="avatar-btn" type="button" aria-expanded="true" aria-label="Account menu for Maya Chen"><span class="avatar avatar--sm" aria-hidden="true">MC</span><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></td></tr>
+    </tbody>
+  </table></div>
+<h3>Loading and missing</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><span class="skeleton skeleton--circle" aria-hidden="true" style="width: var(--space-10); height: var(--space-10);"></span><span class="avatar" aria-hidden="true">?</span></div>
+  <div class="ds-example__caption"><span><b>Loading</b> is a circular <a href="skeleton.html">skeleton</a> of the same size. A member who has not signed in yet shows initials from the name; with no name use "?" and the text label says "Unnamed member".</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;span class=&quot;skeleton skeleton--circle&quot; aria-hidden=&quot;true&quot; style=&quot;width: var(--space-10); height: var(--space-10);&quot;&gt;&lt;/span&gt;&lt;span class=&quot;avatar&quot; aria-hidden=&quot;true&quot;&gt;?&lt;/span&gt;</code></pre></details>
+</div>
+<h3>Both themes</h3>
+<div class="ds-themes">
+  <div data-theme="light"><div class="ds-example__canvas"><span class="avatar avatar--sm" aria-hidden="true">AR</span><span class="avatar" aria-hidden="true">MC</span><span class="avatar avatar--lg" aria-hidden="true">DP</span><span class="avatar avatar--xl" aria-hidden="true">FM</span><div class="avatar-group" role="group" aria-label="Out this week: Ana Ruiz, Maya Chen, Dev Patel"><span class="avatar" aria-hidden="true">AR</span><span class="avatar" aria-hidden="true">MC</span><span class="avatar" aria-hidden="true">DP</span></div></div></div>
+  <div data-theme="dark"><div class="ds-example__canvas"><span class="avatar avatar--sm" aria-hidden="true">AR</span><span class="avatar" aria-hidden="true">MC</span><span class="avatar avatar--lg" aria-hidden="true">DP</span><span class="avatar avatar--xl" aria-hidden="true">FM</span><div class="avatar-group" role="group" aria-label="Out this week: Ana Ruiz, Maya Chen, Dev Patel"><span class="avatar" aria-hidden="true">AR</span><span class="avatar" aria-hidden="true">MC</span><span class="avatar" aria-hidden="true">DP</span></div></div></div>
+</div>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<ul>
+  <li>Avatars never resize with the viewport: they are fixed rem sizes, <code>flex: none</code>, so a long name wraps or truncates while the disc keeps its shape.</li>
+  <li>In the team grid the name column is sticky and the avatar stays 24px at every width; below 48rem the grid scrolls sideways, not the avatar.</li>
+  <li>The person header places the extra-large avatar beside the name at all widths; the big number moves below it under 48rem.</li>
+  <li>A group wider than its container is truncated to the first three discs plus a count in text, never wrapped.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="theming"><h2><a href="#theming">Theming</a></h2>
+<p>The disc uses <code>--color-bg-subtle</code> with <code>--color-fg-muted</code> text. (The earlier <code>--color-accent-subtle</code> tint is overridden further down the stylesheet; see drift.) The group's ring reads <code>--color-bg-surface</code>, so it follows whatever the avatar sits on in either theme.</p>
+<pre><code>/* Tint avatars with the brand for the person header only */
+.person-head .avatar { background: var(--color-accent-subtle); color: var(--color-fg-accent); }</code></pre>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<h3>Role and pattern</h3>
+<p>A decorative image: initials are <code>aria-hidden="true"</code> beside the visible name. A photo beside a name uses <code>alt=""</code>. If an avatar ever stands alone it is <code>role="img"</code> with an <code>aria-label</code> of the person's name. A clickable avatar is a <code>&lt;button&gt;</code> (<a href="menu.html">menu</a> trigger pattern); there is no ARIA avatar role.</p>
+<h3>Keyboard</h3>
+<table class="ds-table ds-keys"><thead><tr><th scope="col">Key</th><th scope="col">Action</th></tr></thead><tbody>
+    <tr><td><kbd>Tab</kbd></td><td>Reaches only the wrapper (account button or name link); the avatar is not a tab stop.</td></tr>
+    <tr><td><kbd>Enter</kbd>, <kbd>Space</kbd> on the account button</td><td>Opens the account menu; <kbd>Esc</kbd> closes it and returns focus.</td></tr>
+  </tbody></table>
+<h3>Focus</h3>
+<p>The account button shows the shared focus ring around the whole avatar-and-chevron. The ring is drawn outside the disc, so the group's overlap never hides it.</p>
+<h3>Labelling</h3>
+<p>Beside a name: hidden from assistive technology, because the name already says it. In a group, one <code>aria-label</code> on the group lists the members ("Out this week: Ana Ruiz, Maya Chen, Dev Patel"). The account button's label names the person and the action: "Account menu for Maya Chen".</p>
+<h3>Contrast</h3>
+<div class="ds-example__canvas ds-example__canvas--stack" style="padding: 0; gap: var(--space-2);">
+  <div class="ds-pair"><span>Initials on avatar disc</span><span class="ds-pair__ratio" data-contrast="--color-fg-muted|--color-bg-subtle" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Initials on brand tint (person header)</span><span class="ds-pair__ratio" data-contrast="--color-fg-accent|--color-accent-subtle" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Group ring on surface</span><span class="ds-pair__ratio" data-contrast="--color-bg-surface|--color-bg-subtle" data-min="1.0"></span></div>
+  <div class="ds-pair"><span>Focus ring on surface</span><span class="ds-pair__ratio" data-contrast="--color-focus-ring|--color-bg-surface" data-min="3"></span></div>
+</div>
+<h3>Motion</h3>
+<p>No motion. A photo that loads late swaps in without a fade.</p>
+<h3>Touch</h3>
+<p>The avatar is not a target. The account button including its padding is 40px tall; the top bar keeps it 8px from neighbours.</p>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul>
+  <li>Initials: first letter of the first name and of the last name, capitals: "Ana Ruiz" is "AR". One word gives one letter.</li>
+  <li>Always show the full name beside the avatar. Never rely on the disc alone.</li>
+  <li>Use "(you)" after the signed-in member's name in the grid, not a different avatar.</li>
+  <li>Photo alt text is the person's name only when the photo stands alone.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don&#x27;t</a></h2>
+<div class="ds-dodont">
+  <figure class="ds-do"><div class="ds-example__canvas"><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" aria-hidden="true">AR</span><span>Ana Ruiz</span></span></div><figcaption>Hidden disc, visible name: the name is announced once.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><span class="cluster" style="gap: var(--space-2); flex-wrap: nowrap;"><span class="avatar avatar--sm" role="img" aria-label="Ana Ruiz">AR</span><span>Ana Ruiz</span></span></div><figcaption>The same name announced twice, once as an image.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="avatar-group" role="group" aria-label="Out this week: Ana Ruiz, Maya Chen, Dev Patel"><span class="avatar" aria-hidden="true">AR</span><span class="avatar" aria-hidden="true">MC</span><span class="avatar" aria-hidden="true">DP</span></div></div><figcaption>A group labelled with the people it shows.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="avatar-group"><span class="avatar" aria-hidden="true">AR</span><span class="avatar" aria-hidden="true">MC</span><span class="avatar" aria-hidden="true">DP</span></div></div><figcaption>A group of unlabelled discs: initials only, and no one knows who is out or why.</figcaption></figure>
+</div>
+    </section>
+    <section class="ds-section" id="tokens"><h2><a href="#tokens">Tokens</a></h2>
+<div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th scope="col">Part</th><th scope="col">Token</th><th scope="col">Light</th><th scope="col">Dark</th></tr></thead>
+    <tbody>
+      <tr><td>Disc fill / text</td><td><code>--color-bg-subtle</code> <code>--color-fg-muted</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-subtle" data-swatch></i><span data-token="--color-bg-subtle"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-fg-muted" data-swatch></i><span data-token="--color-fg-muted"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-subtle" data-swatch></i><span data-token="--color-bg-subtle"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-fg-muted" data-swatch></i><span data-token="--color-fg-muted"></span></span></td></tr>
+      <tr><td>Brand tint (overridden)</td><td><code>--color-accent-subtle</code> <code>--color-fg-accent</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-accent-subtle" data-swatch></i><span data-token="--color-accent-subtle"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-fg-accent" data-swatch></i><span data-token="--color-fg-accent"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-accent-subtle" data-swatch></i><span data-token="--color-accent-subtle"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-fg-accent" data-swatch></i><span data-token="--color-fg-accent"></span></span></td></tr>
+      <tr><td>Initials type</td><td><code>--text-label</code></td><td colspan="2"><span data-token="--text-label"></span></td></tr>
+      <tr><td>Size sm / default / lg / xl</td><td><code>--font-size-xs</code> <code>--font-size-lg</code> <code>--font-size-xl</code></td><td colspan="2"><span data-token="--font-size-xs"></span> <span data-token="--font-size-lg"></span> <span data-token="--font-size-xl"></span></td></tr>
+      <tr><td>Radius</td><td><code>--radius-full</code></td><td colspan="2"><span data-token="--radius-full"></span></td></tr>
+      <tr><td>Group ring / overlap</td><td><code>--color-bg-surface</code> <code>--space-2</code></td><td colspan="2"><span data-token="--color-bg-surface"></span> <span data-token="--space-2"></span></td></tr>
+      <tr><td>Button padding</td><td><code>--space-1</code></td><td colspan="2"><span data-token="--space-1"></span></td></tr>
+    </tbody>
+  </table></div>
+    </section>
+    <section class="ds-section" id="code"><h2><a href="#code">Code</a></h2>
+<pre><code>&lt;span class=&quot;avatar avatar--sm&quot; aria-hidden=&quot;true&quot;&gt;AR&lt;/span&gt;
+
+&lt;div class=&quot;avatar-group&quot; role=&quot;group&quot; aria-label=&quot;Out this week: Ana Ruiz, Maya Chen&quot;&gt;
+  &lt;span class=&quot;avatar&quot; aria-hidden=&quot;true&quot;&gt;AR&lt;/span&gt;
+  &lt;span class=&quot;avatar&quot; aria-hidden=&quot;true&quot;&gt;MC&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;button class=&quot;avatar-btn&quot; type=&quot;button&quot; aria-haspopup=&quot;menu&quot; aria-expanded=&quot;false&quot; aria-label=&quot;Account menu for Maya Chen&quot;&gt;
+  &lt;span class=&quot;avatar avatar--sm&quot; aria-hidden=&quot;true&quot;&gt;MC&lt;/span&gt;
+  &lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;…&lt;/svg&gt;
+&lt;/button&gt;</code></pre>
+<table class="ds-table"><thead><tr><th scope="col">Class / attribute</th><th scope="col">Effect</th></tr></thead><tbody>
+    <tr><td><code>.avatar</code></td><td>40px disc with initials or an <code>&lt;img&gt;</code>.</td></tr>
+    <tr><td><code>.avatar--sm</code> <code>.avatar--lg</code> <code>.avatar--xl</code></td><td>32, 56 and 64px.</td></tr>
+    <tr><td><code>.avatar-group</code></td><td>Overlapping row with surface ring.</td></tr>
+    <tr><td><code>.avatar-btn</code></td><td>Button wrapper: top bar account trigger.</td></tr>
+    <tr><td><code>.grid-name .avatar</code></td><td>24px version inside the team grid.</td></tr>
+  </tbody></table>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<p>Extracted from these mocks:</p>
+<ul><li><a href="../../mocks/pages/calendar/default.html">pages/calendar/default</a> (grid name avatars, top bar account button)</li><li><a href="../../mocks/pages/year/default.html">pages/year/default</a> (avatars in the allowance table)</li><li><a href="../../mocks/pages/requests/default.html">pages/requests/default</a> (request row avatars)</li><li><a href="../../mocks/pages/settings/default.html">pages/settings/default</a> (member list avatars)</li><li><a href="../../mocks/pages/person/default.html">pages/person/default</a> (extra-large avatar in the person header)</li></ul>
+<p>Drift fixed during extraction: <code>.avatar</code> is declared twice: the first rule tints it with <code>--color-accent-subtle</code> and <code>--color-fg-accent</code>, a later brand block (line ~402) overrides it to <code>--color-bg-subtle</code> / <code>--color-fg-muted</code>. The later rule is what renders in the mocks, so it is what this page documents; the first colour pair is dead code. <code>.avatar-group</code> and the photo variant are in the kit but no mock uses them.</p>
+    </section>
+    <footer class="ds-footer"><span>Greenlit design system · extracted from <a href="../../mocks/index.html">docs/mocks</a></span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

@@ -1,10 +1,161 @@
-# Design system
+# Greenlit design system
 
-Extracted from `docs/mocks/` once the first screens exist: tokens (colour with light and dark
-themes, typography, spacing, radius, elevation, motion), foundations, one page per component with
-anatomy, variants, states, responsive behaviour and accessibility. The `components` library in
-`frontend/` implements it; the `--gl-` prefix is reserved for component-scoped knobs.
+Extracted from [docs/mocks](../mocks/README.md) on 2026-11-06. Open [index.html](index.html) locally in a browser; every page has a light/dark toggle (or press `t`).
 
-The sheet's four cell colours are the brand's semantic palette: red (closed), blue (tentative),
-yellow (requested), green (confirmed). Each needs a non-colour carrier (text, icon or accessible
-name) in every component that shows it.
+Greenlit replaces the Google Sheet managers of small teams keep for vacation. The sheet's four colours (red weekend or holiday, blue tentative, yellow requested, green confirmed) are the brand's semantic palette, and each needs a non-colour carrier (text, glyph or accessible name) in every component that shows it. The `components` library in `frontend/` implements this system; the `--gl-` prefix is reserved for component-scoped knobs.
+
+## Foundations
+
+| Page | Covers |
+|---|---|
+| [Color](foundations/color.html) | Primitive ramps, semantic roles, sheet status colours, both themes, live contrast. |
+| [Typography](foundations/typography.html) | Families, scale, weights, role shorthands, measure. |
+| [Spacing](foundations/spacing.html) | The 4px scale and the inside/between rules. |
+| [Layout](foundations/layout.html) | Breakpoints, columns, gutters, margins, containers, page templates. |
+| [Elevation](foundations/elevation.html) | Shadows, surface hierarchy, z-order. |
+| [Shape](foundations/shape.html) | Radii and border widths. |
+| [Motion](foundations/motion.html) | Durations, easings, choreography, reduced motion. |
+| [Iconography](foundations/iconography.html) | The 22-icon set used by the product and its rules. |
+| [Theming](foundations/theming.html) | Light, dark, forced themes, token tiers, tokens.json. |
+| [Responsive](foundations/responsive.html) | Mobile-first rules and per-component behaviour. |
+| [Accessibility](foundations/accessibility.html) | The WCAG 2.2 AA commitments and how to test them. |
+| [Content](foundations/content.html) | Voice, casing, numbers and dates, error and empty-state formulas. |
+
+## Components
+
+| Component | Group | Variants | States | Source mocks |
+|---|---|---|---|---|
+| [Button](components/button.html) | Actions | Primary, Secondary, Ghost, Link, Danger, Approve | Default, Hover, Focus, Active, Disabled, Loading | `dialogs/decline-request/default`, `pages/requests/default`, `pages/calendar/selected` +2 |
+| [Segmented control](components/segmented-control.html) | Actions | Segment, Button group (toggle) | Default (unchecked), Hover, Focus, Checked, Disabled | `pages/calendar/default`, `pages/calendar/painting`, `pages/year/default` |
+| [Link](components/link.html) | Actions | Inline link, Back link, Current page | Default, Hover, Focus | `pages/sign-in/default`, `pages/forgot-password/default`, `dialogs/adjust-allowance/default` +1 |
+| [Menu](components/menu.html) | Actions | Item, Danger item | Default, Hover, Focus, Disabled | `dialogs/user-menu/default` |
+| [Text field](components/text-field.html) | Inputs | Medium, Small, Empty, placeholder | Default, Hover, Focus, Disabled, Invalid, Read-only | `pages/sign-in/default`, `pages/sign-in/invalid`, `dialogs/invite-member/invalid` +2 |
+| [Textarea](components/textarea.html) | Inputs | Textarea | Default, Hover, Focus, Disabled, Invalid, Read-only | `dialogs/decline-request/default`, `dialogs/decline-request/busy`, `dialogs/decline-request/failed` |
+| [Select](components/select.html) | Inputs | Medium, Small | Default, Hover, Focus, Disabled, Invalid | `pages/settings/default`, `dialogs/invite-member/invalid` |
+| [Checkbox](components/checkbox.html) | Inputs | Checkbox | Unchecked, Focus, Checked, Disabled, Disabled, checked, Invalid | `pages/requests/bulk`, `pages/requests/default`, `dialogs/request-detail/default` |
+| [Radio group](components/radio-group.html) | Inputs | Radio | Unselected, Focus, Selected, Disabled, Disabled, selected | `pages/calendar/default`, `dialogs/invite-member/default` |
+| [Switch](components/switch.html) | Inputs | Switch | Off, Focus, On, Disabled off, Disabled on | `pages/settings/default`, `pages/settings/success`, `pages/settings/read-only` |
+| [Form field](components/form-field.html) | Inputs | Field | Default, With help, Focus, Invalid, Disabled | `dialogs/invite-member/invalid`, `dialogs/decline-request/default`, `dialogs/add-holiday/invalid` +1 |
+| [Form layout](components/form-layout.html) | Inputs | Fieldset and legend, Form summary, Form actions | see page | `pages/create-team/invalid`, `pages/create-team/default`, `dialogs/adjust-allowance/invalid` +2 |
+| [Counter](components/counter.html) | Inputs | Counter | Default, At minimum, At maximum, Focus, Disabled | `pages/settings/default` |
+| [Top bar](components/top-bar.html) | Navigation | Account menu button | Default, Hover, Focus, Expanded | `pages/calendar/default`, `pages/requests/default`, `dialogs/user-menu/default` +1 |
+| [App navigation](components/app-nav.html) | Navigation | Link | Default, Hover (real :hover), Focus, Current page, Current with count | `pages/calendar/default`, `pages/year/default`, `pages/requests/default` +1 |
+| [Tabs](components/tabs.html) | Navigation | Tab | Default, Hover, Focus, Selected, Selected + focus | `pages/requests/default`, `pages/requests/approved`, `pages/requests/declined` |
+| [Breadcrumb and back link](components/breadcrumb.html) | Navigation | Back link, Breadcrumb | Default, Hover (real :hover), Focus, Current page | `pages/person/default`, `pages/accept-invite/default`, `dialogs/remove-member/default` |
+| [Pagination](components/pagination.html) | Navigation | Link | Default, Current, Disabled, Focus | `pages/requests/default`, `pages/requests/approved` |
+| [Skip link](components/skip-link.html) | Navigation | Skip link | Hidden (resting), Focused, Hover | `pages/calendar/default`, `pages/sign-in/default`, `dialogs/add-holiday/default` |
+| [Settings navigation](components/settings-nav.html) | Navigation | Link | Default, Hover (real :hover), Focus | `pages/settings/default`, `dialogs/add-holiday/default`, `pages/settings/read-only` |
+| [Period navigation](components/period-nav.html) | Navigation | Previous month | Default, Hover, Focus, Active, Disabled | `pages/calendar/default`, `pages/year/default`, `pages/calendar/other-month` |
+| [Card](components/card.html) | Containers and overlays | Interactive card | Default, Hover, Selected, Focus (inner link) | `pages/sign-in/default`, `pages/brand/default`, `pages/calendar/default` +1 |
+| [Dialog](components/dialog.html) | Containers and overlays | Default (information or confirmation), Destructive, Form, Busy, Failed | see page | `dialogs/sign-out/default`, `dialogs/remove-member/default`, `dialogs/remove-member/busy` +5 |
+| [Drawer](components/drawer.html) | Containers and overlays | Wide (request detail), Standard width, From the left, Content states | see page | `dialogs/request-detail/default`, `dialogs/request-detail/approved`, `dialogs/request-detail/busy` +3 |
+| [Tooltip](components/tooltip.html) | Containers and overlays | Tooltip | Hidden (default), Hover, Keyboard focus | `pages/calendar/default`, `pages/year/default` |
+| [Divider](components/divider.html) | Containers and overlays | see page | see page | `dialogs/user-menu/default`, `pages/settings/default`, `dialogs/remove-member/default` |
+| [Layout primitives](components/layout-primitives.html) | Containers and overlays | Shell and container, Stack, Cluster, Grid, Page header, title row, toolbar, section | see page | `pages/calendar/default`, `pages/settings/default`, `pages/requests/default` +1 |
+| [Table](components/table.html) | Data display | Row, Sortable header | Default, Hover, Selected, Person, Actions, Person, Actions | `pages/year/default`, `pages/year/sorted`, `pages/year/loading` +2 |
+| [List](components/list.html) | Data display | Interactive item | Default, Focus, Hover (pointer only) | `pages/person/default`, `pages/person/over-allowance`, `dialogs/adjust-allowance/default` +1 |
+| [Description list](components/description-list.html) | Data display | Facts, Facts bar | see page | `pages/person/default`, `pages/person/over-allowance`, `pages/person/member` +1 |
+| [Avatar](components/avatar.html) | Data display | Account button | Default, Hover, Focus, Expanded | `pages/calendar/default`, `pages/year/default`, `pages/requests/default` +2 |
+| [Badge and status](components/badge.html) | Data display | Neutral / pending, Positive, Negative, Attention | Badge, Request status, Inline status | `pages/calendar/default`, `pages/requests/approved`, `pages/requests/declined` +3 |
+| [Chip](components/chip.html) | Data display | Filter, off, Filter, on, Day, off, Day, on | Default, Hover, Focus, Active, Disabled | `pages/settings/default`, `dialogs/edit-working-days/default`, `dialogs/add-holiday/default` +1 |
+| [Stat](components/stat.html) | Data display | Big number | Normal, Over allowance, Zero, Loading | `pages/person/default`, `pages/person/over-allowance`, `pages/person/edge` +2 |
+| [Member list](components/member-list.html) | Data display | Member row | Default, Focus (name link), Disabled (read-only) | `pages/settings/default`, `pages/settings/read-only`, `pages/settings/invalid` +3 |
+| [Request row](components/request-row.html) | Data display | Row | Pending, Focus (who button), Selected, Decided | `pages/requests/default`, `pages/requests/bulk`, `pages/requests/approved` +5 |
+| [Toast](components/toast.html) | Feedback | Success, Danger | Resting, Leaving (end frame), Persistent error | `notifications/toast/success`, `notifications/toast/info`, `notifications/toast/warning` +6 |
+| [Alert and banner](components/alert.html) | Feedback | Warning, Danger | Dismissible, Persistent (no dismiss), Announced as alert | `notifications/offline-banner/persistent`, `notifications/offline-banner/info`, `notifications/offline-banner/success` +7 |
+| [Inline message](components/inline-message.html) | Feedback | Field | Default, With help, With error, Help and error | `pages/sign-in/invalid`, `pages/accept-invite/default`, `pages/account/default` +3 |
+| [Progress bar](components/progress-bar.html) | Feedback | Progress | Empty, In progress, Complete, Indeterminate, Failed | `pages/year/default`, `pages/year/member`, `pages/year/sorted` |
+| [Spinner](components/spinner.html) | Feedback | Button | Idle, Busy, Done, Failed | `pages/sign-in/loading`, `pages/calendar/loading`, `notifications/offline-banner/info` +2 |
+| [Skeleton](components/skeleton.html) | Feedback | Member row | Loading, Loaded, Reduced motion | `pages/calendar/loading`, `pages/settings/loading`, `pages/sign-in/loading` +3 |
+| [Empty state](components/empty-state.html) | Feedback | Reason | Nothing yet, Nothing to do, Load failed | `pages/calendar/empty`, `pages/requests/empty`, `pages/settings/holidays-empty` +4 |
+| [Error page](components/error-page.html) | Feedback | Not found, Forbidden, Server error, Offline, Session expired | Status, Tone, Primary action, Secondary | `pages/not-found/default`, `pages/forbidden/default`, `pages/server-error/default` +4 |
+| [Logo lockup](components/logo-lockup.html) | Sheet and brand | Home link, Plain image | Default, Hover, Focus | `pages/brand/default`, `pages/calendar/default`, `pages/sign-in/default` |
+| [Sheet cell](components/sheet-cell.html) | Sheet and brand | Confirmed (confirmed), Requested (requested), Tentative (tentative), Working (empty), Not working (off) | Default, Hover, Focus, Selected, Read-only | `pages/calendar/default`, `pages/calendar/selected`, `pages/calendar/over-allowance` +2 |
+| [Team grid](components/team-grid.html) | Sheet and brand | Default, Loading (aria-busy), Selected cells | Rendering | `pages/calendar/default`, `pages/calendar/member`, `pages/calendar/selected` +4 |
+| [Year grid](components/year-grid.html) | Sheet and brand | Month cell | Default, Hover, Focus | `pages/year/default`, `pages/year/sorted`, `pages/year/member` +2 |
+| [Month mini](components/month-mini.html) | Sheet and brand | Default month, Today, Loading, No leave yet | Rendering | `pages/person/default`, `pages/person/member`, `pages/person/over-allowance` +2 |
+| [Legend](components/legend.html) | Sheet and brand | Default, Narrow (wraps), Within a toolbar | Rendering | `pages/calendar/default`, `pages/person/default`, `pages/calendar/selected` +1 |
+| [Selection bar](components/selection-bar.html) | Sheet and brand | Inverse button | Default, Hover, Focus, Busy | `pages/calendar/selected`, `pages/calendar/over-allowance`, `pages/calendar/painting` +1 |
+
+## Patterns
+
+| Pattern | Covers |
+|---|---|
+| [Forms](patterns/forms.html) | How Greenlit forms are composed, validated and submitted: labels, help, errors, the summary and the footer. |
+| [Feedback and loading](patterns/feedback-and-loading.html) | Tell the user the app heard them: skeletons while a region loads, a busy button while an action runs, words when it is done. |
+| [Empty and error states](patterns/empty-and-error-states.html) | What to show when there is nothing to show, when the list is filtered to nothing, and when something fails. |
+| [Navigation and page structure](patterns/navigation-and-page-structure.html) | The frame around every screen: shell, top bar, main navigation, page title row, and how users move between and within screens. |
+| [Dialogs and overlays](patterns/dialogs-and-overlays.html) | Dialog, drawer and menu: when to interrupt, how to build the interruption, and how focus moves in and out. |
+| [Data tables and lists](patterns/data-tables-and-lists.html) | Choosing between the sheet, a table, a list and a request row, and making each one readable, sortable and operable by keyboard. |
+| [Notifications](patterns/notifications.html) | Toast, banner, alert and inline message: which channel to choose, how long it lives and how it is announced. |
+| [Content and tone](patterns/content-and-tone.html) | The words Greenlit uses, the formulas for errors and empty states, and the rules for labels, numbers and dates. |
+| [Sheet interaction](patterns/sheet-interaction.html) | Painting days, selecting cells, requesting and confirming time off, with the same behaviour on touch, pointer and keyboard. |
+
+## Tokens
+
+- `tokens/tokens.css` — source of truth: primitives, semantic tokens, light and dark themes, reduced-motion and contrast adjustments.
+- `tokens/tokens.json` — DTCG export generated from `tokens.css` (`tokens_to_json.py`); never edit by hand.
+- `tokens/contrast-pairs.json` — every foreground/background pair the components rely on, checked in both themes.
+- `assets/components.css` — the component stylesheet, token-driven; `data-state` hooks exist for documentation only.
+- `assets/ds.css`, `assets/ds.js` — documentation-site chrome (theme toggle, live token values, live contrast ratios).
+- `assets/*.svg` — logo and mark files.
+
+## Drift found in the mocks
+
+| Mock | Issue | Resolution |
+|---|---|---|
+| `assets/ui.css` | `.btn--approve` and the toast icons referenced palette primitives (`--palette-white`, `--palette-*-700`) and per-theme overrides in the component layer. | Added semantic tokens `--color-fg-on-brand-strong` and `--color-{info,success,warning,danger}-icon-on-inverse`; `components.css` reads only semantic tokens. |
+| `assets/ui.css` | `--mock-bar-offset` and `.mock-bar` rules (mock-only chrome) lived in the product stylesheet. | Removed from `components.css`; the mocks keep them in `mock.css`. |
+| `assets/ui.css` | Optical sizes off the 4px grid (`0.1rem`, `0.28em`, `0.35em`, `0.17em`) in the logo lockup, badge dots and buttons. | Kept as component-internal optical adjustments (they scale with `em`); not added to the spacing scale. |
+| `docs/design-system/assets/ds.css` | The motion demo selector expected `data-run` on a descendant while `ds.js` sets it on `.ds-motion-demo`. | Selector changed to `.ds-motion-demo[data-run="true"]`. |
+| Button | .btn--approve hard-coded --palette-white and a dark-theme override using a palette primitive; replaced by the semantic token --color-fg-on-brand-strong. | Fixed in `components.css` as described. |
+| Segmented control | no mock uses .btn-group; it is documented from components.css and the aria-pressed toggle in the year page. The paint-picker buttons all sit in the tab order in the mocks; the implementation should use roving tabindex as the keyboard table states. | Fixed in `components.css` as described. |
+| Link | a:hover and the auth links have no data-state="hover" hook, so hover cannot be forced for review; the specimen reproduces the hover tokens inline. Visited links are intentionally unstyled. | Fixed in `components.css` as described. |
+| Menu | .menu__divider is used on an <hr> in the mock; its rule sets only a top border, so the default <hr> border sides apply (the kit resets them via the global hr rule). .menu__item:focus-visible uses the hover fill with outline: none, so the fill alone is the focus cue; keep it distinguishable from the panel. | Fixed in `components.css` as described. |
+| Text field | no mock uses .search or .input-group + .addon yet; both are documented from components.css, and the 22-icon set has no magnifier so the search specimen draws its own. .input--lg changes min-height and font size but not padding. | Fixed in `components.css` as described. |
+| Textarea | .field__counter exists in components.css but no mock shows a character limit; the counter specimen is derived from the CSS. The mock textarea has no maxlength. | Fixed in `components.css` as described. |
+| Checkbox | .choice has no hover style, so only focus can be forced. Indeterminate is script-only and not shown in the static matrix. The kit's checked tick uses clip-path, which disappears in forced-colors mode (the checked box still shows through its system colours). | Fixed in `components.css` as described. |
+| Radio group | no mock renders a native radio group yet; the page is derived from components.css and the segmented radiogroup in the calendar. .choice has no hover style. | Fixed in `components.css` as described. |
+| Switch | the mock sets the label font and top alignment with inline style on each switch; the design system should provide a .switch__label class. The kit has no hover, invalid or loading style for the switch; .switch input:disabled uses opacity only. | Fixed in `components.css` as described. |
+| Form layout | no mock uses .form-actions or .form-grid--3; settings use .settings-actions, and dialogs use .dialog__footer. Both exist in components.css and are documented from it. | Fixed in `components.css` as described. |
+| Counter | the Adjust allowance dialog uses a plain number text field (steps of 0.5, negative allowed), not a counter. In the settings mock the counter sits in a fieldset without a legend; this page recommends naming the group (role="group" plus a label). | Fixed in `components.css` as described. |
+| Top bar | the generic .topbar, .topbar__nav and .nav-link classes inherited from the base kit are unused by the product; the mocks build the bar from .topbar--app and .app-nav. The mocks' topbar__menu hamburger is also unused. | Fixed in `components.css` as described. |
+| App navigation | .app-nav__link:hover has no data-state="hover" twin (the other nav components have one), so hover cannot be forced in static pages. Not changed here. | Fixed in `components.css` as described. |
+| Tabs | the mocks wrote the counts as a span styled with inline font-variant-numeric; the kit uses .text-subtle and the number inherits tabular figures from the label font. .tab[aria-selected="true"]::after is declared twice in components.css (accent, then brand); the later brand rule wins. | Fixed in `components.css` as described. |
+| Breadcrumb and back link | the product mocks use only the back link; .breadcrumb exists in the kit and is documented for future deep screens but appears in no mock. The back link is listed here because the registry assigns it to this page. | Fixed in `components.css` as described. |
+| Pagination | no mock uses pagination; the component is kept from the base kit and documented so a future long list does not invent its own. Page 2 of 5 is sample content. | Fixed in `components.css` as described. |
+| Settings navigation | the width of the nav column (12.5rem) is hard-coded in .settings-layout rather than a token; aria-current="location" has no style in components.css. | Fixed in `components.css` as described. |
+| Card | .card--interactive has a pointer cursor and hover lift but no stretched-link rule, so the pointer target is only as big as the inner link unless a page adds one. The mocks use only .card, .card-plain and .grid-card. | Fixed in `components.css` as described. |
+| Dialog | the mocks set autofocus and the focus trap in script; the CSS component has no focus-trap behaviour, which the Angular CDK Dialog supplies. Documentation stages use an inline max-height on the panel because the real rule is viewport-based. | Fixed in `components.css` as described. |
+| Drawer | the width tokens are hard-coded (28rem, 40rem) in components.css; the tokens table lists the nearest spacing token only for reference. Focus trapping is supplied by the CDK, not CSS. | Fixed in `components.css` as described. |
+| Tooltip | no mock uses .tooltip; the mocks give sheet cells title attributes instead. .tooltip has pointer-events: none, so it fails the "hoverable" part of WCAG 1.4.13 for long tips; keep them short. | Fixed in `components.css` as described. |
+| Divider | the base kit's .divider class is not used in any mock; only hr.menu__divider and component-owned borders appear. The first contrast row is a documented exception: decorative rules need no 3:1. | Fixed in `components.css` as described. |
+| Layout primitives | .container, .grid, .page-header and .sidebar-layout are unused in the mocks, which compose pages with .shell, .page-title-row, .settings-layout and ad-hoc inline widths; they are kept from the base kit. There are no span utilities beyond .span-full; column spans are set with inline grid-column. The brief names .container/.shell, .stack, .cluster, .grid, .page-header, .page-title-row, .toolbar-row and .section; all are documented. | Fixed in `components.css` as described. |
+| Table | Gap: .table-wrap has overflow but no position: relative, so the absolutely positioned .visually-hidden header spans escape the clip and widen the page at 360px; these examples add position: relative inline, and the real fix is one declaration on .table-wrap. th[aria-sort] and .row-actions exist in the kit CSS but no mock uses them: the year page sorts with an aria-pressed toggle button above the table ("Sort by days left"). Both are documented; the toggle is what ships today. The selected-row style is likewise documented from the CSS only. In .table th[aria-sort] button the all: unset also removes the default focus outline source, so the shared :focus-visible ring is what keeps it visible. | Fixed in `components.css` as described. |
+| List | .list, .list__item and .list__body exist in the kit but no mock uses them; the mocks build their lists from .run-list, .request-list and .member-list. They are documented as the shared base. Two CSS gaps: .list__item--interactive has no data-state="hover" hook (only :hover), so the hover cell above is simulated with the same token; and an anchor used as li > a.list__item loses its separator because :last-child matches it, so keep the class on the <li>. | Fixed in `components.css` as described. |
+| Description list | .dl is defined in the kit but no mock uses it; .facts and .facts-bar are what the person page ships. Both are documented. The mocks' own CSS styles the facts the same as the kit. | Fixed in `components.css` as described. |
+| Avatar | .avatar is declared twice: the first rule tints it with --color-accent-subtle and --color-fg-accent, a later brand block (line ~402) overrides it to --color-bg-subtle / --color-fg-muted. The later rule is what renders in the mocks, so it is what this page documents; the first colour pair is dead code. .avatar-group and the photo variant are in the kit but no mock uses them. | Fixed in `components.css` as described. |
+| Badge and status | .badge tones are in the kit but no mock uses them: the mocks report status with .req-status and .run-list__status text. They are documented because the tabs and members screens will need a neutral label. The mocks style the request counts in tabs as plain text-subtle numbers, not pills. | Fixed in `components.css` as described. |
+| Chip | Only .chip--day is used by the mocks; the filter and removable forms are kit components for the calendar's filtering. Gap: .chip:disabled has no style, so the mock's disabled day chips look enabled (busy dialogs rely on the dialog's own loading cue). .chip:focus-visible relies on the global ring rather than a chip rule. .chip[data-state="selected"] exists but no real page uses it. | Fixed in `components.css` as described. |
+| Stat | The small .stat block is in the kit but no mock uses it; the person page is built from .big-number and the .facts bar (see description list). The stat caption is not a CSS class: the mocks use text-muted text-sm utilities. | Fixed in `components.css` as described. |
+| Member list | The mocks' ids on the role selects (role-maya and so on) are replaced by aria-label in these examples so the same row can appear several times on a page. The mocks' hidden <label for> is equivalent. No mock styles an invited member differently; the invited row is a documented composition of the same classes. | Fixed in `components.css` as described. |
+| Request row | The mocks wrap the note and meta in an unstyled div.request-text; the kit CSS has no rule for it, so it is the grid's third cell by default. The checkbox's inline size and accent-color are inline styles in the mocks and are kept here as tokens. Neither the row nor the who button has a hover style in the kit. | Fixed in `components.css` as described. |
+| Toast | .toast--info/success/warning/danger only colour the icon (via the -on-inverse tokens, added to keep icon contrast on the inverse surface). .toast__progress is a fixed 60% strip with no countdown animation. The mocks put role="alert" on a toast nested in a polite region; the pattern is kept and documented. The region is position: fixed in the app; the documentation overrides it inline. | Fixed in `components.css` as described. |
+| Alert and banner | The mocks put the banner's spinner rule in components.css but ship the refresh icon instead; both are documented. The dismiss .close button and .alert__actions are not given a focus colour of their own, so they rely on the shared ring. | Fixed in `components.css` as described. |
+| Inline message | .field__error draws its ⚠ glyph with ::before content; the glyph is not announced, so the error text must stand on its own. The mocks pair .inline-status--success with a check icon but give no live-region markup; the pattern is documented. | Fixed in `components.css` as described. |
+| Progress bar | .progress does not appear in any mock; it ships in the kit for future imports and uploads. The mocks use only .usage-bar. .usage-bar__seg has no minimum width: a segment of 0 renders nothing, so the label is the only record. A segment of a few percent can fall below 3:1 against the track; the numbers must always be printed. | Fixed in `components.css` as described. |
+| Spinner | The mocks never draw .spinner directly: the busy button is the only place it appears, and the reconnecting banner uses the refresh icon. The spinner and its banner size ship in the kit and are documented here. .spinner has no role, so the markup supplies one. The reduced-motion rule stops it rather than keeping it turning. | Fixed in `components.css` as described. |
+| Skeleton | .skeleton--text:last-child sets 60% width whenever a text line is last in its parent, which overrides an inline width set on it; give the last line an inline width via style only on non-last lines or wrap it. The shimmer highlight is deliberately low contrast (about 1.2:1 to 1.7:1 against the surface). | Fixed in `components.css` as described. |
+| Empty state | The mocks draw the brand mark in .empty__icon for the team-level empty states instead of a glyph; the badge accepts any 4rem content. In the error form .empty--error only changes the badge, not the title colour; the heading and text are unchanged. | Fixed in `components.css` as described. |
+| Error page | The mocks wrap the empty state in .card-plain (a class defined with the sheet styles rather than the kit's card). Session expired is not an empty state: it is an auth card with an h1 and a lead paragraph. The offline page and the offline banner overlap in purpose; the page is for a cold load with no network, the banner for losing it mid-session. | Fixed in `components.css` as described. |
+| Logo lockup | the brand guide's "On ink" tile placed the default lockup (--color-fg-default) on a fixed ink background, so in the light theme the wordmark would be ink on ink; here the tile is wrapped in data-theme="dark". Clear space and minimum size are not in the mocks; they are derived from the lockup's em geometry and listed here as guidance. | Fixed in `components.css` as described. |
+| Sheet cell | button.cell:focus-visible drew the global green ring inset on the cell colour: about 1.5:1 on confirmed, tentative and off cells, below the 3:1 floor of WCAG 1.4.11 / 2.4.11. Fixed in components.css: the ring is now ink (--color-on-status, at least 4.5:1 on every status colour), and the focus ring token on empty cells.The selected ring (aria-pressed) used --color-fg-default, which is light in the dark theme (1.4:1 on requested). Fixed: ink on status cells, --color-fg-default on empty cells.The mocks' double encoding (aria-label containing the status plus aria-pressed) is kept; there is no pointer: coarse rule, so touch uses the same 24px minimum width. | Fixed in `components.css` as described. |
+| Team grid | .cover[data-level="ok"] is not in components.css; the mocks use data-level="some", which has no rule either and falls back to the base .cover style. Only none and short are styled. Document and use some.The mocks do not implement the roving tabindex, arrow-key, Home/End or Shift+arrow behaviour; only "Click or drag, or press Enter then arrow keys, Escape clears" is stated. The keyboard table here is the contract the Angular grid must meet (APG grid).There is no scroll-margin on cells, so a focused cell can sit under the sticky name column. Suggested: .cell { scroll-margin-left: 11rem; }.Left-column overage is red text plus a negative sign; the title carries the detail. | Fixed in `components.css` as described. |
+| Year grid | The first column (names) is not sticky in .year-grid, unlike .team-grid; on a phone the names scroll away with the months. Suggested: share the .grid-name sticky rule.Slivers have no glyph, so on the year view colour carries the status and the month-cell name only counts confirmed days; requested and tentative days are not in the name.At the minimum 3.9rem month width, 31 slivers are about 1px wide with 1px gaps, so individual days are barely resolvable below about 1400px wide; the grid is a pattern view.The mocks' .sliver only maps off to off-soft, so the grid's weekend colour differs from the team grid's full red on purpose. | Fixed in `components.css` as described. |
+| Month mini | Mini days are colour plus number only; the mocks give them no glyph (✓ … ?), unlike the sheet cell. The accessible name carries status, but sighted users with colour-vision loss see only the colour. Consider a corner glyph at 38px.The person page legend uses data-status="off-soft" for its swatch while the calendar legend uses off; both are valid, matching what each view draws. | Fixed in `components.css` as described. |
+| Legend | the legend swatch is colour-only by itself; it relies on the adjacent text, which is allowed. Glyphs (✓ … ?) are not shown in the legend, so a reader cannot learn the glyph-to-status mapping from it. | Fixed in `components.css` as described. |
+| Selection bar | Bug: .btn--inverse sets --btn-fg: inherit, so the busy spinner (border: 2px solid var(--btn-fg) while color is transparent) resolves to transparent: a busy inverse button shows nothing. Suggested: .btn--inverse[aria-busy="true"]::after { border-color: var(--color-fg-inverse); border-right-color: transparent; }.The bar's region is position: fixed with no documentation-friendly modifier; on this page the specimen overrides it inline with position: absolute inside a positioned box.Nothing in components.css reserves space so the bar does not cover the last grid row on short phones; the page needs bottom padding while the bar is open.The mocks show the bar but not the live-region announcement or the toolbar arrow-key navigation; both are specified here for the Angular build. | Fixed in `components.css` as described. |
+
+## Verification
+
+See the verification record at the end of this file (filled in after the final run).

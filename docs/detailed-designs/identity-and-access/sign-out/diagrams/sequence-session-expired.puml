@@ -1,0 +1,35 @@
+@startuml
+title UML sequence behaviour — Recover from an expired session
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Team user" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "Current page" as page
+  participant "SessionStore" as store
+  participant "SessionExpiredPage" as expired
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "JwtBearer authentication" as jwt
+end box
+actor -> page : Use the page after the session expired
+page -> jwt : Request with expired token
+jwt --> page : 401, code session_expired
+page -> store : expire(currentUrl)
+store -> expired : Navigate
+expired --> actor : "Your session has expired" (L2-007 AC1)
+actor -> expired : "Sign in", then sign in
+expired -> store : Read returnUrl
+store --> actor : Back on the original page (L2-007 AC2)
+@enduml

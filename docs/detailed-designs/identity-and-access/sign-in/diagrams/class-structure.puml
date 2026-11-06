@@ -1,0 +1,56 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Sign in
+
+class User <<exists>> {
+  +Guid Id
+  +string Email
+  +string DisplayName
+  +string PasswordHash
+  +UserRole Role
+  +DateTimeOffset CreatedUtc
+}
+enum UserRole <<exists>> {
+  Member
+  Manager
+  Admin
+}
+User --> UserRole : has
+
+class SignInCommand <<new>> {
+  +string Email
+  +string Password
+}
+class SessionDto <<new>> {
+  +string AccessToken
+  +DateTimeOffset ExpiresUtc
+  +Guid UserId
+  +string DisplayName
+  +UserRole Role
+  +Guid TeamId
+}
+class SignInCommandHandler <<new>> {
+  +Handle(command: SignInCommand): Task<SessionDto>
+}
+interface IPasswordHasher <<new>> {
+  +Hash(password: string): string
+  +Verify(hash: string, password: string): bool
+}
+interface ITokenService <<new>> {
+  +Issue(user: User, member: TeamMember): SessionDto
+}
+SignInCommandHandler ..> SignInCommand : handles
+SignInCommandHandler ..> SessionDto : returns
+SignInCommandHandler --> User : loads
+SignInCommandHandler ..> IPasswordHasher
+SignInCommandHandler ..> ITokenService
+@enduml

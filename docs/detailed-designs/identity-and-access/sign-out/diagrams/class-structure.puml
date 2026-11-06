@@ -1,0 +1,42 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Use the account menu and sign out
+
+class SessionStore <<new>> {
+  -token: string | null
+  -returnUrl: string | null
+  +current(): Session | null
+  +signOut(): Promise<void>
+  +expire(returnUrl: string): void
+}
+class UserMenuComponent <<new>> {
+  +user: UserSummary
+  +open(): void
+  +close(): void
+}
+class SignOutDialogComponent <<new>> {
+  +busy: boolean
+  +confirm(): Promise<void>
+}
+class SessionExpiredPage <<new>> {
+  +signInAgain(): void
+}
+class UserSummary <<new>> {
+  +string displayName
+  +string email
+  +UserRole role
+}
+UserMenuComponent --> UserSummary : shows
+UserMenuComponent ..> SignOutDialogComponent : opens
+SignOutDialogComponent ..> SessionStore : signOut()
+SessionExpiredPage ..> SessionStore : reads returnUrl
+@enduml

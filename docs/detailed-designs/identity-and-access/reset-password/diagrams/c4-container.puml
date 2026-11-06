@@ -1,0 +1,18 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Reset a forgotten password
+
+Person(visitor, "Visitor", "A person who is not signed in")
+System_Boundary(greenlit, "Greenlit") {
+  Container(spa, "Greenlit web application", "Angular", "Pages, dialogs and the gl-* components")
+  Container(api, "Greenlit API", "ASP.NET Core (Greenlit.Api)", "Controllers, MediatR handlers, domain rules")
+  ContainerDb(db, "Greenlit database", "SQL Server; SQLite in tests", "Teams, members, days, requests")
+}
+System_Ext(email, "Email provider", "Delivers invitation, reset and notification emails")
+
+Rel(visitor, spa, "Requests and uses a reset link through", "HTTPS")
+Rel(spa, api, "Calls", "JSON/HTTPS")
+Rel(api, db, "Reads and writes", "EF Core")
+Rel(api, email, "Sends email via", "SMTP <TO SUPPLY>")
+@enduml

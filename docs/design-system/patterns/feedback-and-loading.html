@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feedback and loading — Greenlit design system</title>
+<meta name="description" content="Tell the user the app heard them: skeletons while a region loads, a busy button while an action runs, words when it is done.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">Greenlit DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details><summary>Components · Actions</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/segmented-control.html">Segmented control</a></li>
+    </ul></details>
+    <details><summary>Components · Inputs</summary><ul>
+      <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/counter.html">Counter</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+    </ul></details>
+    <details><summary>Components · Navigation</summary><ul>
+      <li><a href="../components/app-nav.html">App navigation</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb and back link</a></li>
+      <li><a href="../components/pagination.html">Pagination</a></li>
+      <li><a href="../components/period-nav.html">Period navigation</a></li>
+      <li><a href="../components/settings-nav.html">Settings navigation</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+    </ul></details>
+    <details><summary>Components · Containers and overlays</summary><ul>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/divider.html">Divider</a></li>
+      <li><a href="../components/drawer.html">Drawer</a></li>
+      <li><a href="../components/layout-primitives.html">Layout primitives</a></li>
+      <li><a href="../components/tooltip.html">Tooltip</a></li>
+    </ul></details>
+    <details><summary>Components · Data display</summary><ul>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/badge.html">Badge and status</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/member-list.html">Member list</a></li>
+      <li><a href="../components/request-row.html">Request row</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+    </ul></details>
+    <details><summary>Components · Feedback</summary><ul>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress-bar.html">Progress bar</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/spinner.html">Spinner</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+    </ul></details>
+    <details><summary>Components · Sheet and brand</summary><ul>
+      <li><a href="../components/legend.html">Legend</a></li>
+      <li><a href="../components/logo-lockup.html">Logo lockup</a></li>
+      <li><a href="../components/month-mini.html">Month mini</a></li>
+      <li><a href="../components/selection-bar.html">Selection bar</a></li>
+      <li><a href="../components/sheet-cell.html">Sheet cell</a></li>
+      <li><a href="../components/team-grid.html">Team grid</a></li>
+      <li><a href="../components/year-grid.html">Year grid</a></li>
+    </ul></details>
+    <details><summary>Patterns</summary><ul>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/data-tables-and-lists.html">Data tables and lists</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/navigation-and-page-structure.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/sheet-interaction.html">Sheet interaction</a></li>
+    </ul></details>
+  </nav>
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Pattern</p>
+      <h1>Feedback and loading</h1>
+      <p class="ds-lead">Tell the user the app heard them: skeletons while a region loads, a busy button while an action runs, words when it is done.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#when">When to use which</a></li><li><a href="#structure">Structure</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don&#x27;t</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>Greenlit is a shared sheet; people glance at it, tap a day and move on. Feedback must therefore be fast, local and quiet. Show it where the user acted, keep the layout still, and say the outcome in text.</p>
+<p>Compose from <a href="../components/skeleton.html">skeleton</a>, <a href="../components/spinner.html">spinner</a>, <a href="../components/progress-bar.html">progress bar</a>, <a href="../components/inline-message.html">inline message</a>, <a href="../components/toast.html">toast</a> and the busy state of <a href="../components/button.html">button</a>. Failures continue in <a href="empty-and-error-states.html">Empty and error states</a>.</p>
+    </section>
+    <section class="ds-section" id="when"><h2><a href="#when">When to use which</a></h2>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Wait</th><th scope="col">Use</th><th scope="col">Why</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Under 100 ms</th><td>Nothing</td><td>Instant changes need no extra motion. The cell just changes colour.</td></tr>
+      <tr><th scope="row">Painting a day</th><td>Optimistic update, then roll back with an error toast</td><td>The sheet is the product; it must feel immediate.</td></tr>
+      <tr><th scope="row">Button action, 0.1 to 3 s</th><td>Busy button (<code>aria-busy</code>)</td><td>The feedback sits under the user's finger.</td></tr>
+      <tr><th scope="row">Region first load</th><td><a href="../components/skeleton.html">Skeleton</a> that matches the layout</td><td>No layout shift; sets expectations.</td></tr>
+      <tr><th scope="row">Known total</th><td><a href="../components/progress-bar.html">Progress bar</a></td><td>Allowance usage and imports, never as decoration.</td></tr>
+      <tr><th scope="row">Button inside a small space</th><td><a href="../components/spinner.html">Spinner</a></td><td>Banners and the connection status use a spinner.</td></tr>
+      <tr><th scope="row">Over 10 s</th><td>Keep the skeleton, add a sentence and a retry</td><td>Stop implying that progress is coming.</td></tr>
+    </tbody>
+  </table></div>
+<ul><li>Never block the whole page with a full-screen spinner. At most one region is replaced by a skeleton at a time.</li><li>A result the user must not miss (a failure) is a persistent message; a result they caused and can see (a colour changed) is at most a toast.</li></ul>
+    </section>
+    <section class="ds-section" id="structure"><h2><a href="#structure">Structure</a></h2>
+<p>A typical view moves through three feedback layers: the region shows a skeleton while it loads, the pressed button shows busy while its request runs, and a status line or toast reports the result.</p>
+<h3>Region loading</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="grid-card"><div class="stack" style="padding: var(--space-4);" aria-busy="true"><span class="skeleton skeleton--title" aria-hidden="true"></span><div class="cluster" aria-hidden="true"><span class="skeleton skeleton--circle" style="width: var(--space-6); height: var(--space-6);"></span><span class="skeleton skeleton--text" style="width: var(--space-24);"></span><span class="skeleton skeleton--text" style="flex: 1;"></span></div><div class="cluster" aria-hidden="true"><span class="skeleton skeleton--circle" style="width: var(--space-6); height: var(--space-6);"></span><span class="skeleton skeleton--text" style="width: var(--space-24);"></span><span class="skeleton skeleton--text" style="flex: 1;"></span></div><div class="cluster" aria-hidden="true"><span class="skeleton skeleton--circle" style="width: var(--space-6); height: var(--space-6);"></span><span class="skeleton skeleton--text" style="width: var(--space-24);"></span><span class="skeleton skeleton--text" style="flex: 1;"></span></div><p class="visually-hidden" role="status">Loading the calendar</p></div></div></div>
+  <div class="ds-example__caption"><span>Skeleton rows match the final layout so nothing jumps. The container is <code>aria-busy</code>; one visually hidden status sentence is announced, not one per skeleton.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;grid-card&quot;&gt;&lt;div class=&quot;stack&quot; style=&quot;padding: var(--space-4);&quot; aria-busy=&quot;true&quot;&gt;&lt;span class=&quot;skeleton skeleton--title&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;&lt;div class=&quot;cluster&quot; aria-hidden=&quot;true&quot;&gt;&lt;span class=&quot;skeleton skeleton--circle&quot; style=&quot;width: var(--space-6); height: var(--space-6);&quot;&gt;&lt;/span&gt;&lt;span class=&quot;skeleton skeleton--text&quot; style=&quot;width: var(--space-24);&quot;&gt;&lt;/span&gt;&lt;span class=&quot;skeleton skeleton--text&quot; style=&quot;flex: 1;&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;cluster&quot; aria-hidden=&quot;true&quot;&gt;&lt;span class=&quot;skeleton skeleton--circle&quot; style=&quot;width: var(--space-6); height: var(--space-6);&quot;&gt;&lt;/span&gt;&lt;span class=&quot;skeleton skeleton--text&quot; style=&quot;width: var(--space-24);&quot;&gt;&lt;/span&gt;&lt;span class=&quot;skeleton skeleton--text&quot; style=&quot;flex: 1;&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;cluster&quot; aria-hidden=&quot;true&quot;&gt;&lt;span class=&quot;skeleton skeleton--circle&quot; style=&quot;width: var(--space-6); height: var(--space-6);&quot;&gt;&lt;/span&gt;&lt;span class=&quot;skeleton skeleton--text&quot; style=&quot;width: var(--space-24);&quot;&gt;&lt;/span&gt;&lt;span class=&quot;skeleton skeleton--text&quot; style=&quot;flex: 1;&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;p class=&quot;visually-hidden&quot; role=&quot;status&quot;&gt;Loading the calendar&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Action busy and result</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="cluster"><button class="btn btn--primary" type="button" aria-busy="true">Send request</button><button class="btn" type="button">Cancel</button><span class="inline-status" role="status"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5"/></svg>Saving…</span></div><div class="cluster" style="margin-top: var(--space-4);"><span class="inline-status inline-status--success"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>Saved just now</span><span class="inline-status inline-status--danger"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Not saved. Try again.</span></div></div>
+  <div class="ds-example__caption"><span>Busy is on the pressed button only. The inline status states the outcome in words as well as colour.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;cluster&quot;&gt;&lt;button class=&quot;btn btn--primary&quot; type=&quot;button&quot; aria-busy=&quot;true&quot;&gt;Send request&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;Cancel&lt;/button&gt;&lt;span class=&quot;inline-status&quot; role=&quot;status&quot;&gt;&lt;svg class=&quot;icon icon--sm&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5&quot;/&gt;&lt;/svg&gt;Saving…&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;cluster&quot; style=&quot;margin-top: var(--space-4);&quot;&gt;&lt;span class=&quot;inline-status inline-status--success&quot;&gt;&lt;svg class=&quot;icon icon--sm&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;m8 12 3 3 5-6&quot;/&gt;&lt;/svg&gt;Saved just now&lt;/span&gt;&lt;span class=&quot;inline-status inline-status--danger&quot;&gt;&lt;svg class=&quot;icon icon--sm&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;M12 8v5M12 16h.01&quot;/&gt;&lt;/svg&gt;Not saved. Try again.&lt;/span&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Determinate progress</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="stack" style="width: 100%; max-width: 24rem;"><div class="cluster cluster--between"><span id="fl-prog">Allowance used</span><span class="text-muted">14 of 25 days</span></div><div class="progress" role="progressbar" aria-labelledby="fl-prog" aria-valuemin="0" aria-valuemax="25" aria-valuenow="14" style="--value: 56%;"><div class="progress__bar"></div></div></div></div>
+  <div class="ds-example__caption"><span>A progress bar is for a quantity with a known total; for an unknown wait use a skeleton or <code>progress--indeterminate</code>.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;stack&quot; style=&quot;width: 100%; max-width: 24rem;&quot;&gt;&lt;div class=&quot;cluster cluster--between&quot;&gt;&lt;span id=&quot;fl-prog&quot;&gt;Allowance used&lt;/span&gt;&lt;span class=&quot;text-muted&quot;&gt;14 of 25 days&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;progress&quot; role=&quot;progressbar&quot; aria-labelledby=&quot;fl-prog&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;25&quot; aria-valuenow=&quot;14&quot; style=&quot;--value: 56%;&quot;&gt;&lt;div class=&quot;progress__bar&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Phase</th><th scope="col">What shows</th><th scope="col">What is announced</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Idle</th><td>The content</td><td>Nothing</td></tr>
+      <tr><th scope="row">Loading</th><td>Skeleton in the region; controls for that region disabled</td><td>"Loading the calendar" once</td></tr>
+      <tr><th scope="row">Busy</th><td>Spinner in the pressed button; width unchanged</td><td>Nothing extra; <code>aria-busy</code> is read on focus</td></tr>
+      <tr><th scope="row">Success</th><td>Content updated; a toast when the change is not visible where the user is</td><td>Toast text through the polite live region</td></tr>
+      <tr><th scope="row">Failure</th><td>Inline message or error empty state; input is kept</td><td>Alert text, once</td></tr>
+      <tr><th scope="row">Slow</th><td>After 10 s add: "This is taking longer than usual." with Retry</td><td>Polite status</td></tr>
+    </tbody>
+  </table></div>
+<ul><li>Skeletons animate with a shimmer that stops under <code>prefers-reduced-motion</code>; the shape still communicates loading.</li><li>A skeleton never stands in for an error or an empty result.</li></ul>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<ul>
+ <li><b>360px:</b> skeleton rows are full width and the sheet skeleton scrolls inside its card like the real sheet. Busy buttons in a block footer keep their full width.</li>
+ <li><b>768px:</b> the same skeleton in the same position; do not add extra columns just to fill space.</li>
+ <li><b>1024px and up:</b> toasts appear bottom right, 24rem wide; on narrow screens they span the width above the selection bar.</li>
+ <li>Reserve the height of the region (min-height from the layout) so loading to loaded never shifts the page.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<ul>
+ <li>Exactly one polite live region per concern: one <code>role="status"</code> for the loading sentence, the toast region for results. Do not put <code>aria-live</code> on skeleton elements.</li>
+ <li>Mark skeleton shapes <code>aria-hidden="true"</code>; mark the loading container <code>aria-busy="true"</code> and clear it when done.</li>
+ <li>A busy button keeps its accessible name; it stays focusable so focus is not lost, and ignores activations.</li>
+ <li>After a region loads, do not move focus unless the user's last action opened it.</li>
+ <li>A progress bar has <code>role="progressbar"</code> with a name and <code>aria-valuenow</code>/<code>min</code>/<code>max</code>; the number is also written next to it.</li>
+ <li>Motion respects <code>prefers-reduced-motion</code>.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul>
+ <li>Loading sentences name the thing: "Loading the calendar", "Loading requests". Not "Please wait".</li>
+ <li>Inline progress is a present participle with an ellipsis: "Saving…". The result replaces it: "Saved just now".</li>
+ <li>Failure follows the formula: what happened, why if known, what to do, and whether anything changed: "Not saved. Check your connection and try again."</li>
+ <li>No exclamation marks, no humour while something is broken.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don&#x27;t</a></h2>
+<div class="ds-dodont">
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="stack" style="width: 100%;" aria-busy="true"><span class="skeleton skeleton--title" aria-hidden="true"></span><span class="skeleton skeleton--text" aria-hidden="true"></span><span class="skeleton skeleton--text" aria-hidden="true"></span></div></div><figcaption>show a skeleton shaped like the content that will replace it.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="cluster" style="width: 100%; justify-content: center; min-height: 6rem;"><span class="spinner spinner--lg" role="status" aria-label="Loading"></span></div></div><figcaption>swap the whole region for a lone spinner; the page jumps when content arrives.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><button class="btn btn--primary" type="button" aria-busy="true">Send request</button></div><figcaption>put the busy state on the button the user pressed.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="cluster"><button class="btn btn--primary" type="button" disabled>Send request</button><span class="spinner" role="status" aria-label="Sending"></span></div></div><figcaption>disable the button and park a spinner beside it; focus is lost and the name changes meaning.</figcaption></figure>
+</div>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<p>Composed from these mocks:</p>
+<ul><li><a href="../../mocks/pages/calendar/loading.html">pages/calendar/loading</a> (skeleton sheet)</li><li><a href="../../mocks/pages/requests/loading.html">pages/requests/loading</a> (skeleton list)</li><li><a href="../../mocks/dialogs/new-request/busy.html">dialogs/new-request/busy</a> (busy submit)</li><li><a href="../../mocks/pages/settings/submitting.html">pages/settings/submitting</a> (section submit)</li><li><a href="../../mocks/pages/create-team/submitting.html">pages/create-team/submitting</a> (auth card submit)</li><li><a href="../../mocks/pages/year/loading.html">pages/year/loading</a> (year skeleton)</li></ul>
+    </section>
+    <footer class="ds-footer"><span>Greenlit design system · extracted from <a href="../../mocks/index.html">docs/mocks</a></span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

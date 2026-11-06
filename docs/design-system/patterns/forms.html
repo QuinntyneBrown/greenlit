@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forms — Greenlit design system</title>
+<meta name="description" content="How Greenlit forms are composed, validated and submitted: labels, help, errors, the summary and the footer.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">Greenlit DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details><summary>Components · Actions</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/segmented-control.html">Segmented control</a></li>
+    </ul></details>
+    <details><summary>Components · Inputs</summary><ul>
+      <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/counter.html">Counter</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+    </ul></details>
+    <details><summary>Components · Navigation</summary><ul>
+      <li><a href="../components/app-nav.html">App navigation</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb and back link</a></li>
+      <li><a href="../components/pagination.html">Pagination</a></li>
+      <li><a href="../components/period-nav.html">Period navigation</a></li>
+      <li><a href="../components/settings-nav.html">Settings navigation</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+    </ul></details>
+    <details><summary>Components · Containers and overlays</summary><ul>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/divider.html">Divider</a></li>
+      <li><a href="../components/drawer.html">Drawer</a></li>
+      <li><a href="../components/layout-primitives.html">Layout primitives</a></li>
+      <li><a href="../components/tooltip.html">Tooltip</a></li>
+    </ul></details>
+    <details><summary>Components · Data display</summary><ul>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/badge.html">Badge and status</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/member-list.html">Member list</a></li>
+      <li><a href="../components/request-row.html">Request row</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+    </ul></details>
+    <details><summary>Components · Feedback</summary><ul>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress-bar.html">Progress bar</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/spinner.html">Spinner</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+    </ul></details>
+    <details><summary>Components · Sheet and brand</summary><ul>
+      <li><a href="../components/legend.html">Legend</a></li>
+      <li><a href="../components/logo-lockup.html">Logo lockup</a></li>
+      <li><a href="../components/month-mini.html">Month mini</a></li>
+      <li><a href="../components/selection-bar.html">Selection bar</a></li>
+      <li><a href="../components/sheet-cell.html">Sheet cell</a></li>
+      <li><a href="../components/team-grid.html">Team grid</a></li>
+      <li><a href="../components/year-grid.html">Year grid</a></li>
+    </ul></details>
+    <details><summary>Patterns</summary><ul>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/data-tables-and-lists.html">Data tables and lists</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/navigation-and-page-structure.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/sheet-interaction.html">Sheet interaction</a></li>
+    </ul></details>
+  </nav>
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Pattern</p>
+      <h1>Forms</h1>
+      <p class="ds-lead">How Greenlit forms are composed, validated and submitted: labels, help, errors, the summary and the footer.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#when">When to use which</a></li><li><a href="#structure">Structure</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don&#x27;t</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>Greenlit has few forms and each is short: sign in, create a team, invite a member, request time off, add a holiday, adjust an allowance, the settings sections. The pattern keeps them uniform so a manager who has learned one has learned all.</p>
+<p>Build forms from <a href="../components/form-field.html">form field</a> (label, control, help, error), <a href="../components/form-layout.html">form layout</a> and the controls: <a href="../components/text-field.html">text field</a>, <a href="../components/textarea.html">textarea</a>, <a href="../components/select.html">select</a>, <a href="../components/checkbox.html">checkbox</a>, <a href="../components/radio-group.html">radio group</a>, <a href="../components/switch.html">switch</a> and <a href="../components/counter.html">counter</a>. Submit with a <a href="../components/button.html">button</a>.</p>
+    </section>
+    <section class="ds-section" id="when"><h2><a href="#when">When to use which</a></h2>
+<p>Pick the container by how much context the task needs and how long it lives.</p>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Form</th><th scope="col">Use for</th><th scope="col">Container</th><th scope="col">Submit behaviour</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Dialog form</th><td>A short task started from a button: request time off, invite, add holiday, decline with a reason</td><td><a href="../components/dialog.html">Dialog</a>, 1 to 4 fields</td><td>Footer primary; the dialog stays open and busy until the server answers</td></tr>
+      <tr><th scope="row">Auth card</th><td>Sign in, create team, accept invite, reset password</td><td><code>.auth-card</code> on its own bare-shell page</td><td>One block primary on narrow screens; link to the sibling task underneath</td></tr>
+      <tr><th scope="row">Settings section</th><td>Standing configuration: team name, time zone, work week, allowances</td><td><code>.settings-section</code> with <code>fieldset</code></td><td>Section-level Save; a success toast, not a page reload</td></tr>
+      <tr><th scope="row">Drawer form</th><td>Editing one entity with many fields while the sheet stays visible</td><td><a href="../components/drawer.html">Drawer</a></td><td>Same footer rules as a dialog</td></tr>
+    </tbody>
+  </table></div>
+<ul>
+ <li>Fewer than five fields and started by a button: dialog. Never expand a form in place on the page.</li>
+ <li>Reached by a link or a route, with no sheet behind it: its own screen.</li>
+ <li>Changing a setting that applies instantly and is reversible: a <a href="../components/switch.html">switch</a> with a toast, no form at all.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="structure"><h2><a href="#structure">Structure</a></h2>
+<p>The reference composition is the <b>Request time off</b> dialog in its invalid state: a header that names the task and says who is affected, a danger summary that links to each broken field, the fields in a <code>.form-grid</code>, and a footer whose primary button stays last. Forms never sit inline on a page; a button opens a dialog or navigates to a screen.</p>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div style="position: relative; transform: translateZ(0); height: 30rem; overflow: hidden; width: 100%; border: 1px solid var(--color-border-default); border-radius: var(--radius-lg); background: var(--color-bg-surface-sunken);"><div class="backdrop"></div><div class="dialog" role="dialog" aria-labelledby="fm-title" aria-describedby="fm-title-desc"><div class="dialog__panel "><div class="dialog__header"><div style="flex: 1;"><h3 class="dialog__title" id="fm-title">Request time off</h3><p id="fm-title-desc" class="text-muted" style="margin-top: var(--space-1);">Maya Chen will be asked to approve it.</p></div><button class="btn btn--icon btn--ghost" type="button" aria-label="Close Request time off"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="dialog__body stack"><div class="alert alert--danger form-summary"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div class="alert__body"><div class="alert__title">Fix 1 thing to continue</div><div><a href="#fm-end">The end date is before the start date</a></div></div></div><div class="form-grid form-grid--2"><div class="field"><label class="field__label" for="fm-start">First day</label><input class="input" type="date" id="fm-start" name="fm-start" value="2026-12-11"></div><div class="field"><label class="field__label" for="fm-end">Last day</label><input class="input" type="date" id="fm-end" name="fm-end" value="2026-12-07" aria-describedby="fm-end-err" aria-invalid="true"><span class="field__error" id="fm-end-err">Pick a day on or after the first day.</span></div></div><div class="field"><label class="field__label" for="fm-note">Note <span class="optional">(optional)</span></label><input class="input" type="text" id="fm-note" name="fm-note" placeholder="e.g. Family trip"></div></div><div class="dialog__footer"><button class="btn" type="button">Cancel</button><button class="btn btn--primary" type="button" disabled>Send request</button></div></div></div></div></div>
+  <div class="ds-example__caption"><span>Dialog form, invalid state. In the live app the summary has <code>role="alert"</code> and focus moves to it; here it is static so the documentation page stays quiet. The submit stays disabled only while the summary is showing.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;position: relative; transform: translateZ(0); height: 30rem; overflow: hidden; width: 100%; border: 1px solid var(--color-border-default); border-radius: var(--radius-lg); background: var(--color-bg-surface-sunken);&quot;&gt;&lt;div class=&quot;backdrop&quot;&gt;&lt;/div&gt;&lt;div class=&quot;dialog&quot; role=&quot;dialog&quot; aria-labelledby=&quot;fm-title&quot; aria-describedby=&quot;fm-title-desc&quot;&gt;&lt;div class=&quot;dialog__panel &quot;&gt;&lt;div class=&quot;dialog__header&quot;&gt;&lt;div style=&quot;flex: 1;&quot;&gt;&lt;h3 class=&quot;dialog__title&quot; id=&quot;fm-title&quot;&gt;Request time off&lt;/h3&gt;&lt;p id=&quot;fm-title-desc&quot; class=&quot;text-muted&quot; style=&quot;margin-top: var(--space-1);&quot;&gt;Maya Chen will be asked to approve it.&lt;/p&gt;&lt;/div&gt;&lt;button class=&quot;btn btn--icon btn--ghost&quot; type=&quot;button&quot; aria-label=&quot;Close Request time off&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;dialog__body stack&quot;&gt;&lt;div class=&quot;alert alert--danger form-summary&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;M12 8v5M12 16h.01&quot;/&gt;&lt;/svg&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;Fix 1 thing to continue&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;#fm-end&quot;&gt;The end date is before the start date&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;form-grid form-grid--2&quot;&gt;&lt;div class=&quot;field&quot;&gt;&lt;label class=&quot;field__label&quot; for=&quot;fm-start&quot;&gt;First day&lt;/label&gt;&lt;input class=&quot;input&quot; type=&quot;date&quot; id=&quot;fm-start&quot; name=&quot;fm-start&quot; value=&quot;2026-12-11&quot;&gt;&lt;/div&gt;&lt;div class=&quot;field&quot;&gt;&lt;label class=&quot;field__label&quot; for=&quot;fm-end&quot;&gt;Last day&lt;/label&gt;&lt;input class=&quot;input&quot; type=&quot;date&quot; id=&quot;fm-end&quot; name=&quot;fm-end&quot; value=&quot;2026-12-07&quot; aria-describedby=&quot;fm-end-err&quot; aria-invalid=&quot;true&quot;&gt;&lt;span class=&quot;field__error&quot; id=&quot;fm-end-err&quot;&gt;Pick a day on or after the first day.&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;field&quot;&gt;&lt;label class=&quot;field__label&quot; for=&quot;fm-note&quot;&gt;Note &lt;span class=&quot;optional&quot;&gt;(optional)&lt;/span&gt;&lt;/label&gt;&lt;input class=&quot;input&quot; type=&quot;text&quot; id=&quot;fm-note&quot; name=&quot;fm-note&quot; placeholder=&quot;e.g. Family trip&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;dialog__footer&quot;&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;Cancel&lt;/button&gt;&lt;button class=&quot;btn btn--primary&quot; type=&quot;button&quot; disabled&gt;Send request&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Validation timing</h3>
+<p>Fields validate on blur, once, then re-validate on every change until valid. The summary appears on a submit attempt and lists every failing field as a link to that field.</p>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="stack" style="max-width: 24rem;"><div class="field"><label class="field__label" for="fm-name">Team name</label><input class="input" type="text" id="fm-name" name="fm-name" value="Design team" aria-describedby="fm-name-help"><span class="field__help" id="fm-name-help">Shown at the top of the calendar for everyone.</span></div><div class="field"><label class="field__label" for="fm-days">Yearly days</label><input class="input" type="number" id="fm-days" name="fm-days" value="-3" aria-describedby="fm-days-err" aria-invalid="true"><span class="field__error" id="fm-days-err">Use 0 or more days a year.</span></div><div class="field"><label class="field__label" for="fm-zone">Time zone</label><select class="select" id="fm-zone" name="fm-zone" aria-describedby="fm-zone-help"><option>London (GMT+0 / BST)</option><option>Dublin</option></select><span class="field__help" id="fm-zone-help">Weekends and holidays are worked out in this time zone.</span></div></div></div>
+  <div class="ds-example__caption"><span>Help sits under the control and is referenced by <code>aria-describedby</code>; the error replaces nothing, it is added below and referenced too.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;stack&quot; style=&quot;max-width: 24rem;&quot;&gt;&lt;div class=&quot;field&quot;&gt;&lt;label class=&quot;field__label&quot; for=&quot;fm-name&quot;&gt;Team name&lt;/label&gt;&lt;input class=&quot;input&quot; type=&quot;text&quot; id=&quot;fm-name&quot; name=&quot;fm-name&quot; value=&quot;Design team&quot; aria-describedby=&quot;fm-name-help&quot;&gt;&lt;span class=&quot;field__help&quot; id=&quot;fm-name-help&quot;&gt;Shown at the top of the calendar for everyone.&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;field&quot;&gt;&lt;label class=&quot;field__label&quot; for=&quot;fm-days&quot;&gt;Yearly days&lt;/label&gt;&lt;input class=&quot;input&quot; type=&quot;number&quot; id=&quot;fm-days&quot; name=&quot;fm-days&quot; value=&quot;-3&quot; aria-describedby=&quot;fm-days-err&quot; aria-invalid=&quot;true&quot;&gt;&lt;span class=&quot;field__error&quot; id=&quot;fm-days-err&quot;&gt;Use 0 or more days a year.&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;field&quot;&gt;&lt;label class=&quot;field__label&quot; for=&quot;fm-zone&quot;&gt;Time zone&lt;/label&gt;&lt;select class=&quot;select&quot; id=&quot;fm-zone&quot; name=&quot;fm-zone&quot; aria-describedby=&quot;fm-zone-help&quot;&gt;&lt;option&gt;London (GMT+0 / BST)&lt;/option&gt;&lt;option&gt;Dublin&lt;/option&gt;&lt;/select&gt;&lt;span class=&quot;field__help&quot; id=&quot;fm-zone-help&quot;&gt;Weekends and holidays are worked out in this time zone.&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Form actions</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="cluster cluster--end" style="width: 100%;"><button class="btn" type="button">Cancel</button><button class="btn btn--primary" type="button">Save changes</button></div></div>
+  <div class="ds-example__caption"><span>Secondary left, primary last. One primary per form. A destructive form swaps the primary for <code>btn--danger</code>.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;cluster cluster--end&quot; style=&quot;width: 100%;&quot;&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;Cancel&lt;/button&gt;&lt;button class=&quot;btn btn--primary&quot; type=&quot;button&quot;&gt;Save changes&lt;/button&gt;&lt;/div&gt;</code></pre></details>
+</div>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">State</th><th scope="col">What the user sees</th><th scope="col">Markup</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Pristine</th><td>Labels, optional help, enabled submit. No errors are shown before the user has acted.</td><td><code>.field</code> only</td></tr>
+      <tr><th scope="row">Field invalid</th><td>Red border, the warning glyph and an error sentence under the field.</td><td><code>aria-invalid="true"</code> + <code>aria-describedby</code> to <code>.field__error</code></td></tr>
+      <tr><th scope="row">Summary</th><td>Danger alert at the top of the body naming how many things to fix, each linking to its field.</td><td><code>.alert.alert--danger.form-summary</code>, <code>role="alert"</code></td></tr>
+      <tr><th scope="row">Busy</th><td>The pressed button shows its spinner; the fields are read-only; Cancel stays active.</td><td><code>aria-busy="true"</code> on the submit</td></tr>
+      <tr><th scope="row">Server failed</th><td>A danger alert replaces the summary: what failed, that nothing changed, what to do.</td><td><code>.alert--danger</code> at the top of the body</td></tr>
+      <tr><th scope="row">Success</th><td>The dialog closes and a toast confirms. On an auth card the card is replaced by a success message.</td><td><a href="../components/toast.html">Toast</a></td></tr>
+    </tbody>
+  </table></div>
+<ul><li>Never disable a field to mean busy; use <code>readonly</code> so values stay selectable and announced.</li><li>The form keeps the user's input after a failure. Only the password fields are cleared.</li></ul>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<ul>
+ <li><b>360px:</b> one column. <code>.form-grid--2</code> collapses automatically; dialogs become bottom sheets with the footer pinned (<code>position: sticky</code>); auth-card primary is <code>btn--block</code>.</li>
+ <li><b>768px:</b> two-column grids for paired fields (first day / last day, role / yearly days). Dialogs centre at 32rem.</li>
+ <li><b>1024px and up:</b> settings sections sit beside the settings navigation; field width never exceeds 32rem, so lines of help text stay short.</li>
+ <li>Inputs are at least 16px so mobile browsers do not zoom on focus; controls are at least 40px tall.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<ul>
+ <li><b>Every control has a visible <code>&lt;label for&gt;</code>.</b> A placeholder is an example, never the label. Table-like rows of inputs (member roles) use a visually hidden label naming the person.</li>
+ <li><b>Focus on open:</b> the first field (<code>autofocus</code>) or, for a confirmation, the safest button. <b>Focus on submit failure:</b> the error summary; each link moves focus to its field.</li>
+ <li><b>Announce:</b> the summary uses <code>role="alert"</code>; field errors are read because the field's <code>aria-describedby</code> points to them. Do not also make each field error a live region.</li>
+ <li><b>Order:</b> DOM order is visual order. Required is the default, so only optional fields are marked, in text: "(optional)".</li>
+ <li>Group related controls (radio sets, the work week) in a <code>fieldset</code> with a <code>legend</code>.</li>
+ <li>Never rely on the red border alone: the error text and the warning glyph carry the state.</li>
+</ul>
+<p>Controls follow their component pages: <a href="../components/text-field.html">text field</a>, <a href="../components/select.html">select</a>, <a href="../components/radio-group.html">radio group</a>.</p>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul>
+ <li><b>Labels</b> are nouns in sentence case: "First day", "Team name". No colons, no "Please enter".</li>
+ <li><b>Error formula:</b> what is wrong, then what to do. "Pick a day on or after the first day." Not "Invalid date".</li>
+ <li><b>Summary title:</b> "Fix 1 thing to continue" / "Fix 3 things to continue".</li>
+ <li><b>Help</b> says why or what for, once: "Weekends and holidays are worked out in this time zone."</li>
+ <li><b>Primary button</b> is the verb of the task: "Send request", "Invite member", "Add holiday", not "Submit" or "OK".</li>
+ <li><b>Cancel</b> is "Cancel" unless the dialog is a confirmation, where the safe option names the outcome: "Keep pending".</li>
+</ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don&#x27;t</a></h2>
+<div class="ds-dodont">
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="field"><label class="field__label" for="fm-do1">Last day</label><input class="input" type="date" id="fm-do1" name="fm-do1" value="2026-12-07" aria-describedby="fm-do1-err" aria-invalid="true"><span class="field__error" id="fm-do1-err">Pick a day on or after the first day.</span></div></div><figcaption>say what to change, tied to the field with <code>aria-describedby</code>.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="field"><label class="field__label" for="fm-dont1">Last day</label><input class="input" type="date" id="fm-dont1" name="fm-dont1" value="2026-12-07" aria-invalid="true"><span class="field__error" id="fm-dont1-err">Invalid input</span></div></div><figcaption>a generic message that does not say what to change and is not associated with the control.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="cluster"><button class="btn" type="button">Cancel</button><button class="btn btn--primary" type="button">Send request</button></div></div><figcaption>name the task in the primary and put it last.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="cluster"><button class="btn btn--primary" type="button">Submit</button><button class="btn" type="button">Reset</button></div></div><figcaption>a vague verb first, and a Reset that discards the member's input.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="field"><label class="field__label" for="fm-do3">Time zone</label><select class="select" id="fm-do3" name="fm-do3"><option>London (GMT+0 / BST)</option></select><span class="field__help" id="fm-do3-help">Weekends and holidays are worked out in this time zone.</span></div></div><figcaption>put the reason under the control in help text.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="field"><label class="field__label" for="fm-dont3">Time zone</label><input class="input" type="text" id="fm-dont3" name="fm-dont3" placeholder="Enter the team time zone in IANA format, e.g. Europe/London"></div></div><figcaption>put instructions in the placeholder; they vanish as soon as the user types.</figcaption></figure>
+</div>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<p>Composed from these mocks:</p>
+<ul><li><a href="../../mocks/dialogs/new-request/invalid.html">dialogs/new-request/invalid</a> (dialog form with error summary and field error)</li><li><a href="../../mocks/dialogs/invite-member/invalid.html">dialogs/invite-member/invalid</a> (invite form)</li><li><a href="../../mocks/dialogs/add-holiday/default.html">dialogs/add-holiday/default</a> (short dialog form)</li><li><a href="../../mocks/pages/settings/invalid.html">pages/settings/invalid</a> (settings validation)</li><li><a href="../../mocks/pages/create-team/invalid.html">pages/create-team/invalid</a> (auth-card form)</li><li><a href="../../mocks/pages/settings/default.html">pages/settings/default</a> (settings section with fieldset and member rows)</li></ul>
+    </section>
+    <footer class="ds-footer"><span>Greenlit design system · extracted from <a href="../../mocks/index.html">docs/mocks</a></span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

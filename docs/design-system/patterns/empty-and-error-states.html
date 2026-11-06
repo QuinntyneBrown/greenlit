@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Empty and error states — Greenlit design system</title>
+<meta name="description" content="What to show when there is nothing to show, when the list is filtered to nothing, and when something fails.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">Greenlit DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details><summary>Components · Actions</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/segmented-control.html">Segmented control</a></li>
+    </ul></details>
+    <details><summary>Components · Inputs</summary><ul>
+      <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/counter.html">Counter</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+    </ul></details>
+    <details><summary>Components · Navigation</summary><ul>
+      <li><a href="../components/app-nav.html">App navigation</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb and back link</a></li>
+      <li><a href="../components/pagination.html">Pagination</a></li>
+      <li><a href="../components/period-nav.html">Period navigation</a></li>
+      <li><a href="../components/settings-nav.html">Settings navigation</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+    </ul></details>
+    <details><summary>Components · Containers and overlays</summary><ul>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/divider.html">Divider</a></li>
+      <li><a href="../components/drawer.html">Drawer</a></li>
+      <li><a href="../components/layout-primitives.html">Layout primitives</a></li>
+      <li><a href="../components/tooltip.html">Tooltip</a></li>
+    </ul></details>
+    <details><summary>Components · Data display</summary><ul>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/badge.html">Badge and status</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/member-list.html">Member list</a></li>
+      <li><a href="../components/request-row.html">Request row</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+    </ul></details>
+    <details><summary>Components · Feedback</summary><ul>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress-bar.html">Progress bar</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/spinner.html">Spinner</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+    </ul></details>
+    <details><summary>Components · Sheet and brand</summary><ul>
+      <li><a href="../components/legend.html">Legend</a></li>
+      <li><a href="../components/logo-lockup.html">Logo lockup</a></li>
+      <li><a href="../components/month-mini.html">Month mini</a></li>
+      <li><a href="../components/selection-bar.html">Selection bar</a></li>
+      <li><a href="../components/sheet-cell.html">Sheet cell</a></li>
+      <li><a href="../components/team-grid.html">Team grid</a></li>
+      <li><a href="../components/year-grid.html">Year grid</a></li>
+    </ul></details>
+    <details><summary>Patterns</summary><ul>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/data-tables-and-lists.html">Data tables and lists</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/navigation-and-page-structure.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/sheet-interaction.html">Sheet interaction</a></li>
+    </ul></details>
+  </nav>
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Pattern</p>
+      <h1>Empty and error states</h1>
+      <p class="ds-lead">What to show when there is nothing to show, when the list is filtered to nothing, and when something fails.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#when">When to use which</a></li><li><a href="#structure">Structure</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don&#x27;t</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>An empty or failed region is a moment where a manager can get stuck, so it must answer three questions: what is this, why is it empty or broken, and what do I do now. Greenlit uses one component, <a href="../components/empty-state.html">empty state</a>, for the first two and <a href="../components/error-page.html">error page</a> for whole-screen failures, plus <a href="../components/alert.html">alerts</a> and <a href="../components/inline-message.html">inline messages</a> when the rest of the screen is still usable.</p>
+    </section>
+    <section class="ds-section" id="when"><h2><a href="#when">When to use which</a></h2>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Situation</th><th scope="col">Pattern</th><th scope="col">Action offered</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Brand-new team, no members</th><td>Empty state with the logo mark</td><td>Open settings (manager) / nothing (member)</td></tr>
+      <tr><th scope="row">List is empty because nothing is pending</th><td>Compact empty state</td><td>None</td></tr>
+      <tr><th scope="row">Filter or search matches nothing</th><td>Compact empty state, names the filter</td><td>Clear the filter</td></tr>
+      <tr><th scope="row">A region failed to load, rest of page fine</th><td>Empty state, <code>empty--error</code></td><td>Try again</td></tr>
+      <tr><th scope="row">Whole screen failed (500)</th><td><a href="../components/error-page.html">Error page</a> in the app shell</td><td>Try again, Back to calendar</td></tr>
+      <tr><th scope="row">Unknown route (404)</th><td>Error page</td><td>Back to calendar</td></tr>
+      <tr><th scope="row">No permission (403)</th><td>Error page that names who can do it</td><td>Back to calendar</td></tr>
+      <tr><th scope="row">Session ended</th><td>Bare-shell page</td><td>Sign in again</td></tr>
+      <tr><th scope="row">Network lost</th><td>Banner, content stays</td><td>None; reconnects itself</td></tr>
+    </tbody>
+  </table></div>
+<ul><li>If any useful content remains, prefer a banner or inline message over replacing the page.</li><li>Empty is not an error. Do not use the danger tint unless something broke.</li></ul>
+    </section>
+    <section class="ds-section" id="structure"><h2><a href="#structure">Structure</a></h2>
+<p>Every empty or error state has the same four parts: an icon that is decoration, a title that names the state, one sentence of explanation, and at most two actions. Only the icon colour and the action change.</p>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="empty "><div class="empty__icon" aria-hidden="true"><svg class="mark" viewBox="0 0 41 30" aria-hidden="true"><rect class="mark__n" x="0" y="0" width="8" height="8" rx="1.75"/><rect class="mark__n" x="11" y="0" width="8" height="8" rx="1.75"/><rect class="mark__n" x="22" y="0" width="8" height="8" rx="1.75"/><rect class="mark__c" x="33" y="0" width="8" height="8" rx="1.75"/><rect class="mark__c" x="0" y="11" width="8" height="8" rx="1.75"/><rect class="mark__n" x="11" y="11" width="8" height="8" rx="1.75"/><rect class="mark__c" x="22" y="11" width="8" height="8" rx="1.75"/><rect class="mark__n" x="33" y="11" width="8" height="8" rx="1.75"/><rect class="mark__n" x="0" y="22" width="8" height="8" rx="1.75"/><rect class="mark__c" x="11" y="22" width="8" height="8" rx="1.75"/><rect class="mark__n" x="22" y="22" width="8" height="8" rx="1.75"/><rect class="mark__n" x="33" y="22" width="8" height="8" rx="1.75"/></svg></div><h3 class="empty__title">No one on the team yet</h3><p class="empty__text">Invite your team from Settings to start planning time off.</p><div class="empty__actions"><button class="btn btn--primary" type="button">Open settings</button></div></div></div>
+  <div class="ds-example__caption"><span>First-run empty: it says what is missing and gives the one action that fixes it.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;empty &quot;&gt;&lt;div class=&quot;empty__icon&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;mark&quot; viewBox=&quot;0 0 41 30&quot; aria-hidden=&quot;true&quot;&gt;&lt;rect class=&quot;mark__n&quot; x=&quot;0&quot; y=&quot;0&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;rect class=&quot;mark__n&quot; x=&quot;11&quot; y=&quot;0&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;rect class=&quot;mark__n&quot; x=&quot;22&quot; y=&quot;0&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;rect class=&quot;mark__c&quot; x=&quot;33&quot; y=&quot;0&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;rect class=&quot;mark__c&quot; x=&quot;0&quot; y=&quot;11&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;rect class=&quot;mark__n&quot; x=&quot;11&quot; y=&quot;11&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;rect class=&quot;mark__c&quot; x=&quot;22&quot; y=&quot;11&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;rect class=&quot;mark__n&quot; x=&quot;33&quot; y=&quot;11&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;rect class=&quot;mark__n&quot; x=&quot;0&quot; y=&quot;22&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;rect class=&quot;mark__c&quot; x=&quot;11&quot; y=&quot;22&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;rect class=&quot;mark__n&quot; x=&quot;22&quot; y=&quot;22&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;rect class=&quot;mark__n&quot; x=&quot;33&quot; y=&quot;22&quot; width=&quot;8&quot; height=&quot;8&quot; rx=&quot;1.75&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;h3 class=&quot;empty__title&quot;&gt;No one on the team yet&lt;/h3&gt;&lt;p class=&quot;empty__text&quot;&gt;Invite your team from Settings to start planning time off.&lt;/p&gt;&lt;div class=&quot;empty__actions&quot;&gt;&lt;button class=&quot;btn btn--primary&quot; type=&quot;button&quot;&gt;Open settings&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="empty empty--error"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><h3 class="empty__title">We couldn't load the calendar</h3><p class="empty__text">Something went wrong on our side. Your days are safe, and nothing was changed.</p><div class="empty__actions"><button class="btn btn--primary" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5"/></svg>Try again</button></div></div></div>
+  <div class="ds-example__caption"><span>Error: <code>empty--error</code> tints the icon; the action retries the same request.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;empty empty--error&quot;&gt;&lt;div class=&quot;empty__icon&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon icon--lg&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;M12 8v5M12 16h.01&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;h3 class=&quot;empty__title&quot;&gt;We couldn&#x27;t load the calendar&lt;/h3&gt;&lt;p class=&quot;empty__text&quot;&gt;Something went wrong on our side. Your days are safe, and nothing was changed.&lt;/p&gt;&lt;div class=&quot;empty__actions&quot;&gt;&lt;button class=&quot;btn btn--primary&quot; type=&quot;button&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5&quot;/&gt;&lt;/svg&gt;Try again&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="empty empty--compact"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg></div><h3 class="empty__title">No requests waiting</h3><p class="empty__text">When a member requests time off, it appears here for you to confirm.</p><div class="empty__actions"></div></div></div>
+  <div class="ds-example__caption"><span>Compact variant for a list or panel inside a page. Nothing to do, so no action.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;empty empty--compact&quot;&gt;&lt;div class=&quot;empty__icon&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon icon--lg&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;m8 12 3 3 5-6&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;h3 class=&quot;empty__title&quot;&gt;No requests waiting&lt;/h3&gt;&lt;p class=&quot;empty__text&quot;&gt;When a member requests time off, it appears here for you to confirm.&lt;/p&gt;&lt;div class=&quot;empty__actions&quot;&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Page-level errors</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="empty "><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></div><h3 class="empty__title">This page doesn't exist</h3><p class="empty__text">The link may be old or mistyped.</p><div class="empty__actions"><a class="btn btn--primary" href="#fe-top">Back to calendar</a></div></div></div>
+  <div class="ds-example__caption"><span>404 uses the same structure. A link, not a button, because it navigates.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;empty &quot;&gt;&lt;div class=&quot;empty__icon&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon icon--lg&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;rect x=&quot;4&quot; y=&quot;5&quot; width=&quot;16&quot; height=&quot;15&quot; rx=&quot;2&quot;/&gt;&lt;path d=&quot;M4 10h16M9 3v4M15 3v4&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;h3 class=&quot;empty__title&quot;&gt;This page doesn&#x27;t exist&lt;/h3&gt;&lt;p class=&quot;empty__text&quot;&gt;The link may be old or mistyped.&lt;/p&gt;&lt;div class=&quot;empty__actions&quot;&gt;&lt;a class=&quot;btn btn--primary&quot; href=&quot;#fe-top&quot;&gt;Back to calendar&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<span id="fe-top"></span>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">State</th><th scope="col">Icon</th><th scope="col">Title example</th><th scope="col">Action</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">First run</th><td>Logo mark</td><td>No one on the team yet</td><td>Primary: the setup step</td></tr>
+      <tr><th scope="row">Nothing pending</th><td>Check circle</td><td>No requests waiting</td><td>None</td></tr>
+      <tr><th scope="row">No results</th><td>Search or filter glyph</td><td>No members match "ben"</td><td>Clear search</td></tr>
+      <tr><th scope="row">Load failed</th><td>Alert circle, danger tint</td><td>We couldn't load the calendar</td><td>Try again</td></tr>
+      <tr><th scope="row">Forbidden</th><td>Lock</td><td>You don't have access to this page</td><td>Back to calendar</td></tr>
+      <tr><th scope="row">Not found</th><td>Calendar</td><td>This page doesn't exist</td><td>Back to calendar</td></tr>
+    </tbody>
+  </table></div>
+<ul><li>While a retry runs, the Try again button is busy; the message stays so the page does not flash.</li><li>If the retry fails again, change the sentence ("Still can't load it. Check your connection.") rather than repeating it.</li></ul>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<ul>
+ <li><b>360px:</b> the block is centred, padded <code>--space-6</code> on the sides; actions stack and the primary is first in the reading order.</li>
+ <li><b>768px:</b> actions sit side by side; the text measure is capped at about 36ch.</li>
+ <li><b>1024px and up:</b> the empty state is centred in its region, not in the viewport, so the topbar and navigation stay visible.</li>
+ <li>The compact variant is used wherever the region is under about 20rem tall.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<ul>
+ <li>The title is a real heading at the next level in the page (<code>h2</code> in a region, <code>h1</code> when it is the whole page). The icon is <code>aria-hidden</code>.</li>
+ <li>When an error replaces content after a user action, move focus to the title (<code>tabindex="-1"</code>) or announce it with <code>role="alert"</code>; on first page load do neither, the heading is read in order.</li>
+ <li>After Try again succeeds, move focus to the new region's heading.</li>
+ <li>The state is never carried by the icon colour alone: the title says "couldn't load".</li>
+ <li>Actions are real buttons or links in reading order after the text.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul>
+ <li><b>Empty formula:</b> what this place is for, then the next step. "No requests waiting. When a member requests time off, it appears here for you to confirm."</li>
+ <li><b>Error formula:</b> what happened + why (if known and useful) + what to do + what was kept. "We couldn't load the calendar. Something went wrong on our side. Your days are safe, and nothing was changed."</li>
+ <li>Title: a short statement in sentence case, with no full stop.</li>
+ <li>Do not blame the user or the browser. Do not say "Oops". Do not show raw error codes; put a reference id in small text only for server errors.</li>
+ <li>Use the domain words: team, member, day, holiday, manager.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don&#x27;t</a></h2>
+<div class="ds-dodont">
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="empty empty--compact"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg></div><h3 class="empty__title">No requests waiting</h3><p class="empty__text">When a member requests time off, it appears here for you to confirm.</p><div class="empty__actions"></div></div></div><figcaption>explain what the place is for and what will appear.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="empty empty--compact"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></div><h3 class="empty__title">Nothing here</h3><p class="empty__text">No data.</p><div class="empty__actions"></div></div></div><figcaption>say nothing useful; the manager cannot tell if it is broken or simply empty.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="empty empty--compact empty--error"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><h3 class="empty__title">We couldn't load the calendar</h3><p class="empty__text">Something went wrong on our side. Your days are safe, and nothing was changed.</p><div class="empty__actions"><button class="btn btn--primary" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5"/></svg>Try again</button></div></div></div><figcaption>reassure about the data and offer the retry.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="empty empty--compact empty--error"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><h3 class="empty__title">Error 500</h3><p class="empty__text">Oops! Something went wrong.</p><div class="empty__actions"></div></div></div><figcaption>show a bare code, a joke, and no way forward.</figcaption></figure>
+</div>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<p>Composed from these mocks:</p>
+<ul><li><a href="../../mocks/pages/calendar/empty.html">pages/calendar/empty</a> (first-run empty)</li><li><a href="../../mocks/pages/calendar/error.html">pages/calendar/error</a> (region error with retry)</li><li><a href="../../mocks/pages/requests/empty.html">pages/requests/empty</a> (nothing pending)</li><li><a href="../../mocks/pages/not-found/default.html">pages/not-found/default</a> (404)</li><li><a href="../../mocks/pages/forbidden/default.html">pages/forbidden/default</a> (403)</li><li><a href="../../mocks/pages/server-error/default.html">pages/server-error/default</a> (500)</li><li><a href="../../mocks/pages/session-expired/default.html">pages/session-expired/default</a> (bare-shell state)</li><li><a href="../../mocks/pages/offline/default.html">pages/offline/default</a> (offline)</li><li><a href="../../mocks/pages/year/empty.html">pages/year/empty</a> (year empty)</li></ul>
+    </section>
+    <footer class="ds-footer"><span>Greenlit design system · extracted from <a href="../../mocks/index.html">docs/mocks</a></span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

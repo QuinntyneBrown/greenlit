@@ -1,0 +1,10 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Accept an invitation
+
+Person(invitee, "Invitee", "A person invited to a team by email")
+System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacation spreadsheet")
+
+Rel(invitee, greenlit, "Joins a team in")
+@enduml

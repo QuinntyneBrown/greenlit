@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dialog — Greenlit design system</title>
+<meta name="description" content="The dialog is the modal for confirmations and short forms: sign out, remove a member, add a day off, decline a request.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">Greenlit DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details><summary>Components · Actions</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/segmented-control.html">Segmented control</a></li>
+    </ul></details>
+    <details><summary>Components · Inputs</summary><ul>
+      <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/counter.html">Counter</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+    </ul></details>
+    <details><summary>Components · Navigation</summary><ul>
+      <li><a href="../components/app-nav.html">App navigation</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb and back link</a></li>
+      <li><a href="../components/pagination.html">Pagination</a></li>
+      <li><a href="../components/period-nav.html">Period navigation</a></li>
+      <li><a href="../components/settings-nav.html">Settings navigation</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+    </ul></details>
+    <details><summary>Components · Containers and overlays</summary><ul>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/divider.html">Divider</a></li>
+      <li><a href="../components/drawer.html">Drawer</a></li>
+      <li><a href="../components/layout-primitives.html">Layout primitives</a></li>
+      <li><a href="../components/tooltip.html">Tooltip</a></li>
+    </ul></details>
+    <details><summary>Components · Data display</summary><ul>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/badge.html">Badge and status</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/member-list.html">Member list</a></li>
+      <li><a href="../components/request-row.html">Request row</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+    </ul></details>
+    <details><summary>Components · Feedback</summary><ul>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress-bar.html">Progress bar</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/spinner.html">Spinner</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+    </ul></details>
+    <details><summary>Components · Sheet and brand</summary><ul>
+      <li><a href="../components/legend.html">Legend</a></li>
+      <li><a href="../components/logo-lockup.html">Logo lockup</a></li>
+      <li><a href="../components/month-mini.html">Month mini</a></li>
+      <li><a href="../components/selection-bar.html">Selection bar</a></li>
+      <li><a href="../components/sheet-cell.html">Sheet cell</a></li>
+      <li><a href="../components/team-grid.html">Team grid</a></li>
+      <li><a href="../components/year-grid.html">Year grid</a></li>
+    </ul></details>
+    <details><summary>Patterns</summary><ul>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/data-tables-and-lists.html">Data tables and lists</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/navigation-and-page-structure.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/sheet-interaction.html">Sheet interaction</a></li>
+    </ul></details>
+  </nav>
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Component · Containers and overlays</p>
+      <h1>Dialog</h1>
+      <p class="ds-lead">The dialog is the modal for confirmations and short forms: sign out, remove a member, add a day off, decline a request.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span><span class="ds-pill">Since v1.0</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#variants">Variants</a></li><li><a href="#sizes">Sizes</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#theming">Theming</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don&#x27;t</a></li><li><a href="#tokens">Tokens</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p><code>.dialog</code> is a full-screen grid that centres a <code>.dialog__panel</code> over a <code>.backdrop</code>. It interrupts the current task, takes focus, makes the page behind inert, and ends with a decision. It always has a title, a description, a close button and a footer with one primary action and a way out.</p>
+<p>Use it for: a confirmation that needs a decision (sign out, remove, decline); a short form that edits one thing (invite a member, adjust allowance, add a day off, new request). Per the project rules, button-triggered editing opens a dialog; there are no inline forms in pages. For reading a record with context use a <a href="drawer.html">drawer</a>. For feedback after the fact use a <a href="toast.html">toast</a>. For a hint use a <a href="tooltip.html">tooltip</a>.</p>
+    </section>
+    <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
+<div class="ds-anatomy">
+    <figure class="ds-anatomy__figure">
+      <div style="position: relative; width: 100%; height: 21rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);"><div class="backdrop"></div><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="an-t" aria-describedby="an-d"><div class="dialog__panel " style="max-height: 20rem;"><div class="dialog__header"><div class="dialog__icon dialog__icon--danger" aria-hidden="true"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></div><div style="flex: 1;"><h3 class="dialog__title" id="an-t">Remove Ben from the team?</h3><p id="an-d" class="text-muted" style="margin-top: var(--space-1);">Their history is kept, but they won’t appear on the calendar.</p></div><button class="btn btn--icon btn--ghost" type="button" aria-label="Close"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="dialog__body stack"><ul style="padding-left: var(--space-5); margin: 0;" class="stack stack--sm"><li>Ben’s days stay in the history.</li><li>Ben won’t appear on the calendar or sign in.</li></ul></div><div class="dialog__footer"><button class="btn" type="button">Cancel</button><button class="btn btn--danger" type="button">Yes, remove Ben</button></div></div></div></div>
+      <span class="ds-callout" style="left: 14%; top: 26%;" aria-hidden="true">1</span>
+      <span class="ds-callout" style="left: 68%; top: 33%;" aria-hidden="true">2</span>
+      <span class="ds-callout" style="left: 80%; top: 30%;" aria-hidden="true">3</span>
+      <span class="ds-callout" style="left: 10%; top: 57%;" aria-hidden="true">4</span>
+      <span class="ds-callout" style="left: 10%; top: 77%;" aria-hidden="true">5</span>
+      <span class="ds-callout" style="left: 8%; top: 16%;" aria-hidden="true">6</span>
+    </figure>
+    <ol class="ds-anatomy__list">
+      <li><div><b>Icon (optional)</b><small><code>.dialog__icon--danger</code> or <code>--info</code>, 40px circle with a tinted background; decorative (<code>aria-hidden</code>).</small></div></li>
+      <li><div><b>Title and description</b><small><code>.dialog__title</code> (h3 scale, an h2 in the page) labels the dialog; the description names the subject and is its <code>aria-describedby</code>.</small></div></li>
+      <li><div><b>Close button</b><small>Ghost icon button, <code>aria-label="Close"</code>. Same effect as Esc.</small></div></li>
+      <li><div><b>Body</b><small><code>.dialog__body.stack</code>: the consequences or the form fields.</small></div></li>
+      <li><div><b>Footer</b><small><code>.dialog__footer</code>, sticky; safe action first, primary or danger last.</small></div></li>
+      <li><div><b>Backdrop</b><small><code>.backdrop</code>, <code>--color-bg-backdrop</code>, dims and blocks the page.</small></div></li>
+    </ol>
+  </div>
+    </section>
+    <section class="ds-section" id="variants"><h2><a href="#variants">Variants</a></h2>
+<p>Documentation stages contain the fixed-position dialog in a clipped box; on a real page the dialog fills the viewport.</p>
+<h3>Default (information or confirmation)</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas" style="padding: 0;"><div style="position: relative; width: 100%; height: 21rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);"><div class="backdrop"></div><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="v1-t" aria-describedby="v1-d"><div class="dialog__panel " style="max-height: 20rem;"><div class="dialog__header"><div class="dialog__icon dialog__icon--info" aria-hidden="true"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/></svg></div><div style="flex: 1;"><h3 class="dialog__title" id="v1-t">Sign out of Greenlit?</h3><p id="v1-d" class="text-muted" style="margin-top: var(--space-1);">You’ll need your email and password to get back in.</p></div><button class="btn btn--icon btn--ghost" type="button" aria-label="Close"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="dialog__body stack"><p>Anything you’ve already saved stays saved.</p></div><div class="dialog__footer"><button class="btn" type="button">Stay signed in</button><button class="btn btn--primary" type="button">Sign out</button></div></div></div></div></div>
+  <div class="ds-example__caption"><span>Info icon, primary confirm. Sign-out dialog.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;position: relative; width: 100%; height: 21rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);&quot;&gt;&lt;div class=&quot;backdrop&quot;&gt;&lt;/div&gt;&lt;div class=&quot;dialog&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot; aria-labelledby=&quot;v1-t&quot; aria-describedby=&quot;v1-d&quot;&gt;&lt;div class=&quot;dialog__panel &quot; style=&quot;max-height: 20rem;&quot;&gt;&lt;div class=&quot;dialog__header&quot;&gt;&lt;div class=&quot;dialog__icon dialog__icon--info&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M9 4H5v16h4M16 8l4 4-4 4M20 12H9&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;div style=&quot;flex: 1;&quot;&gt;&lt;h3 class=&quot;dialog__title&quot; id=&quot;v1-t&quot;&gt;Sign out of Greenlit?&lt;/h3&gt;&lt;p id=&quot;v1-d&quot; class=&quot;text-muted&quot; style=&quot;margin-top: var(--space-1);&quot;&gt;You’ll need your email and password to get back in.&lt;/p&gt;&lt;/div&gt;&lt;button class=&quot;btn btn--icon btn--ghost&quot; type=&quot;button&quot; aria-label=&quot;Close&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;dialog__body stack&quot;&gt;&lt;p&gt;Anything you’ve already saved stays saved.&lt;/p&gt;&lt;/div&gt;&lt;div class=&quot;dialog__footer&quot;&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;Stay signed in&lt;/button&gt;&lt;button class=&quot;btn btn--primary&quot; type=&quot;button&quot;&gt;Sign out&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Destructive</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas" style="padding: 0;"><div style="position: relative; width: 100%; height: 21rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);"><div class="backdrop"></div><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="v2-t" aria-describedby="v2-d"><div class="dialog__panel " style="max-height: 20rem;"><div class="dialog__header"><div class="dialog__icon dialog__icon--danger" aria-hidden="true"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></div><div style="flex: 1;"><h3 class="dialog__title" id="v2-t">Remove Ben from the team?</h3><p id="v2-d" class="text-muted" style="margin-top: var(--space-1);">Their history is kept, but they won’t appear on the calendar.</p></div><button class="btn btn--icon btn--ghost" type="button" aria-label="Close"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="dialog__body stack"><ul style="padding-left: var(--space-5); margin: 0;" class="stack stack--sm"><li>Ben’s days stay in the history.</li><li>Ben won’t appear on the calendar or sign in.</li></ul></div><div class="dialog__footer"><button class="btn" type="button">Cancel</button><button class="btn btn--danger" type="button">Yes, remove Ben</button></div></div></div></div></div>
+  <div class="ds-example__caption"><span><code>dialog__icon--danger</code> plus a danger button that names the loss. The safe action is the first focusable button.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;position: relative; width: 100%; height: 21rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);&quot;&gt;&lt;div class=&quot;backdrop&quot;&gt;&lt;/div&gt;&lt;div class=&quot;dialog&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot; aria-labelledby=&quot;v2-t&quot; aria-describedby=&quot;v2-d&quot;&gt;&lt;div class=&quot;dialog__panel &quot; style=&quot;max-height: 20rem;&quot;&gt;&lt;div class=&quot;dialog__header&quot;&gt;&lt;div class=&quot;dialog__icon dialog__icon--danger&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;div style=&quot;flex: 1;&quot;&gt;&lt;h3 class=&quot;dialog__title&quot; id=&quot;v2-t&quot;&gt;Remove Ben from the team?&lt;/h3&gt;&lt;p id=&quot;v2-d&quot; class=&quot;text-muted&quot; style=&quot;margin-top: var(--space-1);&quot;&gt;Their history is kept, but they won’t appear on the calendar.&lt;/p&gt;&lt;/div&gt;&lt;button class=&quot;btn btn--icon btn--ghost&quot; type=&quot;button&quot; aria-label=&quot;Close&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;dialog__body stack&quot;&gt;&lt;ul style=&quot;padding-left: var(--space-5); margin: 0;&quot; class=&quot;stack stack--sm&quot;&gt;&lt;li&gt;Ben’s days stay in the history.&lt;/li&gt;&lt;li&gt;Ben won’t appear on the calendar or sign in.&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;div class=&quot;dialog__footer&quot;&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;Cancel&lt;/button&gt;&lt;button class=&quot;btn btn--danger&quot; type=&quot;button&quot;&gt;Yes, remove Ben&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Form</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas" style="padding: 0;"><div style="position: relative; width: 100%; height: 26rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);"><div class="backdrop"></div><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="v3-t" aria-describedby="v3-d"><div class="dialog__panel " style="max-height: 24rem;"><div class="dialog__header"><div style="flex: 1;"><h3 class="dialog__title" id="v3-t">Add a day off</h3><p id="v3-d" class="text-muted" style="margin-top: var(--space-1);">It turns red for everyone and never counts against allowance.</p></div><button class="btn btn--icon btn--ghost" type="button" aria-label="Close"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="dialog__body stack"><div class="field"><label class="field__label" for="v3-date">Date</label><input class="input" type="date" id="v3-date" name="v3-date"></div><div class="field"><label class="field__label" for="v3-name">Name</label><input class="input" type="text" id="v3-name" name="v3-name" placeholder="e.g. Company offsite"></div></div><div class="dialog__footer"><button class="btn" type="button">Cancel</button><button class="btn btn--primary" type="button" disabled>Add day off</button></div></div></div></div></div>
+  <div class="ds-example__caption"><span>No icon for forms; focus starts in the first field (<code>autofocus</code>). The primary action is disabled until the form is valid.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;position: relative; width: 100%; height: 26rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);&quot;&gt;&lt;div class=&quot;backdrop&quot;&gt;&lt;/div&gt;&lt;div class=&quot;dialog&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot; aria-labelledby=&quot;v3-t&quot; aria-describedby=&quot;v3-d&quot;&gt;&lt;div class=&quot;dialog__panel &quot; style=&quot;max-height: 24rem;&quot;&gt;&lt;div class=&quot;dialog__header&quot;&gt;&lt;div style=&quot;flex: 1;&quot;&gt;&lt;h3 class=&quot;dialog__title&quot; id=&quot;v3-t&quot;&gt;Add a day off&lt;/h3&gt;&lt;p id=&quot;v3-d&quot; class=&quot;text-muted&quot; style=&quot;margin-top: var(--space-1);&quot;&gt;It turns red for everyone and never counts against allowance.&lt;/p&gt;&lt;/div&gt;&lt;button class=&quot;btn btn--icon btn--ghost&quot; type=&quot;button&quot; aria-label=&quot;Close&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;dialog__body stack&quot;&gt;&lt;div class=&quot;field&quot;&gt;&lt;label class=&quot;field__label&quot; for=&quot;v3-date&quot;&gt;Date&lt;/label&gt;&lt;input class=&quot;input&quot; type=&quot;date&quot; id=&quot;v3-date&quot; name=&quot;v3-date&quot;&gt;&lt;/div&gt;&lt;div class=&quot;field&quot;&gt;&lt;label class=&quot;field__label&quot; for=&quot;v3-name&quot;&gt;Name&lt;/label&gt;&lt;input class=&quot;input&quot; type=&quot;text&quot; id=&quot;v3-name&quot; name=&quot;v3-name&quot; placeholder=&quot;e.g. Company offsite&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;dialog__footer&quot;&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;Cancel&lt;/button&gt;&lt;button class=&quot;btn btn--primary&quot; type=&quot;button&quot; disabled&gt;Add day off&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Busy</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas" style="padding: 0;"><div style="position: relative; width: 100%; height: 21rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);"><div class="backdrop"></div><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="v4-t" aria-describedby="v4-d"><div class="dialog__panel " style="max-height: 20rem;"><div class="dialog__header"><div class="dialog__icon dialog__icon--danger" aria-hidden="true"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></div><div style="flex: 1;"><h3 class="dialog__title" id="v4-t">Remove Ben from the team?</h3><p id="v4-d" class="text-muted" style="margin-top: var(--space-1);">Their history is kept, but they won’t appear on the calendar.</p></div><button class="btn btn--icon btn--ghost" type="button" aria-label="Close"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="dialog__body stack"><ul style="padding-left: var(--space-5); margin: 0;" class="stack stack--sm"><li>Ben’s days stay in the history.</li><li>Ben won’t appear on the calendar or sign in.</li></ul></div><div class="dialog__footer"><button class="btn" type="button" disabled>Cancel</button><button class="btn btn--danger" type="button" aria-busy="true" disabled>Removing…</button></div></div></div></div></div>
+  <div class="ds-example__caption"><span>While the request is in flight every control is disabled and the confirm button shows a spinner (<code>aria-busy</code>). The label changes to the progressive form.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;position: relative; width: 100%; height: 21rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);&quot;&gt;&lt;div class=&quot;backdrop&quot;&gt;&lt;/div&gt;&lt;div class=&quot;dialog&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot; aria-labelledby=&quot;v4-t&quot; aria-describedby=&quot;v4-d&quot;&gt;&lt;div class=&quot;dialog__panel &quot; style=&quot;max-height: 20rem;&quot;&gt;&lt;div class=&quot;dialog__header&quot;&gt;&lt;div class=&quot;dialog__icon dialog__icon--danger&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;div style=&quot;flex: 1;&quot;&gt;&lt;h3 class=&quot;dialog__title&quot; id=&quot;v4-t&quot;&gt;Remove Ben from the team?&lt;/h3&gt;&lt;p id=&quot;v4-d&quot; class=&quot;text-muted&quot; style=&quot;margin-top: var(--space-1);&quot;&gt;Their history is kept, but they won’t appear on the calendar.&lt;/p&gt;&lt;/div&gt;&lt;button class=&quot;btn btn--icon btn--ghost&quot; type=&quot;button&quot; aria-label=&quot;Close&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;dialog__body stack&quot;&gt;&lt;ul style=&quot;padding-left: var(--space-5); margin: 0;&quot; class=&quot;stack stack--sm&quot;&gt;&lt;li&gt;Ben’s days stay in the history.&lt;/li&gt;&lt;li&gt;Ben won’t appear on the calendar or sign in.&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;div class=&quot;dialog__footer&quot;&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot; disabled&gt;Cancel&lt;/button&gt;&lt;button class=&quot;btn btn--danger&quot; type=&quot;button&quot; aria-busy=&quot;true&quot; disabled&gt;Removing…&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Failed</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas" style="padding: 0;"><div style="position: relative; width: 100%; height: 27rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);"><div class="backdrop"></div><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="v5-t" aria-describedby="v5-d"><div class="dialog__panel " style="max-height: 25rem;"><div class="dialog__header"><div class="dialog__icon dialog__icon--danger" aria-hidden="true"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></div><div style="flex: 1;"><h3 class="dialog__title" id="v5-t">Remove Ben from the team?</h3><p id="v5-d" class="text-muted" style="margin-top: var(--space-1);">Their history is kept, but they won’t appear on the calendar.</p></div><button class="btn btn--icon btn--ghost" type="button" aria-label="Close"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="dialog__body stack"><div class="alert alert--danger" role="alert"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><div class="alert__body"><div class="alert__title">We couldn’t remove Ben</div><div>Check your connection and try again. Nothing was changed.</div></div></div><ul style="padding-left: var(--space-5); margin: 0;" class="stack stack--sm"><li>Ben’s days stay in the history.</li><li>Ben won’t appear on the calendar or sign in.</li></ul></div><div class="dialog__footer"><button class="btn" type="button">Cancel</button><button class="btn btn--danger" type="button">Yes, remove Ben</button></div></div></div></div></div>
+  <div class="ds-example__caption"><span>The dialog stays open and shows an <a href="alert.html">alert</a> at the top of the body; the primary action is enabled again. Focus moves to the alert via <code>role="alert"</code> announcement; the person's input is kept.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;position: relative; width: 100%; height: 27rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);&quot;&gt;&lt;div class=&quot;backdrop&quot;&gt;&lt;/div&gt;&lt;div class=&quot;dialog&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot; aria-labelledby=&quot;v5-t&quot; aria-describedby=&quot;v5-d&quot;&gt;&lt;div class=&quot;dialog__panel &quot; style=&quot;max-height: 25rem;&quot;&gt;&lt;div class=&quot;dialog__header&quot;&gt;&lt;div class=&quot;dialog__icon dialog__icon--danger&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;div style=&quot;flex: 1;&quot;&gt;&lt;h3 class=&quot;dialog__title&quot; id=&quot;v5-t&quot;&gt;Remove Ben from the team?&lt;/h3&gt;&lt;p id=&quot;v5-d&quot; class=&quot;text-muted&quot; style=&quot;margin-top: var(--space-1);&quot;&gt;Their history is kept, but they won’t appear on the calendar.&lt;/p&gt;&lt;/div&gt;&lt;button class=&quot;btn btn--icon btn--ghost&quot; type=&quot;button&quot; aria-label=&quot;Close&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;dialog__body stack&quot;&gt;&lt;div class=&quot;alert alert--danger&quot; role=&quot;alert&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;M12 8v5M12 16h.01&quot;/&gt;&lt;/svg&gt;&lt;div class=&quot;alert__body&quot;&gt;&lt;div class=&quot;alert__title&quot;&gt;We couldn’t remove Ben&lt;/div&gt;&lt;div&gt;Check your connection and try again. Nothing was changed.&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;ul style=&quot;padding-left: var(--space-5); margin: 0;&quot; class=&quot;stack stack--sm&quot;&gt;&lt;li&gt;Ben’s days stay in the history.&lt;/li&gt;&lt;li&gt;Ben won’t appear on the calendar or sign in.&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;div class=&quot;dialog__footer&quot;&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;Cancel&lt;/button&gt;&lt;button class=&quot;btn btn--danger&quot; type=&quot;button&quot;&gt;Yes, remove Ben&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+    </section>
+    <section class="ds-section" id="sizes"><h2><a href="#sizes">Sizes</a></h2>
+<p>Three widths; default is 32rem. All are capped to the viewport with a scrolling panel, and the footer is sticky.</p>
+<div class="ds-example">
+  <div class="ds-example__canvas" style="padding: 0;"><div style="position: relative; width: 100%; height: 15rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);"><div class="backdrop"></div><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="s1-t" aria-describedby="s1-d"><div class="dialog__panel dialog__panel--sm" style="max-height: 13rem;"><div class="dialog__header"><div style="flex: 1;"><h3 class="dialog__title" id="s1-t">Sign out of Greenlit?</h3><p id="s1-d" class="text-muted" style="margin-top: var(--space-1);">Small, 24rem.</p></div><button class="btn btn--icon btn--ghost" type="button" aria-label="Close"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="dialog__body stack"><p>Short confirmations.</p></div><div class="dialog__footer"><button class="btn" type="button">Stay</button><button class="btn btn--primary" type="button">Sign out</button></div></div></div></div></div>
+  <div class="ds-example__caption"><span><code>.dialog__panel--sm</code> for one-line confirmations.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;position: relative; width: 100%; height: 15rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);&quot;&gt;&lt;div class=&quot;backdrop&quot;&gt;&lt;/div&gt;&lt;div class=&quot;dialog&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot; aria-labelledby=&quot;s1-t&quot; aria-describedby=&quot;s1-d&quot;&gt;&lt;div class=&quot;dialog__panel dialog__panel--sm&quot; style=&quot;max-height: 13rem;&quot;&gt;&lt;div class=&quot;dialog__header&quot;&gt;&lt;div style=&quot;flex: 1;&quot;&gt;&lt;h3 class=&quot;dialog__title&quot; id=&quot;s1-t&quot;&gt;Sign out of Greenlit?&lt;/h3&gt;&lt;p id=&quot;s1-d&quot; class=&quot;text-muted&quot; style=&quot;margin-top: var(--space-1);&quot;&gt;Small, 24rem.&lt;/p&gt;&lt;/div&gt;&lt;button class=&quot;btn btn--icon btn--ghost&quot; type=&quot;button&quot; aria-label=&quot;Close&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;dialog__body stack&quot;&gt;&lt;p&gt;Short confirmations.&lt;/p&gt;&lt;/div&gt;&lt;div class=&quot;dialog__footer&quot;&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;Stay&lt;/button&gt;&lt;button class=&quot;btn btn--primary&quot; type=&quot;button&quot;&gt;Sign out&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<div class="ds-example">
+  <div class="ds-example__canvas" style="padding: 0;"><div style="position: relative; width: 100%; height: 16rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);"><div class="backdrop"></div><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="s2-t" aria-describedby="s2-d"><div class="dialog__panel dialog__panel--lg" style="max-height: 14rem;"><div class="dialog__header"><div style="flex: 1;"><h3 class="dialog__title" id="s2-t">New request</h3><p id="s2-d" class="text-muted" style="margin-top: var(--space-1);">Large, 48rem. Used when two columns of fields are needed.</p></div><button class="btn btn--icon btn--ghost" type="button" aria-label="Close"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="dialog__body stack"><p class="text-muted">Two-column forms such as a new request with dates, note and allowance preview.</p></div><div class="dialog__footer"><button class="btn" type="button">Cancel</button><button class="btn btn--primary" type="button">Send request</button></div></div></div></div></div>
+  <div class="ds-example__caption"><span><code>.dialog__panel--lg</code> for dialogs with side-by-side fields.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;position: relative; width: 100%; height: 16rem; overflow: hidden; transform: translateZ(0); background: var(--color-bg-canvas); border-radius: var(--radius-md);&quot;&gt;&lt;div class=&quot;backdrop&quot;&gt;&lt;/div&gt;&lt;div class=&quot;dialog&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot; aria-labelledby=&quot;s2-t&quot; aria-describedby=&quot;s2-d&quot;&gt;&lt;div class=&quot;dialog__panel dialog__panel--lg&quot; style=&quot;max-height: 14rem;&quot;&gt;&lt;div class=&quot;dialog__header&quot;&gt;&lt;div style=&quot;flex: 1;&quot;&gt;&lt;h3 class=&quot;dialog__title&quot; id=&quot;s2-t&quot;&gt;New request&lt;/h3&gt;&lt;p id=&quot;s2-d&quot; class=&quot;text-muted&quot; style=&quot;margin-top: var(--space-1);&quot;&gt;Large, 48rem. Used when two columns of fields are needed.&lt;/p&gt;&lt;/div&gt;&lt;button class=&quot;btn btn--icon btn--ghost&quot; type=&quot;button&quot; aria-label=&quot;Close&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M6 6l12 12M18 6 6 18&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;dialog__body stack&quot;&gt;&lt;p class=&quot;text-muted&quot;&gt;Two-column forms such as a new request with dates, note and allowance preview.&lt;/p&gt;&lt;/div&gt;&lt;div class=&quot;dialog__footer&quot;&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;Cancel&lt;/button&gt;&lt;button class=&quot;btn btn--primary&quot; type=&quot;button&quot;&gt;Send request&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<p>The dialog itself has one open state; what varies is the content state. Use the labelled examples in <b>Variants</b> for default, destructive, form, busy and failed. Invalid is a form dialog with <a href="form-field.html">field errors</a> and a form summary (see the <code>invalid</code> mocks); over-allowance adds a warning alert.</p>
+<h3>Both themes</h3>
+<div class="ds-themes">
+  <div data-theme="light"><div class="ds-example__canvas"><div class="dialog__panel" style="max-width: 24rem; animation: none; box-shadow: var(--shadow-2);" role="group" aria-labelledby="th-t"><div class="dialog__header"><div class="dialog__icon dialog__icon--danger" aria-hidden="true"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></div><div style="flex: 1;"><h3 class="dialog__title" id="th-t">Remove Ben from the team?</h3><p class="text-muted" style="margin-top: var(--space-1);">Their history is kept.</p></div></div><div class="dialog__body stack"><ul style="padding-left: var(--space-5); margin: 0;" class="stack stack--sm"><li>Ben’s days stay in the history.</li><li>Ben won’t appear on the calendar or sign in.</li></ul></div><div class="dialog__footer" style="position: static;"><button class="btn" type="button">Cancel</button><button class="btn btn--danger" type="button">Yes, remove Ben</button></div></div></div></div>
+  <div data-theme="dark"><div class="ds-example__canvas"><div class="dialog__panel" style="max-width: 24rem; animation: none; box-shadow: var(--shadow-2);" role="group" aria-labelledby="th-t"><div class="dialog__header"><div class="dialog__icon dialog__icon--danger" aria-hidden="true"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></div><div style="flex: 1;"><h3 class="dialog__title" id="th-t">Remove Ben from the team?</h3><p class="text-muted" style="margin-top: var(--space-1);">Their history is kept.</p></div></div><div class="dialog__body stack"><ul style="padding-left: var(--space-5); margin: 0;" class="stack stack--sm"><li>Ben’s days stay in the history.</li><li>Ben won’t appear on the calendar or sign in.</li></ul></div><div class="dialog__footer" style="position: static;"><button class="btn" type="button">Cancel</button><button class="btn btn--danger" type="button">Yes, remove Ben</button></div></div></div></div>
+</div>
+<ul>
+  <li><b>Opening:</b> panel slides up (phones) or scales in (<code>--duration-slow</code>); the backdrop fades in.</li>
+  <li><b>Closing:</b> Esc, the close button, Cancel and a backdrop click all dismiss. While busy, dismissal is blocked.</li>
+  <li><b>Behind:</b> the page, including the <a href="top-bar.html">top bar</a> and skip link, gets <code>inert</code> and <code>aria-hidden</code>.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<ul>
+  <li>Below 640px the dialog is a bottom sheet: <code>place-items: end center</code>, no padding, top corners <code>--radius-xl</code>, full width, slides up.</li>
+  <li>From 640px (<code>--layout-breakpoint-sm</code>) it is centred with 24px padding, all corners <code>--radius-lg</code>, max-width 32rem (24rem small, 48rem large), scales in.</li>
+  <li><code>max-height: calc(100dvh - 48px)</code>: tall content scrolls inside the panel; header scrolls with it, the footer stays <code>sticky; bottom: 0</code>.</li>
+  <li>Footer buttons wrap (<code>flex-wrap: wrap</code>) and stay right-aligned; the primary remains last.</li>
+  <li>On a phone with the on-screen keyboard open the visible viewport shrinks; <code>dvh</code> units keep the panel fully visible.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="theming"><h2><a href="#theming">Theming</a></h2>
+<p>The panel uses <code>--color-bg-surface-raised</code> and shadow 4; the scrim is <code>--color-bg-backdrop</code>. In dark the panel is lighter than the page so it stays distinct. Icon tints use the danger and info background and icon tokens.</p>
+<pre><code>.dialog__panel { border: 1px solid var(--color-border-default); }  /* defined edge on dark themes */</code></pre>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<h3>Role and pattern</h3>
+<p>WAI-ARIA APG <a href="https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/">Dialog (Modal) pattern</a>: <code>role="dialog"</code>, <code>aria-modal="true"</code>, <code>aria-labelledby</code> the title, <code>aria-describedby</code> the description. Use <code>role="alertdialog"</code> only for a dialog that requires an immediate response and cannot be dismissed neutrally; Greenlit's destructive dialogs offer Cancel, so they stay <code>dialog</code>. Implement with Angular CDK Dialog (project rule), never a hand-rolled modal.</p>
+<h3>Keyboard</h3>
+<table class="ds-table ds-keys"><thead><tr><th scope="col">Key</th><th scope="col">Action</th></tr></thead><tbody>
+    <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Cycles through the dialog's controls only (focus trap); the page behind is inert.</td></tr>
+    <tr><td><kbd>Esc</kbd></td><td>Closes the dialog (not while busy) and returns focus to the control that opened it.</td></tr>
+    <tr><td><kbd>Enter</kbd></td><td>In a form, submits; on a button, activates it. In a destructive dialog <kbd>Enter</kbd> must not default to the danger button when focus is on a field.</td></tr>
+  </tbody></table>
+<h3>Focus</h3>
+<p>On open, focus goes to the first field in a form dialog (<code>autofocus</code>) and to the safe action (Cancel) in a destructive one, never to the danger button. Focus returns to the invoking control on close. The ring uses the shared token and is visible on the raised surface.</p>
+<h3>Labelling</h3>
+<p>The title is the name; the description is the description. The close button is labelled "Close" (not "x"). A failed state uses <code>role="alert"</code> so it is announced without moving focus. The busy button keeps its name and adds <code>aria-busy</code>; announce completion through a toast or by closing.</p>
+<h3>Contrast</h3>
+<div class="ds-example__canvas ds-example__canvas--stack" style="padding: 0; gap: var(--space-2);">
+  <div class="ds-pair"><span>Text on raised surface</span><span class="ds-pair__ratio" data-contrast="--color-fg-default|--color-bg-surface-raised" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Description on raised surface</span><span class="ds-pair__ratio" data-contrast="--color-fg-muted|--color-bg-surface-raised" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Danger icon on its tint</span><span class="ds-pair__ratio" data-contrast="--color-danger-icon|--color-danger-bg" data-min="3"></span></div>
+  <div class="ds-pair"><span>Info icon on its tint</span><span class="ds-pair__ratio" data-contrast="--color-info-icon|--color-info-bg" data-min="3"></span></div>
+  <div class="ds-pair"><span>Danger label</span><span class="ds-pair__ratio" data-contrast="--color-fg-on-danger|--color-danger-solid" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Focus ring on raised surface</span><span class="ds-pair__ratio" data-contrast="--color-focus-ring|--color-bg-surface-raised" data-min="3"></span></div>
+</div>
+<h3>Motion</h3>
+<p>Slide-up on phones and scale-in on desktop over <code>--duration-slow</code>, backdrop fade over <code>--duration-base</code>. Under <code>prefers-reduced-motion</code> both collapse to an instant appearance; no information depends on the motion.</p>
+<h3>Touch</h3>
+<p>Buttons are 40px; the close button is 40px at the top right, away from the primary action. On phones the sheet leaves the top of the page visible so the person knows where they are. Backdrop tap dismisses unless busy.</p>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul>
+  <li>Title is a question for a decision ("Remove Ben from the team?") or a verb phrase for a form ("Add a day off").</li>
+  <li>Description states the subject and the consequence in one sentence; a destructive body lists what stays and what goes.</li>
+  <li>Buttons: the safe action first ("Cancel", "Stay signed in"), the confirm last and named for the outcome ("Yes, remove Ben", "Sign out").</li>
+  <li>Busy label is the progressive verb: "Removing…". Failed copy says what failed and that nothing changed.</li>
+  <li>Sentence case, curly quotes and apostrophes, no exclamation marks.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don&#x27;t</a></h2>
+<div class="ds-dodont">
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="dialog__panel" style="max-width: 24rem; animation: none; box-shadow: var(--shadow-2);" role="group" aria-labelledby="dd1-t"><div class="dialog__header"><div class="dialog__icon dialog__icon--danger" aria-hidden="true"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></div><div style="flex: 1;"><h3 class="dialog__title" id="dd1-t">Remove Ben from the team?</h3><p class="text-muted" style="margin-top: var(--space-1);">Their history is kept.</p></div></div><div class="dialog__body stack"></div><div class="dialog__footer" style="position: static;"><button class="btn" type="button">Cancel</button><button class="btn btn--danger" type="button">Yes, remove Ben</button></div></div></div><figcaption>The title asks the decision and the danger button names the outcome.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="dialog__panel" style="max-width: 24rem; animation: none; box-shadow: var(--shadow-2);" role="group" aria-labelledby="dd2-t"><div class="dialog__header"><div class="dialog__icon dialog__icon--danger" aria-hidden="true"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></div><div style="flex: 1;"><h3 class="dialog__title" id="dd2-t">Are you sure?</h3><p class="text-muted" style="margin-top: var(--space-1);">This action cannot be undone.</p></div></div><div class="dialog__body stack"></div><div class="dialog__footer" style="position: static;"><button class="btn" type="button">No</button><button class="btn btn--danger" type="button">Yes</button></div></div></div><figcaption>"Are you sure?" and "Yes" lose the subject; a screen reader hears the buttons out of context.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="dialog__panel" style="max-width: 24rem; animation: none; box-shadow: var(--shadow-2);" role="group" aria-labelledby="dd3-t"><div class="dialog__header"><div style="flex: 1;"><h3 class="dialog__title" id="dd3-t">Add a day off</h3><p class="text-muted" style="margin-top: var(--space-1);">It turns red for everyone.</p></div></div><div class="dialog__body stack"><div class="field"><label class="field__label" for="dd3-name">Name</label><input class="input" type="text" id="dd3-name" name="dd3-name"></div></div><div class="dialog__footer" style="position: static;"><button class="btn" type="button">Cancel</button><button class="btn btn--primary" type="button">Add day off</button></div></div></div><figcaption>A short form edits one thing and has an explicit way out.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="dialog__panel" style="max-width: 24rem; animation: none; box-shadow: var(--shadow-2);" role="group" aria-labelledby="dd4-t"><div class="dialog__header"><div style="flex: 1;"><h3 class="dialog__title" id="dd4-t">Settings</h3><p class="text-muted" style="margin-top: var(--space-1);">Everything in one place.</p></div></div><div class="dialog__body stack"><div class="field"><label class="field__label" for="dd4-name">Name</label><input class="input" type="text" id="dd4-name" name="dd4-name"></div><div class="field"><label class="field__label" for="dd4-zone">Time zone</label><input class="input" type="text" id="dd4-zone" name="dd4-zone"></div><div class="field"><label class="field__label" for="dd4-days">Working days</label><input class="input" type="text" id="dd4-days" name="dd4-days"></div></div><div class="dialog__footer" style="position: static;"><button class="btn btn--primary" type="button">Done</button></div></div></div><figcaption>A dialog used as a mini page. A multi-section edit belongs on the Settings screen.</figcaption></figure>
+</div>
+    </section>
+    <section class="ds-section" id="tokens"><h2><a href="#tokens">Tokens</a></h2>
+<div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th scope="col">Part</th><th scope="col">Token</th><th scope="col">Light</th><th scope="col">Dark</th></tr></thead>
+    <tbody>
+      <tr><td>Panel surface</td><td><code>--color-bg-surface-raised</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-surface-raised" data-swatch></i><span data-token="--color-bg-surface-raised"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-surface-raised" data-swatch></i><span data-token="--color-bg-surface-raised"></span></span></td></tr>
+      <tr><td>Panel shadow</td><td><code>--shadow-4</code></td><td colspan="2"><span data-token="--shadow-4"></span></td></tr>
+      <tr><td>Backdrop</td><td><code>--color-bg-backdrop</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-backdrop" data-swatch></i><span data-token="--color-bg-backdrop"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-backdrop" data-swatch></i><span data-token="--color-bg-backdrop"></span></span></td></tr>
+      <tr><td>Footer rule</td><td><code>--color-border-default</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-border-default" data-swatch></i><span data-token="--color-border-default"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-border-default" data-swatch></i><span data-token="--color-border-default"></span></span></td></tr>
+      <tr><td>Danger icon tint</td><td><code>--color-danger-bg</code> <code>--color-danger-icon</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-danger-bg" data-swatch></i><span data-token="--color-danger-bg"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-danger-icon" data-swatch></i><span data-token="--color-danger-icon"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-danger-bg" data-swatch></i><span data-token="--color-danger-bg"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-danger-icon" data-swatch></i><span data-token="--color-danger-icon"></span></span></td></tr>
+      <tr><td>Info icon tint</td><td><code>--color-info-bg</code> <code>--color-info-icon</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-info-bg" data-swatch></i><span data-token="--color-info-bg"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-info-icon" data-swatch></i><span data-token="--color-info-icon"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-info-bg" data-swatch></i><span data-token="--color-info-bg"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-info-icon" data-swatch></i><span data-token="--color-info-icon"></span></span></td></tr>
+      <tr><td>Radius desktop / phone</td><td><code>--radius-lg</code> <code>--radius-xl</code></td><td colspan="2"><span data-token="--radius-lg"></span> <span data-token="--radius-xl"></span></td></tr>
+      <tr><td>Padding</td><td><code>--space-4</code> <code>--space-6</code></td><td colspan="2"><span data-token="--space-4"></span> <span data-token="--space-6"></span></td></tr>
+      <tr><td>Title font</td><td><code>--text-h3</code></td><td colspan="2"><span data-token="--text-h3"></span></td></tr>
+      <tr><td>Layers</td><td><code>--z-overlay</code> <code>--z-modal</code></td><td colspan="2"><span data-token="--z-overlay"></span> <span data-token="--z-modal"></span></td></tr>
+      <tr><td>Motion</td><td><code>--duration-slow</code> <code>--ease-enter</code></td><td colspan="2"><span data-token="--duration-slow"></span> <span data-token="--ease-enter"></span></td></tr>
+    </tbody>
+  </table></div>
+    </section>
+    <section class="ds-section" id="code"><h2><a href="#code">Code</a></h2>
+<pre><code>&lt;div class=&quot;backdrop&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;dialog&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot; aria-labelledby=&quot;dlg-t&quot; aria-describedby=&quot;dlg-d&quot;&gt;
+  &lt;div class=&quot;dialog__panel&quot;&gt;
+    &lt;div class=&quot;dialog__header&quot;&gt;
+      &lt;div class=&quot;dialog__icon dialog__icon--danger&quot; aria-hidden=&quot;true&quot;&gt;…&lt;/div&gt;
+      &lt;div style=&quot;flex: 1;&quot;&gt;
+        &lt;h2 class=&quot;dialog__title&quot; id=&quot;dlg-t&quot;&gt;Remove Ben from the team?&lt;/h2&gt;
+        &lt;p id=&quot;dlg-d&quot; class=&quot;text-muted&quot;&gt;Their history is kept.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;button class=&quot;btn btn--ghost btn--icon&quot; type=&quot;button&quot; aria-label=&quot;Close&quot;&gt;…&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;dialog__body stack&quot;&gt;…&lt;/div&gt;
+    &lt;div class=&quot;dialog__footer&quot;&gt;
+      &lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;Cancel&lt;/button&gt;
+      &lt;button class=&quot;btn btn--danger&quot; type=&quot;button&quot;&gt;Yes, remove Ben&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+<table class="ds-table"><thead><tr><th scope="col">Class / attribute</th><th scope="col">Effect</th></tr></thead><tbody>
+    <tr><td><code>.backdrop</code></td><td>Fixed scrim below the dialog.</td></tr>
+    <tr><td><code>.dialog</code></td><td>Fixed full-screen grid; bottom sheet below 640px, centred above.</td></tr>
+    <tr><td><code>.dialog__panel</code> <code>--sm</code> <code>--lg</code></td><td>Panel at 32, 24 and 48rem.</td></tr>
+    <tr><td><code>.dialog__header</code> <code>__title</code> <code>__body</code> <code>__footer</code></td><td>Layout parts; footer is sticky.</td></tr>
+    <tr><td><code>.dialog__icon--danger|--info</code></td><td>40px tinted icon circle.</td></tr>
+    <tr><td><code>aria-busy="true"</code> on the confirm button</td><td>Busy state.</td></tr>
+  </tbody></table>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<p>Extracted from these mocks:</p>
+<ul><li><a href="../../mocks/dialogs/sign-out/default.html">dialogs/sign-out/default</a> (info dialog)</li><li><a href="../../mocks/dialogs/remove-member/default.html">dialogs/remove-member/default</a> (destructive)</li><li><a href="../../mocks/dialogs/remove-member/busy.html">dialogs/remove-member/busy</a> (busy)</li><li><a href="../../mocks/dialogs/remove-member/failed.html">dialogs/remove-member/failed</a> (failed with alert)</li><li><a href="../../mocks/dialogs/add-holiday/default.html">dialogs/add-holiday/default</a> (form dialog)</li><li><a href="../../mocks/dialogs/add-holiday/invalid.html">dialogs/add-holiday/invalid</a> (invalid form)</li><li><a href="../../mocks/dialogs/decline-request/default.html">dialogs/decline-request/default</a> (form inside a destructive dialog)</li><li><a href="../../mocks/dialogs/new-request/over-allowance.html">dialogs/new-request/over-allowance</a> (warning state)</li></ul>
+<p>Drift fixed during extraction: the mocks set <code>autofocus</code> and the focus trap in script; the CSS component has no focus-trap behaviour, which the Angular CDK Dialog supplies. Documentation stages use an inline <code>max-height</code> on the panel because the real rule is viewport-based.</p>
+    </section>
+    <footer class="ds-footer"><span>Greenlit design system · extracted from <a href="../../mocks/index.html">docs/mocks</a></span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

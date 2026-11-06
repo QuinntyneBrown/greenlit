@@ -1,0 +1,57 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Reset a forgotten password
+
+class User <<exists>> {
+  +Guid Id
+  +string Email
+  +string DisplayName
+  +string PasswordHash
+  +UserRole Role
+  +DateTimeOffset CreatedUtc
+}
+enum UserRole <<exists>> {
+  Member
+  Manager
+  Admin
+}
+User --> UserRole : has
+
+class PasswordResetToken <<new>> {
+  +Guid Id
+  +Guid UserId
+  +string TokenHash
+  +DateTimeOffset ExpiresUtc
+  +DateTimeOffset? UsedUtc
+  +IsUsable(now: DateTimeOffset): bool
+}
+class RequestPasswordResetCommand <<new>> {
+  +string Email
+}
+class ResetPasswordCommand <<new>> {
+  +string Token
+  +string NewPassword
+  +string ConfirmPassword
+}
+class RequestPasswordResetCommandHandler <<new>>
+class ResetPasswordCommandHandler <<new>>
+interface IEmailSender <<new>> {
+  +SendAsync(message: EmailMessage): Task
+}
+User "1" --> "*" PasswordResetToken : resets
+RequestPasswordResetCommandHandler ..> RequestPasswordResetCommand : handles
+RequestPasswordResetCommandHandler ..> PasswordResetToken : creates
+RequestPasswordResetCommandHandler ..> IEmailSender
+ResetPasswordCommandHandler ..> ResetPasswordCommand : handles
+ResetPasswordCommandHandler --> PasswordResetToken : consumes
+ResetPasswordCommandHandler --> User : sets PasswordHash
+@enduml

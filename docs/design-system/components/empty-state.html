@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Empty state — Greenlit design system</title>
+<meta name="description" content="An empty state explains why a region has nothing to show and offers the next step: an icon, a title, a sentence and up to two actions, in a default, compact and error form.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">Greenlit DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details><summary>Components · Actions</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/segmented-control.html">Segmented control</a></li>
+    </ul></details>
+    <details><summary>Components · Inputs</summary><ul>
+      <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/counter.html">Counter</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+    </ul></details>
+    <details><summary>Components · Navigation</summary><ul>
+      <li><a href="../components/app-nav.html">App navigation</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb and back link</a></li>
+      <li><a href="../components/pagination.html">Pagination</a></li>
+      <li><a href="../components/period-nav.html">Period navigation</a></li>
+      <li><a href="../components/settings-nav.html">Settings navigation</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+    </ul></details>
+    <details><summary>Components · Containers and overlays</summary><ul>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/divider.html">Divider</a></li>
+      <li><a href="../components/drawer.html">Drawer</a></li>
+      <li><a href="../components/layout-primitives.html">Layout primitives</a></li>
+      <li><a href="../components/tooltip.html">Tooltip</a></li>
+    </ul></details>
+    <details><summary>Components · Data display</summary><ul>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/badge.html">Badge and status</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/member-list.html">Member list</a></li>
+      <li><a href="../components/request-row.html">Request row</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+    </ul></details>
+    <details><summary>Components · Feedback</summary><ul>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress-bar.html">Progress bar</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/spinner.html">Spinner</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+    </ul></details>
+    <details><summary>Components · Sheet and brand</summary><ul>
+      <li><a href="../components/legend.html">Legend</a></li>
+      <li><a href="../components/logo-lockup.html">Logo lockup</a></li>
+      <li><a href="../components/month-mini.html">Month mini</a></li>
+      <li><a href="../components/selection-bar.html">Selection bar</a></li>
+      <li><a href="../components/sheet-cell.html">Sheet cell</a></li>
+      <li><a href="../components/team-grid.html">Team grid</a></li>
+      <li><a href="../components/year-grid.html">Year grid</a></li>
+    </ul></details>
+    <details><summary>Patterns</summary><ul>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/data-tables-and-lists.html">Data tables and lists</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/navigation-and-page-structure.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/sheet-interaction.html">Sheet interaction</a></li>
+    </ul></details>
+  </nav>
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Component · Feedback</p>
+      <h1>Empty state</h1>
+      <p class="ds-lead">An empty state explains why a region has nothing to show and offers the next step: an icon, a title, a sentence and up to two actions, in a default, compact and error form.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span><span class="ds-pill">Since v1.0</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#variants">Variants</a></li><li><a href="#sizes">Sizes</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#theming">Theming</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don&#x27;t</a></li><li><a href="#tokens">Tokens</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>Use an empty state when a list, page or region <b>loaded successfully and has no content</b>: no one on the team yet, no requests waiting, no holidays. Its job is to say what is true, why it matters and what to do next. The same component, in its <b>error</b> form, covers a region that <b>failed to load</b> ("We couldn’t load the calendar").</p>
+<p>A whole-page failure (404, 403, 500, offline, session expired) is an <a href="error-page.html">error page</a>. A region that is still loading is a <a href="skeleton.html">skeleton</a>. A message inside a form is an <a href="inline-message.html">inline message</a>. An empty state is never an error unless it has the error modifier, and is never celebratory noise: "Nothing waiting. Everyone's greenlit." is the tone.</p>
+    </section>
+    <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
+<div class="ds-anatomy">
+    <figure class="ds-anatomy__figure">
+      <div style="width: 100%;"><div class="empty"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg></div><h2 class="empty__title">No one on the team yet</h2><p class="empty__text">Invite your team from Settings to start planning time off.</p><div class="empty__actions"><button class="btn btn--primary" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Invite member</button></div></div></div>
+      <span class="ds-callout" style="left: 50%; top: 17%;" aria-hidden="true">1</span>
+      <span class="ds-callout" style="left: 50%; top: 41%;" aria-hidden="true">2</span>
+      <span class="ds-callout" style="left: 50%; top: 56%;" aria-hidden="true">3</span>
+      <span class="ds-callout" style="left: 50%; top: 79%;" aria-hidden="true">4</span>
+    </figure>
+    <ol class="ds-anatomy__list">
+      <li><div><b>Icon badge</b><small>A 4rem circle on <code>--color-accent-subtle</code> with an <code>.icon--lg</code> glyph, <code>aria-hidden</code>.</small></div></li>
+      <li><div><b>Title</b><small><code>.empty__title</code>, H3 style, states what is empty. A heading element (h2 in a region, h1 on a page).</small></div></li>
+      <li><div><b>Text</b><small><code>.empty__text</code>: why, and what to do, capped at 36ch.</small></div></li>
+      <li><div><b>Actions (optional)</b><small><code>.empty__actions</code>: one primary action and at most one secondary, centred and wrapping.</small></div></li>
+    </ol>
+  </div>
+    </section>
+    <section class="ds-section" id="variants"><h2><a href="#variants">Variants</a></h2>
+<h3>Default</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div style="width: 100%;"><div class="empty"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg></div><h2 class="empty__title">Nothing waiting. Everyone's greenlit.</h2><p class="empty__text">New requests from your team will show up here.</p></div></div></div>
+  <div class="ds-example__caption"><span>Centred stack with generous padding (<code>--space-12</code> by <code>--space-6</code>). Actions are optional: not every empty state has a next step.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;width: 100%;&quot;&gt;&lt;div class=&quot;empty&quot;&gt;&lt;div class=&quot;empty__icon&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon icon--lg&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;m8 12 3 3 5-6&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;h2 class=&quot;empty__title&quot;&gt;Nothing waiting. Everyone&#x27;s greenlit.&lt;/h2&gt;&lt;p class=&quot;empty__text&quot;&gt;New requests from your team will show up here.&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div style="width: 100%;"><div class="empty"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg></div><h2 class="empty__title">No one on the team yet</h2><p class="empty__text">Invite your team from Settings to start planning time off.</p><div class="empty__actions"><button class="btn btn--primary" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Invite member</button></div></div></div></div>
+  <div class="ds-example__caption"><span>With a single primary action.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;width: 100%;&quot;&gt;&lt;div class=&quot;empty&quot;&gt;&lt;div class=&quot;empty__icon&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon icon--lg&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;9&quot; cy=&quot;8&quot; r=&quot;3.5&quot;/&gt;&lt;path d=&quot;M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;h2 class=&quot;empty__title&quot;&gt;No one on the team yet&lt;/h2&gt;&lt;p class=&quot;empty__text&quot;&gt;Invite your team from Settings to start planning time off.&lt;/p&gt;&lt;div class=&quot;empty__actions&quot;&gt;&lt;button class=&quot;btn btn--primary&quot; type=&quot;button&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M12 5v14M5 12h14&quot;/&gt;&lt;/svg&gt;Invite member&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Compact</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="card-plain" style="width: 100%;"><div class="empty empty--compact"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></div><h2 class="empty__title">No holidays yet</h2><p class="empty__text">Add the days your team is off together. They turn red for everyone and never count against allowance.</p><div class="empty__actions"><button class="btn btn--primary btn--sm" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add holiday</button></div></div></div></div>
+  <div class="ds-example__caption"><span><code>.empty--compact</code> reduces padding to <code>--space-8</code> by <code>--space-4</code> for empty tables, cards and settings sections.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;card-plain&quot; style=&quot;width: 100%;&quot;&gt;&lt;div class=&quot;empty empty--compact&quot;&gt;&lt;div class=&quot;empty__icon&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon icon--lg&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;rect x=&quot;4&quot; y=&quot;5&quot; width=&quot;16&quot; height=&quot;15&quot; rx=&quot;2&quot;/&gt;&lt;path d=&quot;M4 10h16M9 3v4M15 3v4&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;h2 class=&quot;empty__title&quot;&gt;No holidays yet&lt;/h2&gt;&lt;p class=&quot;empty__text&quot;&gt;Add the days your team is off together. They turn red for everyone and never count against allowance.&lt;/p&gt;&lt;div class=&quot;empty__actions&quot;&gt;&lt;button class=&quot;btn btn--primary btn--sm&quot; type=&quot;button&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M12 5v14M5 12h14&quot;/&gt;&lt;/svg&gt;Add holiday&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Error</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div style="width: 100%;"><div class="empty empty--error"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><h2 class="empty__title">We couldn’t load the calendar</h2><p class="empty__text">Something went wrong on our side. Your days are safe, and nothing was changed.</p><div class="empty__actions"><button class="btn btn--primary" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5"/></svg>Try again</button><button class="btn" type="button">Back to calendar</button></div></div></div></div>
+  <div class="ds-example__caption"><span><code>.empty--error</code> tints the badge with the danger tokens. It always offers Try again and says that nothing was lost.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div style=&quot;width: 100%;&quot;&gt;&lt;div class=&quot;empty empty--error&quot;&gt;&lt;div class=&quot;empty__icon&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon icon--lg&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/&gt;&lt;path d=&quot;M12 8v5M12 16h.01&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;h2 class=&quot;empty__title&quot;&gt;We couldn’t load the calendar&lt;/h2&gt;&lt;p class=&quot;empty__text&quot;&gt;Something went wrong on our side. Your days are safe, and nothing was changed.&lt;/p&gt;&lt;div class=&quot;empty__actions&quot;&gt;&lt;button class=&quot;btn btn--primary&quot; type=&quot;button&quot;&gt;&lt;svg class=&quot;icon&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5&quot;/&gt;&lt;/svg&gt;Try again&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;Back to calendar&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</code></pre></details>
+</div>
+    </section>
+    <section class="ds-section" id="sizes"><h2><a href="#sizes">Sizes</a></h2>
+<p>Two sizes: the default fills a page or a large panel (<code>--space-12</code> block padding), and <code>.empty--compact</code> (<code>--space-8</code>) fits a card, a table body or a settings section. The icon badge is always 4rem and the text is capped at 36 characters wide. For a single line in a small widget, write a sentence of muted text instead of an empty state.</p>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<p>An empty state has no hover or loading state of its own; its actions do. What varies is the reason it is shown.</p>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Element</th><th scope="col">Nothing yet</th><th scope="col">Nothing to do</th><th scope="col">Load failed</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Reason</th><td><div style="width: 100%;"><div class="empty empty--compact"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg></div><h2 class="empty__title">No one on the team yet</h2><p class="empty__text">Invite your team from Settings.</p></div></div></td><td><div style="width: 100%;"><div class="empty empty--compact"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg></div><h2 class="empty__title">Nothing waiting. Everyone's greenlit.</h2><p class="empty__text">New requests will show up here.</p></div></div></td><td><div style="width: 100%;"><div class="empty empty--compact empty--error"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><h2 class="empty__title">We couldn’t load the requests</h2><p class="empty__text">Your days are safe.</p></div></div></td></tr>
+    </tbody>
+  </table></div>
+<h3>Both themes</h3>
+<div class="ds-themes">
+  <div data-theme="light"><div class="ds-example__canvas" style="padding: 0;"><div class="empty empty--compact"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg></div><h2 class="empty__title">No one on the team yet</h2><p class="empty__text">Invite your team from Settings to start planning time off.</p><div class="empty__actions"><button class="btn btn--primary" type="button">Invite member</button></div></div><div class="empty empty--compact empty--error"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><h2 class="empty__title">We couldn’t load the calendar</h2><p class="empty__text">Your days are safe.</p><div class="empty__actions"><button class="btn btn--primary" type="button">Try again</button></div></div></div></div>
+  <div data-theme="dark"><div class="ds-example__canvas" style="padding: 0;"><div class="empty empty--compact"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg></div><h2 class="empty__title">No one on the team yet</h2><p class="empty__text">Invite your team from Settings to start planning time off.</p><div class="empty__actions"><button class="btn btn--primary" type="button">Invite member</button></div></div><div class="empty empty--compact empty--error"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><h2 class="empty__title">We couldn’t load the calendar</h2><p class="empty__text">Your days are safe.</p><div class="empty__actions"><button class="btn btn--primary" type="button">Try again</button></div></div></div></div>
+</div>
+<ul>
+  <li><b>Loading</b> is never an empty state: show a <a href="skeleton.html">skeleton</a> first, then the empty state if the response is empty.</li>
+  <li><b>Filtered</b>: if a filter hides everything, say so and offer "Clear filters" as the action.</li>
+  <li><b>Error</b>: keep the region's frame and replace its content; do not leave stale data behind.</li>
+  <li>No entrance animation, so nothing changes under <code>prefers-reduced-motion</code>.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<ul>
+  <li>The empty state is a centred column at every width. Padding stays at <code>--space-12</code> by <code>--space-6</code> (default) or <code>--space-8</code> by <code>--space-4</code> (compact).</li>
+  <li>Text is capped at <code>36ch</code> so lines stay short on desktop; on a phone it wraps to the card width.</li>
+  <li>Actions wrap and centre (<code>flex-wrap: wrap</code>); at 360px two buttons stack. Give the primary action <code>.btn--block</code> only if it is the lone action on a phone.</li>
+  <li>In a card, a table body or a split layout use the compact form so the empty state does not push the rest of the page off screen.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="theming"><h2><a href="#theming">Theming</a></h2>
+<p>The badge uses the accent tint (<code>--color-accent-subtle</code> with <code>--color-fg-accent</code> for the glyph); the error form switches to <code>--color-danger-bg</code> and <code>--color-danger-icon</code>. The title uses <code>--text-h3</code> and the text <code>--color-fg-muted</code>. All values are semantic tokens, so both themes work without overrides.</p>
+<pre><code>.empty--info .empty__icon { background: var(--color-info-bg); color: var(--color-info-icon); }</code></pre>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<h3>Role and pattern</h3>
+<p>A static region of content, not a widget: no ARIA role. The title is a real heading (<code>h2</code> inside a page, <code>h1</code> when it is the page's main content) so the region can be found by heading navigation. When an empty or error state appears in response to an action, insert it inside a polite live region or move focus to its heading so the change is announced.</p>
+<h3>Keyboard</h3>
+<table class="ds-table ds-keys"><thead><tr><th scope="col">Key</th><th scope="col">Action</th></tr></thead><tbody>
+    <tr><td><kbd>Tab</kbd></td><td>Moves through the actions in DOM order. The icon and text are not tab stops.</td></tr>
+    <tr><td><kbd>Enter</kbd>, <kbd>Space</kbd></td><td>Activates the focused action button; <kbd>Enter</kbd> follows a link action.</td></tr>
+  </tbody></table>
+<h3>Focus</h3>
+<p>Actions use the shared ring (<a href="button.html">button</a>). When an empty state replaces content after a user action (clearing a filter, a failed refresh), move focus to the title (give it <code>tabindex="-1"</code>) so keyboard and screen-reader users land on the new content.</p>
+<h3>Labelling</h3>
+<p>The icon is decorative and <code>aria-hidden</code>. The title says what is empty in words ("No one on the team yet"), so the tint is never the only signal that something is wrong in the error form. Action labels name the verb and object ("Invite member", "Add holiday", "Try again").</p>
+<h3>Contrast</h3>
+<div class="ds-example__canvas ds-example__canvas--stack" style="padding: 0; gap: var(--space-2);">
+  <div class="ds-pair"><span>Title on surface</span><span class="ds-pair__ratio" data-contrast="--color-fg-default|--color-bg-surface" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Text on surface</span><span class="ds-pair__ratio" data-contrast="--color-fg-muted|--color-bg-surface" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Icon on accent tint</span><span class="ds-pair__ratio" data-contrast="--color-fg-accent|--color-accent-subtle" data-min="3"></span></div>
+  <div class="ds-pair"><span>Error icon on danger tint</span><span class="ds-pair__ratio" data-contrast="--color-danger-icon|--color-danger-bg" data-min="3"></span></div>
+</div>
+<h3>Motion</h3>
+<p>No motion. The empty state appears in place; there is nothing to reduce. Do not add a bouncing or pulsing illustration.</p>
+<h3>Touch</h3>
+<p>Actions are medium (40px) or small (32px) buttons with 12px between them (<code>--space-3</code>), centred in the column. The text is not interactive. On phones, prefer medium buttons for the primary action.</p>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul>
+  <li><b>Title</b>: what is empty, in the product's words: "No one on the team yet", "No holidays yet". For a cleared queue say so warmly and briefly: "Nothing waiting. Everyone's greenlit."</li>
+  <li><b>Text</b>: why it matters or how it gets filled, then what to do: "Invite your team from Settings to start planning time off." At most two sentences.</li>
+  <li><b>Error title</b>: "We couldn’t load the calendar"; text: "Something went wrong on our side. Your days are safe, and nothing was changed." Always reassure about data.</li>
+  <li><b>Actions</b>: the verb that fixes it ("Invite member", "Add holiday", "Try again"). One primary, one secondary at most. Omit actions the person cannot take (a member cannot invite: say "Ask Maya Chen to invite your team").</li>
+  <li>No exclamation marks, no humour about errors, no apologies beyond "couldn’t".</li>
+</ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don&#x27;t</a></h2>
+<div class="ds-dodont">
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="empty empty--compact"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg></div><h2 class="empty__title">No one on the team yet</h2><p class="empty__text">Invite your team from Settings to start planning time off.</p><div class="empty__actions"><button class="btn btn--primary" type="button">Invite member</button></div></div></div><figcaption>A title that says what is empty, a reason and one clear action.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="empty empty--compact"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg></div><h2 class="empty__title">Nothing here</h2><p class="empty__text">No data.</p></div></div><figcaption>Says nothing about why or what to do.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="empty empty--compact empty--error"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><h2 class="empty__title">We couldn’t load the requests</h2><p class="empty__text">Your days are safe, and nothing was changed.</p><div class="empty__actions"><button class="btn btn--primary" type="button">Try again</button></div></div></div><figcaption>The error form reassures and gives Try again.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="empty empty--compact empty--error"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><h2 class="empty__title">Error</h2><p class="empty__text">An unexpected error occurred. Please contact support.</p></div></div><figcaption>A bare code word and a dead end.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="stack stack--sm" style="width: 100%;" aria-busy="true"><span class="visually-hidden" role="status">Loading requests</span><span class="skeleton skeleton--rect" aria-hidden="true" style="width: 100%; height: var(--space-10);"></span><span class="skeleton skeleton--rect" aria-hidden="true" style="width: 100%; height: var(--space-10);"></span></div></div><figcaption>While loading, show skeletons.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="empty empty--compact"><div class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg></div><h2 class="empty__title">Nothing waiting. Everyone's greenlit.</h2><p class="empty__text">New requests from your team will show up here.</p></div></div><figcaption>Showing the empty state while the data is still loading tells the manager a lie.</figcaption></figure>
+</div>
+    </section>
+    <section class="ds-section" id="tokens"><h2><a href="#tokens">Tokens</a></h2>
+<div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th scope="col">Part</th><th scope="col">Token</th><th scope="col">Light</th><th scope="col">Dark</th></tr></thead>
+    <tbody>
+      <tr><td>Badge</td><td><code>--color-accent-subtle</code> <code>--color-fg-accent</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-accent-subtle" data-swatch></i><span data-token="--color-accent-subtle"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-fg-accent" data-swatch></i><span data-token="--color-fg-accent"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-accent-subtle" data-swatch></i><span data-token="--color-accent-subtle"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-fg-accent" data-swatch></i><span data-token="--color-fg-accent"></span></span></td></tr>
+      <tr><td>Error badge</td><td><code>--color-danger-bg</code> <code>--color-danger-icon</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-danger-bg" data-swatch></i><span data-token="--color-danger-bg"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-danger-icon" data-swatch></i><span data-token="--color-danger-icon"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-danger-bg" data-swatch></i><span data-token="--color-danger-bg"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-danger-icon" data-swatch></i><span data-token="--color-danger-icon"></span></span></td></tr>
+      <tr><td>Title / text</td><td><code>--text-h3</code> <code>--color-fg-muted</code></td><td colspan="2"><span data-token="--text-h3"></span> <span data-token="--color-fg-muted"></span></td></tr>
+      <tr><td>Padding default / compact</td><td><code>--space-12</code> <code>--space-6</code> <code>--space-8</code> <code>--space-4</code></td><td colspan="2"><span data-token="--space-12"></span> <span data-token="--space-6"></span> <span data-token="--space-8"></span> <span data-token="--space-4"></span></td></tr>
+      <tr><td>Gap</td><td><code>--space-3</code></td><td colspan="2"><span data-token="--space-3"></span></td></tr>
+      <tr><td>Badge shape</td><td><code>--radius-full</code></td><td colspan="2"><span data-token="--radius-full"></span></td></tr>
+    </tbody>
+  </table></div>
+    </section>
+    <section class="ds-section" id="code"><h2><a href="#code">Code</a></h2>
+<pre><code>&lt;div class=&quot;empty&quot;&gt;
+  &lt;div class=&quot;empty__icon&quot; aria-hidden=&quot;true&quot;&gt;&lt;svg class=&quot;icon icon--lg&quot; …&gt;&lt;/svg&gt;&lt;/div&gt;
+  &lt;h2 class=&quot;empty__title&quot;&gt;No one on the team yet&lt;/h2&gt;
+  &lt;p class=&quot;empty__text&quot;&gt;Invite your team from Settings to start planning time off.&lt;/p&gt;
+  &lt;div class=&quot;empty__actions&quot;&gt;&lt;a class=&quot;btn btn--primary&quot; href=&quot;/settings&quot;&gt;Invite member&lt;/a&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;empty empty--compact empty--error&quot;&gt;…&lt;/div&gt;</code></pre>
+<table class="ds-table"><thead><tr><th scope="col">Class / attribute</th><th scope="col">Effect</th></tr></thead><tbody>
+    <tr><td><code>.empty</code></td><td>Centred column; the default page-size padding.</td></tr>
+    <tr><td><code>.empty--compact</code></td><td>Smaller padding for cards and tables.</td></tr>
+    <tr><td><code>.empty--error</code></td><td>Danger-tinted badge for a failed load.</td></tr>
+    <tr><td><code>.empty__icon</code> <code>__title</code> <code>__text</code> <code>__actions</code></td><td>Parts.</td></tr>
+    <tr><td><code>h1</code> / <code>h2</code></td><td>Use h1 only when the empty state is the page's main content.</td></tr>
+  </tbody></table>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<p>Extracted from these mocks:</p>
+<ul><li><a href="../../mocks/pages/calendar/empty.html">pages/calendar/empty</a> (no one on the team)</li><li><a href="../../mocks/pages/requests/empty.html">pages/requests/empty</a> (nothing waiting)</li><li><a href="../../mocks/pages/settings/holidays-empty.html">pages/settings/holidays-empty</a> (compact, no holidays)</li><li><a href="../../mocks/pages/year/empty.html">pages/year/empty</a> (no one on the team (year))</li><li><a href="../../mocks/pages/calendar/error.html">pages/calendar/error</a> (error form, calendar failed to load)</li><li><a href="../../mocks/pages/requests/error.html">pages/requests/error</a> (error form)</li><li><a href="../../mocks/pages/person/not-found.html">pages/person/not-found</a> (person not on the team)</li></ul>
+<p>Drift fixed during extraction: The mocks draw the brand mark in <code>.empty__icon</code> for the team-level empty states instead of a glyph; the badge accepts any 4rem content. In the error form <code>.empty--error</code> only changes the badge, not the title colour; the heading and text are unchanged.</p>
+    </section>
+    <footer class="ds-footer"><span>Greenlit design system · extracted from <a href="../../mocks/index.html">docs/mocks</a></span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

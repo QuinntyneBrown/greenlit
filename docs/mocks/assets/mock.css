@@ -43,3 +43,9 @@
 
 /* Static mocks show the end state of entrance animations, never a frame in the middle. */
 .drawer, .dialog__panel, .backdrop, .toast, .selection-bar, .menu, .skeleton { animation: none !important; }
+
+/* Mock-only: keep floating regions clear of the mock bar (the design system's components.css knows nothing about it). */
+.toast-region { bottom: calc(var(--space-4) + var(--mock-bar-offset, 0px)); }
+@media (min-width: 40rem) { .toast-region { bottom: calc(var(--space-6) + var(--mock-bar-offset, 0px)); } }
+.toast-region--top { bottom: auto; top: var(--space-4); }
+.selection-bar-region { bottom: calc(var(--space-6) + var(--mock-bar-offset, 0px)); }

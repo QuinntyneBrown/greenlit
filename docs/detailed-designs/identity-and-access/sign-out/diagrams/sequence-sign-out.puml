@@ -1,0 +1,39 @@
+@startuml
+title UML sequence behaviour — Sign out from the account menu
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Team user" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "UserMenu" as menu
+  participant "SignOutDialog" as dialog
+  participant "SessionStore" as store
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "AuthController" as ctrl
+end box
+actor -> menu : Open "Account menu for Maya Chen"
+menu --> actor : Name, "Manager · maya@northwind.studio", items (L2-006 AC1)
+actor -> menu : Choose "Sign out"
+menu -> dialog : Open "Sign out of Greenlit?" (L2-006 AC3)
+alt "Sign out"
+  dialog -> dialog : Show "Signing out…"
+  dialog -> ctrl : POST /api/auth/sign-out
+  ctrl --> dialog : 204
+  dialog -> store : signOut()
+  dialog --> actor : Sign-in page (L2-006 AC4)
+else "Stay signed in"
+  dialog --> actor : Dialog closes, session kept
+end
+@enduml

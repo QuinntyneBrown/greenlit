@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Segmented control — Greenlit design system</title>
+<meta name="description" content="A segmented control picks exactly one option from a short, always-visible set. In Greenlit it is the paint picker on the calendar; the same file also holds the joined button group for independent toggles.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">Greenlit DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details><summary>Components · Actions</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/segmented-control.html">Segmented control</a></li>
+    </ul></details>
+    <details><summary>Components · Inputs</summary><ul>
+      <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/counter.html">Counter</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+    </ul></details>
+    <details><summary>Components · Navigation</summary><ul>
+      <li><a href="../components/app-nav.html">App navigation</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb and back link</a></li>
+      <li><a href="../components/pagination.html">Pagination</a></li>
+      <li><a href="../components/period-nav.html">Period navigation</a></li>
+      <li><a href="../components/settings-nav.html">Settings navigation</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+    </ul></details>
+    <details><summary>Components · Containers and overlays</summary><ul>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/divider.html">Divider</a></li>
+      <li><a href="../components/drawer.html">Drawer</a></li>
+      <li><a href="../components/layout-primitives.html">Layout primitives</a></li>
+      <li><a href="../components/tooltip.html">Tooltip</a></li>
+    </ul></details>
+    <details><summary>Components · Data display</summary><ul>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/badge.html">Badge and status</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/member-list.html">Member list</a></li>
+      <li><a href="../components/request-row.html">Request row</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+    </ul></details>
+    <details><summary>Components · Feedback</summary><ul>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress-bar.html">Progress bar</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/spinner.html">Spinner</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+    </ul></details>
+    <details><summary>Components · Sheet and brand</summary><ul>
+      <li><a href="../components/legend.html">Legend</a></li>
+      <li><a href="../components/logo-lockup.html">Logo lockup</a></li>
+      <li><a href="../components/month-mini.html">Month mini</a></li>
+      <li><a href="../components/selection-bar.html">Selection bar</a></li>
+      <li><a href="../components/sheet-cell.html">Sheet cell</a></li>
+      <li><a href="../components/team-grid.html">Team grid</a></li>
+      <li><a href="../components/year-grid.html">Year grid</a></li>
+    </ul></details>
+    <details><summary>Patterns</summary><ul>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/data-tables-and-lists.html">Data tables and lists</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/navigation-and-page-structure.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/sheet-interaction.html">Sheet interaction</a></li>
+    </ul></details>
+  </nav>
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Component · Actions</p>
+      <h1>Segmented control</h1>
+      <p class="ds-lead">A segmented control picks exactly one option from a short, always-visible set. In Greenlit it is the paint picker on the calendar; the same file also holds the joined button group for independent toggles.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span><span class="ds-pill">Since v1.0</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#variants">Variants</a></li><li><a href="#sizes">Sizes</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#theming">Theming</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don&#x27;t</a></li><li><a href="#tokens">Tokens</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>Use a <b>segmented control</b> when the user chooses one of two to six mutually exclusive options and the choice takes effect immediately, such as which status to paint onto the sheet (Select, Confirmed, Requested, Tentative, Clear). The options are all visible, the current one is obvious, and changing it is one tap.</p>
+<p>It is not navigation (use <a href="tabs.html">tabs</a>), not a form answer to be submitted later (use a <a href="radio-group.html">radio group</a>) and not for more than about six options (use a <a href="select.html">select</a>). A single on/off preference is a <a href="switch.html">switch</a>; a lone toggle such as a sort order is a <a href="button.html">button</a> with <code>aria-pressed</code>.</p>
+<p>The same file styles <code>.btn-group</code>: buttons fused into one bar where each button is an <b>independent</b> pressed toggle (<code>aria-pressed</code>), so zero, one or several can be on. Choose by semantics, not looks: exclusive choice means a segmented control, independent toggles mean a button group.</p>
+    </section>
+    <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
+<div class="ds-anatomy">
+    <figure class="ds-anatomy__figure">
+      <span id="seg-anat-label" class="paint-picker__label">Paint</span> <div class="segmented" role="radiogroup" aria-labelledby="seg-anat-label"><button class="segmented__btn" type="button" role="radio" aria-checked="false"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="m5 3 14 7-6 2-2 6z"/></svg>Select</button><button class="segmented__btn" type="button" role="radio" aria-checked="true"><span class="swatch" data-status="confirmed" aria-hidden="true"></span>Confirmed</button><button class="segmented__btn" type="button" role="radio" aria-checked="false"><span class="swatch" data-status="requested" aria-hidden="true"></span>Requested</button><button class="segmented__btn" type="button" role="radio" aria-checked="false"><span class="swatch" data-status="tentative" aria-hidden="true"></span>Tentative</button></div>
+      <span class="ds-callout" style="left: 43%; top: 28%;" aria-hidden="true">1</span>
+      <span class="ds-callout" style="left: 13%; top: 48%;" aria-hidden="true">2</span>
+      <span class="ds-callout" style="left: 38%; top: 70%;" aria-hidden="true">3</span>
+      <span class="ds-callout" style="left: 50%; top: 62%;" aria-hidden="true">4</span>
+    </figure>
+    <ol class="ds-anatomy__list">
+      <li><div><b>Group label</b><small><code>.paint-picker__label</code>. Names the group; the control references it with <code>aria-labelledby</code>.</small></div></li>
+      <li><div><b>Track</b><small><code>.segmented</code>: <code>role="radiogroup"</code>, 1px border, <code>--radius-md</code>, scrolls horizontally rather than wrapping.</small></div></li>
+      <li><div><b>Checked segment</b><small><code>aria-checked="true"</code> inverts to <code>--color-fg-default</code> on <code>--color-bg-surface</code>.</small></div></li>
+      <li><div><b>Swatch and label</b><small>A status swatch (<code>.swatch[data-status]</code>) plus the status word. The word carries the state; the colour only repeats it.</small></div></li>
+    </ol>
+  </div>
+    </section>
+    <section class="ds-section" id="variants"><h2><a href="#variants">Variants</a></h2>
+<p>One visual form, three content shapes.</p>
+<div class="ds-example">
+  <div class="ds-example__canvas"><span id="seg-v1" class="paint-picker__label">Paint</span><div class="segmented" role="radiogroup" aria-labelledby="seg-v1"><button class="segmented__btn" type="button" role="radio" aria-checked="true"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="m5 3 14 7-6 2-2 6z"/></svg>Select</button><button class="segmented__btn" type="button" role="radio" aria-checked="false"><span class="swatch" data-status="confirmed" aria-hidden="true"></span>Confirmed</button><button class="segmented__btn" type="button" role="radio" aria-checked="false"><span class="swatch" data-status="requested" aria-hidden="true"></span>Requested</button><button class="segmented__btn" type="button" role="radio" aria-checked="false"><span class="swatch" data-status="tentative" aria-hidden="true"></span>Tentative</button><button class="segmented__btn" type="button" role="radio" aria-checked="false"><span class="swatch" data-status="empty" aria-hidden="true"></span>Clear</button></div></div>
+  <div class="ds-example__caption"><span>Paint picker: icon or status swatch plus text. The swatch is decoration, the word is the name.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;span id=&quot;seg-v1&quot; class=&quot;paint-picker__label&quot;&gt;Paint&lt;/span&gt;&lt;div class=&quot;segmented&quot; role=&quot;radiogroup&quot; aria-labelledby=&quot;seg-v1&quot;&gt;&lt;button class=&quot;segmented__btn&quot; type=&quot;button&quot; role=&quot;radio&quot; aria-checked=&quot;true&quot;&gt;&lt;svg class=&quot;icon icon--sm&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 24 24&quot;&gt;&lt;path d=&quot;m5 3 14 7-6 2-2 6z&quot;/&gt;&lt;/svg&gt;Select&lt;/button&gt;&lt;button class=&quot;segmented__btn&quot; type=&quot;button&quot; role=&quot;radio&quot; aria-checked=&quot;false&quot;&gt;&lt;span class=&quot;swatch&quot; data-status=&quot;confirmed&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;Confirmed&lt;/button&gt;&lt;button class=&quot;segmented__btn&quot; type=&quot;button&quot; role=&quot;radio&quot; aria-checked=&quot;false&quot;&gt;&lt;span class=&quot;swatch&quot; data-status=&quot;requested&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;Requested&lt;/button&gt;&lt;button class=&quot;segmented__btn&quot; type=&quot;button&quot; role=&quot;radio&quot; aria-checked=&quot;false&quot;&gt;&lt;span class=&quot;swatch&quot; data-status=&quot;tentative&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;Tentative&lt;/button&gt;&lt;button class=&quot;segmented__btn&quot; type=&quot;button&quot; role=&quot;radio&quot; aria-checked=&quot;false&quot;&gt;&lt;span class=&quot;swatch&quot; data-status=&quot;empty&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;Clear&lt;/button&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<div class="ds-example">
+  <div class="ds-example__canvas"><span id="seg-v2" class="paint-picker__label">View</span><div class="segmented" role="radiogroup" aria-labelledby="seg-v2"><button class="segmented__btn" type="button" role="radio" aria-checked="true">Month</button><button class="segmented__btn" type="button" role="radio" aria-checked="false">Year</button></div></div>
+  <div class="ds-example__caption"><span>Text only, two options. The simplest and most robust form.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;span id=&quot;seg-v2&quot; class=&quot;paint-picker__label&quot;&gt;View&lt;/span&gt;&lt;div class=&quot;segmented&quot; role=&quot;radiogroup&quot; aria-labelledby=&quot;seg-v2&quot;&gt;&lt;button class=&quot;segmented__btn&quot; type=&quot;button&quot; role=&quot;radio&quot; aria-checked=&quot;true&quot;&gt;Month&lt;/button&gt;&lt;button class=&quot;segmented__btn&quot; type=&quot;button&quot; role=&quot;radio&quot; aria-checked=&quot;false&quot;&gt;Year&lt;/button&gt;&lt;/div&gt;</code></pre></details>
+</div>
+<h3>Button group (independent toggles)</h3>
+<div class="ds-example">
+  <div class="ds-example__canvas"><div class="btn-group" role="group" aria-label="Request filters"><button class="btn" type="button" aria-pressed="true">Pending</button><button class="btn" type="button" aria-pressed="false">Approved</button><button class="btn" type="button" aria-pressed="false">Declined</button></div></div>
+  <div class="ds-example__caption"><span><code>.btn-group</code> with <code>role="group"</code> and <code>aria-pressed</code> on each button. Any combination can be on, so the pressed state is the label plus a tinted background, not colour alone.</span></div>
+  <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class=&quot;btn-group&quot; role=&quot;group&quot; aria-label=&quot;Request filters&quot;&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Pending&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Approved&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Declined&lt;/button&gt;&lt;/div&gt;</code></pre></details>
+</div>
+    </section>
+    <section class="ds-section" id="sizes"><h2><a href="#sizes">Sizes</a></h2>
+<p>One size. Segments are <code>--control-height-sm</code> (32px) high on a fine pointer and grow to <code>--target-comfortable</code> (44px) under <code>@media (pointer: coarse)</code>, so touch users get a comfortable target without a size prop. <code>.btn-group</code> follows the <a href="button.html">button</a> sizes (<code>.btn--sm</code>, default, <code>.btn--lg</code>).</p>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<p>The checked state is exposed with <code>aria-checked</code> (radio) or <code>aria-pressed</code> (toggle), never with a class. Hover and focus are forced with <code>data-state</code> for review; the pages use <code>:hover</code> and <code>:focus-visible</code>.</p>
+<div class="ds-matrix"><table>
+    <thead><tr><th scope="col">Control</th><th scope="col">Default (unchecked)</th><th scope="col">Hover</th><th scope="col">Focus</th><th scope="col">Checked</th><th scope="col">Disabled</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Segment</th><td><div class="segmented" role="radiogroup" aria-label="Default state"><button class="segmented__btn" type="button" role="radio" aria-checked="false">Requested</button></div></td><td><div class="segmented" role="radiogroup" aria-label="Hover state"><button class="segmented__btn" type="button" role="radio" aria-checked="false" data-state="hover">Requested</button></div></td><td><div class="segmented" role="radiogroup" aria-label="Focus state"><button class="segmented__btn" type="button" role="radio" aria-checked="false" data-state="focus">Requested</button></div></td><td><div class="segmented" role="radiogroup" aria-label="Checked state"><button class="segmented__btn" type="button" role="radio" aria-checked="true">Requested</button></div></td><td><div class="segmented" role="radiogroup" aria-label="Disabled state"><button class="segmented__btn" type="button" role="radio" aria-checked="false" disabled>Requested</button></div></td></tr>
+      <tr><th scope="row">Button group (toggle)</th><td><button class="btn btn--sm" type="button" aria-pressed="false">Most days left first</button></td><td><button class="btn btn--sm" type="button" aria-pressed="false" data-state="hover">Most days left first</button></td><td><button class="btn btn--sm" type="button" aria-pressed="false" data-state="focus">Most days left first</button></td><td><button class="btn btn--sm" type="button" aria-pressed="true">Most days left first</button></td><td><button class="btn btn--sm" type="button" aria-pressed="false" disabled>Most days left first</button></td></tr>
+    </tbody>
+  </table></div>
+<h3>Both themes</h3>
+<div class="ds-themes">
+  <div data-theme="light"><div class="ds-example__canvas" style="padding: 0;"><div class="cluster" style="padding: var(--space-4);"><div class="segmented" role="radiogroup" aria-label="Paint"><button class="segmented__btn" type="button" role="radio" aria-checked="true"><span class="swatch" data-status="confirmed" aria-hidden="true"></span>Confirmed</button><button class="segmented__btn" type="button" role="radio" aria-checked="false" data-state="hover"><span class="swatch" data-status="requested" aria-hidden="true"></span>Requested</button></div></div></div></div>
+  <div data-theme="dark"><div class="ds-example__canvas" style="padding: 0;"><div class="cluster" style="padding: var(--space-4);"><div class="segmented" role="radiogroup" aria-label="Paint"><button class="segmented__btn" type="button" role="radio" aria-checked="true"><span class="swatch" data-status="confirmed" aria-hidden="true"></span>Confirmed</button><button class="segmented__btn" type="button" role="radio" aria-checked="false" data-state="hover"><span class="swatch" data-status="requested" aria-hidden="true"></span>Requested</button></div></div></div></div>
+</div>
+<ul>
+  <li>The checked segment inverts rather than tints, so it stays distinguishable in forced-colors mode and for users who cannot tell the status colours apart.</li>
+  <li>There is no loading or error state. If the choice triggers a request, show progress on the surface the choice affects, not on the control.</li>
+  <li>Disabled segments use the native <code>disabled</code> attribute at 50% opacity and leave the tab order.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<ul>
+  <li>The track is <code>inline-flex</code> with <code>max-width: 100%</code> and <code>overflow-x: auto</code>. At 360px the five paint options scroll sideways inside the track instead of wrapping or pushing the page wide.</li>
+  <li><code>.paint-picker</code> keeps <code>min-width: 0</code> so the toolbar row that contains it can shrink; the label stays on the same line as the track.</li>
+  <li>On touch devices (<code>pointer: coarse</code>) segments grow to 44px high. Labels never truncate; <code>white-space: nowrap</code> keeps each segment on one line.</li>
+  <li>Never switch the control to a dropdown at small widths: the sheet needs the current paint status visible while painting.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="theming"><h2><a href="#theming">Theming</a></h2>
+<p>The control reads only semantic tokens: <code>--color-bg-surface</code> and <code>--color-border-default</code> for the track, <code>--color-fg-muted</code> for unchecked labels, <code>--color-bg-subtle</code> for hover, and <code>--color-fg-default</code> on <code>--color-bg-surface</code> (swapped) for the checked segment. Both themes therefore invert automatically: a dark checked segment on a light track, and the reverse.</p>
+<pre><code>/* Tint the checked segment with the accent instead of inverting */
+.segmented__btn[aria-checked="true"] { background: var(--color-accent); color: var(--color-fg-on-accent); }</code></pre>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<h3>Role and pattern</h3>
+<p>WAI-ARIA APG <a href="https://www.w3.org/WAI/ARIA/apg/patterns/radio/">Radio Group</a>: <code>role="radiogroup"</code> with <code>aria-labelledby</code> on the track, <code>role="radio"</code> and <code>aria-checked</code> on each segment. The button group follows the toggle <a href="https://www.w3.org/WAI/ARIA/apg/patterns/button/">Button</a> pattern: <code>role="group"</code> with <code>aria-pressed</code> on each button.</p>
+<h3>Keyboard</h3>
+<table class="ds-table ds-keys"><thead><tr><th scope="col">Key</th><th scope="col">Action</th></tr></thead><tbody>
+    <tr><td><kbd>Tab</kbd></td><td>Moves into the group onto the checked segment (roving tabindex: only one segment is in the tab order), then out of it.</td></tr>
+    <tr><td><kbd>→</kbd> / <kbd>↓</kbd></td><td>Moves focus to the next segment and checks it; wraps from last to first.</td></tr>
+    <tr><td><kbd>←</kbd> / <kbd>↑</kbd></td><td>Moves focus to the previous segment and checks it; wraps.</td></tr>
+    <tr><td><kbd>Space</kbd></td><td>Checks the focused segment if it is not already checked.</td></tr>
+    <tr><td><kbd>Space</kbd> / <kbd>Enter</kbd> (button group)</td><td>Toggles <code>aria-pressed</code> on the focused button; <kbd>Tab</kbd> moves between buttons.</td></tr>
+  </tbody></table>
+<h3>Focus</h3>
+<p>The shared focus ring is drawn around the focused segment, offset into the track. Because arrow keys check as they move, focus and selection always agree; do not decouple them.</p>
+<h3>Labelling</h3>
+<p>The group is named by its visible label (<code>aria-labelledby="paint-label"</code>); a group with no visible label uses <code>aria-label</code>. Each segment's name is its text. The status swatch is <code>aria-hidden</code> so "Confirmed" is read once. Never rely on the swatch colour to tell options apart.</p>
+<h3>Contrast</h3>
+<div class="ds-example__canvas ds-example__canvas--stack" style="padding: 0; gap: var(--space-2);">
+  <div class="ds-pair"><span>Unchecked label on track</span><span class="ds-pair__ratio" data-contrast="--color-fg-muted|--color-bg-surface" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Checked label on checked segment</span><span class="ds-pair__ratio" data-contrast="--color-bg-surface|--color-fg-default" data-min="4.5"></span></div>
+  <div class="ds-pair"><span>Track border on page</span><span class="ds-pair__ratio" data-contrast="--color-border-default|--color-bg-canvas" data-min="1.2"></span></div>
+  <div class="ds-pair"><span>Focus ring on track</span><span class="ds-pair__ratio" data-contrast="--color-focus-ring|--color-bg-surface" data-min="3"></span></div>
+  <div class="ds-pair"><span>Pressed button label</span><span class="ds-pair__ratio" data-contrast="--color-fg-accent|--color-accent-subtle" data-min="4.5"></span></div>
+</div>
+<h3>Motion</h3>
+<p>No animation: the checked segment changes colour instantly. Nothing needs a reduced-motion override.</p>
+<h3>Touch</h3>
+<p>44px segments on coarse pointers (WCAG 2.5.8 comfortably exceeded), 2px gaps inside a padded track. Painting is also possible without the control by tapping cells, so the picker is a shortcut, not a gate.</p>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul>
+  <li>Labels are one word, a noun or status name, in sentence case: "Confirmed", "Month". Not "Show confirmed days".</li>
+  <li>Use the domain's status words exactly: Confirmed, Requested, Tentative. "Clear" removes a day; do not call it "Delete" or "None".</li>
+  <li>Keep labels about the same length so segments look balanced. Two to five options; more than six becomes a select.</li>
+  <li>The group label states what the choice controls ("Paint", "View"), not the control type.</li>
+</ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don&#x27;t</a></h2>
+<div class="ds-dodont">
+  <figure class="ds-do"><div class="ds-example__canvas"><span id="seg-dd1" class="paint-picker__label">View</span><div class="segmented" role="radiogroup" aria-labelledby="seg-dd1"><button class="segmented__btn" type="button" role="radio" aria-checked="true">Month</button><button class="segmented__btn" type="button" role="radio" aria-checked="false">Year</button></div></div><figcaption>A short, exclusive choice with a visible group label.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><span id="seg-dd2" class="paint-picker__label">Filters</span><div class="btn-group" role="group" aria-labelledby="seg-dd2"><button class="btn" type="button" aria-pressed="true">Month</button><button class="btn" type="button" aria-pressed="true">Year</button></div></div><figcaption>Two toggles that contradict each other. Mutually exclusive choices are radios, not pressed buttons.</figcaption></figure>
+  <figure class="ds-do"><div class="ds-example__canvas"><div class="segmented" role="radiogroup" aria-label="Paint status"><button class="segmented__btn" type="button" role="radio" aria-checked="true"><span class="swatch" data-status="confirmed" aria-hidden="true"></span>Confirmed</button><button class="segmented__btn" type="button" role="radio" aria-checked="false"><span class="swatch" data-status="requested" aria-hidden="true"></span>Requested</button></div></div><figcaption>Each option has the status word as well as the swatch.</figcaption></figure>
+  <figure class="ds-dont"><div class="ds-example__canvas"><div class="segmented" role="radiogroup" aria-label="Paint status"><button class="segmented__btn" type="button" role="radio" aria-checked="true" aria-label="Confirmed"><span class="swatch" data-status="confirmed" aria-hidden="true"></span></button><button class="segmented__btn" type="button" role="radio" aria-checked="false" aria-label="Requested"><span class="swatch" data-status="requested" aria-hidden="true"></span></button></div></div><figcaption>Colour-only segments: sighted colour-blind users cannot tell them apart. The colour is never the only carrier.</figcaption></figure>
+</div>
+    </section>
+    <section class="ds-section" id="tokens"><h2><a href="#tokens">Tokens</a></h2>
+<div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th scope="col">Part</th><th scope="col">Token</th><th scope="col">Light</th><th scope="col">Dark</th></tr></thead>
+    <tbody>
+      <tr><td>Track background / border</td><td><code>--color-bg-surface</code> <code>--color-border-default</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-surface" data-swatch></i><span data-token="--color-bg-surface"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-border-default" data-swatch></i><span data-token="--color-border-default"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-surface" data-swatch></i><span data-token="--color-bg-surface"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-border-default" data-swatch></i><span data-token="--color-border-default"></span></span></td></tr>
+      <tr><td>Track padding and gap</td><td><code>--space-0-5</code></td><td colspan="2"><span data-token="--space-0-5"></span></td></tr>
+      <tr><td>Radius (track / segment)</td><td><code>--radius-md</code> <code>--radius-sm</code></td><td colspan="2"><span data-token="--radius-md"></span> <span data-token="--radius-sm"></span></td></tr>
+      <tr><td>Segment height (fine / coarse)</td><td><code>--control-height-sm</code> <code>--target-comfortable</code></td><td colspan="2"><span data-token="--control-height-sm"></span> <span data-token="--target-comfortable"></span></td></tr>
+      <tr><td>Unchecked label</td><td><code>--color-fg-muted</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-fg-muted" data-swatch></i><span data-token="--color-fg-muted"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-fg-muted" data-swatch></i><span data-token="--color-fg-muted"></span></span></td></tr>
+      <tr><td>Hover background</td><td><code>--color-bg-subtle</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-subtle" data-swatch></i><span data-token="--color-bg-subtle"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-subtle" data-swatch></i><span data-token="--color-bg-subtle"></span></span></td></tr>
+      <tr><td>Checked background / label</td><td><code>--color-fg-default</code> <code>--color-bg-surface</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-fg-default" data-swatch></i><span data-token="--color-fg-default"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-bg-surface" data-swatch></i><span data-token="--color-bg-surface"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-fg-default" data-swatch></i><span data-token="--color-fg-default"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-bg-surface" data-swatch></i><span data-token="--color-bg-surface"></span></span></td></tr>
+      <tr><td>Label font</td><td><code>--text-caption</code></td><td colspan="2"><span data-token="--text-caption"></span></td></tr>
+      <tr><td>Pressed toggle</td><td><code>--color-accent-subtle</code> <code>--color-fg-accent</code> <code>--color-accent</code></td><td><span class="ds-swatch-cell" data-theme="light"><i data-token="--color-accent-subtle" data-swatch></i><span data-token="--color-accent-subtle"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-fg-accent" data-swatch></i><span data-token="--color-fg-accent"></span></span> <span class="ds-swatch-cell" data-theme="light"><i data-token="--color-accent" data-swatch></i><span data-token="--color-accent"></span></span></td><td><span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-accent-subtle" data-swatch></i><span data-token="--color-accent-subtle"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-fg-accent" data-swatch></i><span data-token="--color-fg-accent"></span></span> <span class="ds-swatch-cell" data-theme="dark"><i data-token="--color-accent" data-swatch></i><span data-token="--color-accent"></span></span></td></tr>
+      <tr><td>Focus ring</td><td><code>--color-focus-ring</code> <code>--focus-ring-width</code></td><td colspan="2"><span data-token="--color-focus-ring"></span> <span data-token="--focus-ring-width"></span></td></tr>
+    </tbody>
+  </table></div>
+    </section>
+    <section class="ds-section" id="code"><h2><a href="#code">Code</a></h2>
+<pre><code>&lt;span id=&quot;paint-label&quot; class=&quot;paint-picker__label&quot;&gt;Paint&lt;/span&gt;
+&lt;div class=&quot;segmented&quot; role=&quot;radiogroup&quot; aria-labelledby=&quot;paint-label&quot;&gt;
+  &lt;button class=&quot;segmented__btn&quot; type=&quot;button&quot; role=&quot;radio&quot; aria-checked=&quot;true&quot;&gt;Select&lt;/button&gt;
+  &lt;button class=&quot;segmented__btn&quot; type=&quot;button&quot; role=&quot;radio&quot; aria-checked=&quot;false&quot;&gt;
+    &lt;span class=&quot;swatch&quot; data-status=&quot;confirmed&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;Confirmed
+  &lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;btn-group&quot; role=&quot;group&quot; aria-label=&quot;Request filters&quot;&gt;
+  &lt;button class=&quot;btn&quot; type=&quot;button&quot; aria-pressed=&quot;true&quot;&gt;Pending&lt;/button&gt;
+  &lt;button class=&quot;btn&quot; type=&quot;button&quot; aria-pressed=&quot;false&quot;&gt;Approved&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+<table class="ds-table"><thead><tr><th scope="col">Class / attribute</th><th scope="col">Effect</th></tr></thead><tbody>
+    <tr><td><code>.segmented</code></td><td>Track. Add <code>role="radiogroup"</code> and a name.</td></tr>
+    <tr><td><code>.segmented__btn</code></td><td>One option. <code>type="button"</code>, <code>role="radio"</code>.</td></tr>
+    <tr><td><code>aria-checked="true|false"</code></td><td>The checked segment; the only thing that styles it.</td></tr>
+    <tr><td><code>.paint-picker</code> / <code>__label</code></td><td>Label plus track in one row (calendar toolbar).</td></tr>
+    <tr><td><code>.btn-group</code></td><td>Joined buttons; each carries <code>aria-pressed</code>.</td></tr>
+    <tr><td><code>data-state="hover|focus"</code></td><td>Documentation only.</td></tr>
+  </tbody></table>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<p>Extracted from these mocks:</p>
+<ul><li><a href="../../mocks/pages/calendar/default.html">pages/calendar/default</a> (paint picker (radiogroup))</li><li><a href="../../mocks/pages/calendar/painting.html">pages/calendar/painting</a> (paint picker while painting)</li><li><a href="../../mocks/pages/year/default.html">pages/year/default</a> (aria-pressed toggle button (sort order))</li></ul>
+<p>Drift fixed during extraction: no mock uses <code>.btn-group</code>; it is documented from components.css and the <code>aria-pressed</code> toggle in the year page. The paint-picker buttons all sit in the tab order in the mocks; the implementation should use roving tabindex as the keyboard table states.</p>
+    </section>
+    <footer class="ds-footer"><span>Greenlit design system · extracted from <a href="../../mocks/index.html">docs/mocks</a></span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>
