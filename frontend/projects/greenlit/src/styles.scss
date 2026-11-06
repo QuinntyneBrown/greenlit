@@ -1,0 +1,30 @@
+/*
+ * Global styles: shared foundations and utilities only. Component styles stay
+ * encapsulated in the `components` library; design tokens come from
+ * `styles/_tokens.scss` there once the design system lands.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: 4rem;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.gl-frame {
+  min-height: 100dvh;
+}

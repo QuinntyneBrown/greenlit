@@ -1,0 +1,9 @@
+<gl-skip-link />
+<!--
+  One outlet, always mounted. Toggling classes (rather than switching between
+  outlet branches) keeps the routed component alive when the shell data
+  changes on NavigationEnd.
+-->
+<main id="main" class="gl-frame" [class.gl-frame--bare]="shell() === 'bare'">
+  <router-outlet />
+</main>
