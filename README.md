@@ -1,4 +1,15 @@
-# Greenlit
+<p align="center">
+  <img src="docs/assets/greenlit-icon-green.svg" alt="Greenlit logo" width="96" height="96">
+</p>
+
+<h1 align="center">Greenlit</h1>
+
+<p align="center">
+  <strong>Team time off, one month at a time.</strong><br>
+  The vacation sheet small teams keep in Google Sheets, as a product: members down
+  the side, days across the top, a colour in every cell, and the manager's
+  green light where it counts.
+</p>
 
 Managers of small teams still track vacation in a Google Sheet: one table per month, names down
 the side, weekday initials and day numbers across the top, and a colour in every cell. Red for

@@ -33,6 +33,7 @@ public static class CliHostFactory
                     o.TimestampFormat = "HH:mm:ss ";
                 });
                 log.SetMinimumLevel(verbose ? LogLevel.Debug : LogLevel.Information);
+                log.AddFilter("Microsoft.EntityFrameworkCore", verbose ? LogLevel.Information : LogLevel.Warning);
             })
             .ConfigureServices((ctx, services) =>
             {
