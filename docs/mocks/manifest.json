@@ -1,0 +1,620 @@
+{
+  "project": "Greenlit",
+  "screens": [
+    {
+      "id": "sign-in",
+      "kind": "page",
+      "title": "Sign in",
+      "requirements": [
+        "L1-006"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "error",
+        "invalid",
+        "submitting",
+        "success"
+      ],
+      "route": "/sign-in",
+      "not_applicable": {
+        "empty": "A form has no collection that could be empty."
+      }
+    },
+    {
+      "id": "forgot-password",
+      "kind": "page",
+      "title": "Forgot password",
+      "requirements": [
+        "L1-006"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "error",
+        "invalid",
+        "submitting",
+        "success"
+      ],
+      "route": "/forgot-password",
+      "not_applicable": {
+        "empty": "A form has no collection that could be empty."
+      }
+    },
+    {
+      "id": "reset-password",
+      "kind": "page",
+      "title": "Reset password",
+      "requirements": [
+        "L1-006"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "error",
+        "invalid",
+        "submitting",
+        "success"
+      ],
+      "route": "/reset-password",
+      "not_applicable": {
+        "empty": "A form has no collection that could be empty."
+      }
+    },
+    {
+      "id": "accept-invite",
+      "kind": "page",
+      "title": "Accept invitation",
+      "requirements": [
+        "L1-006",
+        "L1-001"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "error",
+        "invalid",
+        "submitting",
+        "success"
+      ],
+      "route": "/invite/:token",
+      "not_applicable": {
+        "empty": "A form has no collection that could be empty."
+      }
+    },
+    {
+      "id": "create-team",
+      "kind": "page",
+      "title": "Create team",
+      "requirements": [
+        "L1-001"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "error",
+        "invalid",
+        "submitting",
+        "success"
+      ],
+      "route": "/create-team",
+      "not_applicable": {
+        "empty": "A form has no collection that could be empty."
+      }
+    },
+    {
+      "id": "calendar",
+      "kind": "page",
+      "title": "Calendar",
+      "requirements": [
+        "L1-002",
+        "L1-003",
+        "L1-004",
+        "L1-007"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error",
+        "member",
+        "selected",
+        "painting",
+        "over-allowance",
+        "coverage-short",
+        "other-month",
+        "offline"
+      ],
+      "route": "/"
+    },
+    {
+      "id": "year",
+      "kind": "page",
+      "title": "Year",
+      "requirements": [
+        "L1-002"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error",
+        "member",
+        "sorted"
+      ],
+      "route": "/year"
+    },
+    {
+      "id": "requests",
+      "kind": "page",
+      "title": "Requests",
+      "requirements": [
+        "L1-003",
+        "L1-004"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error",
+        "approved",
+        "declined",
+        "bulk",
+        "member",
+        "member-empty",
+        "long"
+      ],
+      "route": "/requests"
+    },
+    {
+      "id": "person",
+      "kind": "page",
+      "title": "Person",
+      "requirements": [
+        "L1-001",
+        "L1-003",
+        "L1-004"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "error",
+        "member",
+        "forbidden",
+        "not-found",
+        "over-allowance",
+        "edge"
+      ],
+      "route": "/people/:id",
+      "not_applicable": {
+        "empty": "A person always has a year to show; an unknown person is the not-found state."
+      }
+    },
+    {
+      "id": "settings",
+      "kind": "page",
+      "title": "Settings",
+      "requirements": [
+        "L1-001",
+        "L1-005",
+        "L1-006"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "error",
+        "read-only",
+        "invalid",
+        "submitting",
+        "success",
+        "holidays-empty"
+      ],
+      "route": "/settings",
+      "not_applicable": {
+        "empty": "Settings always has values; the one empty collection (holidays) is the holidays-empty state."
+      }
+    },
+    {
+      "id": "account",
+      "kind": "page",
+      "title": "Account",
+      "requirements": [
+        "L1-006"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "error",
+        "invalid",
+        "submitting",
+        "success"
+      ],
+      "route": "/account",
+      "not_applicable": {
+        "empty": "A form has no collection that could be empty."
+      }
+    },
+    {
+      "id": "not-found",
+      "kind": "page",
+      "title": "Not found",
+      "requirements": [
+        "L2-002"
+      ],
+      "states": [
+        "default"
+      ],
+      "route": "/404",
+      "not_applicable": {
+        "loading": "A static message page has no data to load.",
+        "empty": "A message page has no collection.",
+        "error": "This page is itself the error state."
+      }
+    },
+    {
+      "id": "forbidden",
+      "kind": "page",
+      "title": "Forbidden",
+      "requirements": [
+        "L1-006"
+      ],
+      "states": [
+        "default"
+      ],
+      "route": "/403",
+      "not_applicable": {
+        "loading": "A static message page has no data to load.",
+        "empty": "A message page has no collection.",
+        "error": "This page is itself the error state."
+      }
+    },
+    {
+      "id": "server-error",
+      "kind": "page",
+      "title": "Server error",
+      "requirements": [
+        "L2-002"
+      ],
+      "states": [
+        "default"
+      ],
+      "route": "/500",
+      "not_applicable": {
+        "loading": "A static message page has no data to load.",
+        "empty": "A message page has no collection.",
+        "error": "This page is itself the error state."
+      }
+    },
+    {
+      "id": "offline",
+      "kind": "page",
+      "title": "Offline",
+      "requirements": [
+        "L1-007"
+      ],
+      "states": [
+        "default"
+      ],
+      "route": "/offline",
+      "not_applicable": {
+        "loading": "A static message page has no data to load.",
+        "empty": "A message page has no collection.",
+        "error": "This page is itself the error state."
+      }
+    },
+    {
+      "id": "session-expired",
+      "kind": "page",
+      "title": "Session expired",
+      "requirements": [
+        "L1-006"
+      ],
+      "states": [
+        "default"
+      ],
+      "route": "/session-expired",
+      "not_applicable": {
+        "loading": "A static message page has no data to load.",
+        "empty": "A message page has no collection.",
+        "error": "This page is itself the error state."
+      }
+    },
+    {
+      "id": "brand",
+      "kind": "page",
+      "title": "Brand guide",
+      "requirements": [],
+      "states": [
+        "default"
+      ],
+      "route": "/brand",
+      "not_applicable": {
+        "loading": "Static content with nothing to load.",
+        "empty": "Static content with no collection.",
+        "error": "Static content cannot fail to load."
+      }
+    },
+    {
+      "id": "new-request",
+      "kind": "dialog",
+      "title": "Request time off",
+      "requirements": [
+        "L1-003"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "invalid",
+        "failed",
+        "over-allowance"
+      ],
+      "opens_from": "requests"
+    },
+    {
+      "id": "request-detail",
+      "kind": "dialog",
+      "title": "Request detail",
+      "requirements": [
+        "L1-004"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "failed",
+        "approved",
+        "declined",
+        "member",
+        "scroll"
+      ],
+      "opens_from": "requests",
+      "not_applicable": {
+        "invalid": "The detail panel has no inputs; decisions are buttons."
+      }
+    },
+    {
+      "id": "decline-request",
+      "kind": "dialog",
+      "title": "Decline request",
+      "requirements": [
+        "L1-004"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "failed"
+      ],
+      "opens_from": "requests",
+      "not_applicable": {
+        "invalid": "The reason is optional, so nothing can be invalid."
+      }
+    },
+    {
+      "id": "cancel-request",
+      "kind": "dialog",
+      "title": "Cancel request",
+      "requirements": [
+        "L1-003"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "failed"
+      ],
+      "opens_from": "requests",
+      "not_applicable": {
+        "invalid": "A confirmation has no inputs."
+      }
+    },
+    {
+      "id": "remove-member",
+      "kind": "dialog",
+      "title": "Remove member",
+      "requirements": [
+        "L1-001"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "failed"
+      ],
+      "opens_from": "person",
+      "not_applicable": {
+        "invalid": "A confirmation has no inputs."
+      }
+    },
+    {
+      "id": "invite-member",
+      "kind": "dialog",
+      "title": "Invite a member",
+      "requirements": [
+        "L1-006"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "invalid",
+        "failed",
+        "success"
+      ],
+      "opens_from": "settings"
+    },
+    {
+      "id": "add-holiday",
+      "kind": "dialog",
+      "title": "Add a day off",
+      "requirements": [
+        "L1-005"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "invalid",
+        "failed"
+      ],
+      "opens_from": "settings"
+    },
+    {
+      "id": "remove-holiday",
+      "kind": "dialog",
+      "title": "Remove holiday",
+      "requirements": [
+        "L1-005"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "failed"
+      ],
+      "opens_from": "settings",
+      "not_applicable": {
+        "invalid": "A confirmation has no inputs."
+      }
+    },
+    {
+      "id": "adjust-allowance",
+      "kind": "dialog",
+      "title": "Adjust allowance",
+      "requirements": [
+        "L1-001"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "invalid",
+        "failed"
+      ],
+      "opens_from": "person"
+    },
+    {
+      "id": "edit-working-days",
+      "kind": "dialog",
+      "title": "Edit working days",
+      "requirements": [
+        "L1-001"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "invalid",
+        "failed"
+      ],
+      "opens_from": "person"
+    },
+    {
+      "id": "user-menu",
+      "kind": "dialog",
+      "title": "Account menu",
+      "requirements": [
+        "L1-006"
+      ],
+      "states": [
+        "default"
+      ],
+      "opens_from": "calendar",
+      "not_applicable": {
+        "busy": "A menu opens instantly and has no async work.",
+        "invalid": "A menu has no inputs."
+      }
+    },
+    {
+      "id": "sign-out",
+      "kind": "dialog",
+      "title": "Sign out",
+      "requirements": [
+        "L1-006"
+      ],
+      "states": [
+        "default",
+        "busy"
+      ],
+      "opens_from": "account",
+      "not_applicable": {
+        "invalid": "A confirmation has no inputs."
+      }
+    },
+    {
+      "id": "toast",
+      "kind": "notification",
+      "title": "Calendar toast",
+      "requirements": [
+        "L1-003",
+        "L1-004"
+      ],
+      "states": [
+        "info",
+        "success",
+        "warning",
+        "danger",
+        "with-action",
+        "stacked"
+      ],
+      "opens_from": "calendar"
+    },
+    {
+      "id": "request-toast",
+      "kind": "notification",
+      "title": "Request toast",
+      "requirements": [
+        "L1-004"
+      ],
+      "states": [
+        "info",
+        "success",
+        "warning",
+        "danger",
+        "with-action"
+      ],
+      "opens_from": "requests"
+    },
+    {
+      "id": "settings-toast",
+      "kind": "notification",
+      "title": "Settings toast",
+      "requirements": [
+        "L1-001",
+        "L1-005"
+      ],
+      "states": [
+        "info",
+        "success",
+        "warning",
+        "danger",
+        "with-action"
+      ],
+      "opens_from": "settings"
+    },
+    {
+      "id": "offline-banner",
+      "kind": "notification",
+      "title": "Connection banner",
+      "requirements": [
+        "L1-007"
+      ],
+      "states": [
+        "info",
+        "success",
+        "warning",
+        "danger",
+        "persistent"
+      ],
+      "opens_from": "calendar"
+    },
+    {
+      "id": "settings-banner",
+      "kind": "notification",
+      "title": "Settings banner",
+      "requirements": [
+        "L1-001",
+        "L1-006"
+      ],
+      "states": [
+        "info",
+        "success",
+        "warning",
+        "danger",
+        "persistent"
+      ],
+      "opens_from": "settings"
+    }
+  ]
+}
