@@ -1,0 +1,71 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Follow and cancel own requests
+
+class TimeOffRequest <<new>> {
+  +Guid Id
+  +Guid TeamMemberId
+  +DateOnly FirstDay
+  +DateOnly LastDay
+  +string? Note
+  +RequestStatus Status
+  +DateTimeOffset SentUtc
+  +DateTimeOffset? DecidedUtc
+  +Guid? DecidedByUserId
+  +string? DeclineReason
+  +Approve(by: Guid, now: DateTimeOffset): void
+  +Decline(by: Guid, reason: string?, now: DateTimeOffset): void
+  +Cancel(now: DateTimeOffset): void
+  +Reopen(): void
+}
+enum RequestStatus <<new>> {
+  Pending
+  Approved
+  Declined
+  Cancelled
+}
+class TimeOffDay <<exists>> {
+  +DateOnly Date
+  +DayStatus Status
+  +Guid? TimeOffRequestId
+}
+class TeamMember <<exists>> {
+  +Guid Id
+  +string Name
+}
+TimeOffRequest --> RequestStatus
+TeamMember "1" --> "*" TimeOffRequest : asks
+TimeOffRequest "1" o-- "*" TimeOffDay : covers working days
+
+class MyRequestsDto <<new>> {
+  +List<RequestSummaryDto> Upcoming
+  +List<RequestSummaryDto> Past
+}
+class RequestSummaryDto <<new>> {
+  +Guid Id
+  +DateOnly FirstDay
+  +DateOnly LastDay
+  +int Days
+  +string? Note
+  +RequestStatus Status
+  +DateTimeOffset SentUtc
+  +DateTimeOffset? DecidedUtc
+  +string? DeclineReason
+  +List<OverlapDto> Overlaps
+}
+class OverlapFinder <<new>> {
+  +For(request: TimeOffRequest): IReadOnlyList<OverlapDto>
+}
+class CancelRequestCommandHandler <<new>>
+MyRequestsDto *-- "*" RequestSummaryDto
+CancelRequestCommandHandler --> TimeOffRequest : Cancel()
+@enduml

@@ -1,0 +1,39 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Report outcomes with toasts
+
+class ToastService <<new>> {
+  -stack: ToastHandle[]
+  +show(request: ToastRequest): ToastHandle
+  +dismiss(handle: ToastHandle): void
+  +pause(handle: ToastHandle): void
+  +resume(handle: ToastHandle): void
+}
+class ToastRequest <<new>> {
+  +tone: 'info' | 'success' | 'warning' | 'danger'
+  +title: string
+  +body?: string
+  +action?: ToastAction
+}
+class ToastAction <<new>> {
+  +label: string
+  +run(): Promise<void>
+}
+class ToastHandle <<new>> {
+  +id: string
+  +request: ToastRequest
+  +remainingMs: number | null
+}
+ToastService *-- "*" ToastHandle
+ToastHandle --> ToastRequest
+ToastRequest --> ToastAction
+@enduml

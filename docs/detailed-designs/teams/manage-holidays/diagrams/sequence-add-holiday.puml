@@ -1,0 +1,49 @@
+@startuml
+title UML sequence behaviour — Add a day off
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "AddHolidayDialog" as dialog
+  participant "HttpHolidayService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "HolidaysController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "AddHolidayCommandHandler" as handler
+  participant "WeekendRule" as rule
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> dialog : Date, name, "Add day off"
+dialog -> client : add(date, name)
+client -> ctrl : POST /api/team/holidays
+ctrl -> handler : Send AddHolidayCommand (Manager policy)
+handler -> db : Find holiday on date
+handler -> rule : IsTeamNonWorking(team, date)
+alt duplicate or no name
+  ctrl --> client : 400 ProblemDetails, codes holiday_exists, name_required
+  dialog --> actor : "Mon 25 May is already a holiday (Spring bank holiday)." (L2-037 AC2)
+else weekend
+  ctrl --> client : 409 ProblemDetails, code day_is_weekend
+  dialog --> actor : Toast "That day is already a weekend" (L2-037 AC3)
+else valid
+  handler -> db : Insert Holiday
+  ctrl --> client : 201
+  dialog --> actor : Date red for everyone (L2-037 AC4)
+end
+@enduml

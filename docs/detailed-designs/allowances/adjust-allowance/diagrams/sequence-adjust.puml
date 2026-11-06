@@ -1,0 +1,46 @@
+@startuml
+title UML sequence behaviour — Add an adjustment
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "AdjustAllowanceDialog" as dialog
+  participant "HttpPersonService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "PeopleController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "AddAdjustmentCommandHandler" as handler
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> dialog : "Adjust allowance", days +3, reason, "Add adjustment"
+dialog -> client : adjust(memberId, 3, reason)
+client -> ctrl : POST /api/people/{id}/adjustments
+ctrl -> handler : Send AddAdjustmentCommand (Manager policy)
+alt invalid
+  ctrl --> client : 400 ProblemDetails
+  dialog --> actor : "Fix 2 things to continue" (L2-028 AC2)
+else saved
+  handler -> db : Insert AllowanceAdjustment
+  ctrl --> client : 201
+  dialog --> actor : Allowance and days left up by 3, listed under adjustments (L2-028 AC3)
+else failed
+  ctrl --> client : 500 ProblemDetails
+  dialog --> actor : "We couldn’t save the adjustment" (L2-028 AC4)
+end
+@enduml

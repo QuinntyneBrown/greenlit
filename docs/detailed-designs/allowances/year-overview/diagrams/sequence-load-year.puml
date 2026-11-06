@@ -1,0 +1,50 @@
+@startuml
+title UML sequence behaviour — Load the year and open a month
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "YearPage" as page
+  participant "HttpYearService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "YearController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "GetYearQueryHandler" as handler
+  participant "AllowanceCalculator" as calc
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> page : Open Year
+page -> client : year(2026)
+client -> ctrl : GET /api/year?year=2026
+ctrl -> handler : Send GetYearQuery
+handler -> db : Confirmed days grouped by member and month
+handler -> calc : Allowance per member
+alt loaded
+  ctrl --> client : 200 YearDto
+  page --> actor : "Time off by month" and "Allowance in 2026" (L2-031 AC1, L2-032 AC1)
+else no members
+  page --> actor : "No one on the team yet" (L2-031 AC5)
+else failed
+  page --> actor : "We couldn't load the year" (L2-031 AC6)
+end
+actor -> page : "Most days left first"
+page --> actor : Rows ordered by Left (L2-032 AC3)
+actor -> page : Select Ben's December
+page --> actor : Calendar on December 2026 (L2-031 AC3)
+@enduml

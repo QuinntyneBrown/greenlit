@@ -1,0 +1,93 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — View a person's page
+
+class AllowanceCalculator <<new>> {
+  +For(member: TeamMember, year: LeaveYear, today: DateOnly): Allowance
+}
+class Allowance <<new>> {
+  +int YearlyDays
+  +int Adjustments
+  +int Total
+  +int Used
+  +int Booked
+  +int Requested
+  +int Tentative
+  +int Left
+  +int LeftAfterRequests
+  +bool IsOver
+}
+class LeaveYear <<new>> {
+  +DateOnly Start
+  +DateOnly End
+  +int Label
+  +Containing(date: DateOnly, startMonth: int): LeaveYear
+}
+class AllowanceAdjustment <<new>> {
+  +Guid Id
+  +Guid TeamMemberId
+  +int Days
+  +string Reason
+  +DateOnly EffectiveOn
+  +Guid CreatedByUserId
+  +DateTimeOffset CreatedUtc
+}
+class TeamMember <<exists>> {
+  +Guid Id
+  +string Name
+  +int? YearlyDays
+  .. new ..
+  +string? JobTitle
+  +DateOnly? JoinedOn
+}
+class Team <<exists>> {
+  .. new ..
+  +int DefaultYearlyDays
+  +int LeaveYearStartMonth
+  +int MaxCarryOver
+}
+TeamMember "1" *-- "*" AllowanceAdjustment
+AllowanceCalculator ..> Allowance : computes
+AllowanceCalculator ..> LeaveYear
+AllowanceCalculator ..> AllowanceAdjustment : sums
+AllowanceCalculator ..> Team : default days
+
+class PersonDto <<new>> {
+  +Guid Id
+  +string Name
+  +string? JobTitle
+  +DateOnly? JoinedOn
+  +WorkingDays? WorkingDays
+  +bool IsYou
+  +bool CanManage
+  +Allowance Allowance
+  +List<CellDto> Year
+  +List<RunDto> Upcoming
+  +List<RunDto> Taken
+  +List<AllowanceAdjustment> Adjustments
+}
+class RunDto <<new>> {
+  +DateOnly First
+  +DateOnly Last
+  +int Days
+  +DayStatus Status
+}
+class GetPersonQueryHandler <<new>>
+class RunBuilder <<new>> {
+  +Build(cells: IEnumerable<CellDto>): IReadOnlyList<RunDto>
+}
+PersonDto --> Allowance
+PersonDto *-- "*" RunDto
+GetPersonQueryHandler ..> PersonDto : builds
+GetPersonQueryHandler ..> RunBuilder
+GetPersonQueryHandler ..> AllowanceCalculator
+@enduml

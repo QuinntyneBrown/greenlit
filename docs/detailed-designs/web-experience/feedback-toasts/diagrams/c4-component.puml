@@ -1,0 +1,18 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Report outcomes with toasts
+
+Person(person, "Team user", "A manager or member of a team")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(svc, "ToastService", "Angular service", "Stack and timers")
+  Component(outlet, "ToastOutlet", "Angular component", "aria-live region")
+  Component(toast, "Toast", "gl-toast", "One message")
+  Component(feature, "Feature page or dialog", "Angular component", "Raises toasts")
+}
+
+Rel(feature, svc, "show()")
+Rel(svc, outlet, "Pushes")
+Rel(outlet, toast, "Renders")
+Rel(person, toast, "Hovers, Undo, Dismiss")
+@enduml

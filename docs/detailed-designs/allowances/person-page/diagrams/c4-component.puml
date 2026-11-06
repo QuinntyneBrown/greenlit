@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — View a person's page
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+Person(member, "Member", "A row on the sheet; colours and requests their own days")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(page, "PersonPage", "Angular page", "Person summary and actions")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "PeopleController", "ASP.NET Core controller", "GET /api/people/{id}")
+  Component(handler, "GetPersonQueryHandler", "MediatR handler", "Access check and figures")
+  Component(calc, "AllowanceCalculator", "Domain service", "Figures")
+  Component(runs, "RunBuilder", "Domain helper", "Upcoming and taken runs")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Members, days, adjustments")
+}
+
+Rel(manager, page, "Views any member")
+Rel(member, page, "Views own page")
+Rel(page, ctrl, "GET /api/people/{id}", "JSON/HTTPS")
+Rel(ctrl, handler, "Sends GetPersonQuery")
+Rel(handler, db, "Reads", "EF Core")
+Rel(handler, calc, "Figures")
+Rel(handler, runs, "Groups days")
+@enduml

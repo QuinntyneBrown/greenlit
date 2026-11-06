@@ -1,0 +1,68 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Mark days on the calendar
+
+class TimeOffDay <<exists>> {
+  +Guid Id
+  +Guid TeamMemberId
+  +DateOnly Date
+  +DayStatus Status
+  +DateTimeOffset UpdatedUtc
+  +DateTimeOffset? ConfirmedUtc
+  .. new ..
+  +Guid? TimeOffRequestId
+}
+enum DayStatus <<exists>> {
+  Tentative
+  Requested
+  Confirmed
+}
+class TeamMember <<exists>> {
+  +Guid Id
+  +string Name
+  +int SortOrder
+  +WorkingDays? WorkingDays
+}
+TeamMember "1" *-- "*" TimeOffDay
+TimeOffDay --> DayStatus
+
+class SetDaysCommand <<new>> {
+  +Guid TeamMemberId
+  +List<DateOnly> Dates
+  +DayStatus? Status
+}
+class ChangeSet <<new>> {
+  +Guid TeamMemberId
+  +List<DayChange> Changes
+  +int ChangedCount
+}
+class DayChange <<new>> {
+  +DateOnly Date
+  +DayStatus? Before
+  +DayStatus? After
+}
+class DayChangePolicy <<new>> {
+  +Check(caller: ICurrentUser, member: TeamMember, day: TimeOffDay?, target: DayStatus?): PolicyResult
+}
+class SetDaysCommandHandler <<new>> {
+  +Handle(command: SetDaysCommand): Task<ChangeSet>
+}
+class RequestLedger <<new>> {
+  +Sync(member: TeamMember, changes: ChangeSet): void
+}
+SetDaysCommandHandler ..> SetDaysCommand : handles
+SetDaysCommandHandler ..> DayChangePolicy
+SetDaysCommandHandler ..> RequestLedger
+SetDaysCommandHandler --> TimeOffDay : creates / updates / deletes
+SetDaysCommandHandler ..> ChangeSet : returns
+ChangeSet *-- "*" DayChange
+@enduml

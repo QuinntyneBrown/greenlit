@@ -1,0 +1,55 @@
+@startuml
+title UML sequence behaviour — Load and render a month
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Member" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "CalendarPage" as page
+  participant "TeamGrid" as grid
+  participant "HttpSheetService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "SheetController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "GetMonthQueryHandler" as handler
+  participant "WeekendRule" as rule
+  participant "CoverageCalculator" as cov
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> page : Open the calendar, or "Previous month" / "Next month" / "Today"
+page -> grid : Show headings and placeholder rows (L2-012 AC8)
+page -> client : month("2026-11")
+client -> ctrl : GET /api/sheet?month=2026-11
+ctrl -> handler : Send GetMonthQuery scoped to ICurrentUser.TeamId
+handler -> db : Members, TimeOffDay rows, holidays for the month
+db --> handler : Rows
+handler -> rule : Classify each date per member
+handler -> cov : Out and in per date, flag below minimum
+handler --> ctrl : MonthDto
+alt loaded
+  ctrl --> client : 200 MonthDto
+  client --> page : Month
+  page -> grid : Render rows, own row first, Left column, Out row
+  grid --> actor : "Time off, November 2026" (L2-012 AC1, L2-013, L2-014)
+else no members
+  page --> actor : "No one on the team yet" (L2-012 AC6)
+else failed
+  ctrl --> client : 500 ProblemDetails
+  page --> actor : "We couldn't load the calendar" (L2-012 AC7)
+end
+@enduml

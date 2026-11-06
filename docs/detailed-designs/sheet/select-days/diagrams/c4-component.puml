@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Select days and use the keyboard
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+Person(member, "Member", "A row on the sheet; colours and requests their own days")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(sel, "SelectionController", "Angular directive", "Pointer and keyboard selection")
+  Component(bar, "SelectionBar", "gl-selection-bar", "Range, counts, actions")
+  Component(skip, "SkipLink", "gl-skip-link", "Skip to content")
+  Component(svc, "HttpSheetService", "SHEET_SERVICE implementation", "setDays()")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "SheetController", "ASP.NET Core controller", "PUT /api/sheet/days")
+  Component(handler, "SetDaysCommandHandler", "MediatR handler", "Applies the action")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Days")
+}
+
+Rel(member, sel, "Clicks, drags, Enter and arrows")
+Rel(sel, bar, "Opens with range")
+Rel(bar, svc, "setDays()")
+Rel(svc, ctrl, "PUT /api/sheet/days", "JSON/HTTPS")
+Rel(ctrl, handler, "Sends SetDaysCommand")
+Rel(handler, db, "Writes", "EF Core")
+@enduml

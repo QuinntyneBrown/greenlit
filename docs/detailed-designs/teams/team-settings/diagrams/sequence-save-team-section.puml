@@ -1,0 +1,49 @@
+@startuml
+title UML sequence behaviour — Save the Team section
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "TeamSection" as section
+  participant "HttpTeamSettingsService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "SettingsController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "SaveTeamSectionCommandHandler" as handler
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> section : Change team name, a role or yearly days, "Save changes"
+alt nothing changed
+  section --> actor : Toast "No changes to save" (L2-009 AC4)
+else changes
+  section -> section : Button shows "Saving…"
+  section -> client : saveTeam(section)
+  client -> ctrl : PUT /api/team/settings/team
+  ctrl -> ctrl : Manager policy
+  ctrl -> handler : Send SaveTeamSectionCommand
+  handler -> db : Update Team and TeamMember rows
+  alt saved
+    ctrl --> client : 204
+    section --> actor : "Saved" (L2-009 AC2), banner "Team settings saved" (AC7)
+  else failed
+    ctrl --> client : 500 ProblemDetails
+    section --> actor : "We couldn't save your settings", values kept (L2-009 AC5)
+  end
+end
+@enduml

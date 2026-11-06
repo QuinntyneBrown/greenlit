@@ -1,0 +1,47 @@
+@startuml
+title UML sequence behaviour — Decline a request
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "DeclineRequestDialog" as dialog
+  participant "ToastService" as toast
+  participant "HttpRequestService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "RequestsController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "DeclineRequestCommandHandler" as handler
+  participant "RequestNotifier" as notifier
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> dialog : "Decline", optional reason, "Decline request"
+dialog -> dialog : Show "Declining…"
+dialog -> client : decline(id, reason)
+client -> ctrl : POST /api/requests/{id}/decline
+ctrl -> handler : Send DeclineRequestCommand (Manager policy)
+handler -> db : Request Declined with reason, days Tentative (L2-025 AC2)
+handler -> notifier : RequestDecided
+alt declined
+  ctrl --> client : 204
+  dialog -> toast : "Declined Ben’s request" with Undo (L2-025 AC3)
+else failed
+  ctrl --> client : 500 ProblemDetails
+  dialog --> actor : "We couldn’t decline the request", reason kept (L2-025 AC4)
+end
+@enduml

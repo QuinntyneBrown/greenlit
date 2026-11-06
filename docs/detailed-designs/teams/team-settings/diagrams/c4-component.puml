@@ -1,0 +1,27 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Edit team settings
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+Person(member, "Member", "A row on the sheet; colours and requests their own days")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(page, "SettingsPage", "Angular page", "Section nav and sections")
+  Component(section, "TeamSection", "Angular component", "Team name, time zone, members")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "SettingsController", "ASP.NET Core controller", "/api/team/settings")
+  Component(get, "GetTeamSettingsQueryHandler", "MediatR handler", "Reads settings")
+  Component(save, "SaveTeamSectionCommandHandler", "MediatR handler", "Saves the Team section")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Teams, members")
+}
+
+Rel(manager, section, "Edits")
+Rel(member, page, "Reads")
+Rel(page, ctrl, "GET /api/team/settings", "JSON/HTTPS")
+Rel(section, ctrl, "PUT /api/team/settings/team", "JSON/HTTPS")
+Rel(ctrl, get, "Sends query")
+Rel(ctrl, save, "Sends command (Manager policy)")
+Rel(get, db, "Reads", "EF Core")
+Rel(save, db, "Writes", "EF Core")
+@enduml

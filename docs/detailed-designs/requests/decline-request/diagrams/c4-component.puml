@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Decline a request
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(dialog, "DeclineRequestDialog", "CDK Dialog", "Reason")
+  Component(toast, "ToastService", "Angular service", "Outcome and Undo")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "RequestsController", "ASP.NET Core controller", "decline")
+  Component(handler, "DeclineRequestCommandHandler", "MediatR handler", "Declines")
+  Component(notifier, "RequestNotifier", "Application service", "Decision email")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Requests, days")
+}
+System_Ext(email, "Email provider", "Delivers invitation, reset and notification emails")
+
+Rel(manager, dialog, "Enters reason")
+Rel(dialog, ctrl, "POST /api/requests/{id}/decline", "JSON/HTTPS")
+Rel(dialog, toast, "Reports")
+Rel(ctrl, handler, "Sends command")
+Rel(handler, db, "Declines, days Tentative", "EF Core")
+Rel(handler, notifier, "RequestDecided")
+Rel(notifier, email, "Emails member", "SMTP <TO SUPPLY>")
+@enduml

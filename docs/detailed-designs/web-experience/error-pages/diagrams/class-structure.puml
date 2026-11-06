@@ -1,0 +1,33 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Show error pages
+
+class ProblemDetails <<exists>> {
+  +int Status
+  +string Title
+  +string Code
+  +string? Reference
+}
+class ExceptionHandlingMiddleware <<exists>> {
+  +InvokeAsync(context: HttpContext): Task
+}
+class ErrorInterceptor <<new>> {
+  +intercept(req, next): Observable<HttpEvent>
+}
+class ServerErrorPage <<new>> {
+  +reference: string
+  +retry(): void
+}
+ExceptionHandlingMiddleware ..> ProblemDetails : writes
+ErrorInterceptor ..> ProblemDetails : reads
+ErrorInterceptor ..> ServerErrorPage : navigates
+@enduml

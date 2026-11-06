@@ -1,0 +1,54 @@
+@startuml
+title UML sequence behaviour — Send a request from the dialog
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Member" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "NewRequestDialog" as dialog
+  participant "HttpRequestService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "RequestsController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "QuoteRequestQueryHandler" as quote
+  participant "SendRequestCommandHandler" as send
+  participant "RequestNotifier" as notifier
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> dialog : "New request", pick first and last day
+dialog -> client : quote(first, last)
+client -> ctrl : GET /api/requests/quote
+ctrl -> quote : Count working days (L2-019 AC7)
+quote --> dialog : Days, days left after, over
+dialog --> actor : "2 days from your allowance. 4 days left after this." (L2-019 AC2)
+opt over allowance
+  dialog --> actor : "That’s 4 days over." (L2-019 AC3)
+end
+actor -> dialog : Note, "Send request"
+alt last day before first day
+  dialog --> actor : "The end date is before the start date" (L2-019 AC4)
+else valid
+  dialog -> client : send(first, last, note)
+  client -> ctrl : POST /api/requests
+  ctrl -> send : Send SendRequestCommand
+  send -> db : Create TimeOffRequest, days Requested
+  send -> notifier : RequestSent
+  ctrl --> client : 201 request
+  dialog --> actor : Yellow days on the calendar, request in My requests (L2-019 AC5)
+end
+@enduml

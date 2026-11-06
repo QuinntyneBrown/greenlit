@@ -1,0 +1,12 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Invite a member
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacation spreadsheet")
+System_Ext(email, "Email provider", "Delivers invitation, reset and notification emails")
+
+Rel(manager, greenlit, "Invites people through")
+Rel(greenlit, email, "Sends email via", "SMTP <TO SUPPLY>")
+@enduml

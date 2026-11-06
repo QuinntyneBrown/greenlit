@@ -1,0 +1,10 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Follow and cancel own requests
+
+Person(member, "Member", "A row on the sheet; colours and requests their own days")
+System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacation spreadsheet")
+
+Rel(member, greenlit, "Follows own requests in")
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — View the team's month
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+Person(member, "Member", "A row on the sheet; colours and requests their own days")
+System_Boundary(greenlit, "Greenlit") {
+  Container(spa, "Greenlit web application", "Angular", "Pages, dialogs and the gl-* components")
+  Container(api, "Greenlit API", "ASP.NET Core (Greenlit.Api)", "Controllers, MediatR handlers, domain rules")
+  ContainerDb(db, "Greenlit database", "SQL Server; SQLite in tests", "Teams, members, days, requests")
+}
+
+Rel(manager, spa, "Opens the calendar in", "HTTPS")
+Rel(member, spa, "Opens the calendar in", "HTTPS")
+Rel(spa, api, "Loads the month from", "JSON/HTTPS")
+Rel(api, db, "Reads and writes", "EF Core")
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+title UML sequence behaviour — Show a server error with its reference
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Team user" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "Current page" as page
+  participant "ErrorInterceptor" as interceptor
+  participant "ServerErrorPage" as error
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "ExceptionHandlingMiddleware" as mw
+  participant "Controller" as ctrl
+end box
+actor -> page : Action that loads data
+page -> interceptor : HTTP request
+interceptor -> mw : Request
+mw -> ctrl : Next
+ctrl --> mw : Unhandled exception
+mw -> mw : Log with reference
+mw --> interceptor : 500 ProblemDetails with reference
+interceptor -> error : Navigate with reference
+error --> actor : "Something went wrong on our side", "Error reference 7F3A-91C2." (L2-046 AC3)
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Create a team
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+System_Boundary(greenlit, "Greenlit") {
+  Container(spa, "Greenlit web application", "Angular", "Pages, dialogs and the gl-* components")
+  Container(api, "Greenlit API", "ASP.NET Core (Greenlit.Api)", "Controllers, MediatR handlers, domain rules")
+  ContainerDb(db, "Greenlit database", "SQL Server; SQLite in tests", "Teams, members, days, requests")
+}
+System_Ext(email, "Email provider", "Delivers invitation, reset and notification emails")
+System_Ext(holidays, "Public-holiday source", "Publishes each country's public holidays <TO SUPPLY>")
+
+Rel(manager, spa, "Fills in the team form in", "HTTPS")
+Rel(spa, api, "Posts the new team to", "JSON/HTTPS")
+Rel(api, db, "Reads and writes", "EF Core")
+Rel(api, email, "Sends email via", "SMTP <TO SUPPLY>")
+Rel(api, holidays, "Reads public holidays from", "<TO SUPPLY>")
+@enduml

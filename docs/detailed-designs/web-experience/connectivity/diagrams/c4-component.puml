@@ -1,0 +1,18 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Handle connection changes
+
+Person(person, "Team user", "A manager or member of a team")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(conn, "ConnectivityService", "Angular service", "Connection state")
+  Component(banner, "ConnectionBanner", "gl-alert", "State banner")
+  Component(calendar, "CalendarPage", "Angular page", "Read-only while offline")
+  Component(http, "HTTP interceptor", "Angular interceptor", "Reports request outcomes")
+}
+
+Rel(http, conn, "Success or network error")
+Rel(conn, banner, "State")
+Rel(conn, calendar, "Disables editing offline")
+Rel(person, banner, "Reads, Retry")
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+title UML sequence behaviour — Create a team with its rows
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "CreateTeamPage" as page
+  participant "HttpTeamService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "TeamsController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "CreateTeamCommandHandler" as handler
+  participant "IPublicHolidayProvider" as hol
+  participant "IEmailSender" as mail
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> page : Name, time zone, holidays, member rows, "Create team"
+page -> client : create(request)
+client -> ctrl : POST /api/teams
+ctrl -> handler : Send CreateTeamCommand (validator: L2-008 AC4)
+handler -> hol : For(country, year)
+hol --> handler : Public holidays
+handler -> db : Add Team, manager row, member rows, holidays, invitations
+alt commit succeeds
+  db --> handler : Committed
+  loop each row with an email
+    handler -> mail : Send invitation (L2-008 AC5)
+  end
+  ctrl --> client : 201 team and session
+  page --> actor : The team's calendar
+else commit fails
+  ctrl --> client : 500 ProblemDetails
+  page --> actor : "We couldn't create your team" (L2-008 AC6)
+end
+@enduml

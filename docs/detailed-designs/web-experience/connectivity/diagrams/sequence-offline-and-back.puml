@@ -1,0 +1,32 @@
+@startuml
+title UML sequence behaviour — Go offline and come back
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Team user" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "ConnectivityService" as conn
+  participant "ConnectionBanner" as banner
+  participant "CalendarPage" as calendar
+end box
+conn -> conn : Browser offline event
+conn -> banner : Offline: "You’re offline", no dismiss (L2-045 AC1)
+conn -> calendar : Disable paint and select
+actor -> calendar : Try to paint
+calendar --> actor : Nothing changes
+conn -> banner : Reconnecting: "Reconnecting…" (L2-045 AC2)
+conn -> conn : Probe succeeds
+conn -> banner : Online: "You’re back online", dismiss after 5 s (L2-045 AC3)
+conn -> calendar : Enable editing
+@enduml

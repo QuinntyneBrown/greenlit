@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Show error pages
+
+Person(person, "Team user", "A manager or member of a team")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(router, "Angular router", "Routes and guards", "Not found, forbidden")
+  Component(interceptor, "ErrorInterceptor", "Angular interceptor", "Server errors")
+  Component(pages, "Error pages", "Angular pages", "Not found, forbidden, server error, offline")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(mw, "ExceptionHandlingMiddleware", "ASP.NET Core middleware", "ProblemDetails with reference")
+}
+
+Rel(person, router, "Navigates")
+Rel(router, pages, "Unknown route or guard")
+Rel(interceptor, mw, "Receives 500 ProblemDetails", "JSON/HTTPS")
+Rel(interceptor, pages, "Server-error page with reference")
+@enduml

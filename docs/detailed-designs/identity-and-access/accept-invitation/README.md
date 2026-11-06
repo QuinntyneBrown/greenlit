@@ -14,7 +14,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Frontend**
 
-- **`AcceptInvitePage`** — Bare-shell page. It loads the invitation summary, pre-fills Email (read-only, "This is where your invitation was sent.") and Your name, and validates the password rules of `L2-003`.
+- **`AcceptInvitePage`** — Bare-shell page. It loads the invitation summary, pre-fills Email (read-only, "This is where your invitation was sent.") and "Your name", and validates the password rules of `L2-003`.
 - **`InvitationService / INVITATION_SERVICE`** — Contract and token: `get(token)` and `accept(token, name, password)`.
 
 **Backend**

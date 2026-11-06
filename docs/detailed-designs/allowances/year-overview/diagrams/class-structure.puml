@@ -1,0 +1,38 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — View the team's year
+
+class YearDto <<new>> {
+  +int Year
+  +List<YearRowDto> Rows
+}
+class YearRowDto <<new>> {
+  +Guid MemberId
+  +string Name
+  +bool IsYou
+  +int[] ConfirmedByMonth
+  +Allowance Allowance
+}
+class Allowance <<new>> {
+  +int Total
+  +int Used
+  +int Booked
+  +int Requested
+  +int Left
+}
+class GetYearQueryHandler <<new>> {
+  +Handle(query: GetYearQuery): Task<YearDto>
+}
+YearDto *-- "*" YearRowDto
+YearRowDto --> Allowance
+GetYearQueryHandler ..> YearDto : builds
+@enduml

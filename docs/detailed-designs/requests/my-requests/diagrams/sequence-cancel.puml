@@ -1,0 +1,50 @@
+@startuml
+title UML sequence behaviour — Cancel a pending request
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Member" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "RequestsPage" as page
+  participant "CancelRequestDialog" as dialog
+  participant "HttpRequestService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "RequestsController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "CancelRequestCommandHandler" as handler
+  participant "TimeOffRequest" as req
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> page : "Cancel request" on 16–20 Nov
+page -> dialog : "Cancel this request?" (L2-021 AC1)
+actor -> dialog : "Cancel request"
+dialog -> dialog : Show "Cancelling…"
+dialog -> client : cancel(id)
+client -> ctrl : POST /api/requests/{id}/cancel
+ctrl -> handler : Send CancelRequestCommand
+handler -> db : Load request and its days
+handler -> req : Cancel(now), own member and Pending only
+alt cancelled
+  handler -> db : Delete linked TimeOffDay rows
+  ctrl --> client : 204
+  page --> actor : Request under Past as "Cancelled" (L2-021 AC2)
+else failed
+  ctrl --> client : 500 ProblemDetails
+  dialog --> actor : "We couldn’t cancel the request" (L2-021 AC3)
+end
+@enduml

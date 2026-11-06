@@ -1,0 +1,62 @@
+@startuml
+title UML sequence behaviour — Paint a stroke
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "PaintController" as paint
+  participant "ToastService" as toast
+  participant "HttpSheetService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "SheetController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "SetDaysCommandHandler" as handler
+  participant "DayChangePolicy" as policy
+  participant "RequestLedger" as ledger
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> paint : Choose "Confirmed", drag across Ana's 23–25 Nov
+paint -> paint : Preview colour on covered cells
+actor -> paint : Release
+paint -> client : setDays(Ana, [23, 24, 25 Nov], Confirmed)
+client -> ctrl : PUT /api/sheet/days
+ctrl -> handler : Send SetDaysCommand
+handler -> db : Load member, days, holidays
+handler -> handler : Drop non-working dates (L2-017 AC3, AC4)
+loop each remaining date
+  handler -> policy : Check(caller, member, day, Confirmed)
+end
+alt allowed
+  handler -> db : Write days
+  handler -> ledger : Sync requested days (L2-015 AC5)
+  handler --> ctrl : ChangeSet
+  ctrl --> client : 200 ChangeSet
+  paint -> toast : "3 days marked confirmed for Ana" with Undo (L2-015 AC4)
+else only non-working days
+  ctrl --> client : 409 ProblemDetails, code all_non_working
+  paint -> toast : "Those are all non-working days" (L2-017 AC3)
+else member on confirmed day
+  ctrl --> client : 403 ProblemDetails, code confirmed_locked
+  paint -> toast : "Confirmed days can only be changed by Maya" (L2-017 AC2)
+else save failed
+  ctrl --> client : 500 ProblemDetails
+  paint -> paint : Restore previous colours
+  paint -> toast : "We couldn’t save those days" with Try again (L2-018 AC2)
+end
+@enduml

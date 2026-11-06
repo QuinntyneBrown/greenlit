@@ -1,0 +1,12 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Manage team holidays
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacation spreadsheet")
+System_Ext(holidays, "Public-holiday source", "Publishes each country's public holidays <TO SUPPLY>")
+
+Rel(manager, greenlit, "Maintains holidays in")
+Rel(greenlit, holidays, "Reads public holidays from", "<TO SUPPLY>")
+@enduml

@@ -1,0 +1,47 @@
+@startuml
+title UML sequence behaviour — Email on a request event
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Member" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "Requests or calendar" as ui
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "RequestsController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "Request command handler" as handler
+  participant "RequestNotifier" as notifier
+  participant "IEmailSender" as mail
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+participant "Email provider" as email
+actor -> ui : Send a request (or manager decides one)
+ui -> ctrl : POST /api/requests (or approve, decline)
+ctrl -> handler : Send command
+handler -> db : Commit request change
+handler -> notifier : RequestSent / RequestDecided
+notifier -> db : Read NotifyNewRequests / NotifyDecisions
+alt switch on
+  notifier -> mail : Send to manager or member (L2-043 AC2, AC3)
+  mail -> email : Deliver
+else switch off
+  notifier -> notifier : Send nothing
+end
+handler --> ctrl : Result
+ctrl --> ui : Response
+@enduml

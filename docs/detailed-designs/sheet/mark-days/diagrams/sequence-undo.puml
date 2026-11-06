@@ -1,0 +1,39 @@
+@startuml
+title UML sequence behaviour — Undo a change
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "ToastService" as toast
+  participant "HttpSheetService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "SheetController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "RestoreDaysCommandHandler" as handler
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> toast : Undo
+toast -> client : restore(changeSet)
+client -> ctrl : POST /api/sheet/days/restore
+ctrl -> handler : Send RestoreDaysCommand
+handler -> db : Write each day's Before status
+handler --> ctrl : ChangeSet
+ctrl --> client : 200
+client --> actor : Cells back to previous statuses (L2-018 AC1)
+@enduml

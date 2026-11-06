@@ -1,0 +1,10 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Set working days
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacation spreadsheet")
+
+Rel(manager, greenlit, "Sets working days in")
+@enduml

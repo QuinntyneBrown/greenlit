@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Handle connection changes
+
+enum ConnectionState <<new>> {
+  Online
+  Offline
+  Reconnecting
+  Unstable
+  SyncFailed
+}
+class ConnectivityService <<new>> {
+  +state: Signal<ConnectionState>
+  +lastSync: Signal<Date | null>
+  +retry(): void
+}
+class ConnectionBannerComponent <<new>> {
+  +state: ConnectionState
+  +dismissible(): boolean
+}
+ConnectivityService --> ConnectionState
+ConnectionBannerComponent ..> ConnectivityService : reads
+@enduml

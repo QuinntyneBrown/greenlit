@@ -1,0 +1,74 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — View the team's month
+
+class TimeOffDay <<exists>> {
+  +Guid Id
+  +Guid TeamMemberId
+  +DateOnly Date
+  +DayStatus Status
+  +DateTimeOffset UpdatedUtc
+  +DateTimeOffset? ConfirmedUtc
+  .. new ..
+  +Guid? TimeOffRequestId
+}
+enum DayStatus <<exists>> {
+  Tentative
+  Requested
+  Confirmed
+}
+class TeamMember <<exists>> {
+  +Guid Id
+  +string Name
+  +int SortOrder
+  +WorkingDays? WorkingDays
+}
+TeamMember "1" *-- "*" TimeOffDay
+TimeOffDay --> DayStatus
+
+class MonthDto <<new>> {
+  +string Month
+  +DateOnly Today
+  +bool IsManager
+  +int CoverageMinimum
+  +List<MemberRowDto> Members
+  +List<DayCoverage> Coverage
+}
+class MemberRowDto <<new>> {
+  +Guid Id
+  +string Name
+  +bool IsYou
+  +int DaysLeft
+  +List<CellDto> Cells
+}
+class CellDto <<new>> {
+  +DateOnly Date
+  +CellKind Kind
+  +DayStatus? Status
+  +string? HolidayName
+}
+enum CellKind <<new>> {
+  Working
+  NotWorking
+  Holiday
+  TimeOff
+}
+class GetMonthQueryHandler <<new>> {
+  +Handle(query: GetMonthQuery): Task<MonthDto>
+}
+MonthDto *-- "*" MemberRowDto
+MemberRowDto *-- "*" CellDto
+CellDto --> CellKind
+CellDto --> DayStatus
+GetMonthQueryHandler ..> MonthDto : builds
+GetMonthQueryHandler --> TimeOffDay : reads
+@enduml

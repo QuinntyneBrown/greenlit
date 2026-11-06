@@ -1,0 +1,64 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Approve a request
+
+class TimeOffRequest <<new>> {
+  +Guid Id
+  +Guid TeamMemberId
+  +DateOnly FirstDay
+  +DateOnly LastDay
+  +string? Note
+  +RequestStatus Status
+  +DateTimeOffset SentUtc
+  +DateTimeOffset? DecidedUtc
+  +Guid? DecidedByUserId
+  +string? DeclineReason
+  +Approve(by: Guid, now: DateTimeOffset): void
+  +Decline(by: Guid, reason: string?, now: DateTimeOffset): void
+  +Cancel(now: DateTimeOffset): void
+  +Reopen(): void
+}
+enum RequestStatus <<new>> {
+  Pending
+  Approved
+  Declined
+  Cancelled
+}
+class TimeOffDay <<exists>> {
+  +DateOnly Date
+  +DayStatus Status
+  +Guid? TimeOffRequestId
+}
+class TeamMember <<exists>> {
+  +Guid Id
+  +string Name
+}
+TimeOffRequest --> RequestStatus
+TeamMember "1" --> "*" TimeOffRequest : asks
+TimeOffRequest "1" o-- "*" TimeOffDay : covers working days
+
+class ApproveRequestsCommand <<new>> {
+  +List<Guid> RequestIds
+}
+class ApprovalResult <<new>> {
+  +Guid RequestId
+  +DateOnly? FirstShortDate
+  +int? InOnShortDate
+  +int CoverageMinimum
+}
+class ApproveRequestsCommandHandler <<new>>
+class ReopenRequestCommandHandler <<new>>
+ApproveRequestsCommandHandler ..> ApproveRequestsCommand : handles
+ApproveRequestsCommandHandler ..> ApprovalResult : returns
+ApproveRequestsCommandHandler --> TimeOffRequest : Approve()
+ReopenRequestCommandHandler --> TimeOffRequest : Reopen()
+@enduml

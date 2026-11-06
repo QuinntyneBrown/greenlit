@@ -1,0 +1,16 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Show error pages
+
+Person(person, "Team user", "A manager or member of a team")
+System_Boundary(greenlit, "Greenlit") {
+  Container(spa, "Greenlit web application", "Angular", "Pages, dialogs and the gl-* components")
+  Container(api, "Greenlit API", "ASP.NET Core (Greenlit.Api)", "Controllers, MediatR handlers, domain rules")
+  ContainerDb(db, "Greenlit database", "SQL Server; SQLite in tests", "Teams, members, days, requests")
+}
+
+Rel(person, spa, "Uses", "HTTPS")
+Rel(spa, api, "Receives errors from", "JSON/HTTPS")
+Rel(api, db, "Reads and writes", "EF Core")
+@enduml

@@ -1,0 +1,40 @@
+@startuml
+title UML sequence behaviour — Show, pause and undo a toast
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Team user" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "Feature component" as feature
+  participant "ToastService" as svc
+  participant "Toast" as toast
+end box
+feature -> svc : show({ tone: success, title: "Approved Ana’s time off", action: Undo })
+svc -> toast : Render at top of stack, start 8 s timer
+actor -> toast : Hover or focus
+toast -> svc : pause()
+actor -> toast : Leave
+toast -> svc : resume()
+alt Undo before it leaves
+  actor -> toast : Undo
+  toast -> feature : action.run() (L2-044 AC3)
+  svc -> toast : Remove
+else timer ends
+  svc -> toast : Remove (L2-044 AC1)
+else Dismiss
+  actor -> toast : Dismiss
+  svc -> toast : Remove (L2-044 AC4)
+end
+note over svc : Danger toasts start no timer (L2-044 AC2)
+@enduml

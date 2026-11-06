@@ -1,0 +1,40 @@
+@startuml
+title UML sequence behaviour — Save the coverage minimum
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "CoverageSection" as section
+  participant "HttpTeamSettingsService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "SettingsController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "SaveCoverageCommandHandler" as handler
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> section : "More people" / "Fewer people"
+section -> section : Clamp to 0..team size (L2-041 AC2)
+actor -> section : "Save changes"
+section -> client : saveCoverage(minimum)
+client -> ctrl : PUT /api/team/settings/coverage
+ctrl -> handler : Send SaveCoverageCommand (Manager policy)
+handler -> db : Save Team.CoverageMinimum
+ctrl --> client : 204
+section --> actor : "Saved"
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Follow and cancel own requests
+
+Person(member, "Member", "A row on the sheet; colours and requests their own days")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(page, "RequestsPage", "Angular page", "My requests")
+  Component(dialog, "CancelRequestDialog", "CDK Dialog", "Confirms cancel")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "RequestsController", "ASP.NET Core controller", "/api/requests/mine, cancel")
+  Component(mine, "GetMyRequestsQueryHandler", "MediatR handler", "Upcoming and past")
+  Component(cancel, "CancelRequestCommandHandler", "MediatR handler", "Cancels a pending request")
+  Component(overlap, "OverlapFinder", "Domain service", "Teammates out")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Requests, days")
+}
+
+Rel(member, page, "Reads")
+Rel(page, dialog, "Opens on Cancel request")
+Rel(page, ctrl, "GET /api/requests/mine", "JSON/HTTPS")
+Rel(dialog, ctrl, "POST /api/requests/{id}/cancel", "JSON/HTTPS")
+Rel(ctrl, mine, "Sends query")
+Rel(ctrl, cancel, "Sends command")
+Rel(mine, overlap, "Finds overlaps")
+Rel(cancel, db, "Cancels, deletes days", "EF Core")
+Rel(mine, db, "Reads", "EF Core")
+@enduml

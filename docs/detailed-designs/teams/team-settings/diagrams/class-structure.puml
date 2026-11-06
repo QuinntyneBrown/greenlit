@@ -1,0 +1,92 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Edit team settings
+
+class Team <<exists>> {
+  +Guid Id
+  +string Name
+  +Guid ManagerUserId
+  +string TimeZone
+  +DateTimeOffset CreatedUtc
+  .. new ..
+  +string? HolidayCountry
+  +WorkingDays WorkingDays
+  +int DefaultYearlyDays
+  +int LeaveYearStartMonth
+  +int MaxCarryOver
+  +int CoverageMinimum
+  +bool NotifyNewRequests
+  +bool NotifyDecisions
+}
+class TeamMember <<exists>> {
+  +Guid Id
+  +Guid TeamId
+  +string Name
+  +string? Email
+  +Guid? UserId
+  +int SortOrder
+  .. new ..
+  +MemberRole Role
+  +int? YearlyDays
+  +WorkingDays? WorkingDays
+  +DateTimeOffset? RemovedUtc
+}
+class Holiday <<exists>> {
+  +Guid Id
+  +Guid TeamId
+  +DateOnly Date
+  +string Name
+}
+enum WorkingDays <<new, flags>> {
+  Mon
+  Tue
+  Wed
+  Thu
+  Fri
+  Sat
+  Sun
+}
+enum MemberRole <<new>> {
+  Member
+  Manager
+}
+Team "1" *-- "*" TeamMember : members
+Team "1" *-- "*" Holiday : holidays
+Team --> WorkingDays
+TeamMember --> MemberRole
+TeamMember --> WorkingDays : overrides
+
+class TeamSettingsDto <<new>> {
+  +bool CanEdit
+  +string ManagerName
+  +TeamSectionDto Team
+  +AllowanceSectionDto Allowances
+  +WorkWeekSectionDto WorkWeek
+  +CoverageSectionDto Coverage
+  +NotificationSectionDto Notifications
+}
+class SaveTeamSectionCommand <<new>> {
+  +string Name
+  +string TimeZone
+  +List<MemberSettings> Members
+}
+class MemberSettings <<new>> {
+  +Guid TeamMemberId
+  +MemberRole Role
+  +int? YearlyDays
+}
+class SaveTeamSectionCommandHandler <<new>>
+SaveTeamSectionCommand *-- "*" MemberSettings
+SaveTeamSectionCommandHandler ..> SaveTeamSectionCommand : handles
+SaveTeamSectionCommandHandler --> Team : updates
+SaveTeamSectionCommandHandler --> TeamMember : updates role, yearly days
+@enduml

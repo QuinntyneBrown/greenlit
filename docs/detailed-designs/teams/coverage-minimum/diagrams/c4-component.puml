@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Set the coverage minimum
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(section, "CoverageSection", "Angular component", "Stepper")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "SettingsController", "ASP.NET Core controller", "PUT coverage")
+  Component(handler, "SaveCoverageCommandHandler", "MediatR handler", "Saves the minimum")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Teams")
+}
+
+Rel(manager, section, "Steps")
+Rel(section, ctrl, "PUT /api/team/settings/coverage", "JSON/HTTPS")
+Rel(ctrl, handler, "Sends command")
+Rel(handler, db, "Saves", "EF Core")
+@enduml

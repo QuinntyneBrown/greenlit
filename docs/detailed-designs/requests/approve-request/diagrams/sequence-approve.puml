@@ -1,0 +1,58 @@
+@startuml
+title UML sequence behaviour — Approve a request
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "RequestDetailDialog" as detail
+  participant "ToastService" as toast
+  participant "HttpRequestService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "RequestsController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "ApproveRequestsCommandHandler" as handler
+  participant "CoverageCalculator" as cov
+  participant "RequestNotifier" as notifier
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> detail : "Approve"
+detail -> detail : Show "Approving…"
+detail -> client : approve([id])
+client -> ctrl : POST /api/requests/approve
+ctrl -> handler : Send ApproveRequestsCommand (Manager policy)
+handler -> db : Request Approved, days Confirmed (L2-024 AC1)
+handler -> cov : First date below minimum in range
+handler -> notifier : RequestDecided
+alt approved, coverage fine
+  ctrl --> client : 200 ApprovalResult
+  detail -> toast : "Approved Ana’s time off" with Undo (L2-024 AC2)
+else approved, below minimum
+  ctrl --> client : 200 ApprovalResult with short date
+  detail -> toast : "Approved, but only 3 people will be in on 18 Nov" (L2-042 AC2)
+else failed
+  ctrl --> client : 500 ProblemDetails
+  detail --> actor : "We couldn’t record your decision", still pending (L2-024 AC4)
+end
+opt Undo
+  actor -> toast : Undo
+  toast -> client : reopen(id)
+  client -> ctrl : POST /api/requests/{id}/reopen
+  ctrl --> client : 204, request Pending, days Requested (L2-024 AC3)
+end
+@enduml

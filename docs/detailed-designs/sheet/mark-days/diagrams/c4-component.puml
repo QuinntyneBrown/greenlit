@@ -1,0 +1,32 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Mark days on the calendar
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+Person(member, "Member", "A row on the sheet; colours and requests their own days")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(toolbar, "CalendarToolbar", "Angular component", "Mode and paint colour")
+  Component(paint, "PaintController", "Angular directive", "Turns a drag into a stroke")
+  Component(toast, "ToastService", "Angular service", "Outcome and Undo")
+  Component(svc, "HttpSheetService", "SHEET_SERVICE implementation", "setDays, restore")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "SheetController", "ASP.NET Core controller", "PUT /api/sheet/days")
+  Component(handler, "SetDaysCommandHandler", "MediatR handler", "Applies a stroke")
+  Component(policy, "DayChangePolicy", "Domain service", "Who may change which day")
+  Component(ledger, "RequestLedger", "Application service", "Keeps requests in step")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Days, requests")
+}
+
+Rel(member, toolbar, "Chooses colour")
+Rel(member, paint, "Drags")
+Rel(manager, paint, "Drags")
+Rel(paint, svc, "setDays()")
+Rel(svc, ctrl, "PUT /api/sheet/days", "JSON/HTTPS")
+Rel(paint, toast, "Reports")
+Rel(ctrl, handler, "Sends SetDaysCommand")
+Rel(handler, policy, "Checks each day")
+Rel(handler, ledger, "Syncs requested days")
+Rel(handler, db, "Writes in one unit of work", "EF Core")
+@enduml

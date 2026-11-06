@@ -1,0 +1,50 @@
+@startuml
+title UML sequence behaviour — Approve ticked requests together
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "RequestsPage" as page
+  participant "HttpRequestService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "RequestsController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "ApproveRequestsCommandHandler" as handler
+  participant "TimeOffRequest" as req
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> page : Open Requests (Pending tab)
+page -> client : list(Pending)
+client -> ctrl : GET /api/requests?status=Pending
+ctrl --> client : RequestLedgerDto
+page --> actor : Tabs with counts, pending rows (L2-022 AC1, AC2)
+actor -> page : Tick two requests, or "Select all" (L2-026 AC2)
+page --> actor : "Approve 2" (L2-026 AC1)
+actor -> page : "Approve 2"
+page -> client : approve([ids])
+client -> ctrl : POST /api/requests/approve
+ctrl -> handler : Send ApproveRequestsCommand (Manager policy)
+loop each request
+  handler -> req : Approve(by, now)
+  handler -> db : Days to Confirmed
+end
+handler -> db : Commit once
+ctrl --> client : 200
+page --> actor : Rows leave Pending, counts update
+@enduml

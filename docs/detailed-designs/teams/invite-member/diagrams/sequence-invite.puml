@@ -1,0 +1,47 @@
+@startuml
+title UML sequence behaviour — Invite a member
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "InviteMemberDialog" as dialog
+  participant "HttpTeamService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "MembersController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "InviteMemberCommandHandler" as handler
+  participant "IEmailSender" as mail
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> dialog : Name, email, role, "Send invite"
+dialog -> dialog : Validate (L2-010 AC2)
+dialog -> client : invite(name, email, role)
+client -> ctrl : POST /api/team/members
+ctrl -> handler : Send InviteMemberCommand (Manager policy)
+handler -> db : Add TeamMember and Invitation, commit
+handler -> mail : Send invitation link
+alt sent
+  ctrl --> client : 201 member
+  dialog --> actor : "Invite sent to finn@northwind.studio", row on the calendar (L2-010 AC3)
+else email failed
+  handler -> db : Remove member and invitation
+  ctrl --> client : 503 ProblemDetails, code email_failed
+  dialog --> actor : "We couldn’t send the invite", nothing added (L2-010 AC4)
+end
+@enduml

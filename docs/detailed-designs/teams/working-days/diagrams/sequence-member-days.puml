@@ -1,0 +1,45 @@
+@startuml
+title UML sequence behaviour — Set a part-timer's working days
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "EditWorkingDaysDialog" as dialog
+  participant "HttpTeamService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "MembersController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "SetMemberWorkingDaysCommandHandler" as handler
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> dialog : "Edit working days", toggle Mon–Thu, "Save working days"
+dialog -> dialog : At least one day (L2-040 AC2)
+dialog -> dialog : Show "Saving…"
+dialog -> client : setWorkingDays(memberId, days)
+client -> ctrl : PUT /api/team/members/{id}/working-days
+ctrl -> handler : Send SetMemberWorkingDaysCommand (Manager policy)
+handler -> db : Save TeamMember.WorkingDays
+alt saved
+  ctrl --> client : 204
+  dialog --> actor : Fridays red on Dev's row only (L2-040 AC3)
+else failed
+  ctrl --> client : 500 ProblemDetails
+  dialog --> actor : "We couldn’t save the working days" (L2-040 AC4)
+end
+@enduml

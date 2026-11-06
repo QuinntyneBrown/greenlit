@@ -1,0 +1,40 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Select days and use the keyboard
+
+class SelectionState <<new>> {
+  +memberId: string
+  +anchor: Date
+  +focus: Date
+  +range(): Date[]
+  +workingDays(month: Month): number
+  +overAllowance(daysLeft: number): number
+}
+class SelectionController <<new>> {
+  +onPointerDown(cell: CellRef): void
+  +onKeydown(event: KeyboardEvent): void
+  +clear(): void
+}
+class SelectionBarComponent <<new>> {
+  +selection: SelectionState
+  +canConfirm: boolean
+  +apply(status: DayStatus | null): void
+}
+interface SheetService <<new>> {
+  +month(month: string): Observable<Month>
+  +setDays(change: DayChangeRequest): Observable<ChangeSet>
+  +restore(changes: ChangeSet): Observable<ChangeSet>
+}
+SelectionController --> SelectionState : maintains
+SelectionBarComponent --> SelectionState : reads
+SelectionBarComponent ..> SheetService : setDays()
+@enduml

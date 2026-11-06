@@ -1,0 +1,84 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Set the coverage minimum
+
+class Team <<exists>> {
+  +Guid Id
+  +string Name
+  +Guid ManagerUserId
+  +string TimeZone
+  +DateTimeOffset CreatedUtc
+  .. new ..
+  +string? HolidayCountry
+  +WorkingDays WorkingDays
+  +int DefaultYearlyDays
+  +int LeaveYearStartMonth
+  +int MaxCarryOver
+  +int CoverageMinimum
+  +bool NotifyNewRequests
+  +bool NotifyDecisions
+}
+class TeamMember <<exists>> {
+  +Guid Id
+  +Guid TeamId
+  +string Name
+  +string? Email
+  +Guid? UserId
+  +int SortOrder
+  .. new ..
+  +MemberRole Role
+  +int? YearlyDays
+  +WorkingDays? WorkingDays
+  +DateTimeOffset? RemovedUtc
+}
+class Holiday <<exists>> {
+  +Guid Id
+  +Guid TeamId
+  +DateOnly Date
+  +string Name
+}
+enum WorkingDays <<new, flags>> {
+  Mon
+  Tue
+  Wed
+  Thu
+  Fri
+  Sat
+  Sun
+}
+enum MemberRole <<new>> {
+  Member
+  Manager
+}
+Team "1" *-- "*" TeamMember : members
+Team "1" *-- "*" Holiday : holidays
+Team --> WorkingDays
+TeamMember --> MemberRole
+TeamMember --> WorkingDays : overrides
+
+class SaveCoverageCommand <<new>> {
+  +int Minimum
+}
+class SaveCoverageCommandHandler <<new>>
+class CoverageCalculator <<new>> {
+  +ForRange(team: Team, from: DateOnly, to: DateOnly): IReadOnlyList<DayCoverage>
+}
+class DayCoverage <<new>> {
+  +DateOnly Date
+  +int Out
+  +int In
+  +bool BelowMinimum
+}
+SaveCoverageCommandHandler ..> SaveCoverageCommand : handles
+SaveCoverageCommandHandler --> Team : sets CoverageMinimum
+CoverageCalculator ..> DayCoverage : produces
+@enduml

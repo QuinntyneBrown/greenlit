@@ -1,0 +1,53 @@
+@startuml
+title UML sequence behaviour — Open a person page
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Member" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "PersonPage" as page
+  participant "HttpPersonService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "PeopleController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "GetPersonQueryHandler" as handler
+  participant "AllowanceCalculator" as calc
+  participant "RunBuilder" as runs
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> page : Open /people/{id}
+page -> client : get(id)
+client -> ctrl : GET /api/people/{id}
+ctrl -> handler : Send GetPersonQuery
+handler -> db : Load member in caller's team
+alt member opens another member's page
+  ctrl --> client : 403 ProblemDetails, code own_details_only
+  page --> actor : "Only your own details are visible" (L2-035 AC1)
+else not on the team
+  ctrl --> client : 404 ProblemDetails
+  page --> actor : "Person not found" (L2-035 AC2)
+else allowed
+  handler -> calc : Figures for the leave year
+  handler -> runs : Upcoming and taken runs
+  ctrl --> client : 200 PersonDto
+  page --> actor : Days left, figures, year at a glance, runs (L2-033)
+  opt CanManage
+    page --> actor : Adjustments, Working days, Remove from team (L2-034 AC1)
+  end
+end
+@enduml

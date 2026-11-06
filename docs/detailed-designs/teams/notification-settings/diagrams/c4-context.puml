@@ -1,0 +1,14 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Send email notifications
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+Person(member, "Member", "A row on the sheet; colours and requests their own days")
+System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacation spreadsheet")
+System_Ext(email, "Email provider", "Delivers invitation, reset and notification emails")
+
+Rel(manager, greenlit, "Receives request emails from")
+Rel(member, greenlit, "Receives decision emails from")
+Rel(greenlit, email, "Sends email via", "SMTP <TO SUPPLY>")
+@enduml

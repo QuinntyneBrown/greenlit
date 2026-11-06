@@ -1,0 +1,34 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — View the team's month
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+Person(member, "Member", "A row on the sheet; colours and requests their own days")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(page, "CalendarPage", "Angular page", "Month cursor and states")
+  Component(grid, "TeamGrid", "gl-team-grid", "Grid, Left column, Out row")
+  Component(cell, "SheetCell", "gl-sheet-cell", "Colour, glyph, name")
+  Component(svc, "HttpSheetService", "SHEET_SERVICE implementation", "GET /api/sheet")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "SheetController", "ASP.NET Core controller", "GET /api/sheet")
+  Component(handler, "GetMonthQueryHandler", "MediatR handler", "Builds MonthDto")
+  Component(rule, "WeekendRule", "Domain service", "Non-working days")
+  Component(alloc, "AllowanceCalculator", "Domain service", "Days left")
+  Component(cov, "CoverageCalculator", "Domain service", "Out and in counts")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Members, days, holidays")
+}
+
+Rel(manager, page, "Views")
+Rel(member, page, "Views")
+Rel(page, svc, "month()")
+Rel(page, grid, "Renders")
+Rel(grid, cell, "Renders")
+Rel(svc, ctrl, "GET /api/sheet?month=", "JSON/HTTPS")
+Rel(ctrl, handler, "Sends GetMonthQuery")
+Rel(handler, db, "One query for the month", "EF Core")
+Rel(handler, rule, "Resolves red days")
+Rel(handler, alloc, "Days left")
+Rel(handler, cov, "Out row")
+@enduml

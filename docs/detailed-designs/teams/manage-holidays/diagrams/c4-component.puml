@@ -1,0 +1,31 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Manage team holidays
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(section, "WorkWeekSection", "Angular component", "Holiday list")
+  Component(add, "AddHolidayDialog", "CDK Dialog", "Date and name")
+  Component(rem, "RemoveHolidayDialog", "CDK Dialog", "Confirms removal")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "HolidaysController", "ASP.NET Core controller", "/api/team/holidays")
+  Component(addh, "AddHolidayCommandHandler", "MediatR handler", "Adds a day off")
+  Component(remh, "RemoveHolidayCommandHandler", "MediatR handler", "Removes and restores")
+  Component(rule, "WeekendRule", "Domain service", "Non-working day rule")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Holidays")
+}
+System_Ext(holidays, "Public-holiday source", "Publishes each country's public holidays <TO SUPPLY>")
+
+Rel(manager, section, "Manages holidays")
+Rel(section, add, "Opens")
+Rel(section, rem, "Opens")
+Rel(add, ctrl, "POST", "JSON/HTTPS")
+Rel(rem, ctrl, "DELETE, POST restore", "JSON/HTTPS")
+Rel(ctrl, addh, "Sends AddHolidayCommand")
+Rel(ctrl, remh, "Sends Remove/RestoreHolidayCommand")
+Rel(addh, rule, "Checks weekend")
+Rel(addh, db, "Inserts", "EF Core")
+Rel(remh, db, "Soft-deletes, restores", "EF Core")
+@enduml

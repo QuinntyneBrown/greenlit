@@ -1,0 +1,51 @@
+@startuml
+title UML sequence behaviour — Select days from the keyboard
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Member" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "SelectionController" as sel
+  participant "SelectionBar" as bar
+  participant "HttpSheetService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "SheetController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "SetDaysCommandHandler" as handler
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> sel : Focus own cell on 23 Nov, press Enter
+sel -> sel : Anchor selection
+actor -> sel : ArrowRight twice
+sel -> bar : Open "Ana Ruiz · 23–25 Nov", "3 days working" (L2-016 AC1)
+opt range exceeds days left
+  bar --> actor : "2 days over allowance" (L2-016 AC5)
+end
+alt choose "Request"
+  actor -> bar : Request
+  bar -> client : setDays(Ana, range, Requested)
+  client -> ctrl : PUT /api/sheet/days
+  ctrl -> handler : Send SetDaysCommand
+  handler -> db : Write days, sync request
+  ctrl --> client : 200 ChangeSet
+  bar --> actor : Toast "Requested 3 days" with Undo (L2-016 AC3)
+else Escape or "Clear selection"
+  actor -> sel : Escape
+  sel --> actor : "Selection cleared" (L2-016 AC4)
+end
+@enduml
