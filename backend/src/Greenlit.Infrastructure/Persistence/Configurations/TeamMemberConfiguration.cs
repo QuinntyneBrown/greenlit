@@ -12,6 +12,7 @@ public sealed class TeamMemberConfiguration : IEntityTypeConfiguration<TeamMembe
         b.Property(x => x.Name).HasMaxLength(120).IsRequired();
         b.Property(x => x.Email).HasMaxLength(256);
         b.HasIndex(x => new { x.TeamId, x.SortOrder });
+        b.Property(x => x.Role).HasConversion<string>().HasMaxLength(32);
         b.HasIndex(x => x.UserId);
         b.HasMany(x => x.TimeOffDays).WithOne(d => d.TeamMember).HasForeignKey(d => d.TeamMemberId).OnDelete(DeleteBehavior.Cascade);
     }

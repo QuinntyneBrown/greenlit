@@ -23,6 +23,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/calendar/calendar.page').then((m) => m.CalendarPage),
   },
   {
+    path: 'settings',
+    data: { page: 'settings' },
+    canActivate: [authGuard, teamGuard],
+    loadComponent: () => import('./pages/settings/settings.page').then((m) => m.SettingsPage),
+  },
+  {
     path: 'create-team',
     data: { shell: 'bare', page: 'create-team' },
     canActivate: [authGuard, noTeamGuard],

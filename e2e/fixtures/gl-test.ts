@@ -17,13 +17,17 @@ import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { Person, SESSION_KEY, signIn } from "./session.js";
 import { CalendarPage } from "../pages/calendar.page.js";
 import { CreateTeamPage } from "../pages/create-team.page.js";
+import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
+import { SettingsPage } from "../pages/settings.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
 
 interface Pages {
   calendar: CalendarPage;
   createTeam: CreateTeamPage;
+  inviteMember: InviteMemberDialog;
   notFound: NotFoundPage;
+  settings: SettingsPage;
   signIn: SignInPage;
 }
 
@@ -76,8 +80,19 @@ interface TeamApi {
   fail(): Promise<void>;
 }
 
+/** Watches and steers the invite request (POST /api/team/members). */
+interface MembersApi {
+  /** How many invite requests the page has sent so far. */
+  requests(): number;
+  /** Holds invite requests until the returned function is called. */
+  hold(): Promise<() => void>;
+  /** Every invite request fails with a 500. */
+  fail(): Promise<void>;
+}
+
 interface GlFixtures {
   authApi: AuthApi;
+  membersApi: MembersApi;
   teamApi: TeamApi;
   sheetApi: SheetApi;
   goto: (key: RouteKey, options?: GotoOptions) => Promise<void>;
@@ -111,6 +126,28 @@ export const test = base.extend<GlFixtures>({
     let count = 0;
     page.on("request", (request) => {
       if (request.method() === "POST" && new URL(request.url()).pathname === "/api/auth/sign-in") count++;
+    });
+    await use({
+      requests: () => count,
+      hold: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      fail: async () => {
+        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+    });
+  },
+  membersApi: async ({ page }, use) => {
+    const pattern = "**/api/team/members";
+    let count = 0;
+    page.on("request", (request) => {
+      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/team/members") count++;
     });
     await use({
       requests: () => count,
@@ -180,7 +217,9 @@ export const test = base.extend<GlFixtures>({
     await use({
       calendar: new CalendarPage(page),
       createTeam: new CreateTeamPage(page),
+      inviteMember: new InviteMemberDialog(page),
       notFound: new NotFoundPage(page),
+      settings: new SettingsPage(page),
       signIn: new SignInPage(page),
     });
   },

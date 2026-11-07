@@ -13,6 +13,7 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
     public DbSet<TimeOffDay> TimeOffDays => Set<TimeOffDay>();
     public DbSet<Holiday> Holidays => Set<Holiday>();
+    public DbSet<Invitation> Invitations => Set<Invitation>();
 
     public void DiscardChanges() => ChangeTracker.Clear();
 

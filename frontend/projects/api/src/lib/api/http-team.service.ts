@@ -2,12 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 
+import { InvitedMember, NewMember } from '../models/invited-member';
 import { CreatedTeam, NewTeam } from '../models/new-team';
 import { API_BASE_URL, apiUrl } from './api-base-url';
+import { problemCode } from './problem';
 import { SESSION_STORE } from './session-store';
-import { CreateTeamResult, TeamService } from './team.service';
+import { CreateTeamResult, InviteResult, TeamService } from './team.service';
 
-/** POST /api/teams; keeps the new manager's session in the session store on success. */
+/** POST /api/teams and POST /api/team/members; creating a team keeps the new manager's session in the session store. */
 @Injectable({ providedIn: 'root' })
 export class HttpTeamService implements TeamService {
   private readonly http = inject(HttpClient);
@@ -19,6 +21,15 @@ export class HttpTeamService implements TeamService {
       tap((created) => this.store.setToken(created.session.accessToken)),
       map((created): CreateTeamResult => ({ outcome: 'created', team: created })),
       catchError(() => of<CreateTeamResult>({ outcome: 'failed' })),
+    );
+  }
+
+  invite(member: NewMember): Observable<InviteResult> {
+    return this.http.post<InvitedMember>(apiUrl(this.baseUrl, 'api/team/members'), member).pipe(
+      map((invited): InviteResult => ({ outcome: 'invited', member: invited })),
+      catchError((error: unknown) =>
+        of<InviteResult>({ outcome: problemCode(error) === 'member_exists' ? 'exists' : 'failed' }),
+      ),
     );
   }
 }

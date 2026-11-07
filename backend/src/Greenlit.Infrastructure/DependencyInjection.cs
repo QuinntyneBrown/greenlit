@@ -1,5 +1,6 @@
 using Greenlit.Application.Abstractions;
 using Greenlit.Infrastructure.Authentication;
+using Greenlit.Infrastructure.Email;
 using Greenlit.Infrastructure.Holidays;
 using Greenlit.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +48,8 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
         services.AddSingleton<ITokenService, JwtTokenService>();
         services.AddSingleton<IPublicHolidayProvider, RuleBasedPublicHolidayProvider>();
+        services.AddSingleton<IEmailSender, LoggingEmailSender>();
+        services.AddSingleton<IInvitationLinks, InvitationLinks>();
 
         return services;
     }

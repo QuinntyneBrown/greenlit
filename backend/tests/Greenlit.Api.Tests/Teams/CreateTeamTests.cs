@@ -36,7 +36,7 @@ public class CreateTeamTests : IClassFixture<FrozenClockApiFactory>
         response.StatusCode.Should().Be(HttpStatusCode.Created, $"body: {body}");
         var created = JsonDocument.Parse(body).RootElement;
         created.GetProperty("name").GetString().Should().Be("Design team");
-        created.GetProperty("invited").GetInt32().Should().Be(0);
+        created.GetProperty("invited").GetInt32().Should().Be(1);
         var teamId = created.GetProperty("teamId").GetGuid();
 
         var month = await MonthAsync(SessionClient(created), "2026-11");
@@ -51,6 +51,47 @@ public class CreateTeamTests : IClassFixture<FrozenClockApiFactory>
         team.TimeZone.Should().Be("Europe/London");
         db.TeamMembers.Single(m => m.TeamId == teamId && m.Name == "Ana Ruiz").Email.Should().Be("ana@northwind.studio");
         db.TeamMembers.Single(m => m.TeamId == teamId && m.Name == "Ben Okafor").UserId.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Every_named_member_with_an_email_is_sent_an_invitation_and_counted()
+    {
+        // L2-008 AC5 and AC7, L2-010: "every member with an email must be sent an invitation".
+        var noor = await TestAccount.CreateAsync(_factory, "Noor Haddad");
+
+        var created = await CreatedAsync(_factory.ClientFor(noor), Request(members:
+        [
+            new { name = "Ana Ruiz", email = "created.ana@northwind.studio" },
+            new { name = "Ben Okafor", email = (string?)null },
+            new { name = "Cleo Park", email = "created.cleo@northwind.studio" },
+        ]));
+
+        created.GetProperty("invited").GetInt32().Should().Be(2);
+        var ana = _factory.Emails.To("created.ana@northwind.studio").Should().ContainSingle().Subject;
+        ana.Subject.Should().Contain("Noor Haddad").And.Contain("Design team");
+        RecordingEmailSender.TokenIn(ana).Should().NotBeEmpty();
+        _factory.Emails.To("created.cleo@northwind.studio").Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task A_member_whose_invitation_cannot_be_sent_is_still_a_row_and_is_not_counted()
+    {
+        var noor = await TestAccount.CreateAsync(_factory, "Noor Haddad");
+        _factory.Emails.Failing = true;
+        JsonElement created;
+        try
+        {
+            created = await CreatedAsync(_factory.ClientFor(noor), Request(members: [new { name = "Ana Ruiz", email = "unsent.ana@northwind.studio" }]));
+        }
+        finally
+        {
+            _factory.Emails.Failing = false;
+        }
+
+        created.GetProperty("invited").GetInt32().Should().Be(0);
+        var month = await MonthAsync(SessionClient(created), "2026-11");
+        month.GetProperty("members").EnumerateArray().Select(m => m.GetProperty("name").GetString())
+            .Should().Equal("Noor Haddad", "Ana Ruiz");
     }
 
     [Fact]
