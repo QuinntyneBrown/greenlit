@@ -28,6 +28,11 @@ public sealed class RequestsController : ControllerBase
     public async Task<ActionResult<RequestCountsDto>> Counts(CancellationToken ct) =>
         Ok(await _sender.Send(new CountRequestsQuery(), ct));
 
+    /// <summary>One request of the manager's team with every member's days for the weeks around it; manager only.</summary>
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<RequestDetailDto>> Get(Guid id, CancellationToken ct) =>
+        Ok(await _sender.Send(new GetRequestQuery(id), ct));
+
     /// <summary>Asks the manager for a run of days on the caller's own row and marks them Requested.</summary>
     [HttpPost]
     public async Task<ActionResult<RequestDto>> Send([FromBody] SendRequestCommand command, CancellationToken ct) =>

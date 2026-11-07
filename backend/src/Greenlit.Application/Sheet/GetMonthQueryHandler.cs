@@ -95,7 +95,7 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
             coverage);
     }
 
-    private static CellDto CellFor(
+    internal static CellDto CellFor(
         Guid memberId,
         DateOnly date,
         IReadOnlyDictionary<DateOnly, string> holidays,
