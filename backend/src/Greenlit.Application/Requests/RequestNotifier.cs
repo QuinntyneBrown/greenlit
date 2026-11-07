@@ -8,8 +8,8 @@ namespace Greenlit.Application.Requests;
 /// <summary>
 /// Tells a member how their request was decided (docs/detailed-designs/requests/approve-request).
 /// Sent after the decision is saved, so a failing mail server never undoes it: the answer is
-/// whether the message was handed over. Decision emails are always on until the Decisions switch
-/// of journey 25 exists.
+/// whether the message was handed over. Decision emails go out only while the team's Decisions
+/// switch is on (L2-043); the new-request email to the manager follows the New requests switch.
 /// </summary>
 public sealed class RequestNotifier
 {
@@ -58,6 +58,8 @@ public sealed class RequestNotifier
     private async Task<bool> SendAsync(TimeOffRequest request, string kind, Func<string, EmailMessage> compose, CancellationToken ct)
     {
         var member = request.TeamMember;
+        var decisionsOn = await _db.Teams.AsNoTracking().Where(t => t.Id == member.TeamId).Select(t => t.NotifyDecisions).FirstOrDefaultAsync(ct);
+        if (!decisionsOn) return false;
         var address = member.Email;
         if (string.IsNullOrWhiteSpace(address) && member.UserId is { } userId)
             address = await _db.Users.AsNoTracking().Where(u => u.Id == userId).Select(u => u.Email).FirstOrDefaultAsync(ct);
