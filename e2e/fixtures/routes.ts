@@ -22,9 +22,11 @@ export type PageSlug =
   | "accept-invite"
   | "calendar"
   | "create-team"
+  | "forgot-password"
   | "marketing"
   | "not-found"
   | "requests"
+  | "reset-password"
   | "settings"
   | "sign-in";
 
@@ -64,6 +66,11 @@ export const ROUTES = {
     mock: "/pages/marketing/default.html",
     page: "marketing",
   },
+  forgotPassword: {
+    app: "/forgot-password",
+    mock: "/pages/forgot-password/default.html",
+    page: "forgot-password",
+  },
   notFound: {
     app: "/no-such-page",
     mock: "/pages/not-found/default.html",
@@ -81,6 +88,12 @@ export const ROUTES = {
     mock: "/pages/requests/default.html",
     guard: "manager",
     page: "requests",
+  },
+  /** The page the emailed reset link opens; `token` is the one in the link. */
+  resetPassword: {
+    app: "/reset-password/:token",
+    mock: "/pages/reset-password/default.html",
+    page: "reset-password",
   },
   settings: {
     app: "/settings",

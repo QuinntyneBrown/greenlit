@@ -67,6 +67,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/sign-in/sign-in.page').then((m) => m.SignInPage),
   },
   {
+    path: 'forgot-password',
+    data: { shell: 'bare', page: 'forgot-password' },
+    loadComponent: () =>
+      import('./pages/forgot-password/forgot-password.page').then((m) => m.ForgotPasswordPage),
+  },
+  {
     path: '**',
     data: { page: 'not-found' },
     loadComponent: () => import('./pages/not-found/not-found.page').then((m) => m.NotFoundPage),

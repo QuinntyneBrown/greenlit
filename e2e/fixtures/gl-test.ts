@@ -19,6 +19,8 @@ import { RemoveHolidayDialog } from "../pages/remove-holiday.dialog.js";
 import { EditWorkingDaysDialog } from "../pages/edit-working-days.dialog.js";
 import { AddHolidayDialog } from "../pages/add-holiday.dialog.js";
 import { AcceptInvitePage } from "../pages/accept-invite.page.js";
+import { ForgotPasswordPage } from "../pages/forgot-password.page.js";
+import { ResetPasswordPage } from "../pages/reset-password.page.js";
 import { CalendarPage } from "../pages/calendar.page.js";
 import { CreateTeamPage } from "../pages/create-team.page.js";
 import { CancelRequestDialog } from "../pages/cancel-request.dialog.js";
@@ -37,6 +39,8 @@ interface Pages {
   removeHoliday: RemoveHolidayDialog;
   addHoliday: AddHolidayDialog;
   acceptInvite: AcceptInvitePage;
+  forgotPassword: ForgotPasswordPage;
+  resetPassword: ResetPasswordPage;
   calendar: CalendarPage;
   createTeam: CreateTeamPage;
   inviteMember: InviteMemberDialog;
@@ -92,6 +96,32 @@ interface AuthApi {
   hold(): Promise<() => void>;
   /** Every sign-in request fails with a 500. */
   fail(): Promise<void>;
+}
+
+/**
+ * Watches and steers the password reset requests: asking for a link (POST /api/auth/password-reset),
+ * opening one (GET /api/auth/password-reset/{token}) and choosing a password (POST .../confirm).
+ */
+interface PasswordResetApi {
+  /** How many link requests the page has sent so far. */
+  requests(): number;
+  /** Holds link requests until the returned function is called. */
+  holdRequest(): Promise<() => void>;
+  /** Link requests fail with a 503 `email_failed` until `recoverRequest()`. */
+  failRequest(): Promise<void>;
+  recoverRequest(): Promise<void>;
+  /** How many choose-a-password requests the page has sent so far. */
+  confirms(): number;
+  /** Holds choose-a-password requests until the returned function is called. */
+  holdConfirm(): Promise<() => void>;
+  /** Choose-a-password requests fail with a 500 until `recoverConfirm()`. */
+  failConfirm(): Promise<void>;
+  recoverConfirm(): Promise<void>;
+  /** Holds the check of an opened link until the returned function is called. */
+  holdCheck(): Promise<() => void>;
+  /** The check of an opened link fails with a 500 until `recoverCheck()`. */
+  failCheck(): Promise<void>;
+  recoverCheck(): Promise<void>;
 }
 
 /** Watches and steers the create-team request (POST /api/teams). */
@@ -265,6 +295,7 @@ interface GlFixtures {
   holidaysApi: HolidaysApi;
   requestsApi: RequestsApi;
   invitationsApi: InvitationsApi;
+  passwordResetApi: PasswordResetApi;
   authApi: AuthApi;
   membersApi: MembersApi;
   teamApi: TeamApi;
@@ -685,6 +716,51 @@ export const test = base.extend<GlFixtures>({
       recoverList: () => page.unroute(list),
     });
   },
+  passwordResetApi: async ({ page }, use) => {
+    const request = (r: { url(): string; method(): string }) =>
+      r.method() === "POST" && new URL(r.url()).pathname === "/api/auth/password-reset";
+    const confirm = (r: { url(): string; method(): string }) =>
+      r.method() === "POST" && new URL(r.url()).pathname === "/api/auth/password-reset/confirm";
+    const check = (r: { url(): string; method(): string }) =>
+      r.method() === "GET" && /^\/api\/auth\/password-reset\/[^/]+$/.test(new URL(r.url()).pathname);
+    let requests = 0;
+    let confirms = 0;
+    page.on("request", (r) => {
+      if (request(r)) requests++;
+      if (confirm(r)) confirms++;
+    });
+    const any = "**/api/auth/password-reset**";
+    const hold = async (matches: typeof request) => {
+      let release!: () => void;
+      const released = new Promise<void>((resolve) => (release = resolve));
+      await page.route(any, async (route) => {
+        if (!matches(route.request())) return route.fallback();
+        await released;
+        await route.continue();
+      });
+      return release;
+    };
+    const fail = async (matches: typeof request, status: number, body: object | string) => {
+      await page.route(any, (route) =>
+        matches(route.request())
+          ? route.fulfill(typeof body === "string" ? { status, body } : { status, json: body })
+          : route.fallback(),
+      );
+    };
+    await use({
+      requests: () => requests,
+      holdRequest: () => hold(request),
+      failRequest: () => fail(request, 503, { code: "email_failed" }),
+      recoverRequest: () => page.unroute(any),
+      confirms: () => confirms,
+      holdConfirm: () => hold(confirm),
+      failConfirm: () => fail(confirm, 500, ""),
+      recoverConfirm: () => page.unroute(any),
+      holdCheck: () => hold(check),
+      failCheck: () => fail(check, 500, ""),
+      recoverCheck: () => page.unroute(any),
+    });
+  },
   invitationsApi: async ({ page }, use) => {
     const read = "**/api/invitations/*";
     const accept = "**/api/invitations/*/accept";
@@ -828,6 +904,8 @@ export const test = base.extend<GlFixtures>({
   pages: async ({ page }, use) => {
     await use({
       acceptInvite: new AcceptInvitePage(page),
+      forgotPassword: new ForgotPasswordPage(page),
+      resetPassword: new ResetPasswordPage(page),
       editWorkingDays: new EditWorkingDaysDialog(page),
       addHoliday: new AddHolidayDialog(page),
       removeHoliday: new RemoveHolidayDialog(page),

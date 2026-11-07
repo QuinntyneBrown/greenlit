@@ -4,7 +4,7 @@ import { Observable, catchError, map, of, tap } from 'rxjs';
 
 import { Session } from '../models/session';
 import { API_BASE_URL, apiUrl } from './api-base-url';
-import { AuthService, SignInResult } from './auth.service';
+import { AuthService, RequestPasswordResetResult, SignInResult } from './auth.service';
 import { SESSION_STORE } from './session-store';
 
 /** POST /api/auth/sign-in; keeps the token in the session store on success. */
@@ -30,5 +30,12 @@ export class HttpAuthService implements AuthService {
           ),
         ),
       );
+  }
+
+  requestPasswordReset(email: string): Observable<RequestPasswordResetResult> {
+    return this.http.post<void>(apiUrl(this.baseUrl, 'api/auth/password-reset'), { email }).pipe(
+      map((): RequestPasswordResetResult => ({ outcome: 'sent' })),
+      catchError(() => of<RequestPasswordResetResult>({ outcome: 'failed' })),
+    );
   }
 }
