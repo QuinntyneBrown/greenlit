@@ -4,6 +4,7 @@ import { Button, LogoLockup } from 'components';
 
 import { environment } from '../../../environments/environment';
 import { HERO_SHEET } from './hero-sheet';
+import { RevealDirective } from './reveal.directive';
 
 /**
  * The marketing page (L2-050): the mock `pages/marketing/default.html` section
@@ -12,7 +13,7 @@ import { HERO_SHEET } from './hero-sheet';
  */
 @Component({
   selector: 'mk-marketing-page',
-  imports: [Button, LogoLockup],
+  imports: [Button, LogoLockup, RevealDirective],
   templateUrl: './marketing.page.html',
   styleUrl: './marketing.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
