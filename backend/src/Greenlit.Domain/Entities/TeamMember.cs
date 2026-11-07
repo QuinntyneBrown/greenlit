@@ -22,5 +22,6 @@ public class TeamMember
     public UserRole Role { get; set; } = UserRole.Member;
 
     public ICollection<Invitation> Invitations { get; set; } = new List<Invitation>();
+    public ICollection<TimeOffRequest> Requests { get; set; } = new List<TimeOffRequest>();
     public ICollection<TimeOffDay> TimeOffDays { get; set; } = new List<TimeOffDay>();
 }

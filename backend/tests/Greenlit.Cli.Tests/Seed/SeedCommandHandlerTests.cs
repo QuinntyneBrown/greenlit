@@ -116,6 +116,23 @@ public class SeedCommandHandlerTests
         days.Should().HaveCount(16);
     }
 
+    [Fact]
+    public async Task Requested_days_belong_to_pending_requests()
+    {
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        var requests = await read.TimeOffRequests.Include(r => r.TeamMember).Include(r => r.Days)
+            .OrderBy(r => r.FirstDay)
+            .Select(r => new { r.TeamMember.Name, r.FirstDay, r.LastDay, r.Note, r.Status, Days = r.Days.Count })
+            .ToListAsync();
+        requests.Should().HaveCount(3);
+        requests.Select(r => (r.Name, r.FirstDay.Day, r.LastDay.Day, r.Days)).Should().Equal(
+            ("Cleo Park", 12, 13, 2), ("Ana Ruiz", 16, 20, 5), ("Dev Patel", 18, 19, 2));
+        requests.Should().OnlyContain(r => r.Status == RequestStatus.Pending);
+        requests.Single(r => r.Name == "Ana Ruiz").Note.Should().Be("Visiting family in Seville");
+    }
+
     private static async Task<DbContextOptions<AppDbContext>> SeedTwiceAsync()
     {
         var connection = new SqliteConnection("Data Source=:memory:");

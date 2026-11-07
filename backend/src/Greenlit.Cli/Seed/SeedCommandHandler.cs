@@ -168,8 +168,44 @@ public sealed class SeedCommandHandler
             });
         }
 
+        await SeedRequestsAsync(team, ct);
+
         var written = await _db.SaveChangesAsync(ct);
         _logger.LogInformation("Seed complete ({Rows} rows written).", written);
         return 0;
+    }
+
+    /// <summary>The note on Ana's request, as pages/requests/member shows it.</summary>
+    private static readonly Dictionary<string, string> RequestNotes = new() { ["Ana Ruiz"] = "Visiting family in Seville" };
+
+    /// <summary>
+    /// The Requested days of November are each member's pending request, as the requests mocks show.
+    /// Days that already belong to a request are left alone, so a second seed adds nothing.
+    /// </summary>
+    private async Task SeedRequestsAsync(Team team, CancellationToken ct)
+    {
+        var now = DateTimeOffset.UtcNow;
+        var memberIds = team.Members.Select(m => m.Id).ToList();
+        var stored = await _db.TimeOffRequests.Where(r => memberIds.Contains(r.TeamMemberId)).ToListAsync(ct);
+        foreach (var member in team.Members)
+        {
+            var open = _db.TimeOffDays.Local
+                .Where(d => d.TeamMemberId == member.Id && d.Status == DayStatus.Requested && d.TimeOffRequestId is null)
+                .OrderBy(d => d.Date)
+                .ToList();
+            if (open.Count == 0 || stored.Any(r => r.TeamMemberId == member.Id)) continue;
+            var request = new TimeOffRequest
+            {
+                Id = Guid.NewGuid(),
+                TeamMemberId = member.Id,
+                FirstDay = open[0].Date,
+                LastDay = open[^1].Date,
+                Note = RequestNotes.GetValueOrDefault(member.Name),
+                Status = RequestStatus.Pending,
+                CreatedUtc = now,
+            };
+            _db.TimeOffRequests.Add(request);
+            foreach (var day in open) day.TimeOffRequestId = request.Id;
+        }
     }
 }
