@@ -1,8 +1,9 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
-import { AUTH_SERVICE, REQUEST_SERVICE, SESSION_STORE } from 'api';
+import { AUTH_SERVICE, CONNECTIVITY_SERVICE, REQUEST_SERVICE, SESSION_STORE } from 'api';
 import { App } from './app';
 
 describe('App', () => {
@@ -17,6 +18,18 @@ describe('App', () => {
         },
         { provide: AUTH_SERVICE, useValue: { account: () => of(null) } },
         { provide: REQUEST_SERVICE, useValue: {} },
+        {
+          provide: CONNECTIVITY_SERVICE,
+          useValue: {
+            state: signal('online'),
+            readOnly: signal(false),
+            reloads: signal(0),
+            lastSync: signal(new Date()),
+            succeeded: () => undefined,
+            failed: () => undefined,
+            retry: () => undefined,
+          },
+        },
       ],
     }).compileComponents();
   });
