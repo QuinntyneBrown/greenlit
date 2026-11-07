@@ -12,13 +12,15 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { INVITATION_SERVICE, Invitation } from 'api';
+import { GOOGLE_IDENTITY, INVITATION_SERVICE, Invitation } from 'api';
 import {
   Alert,
   AuthCard,
+  AuthDivider,
   Button,
   FormSummary,
   FormSummaryItem,
+  GoogleButton,
   Skeleton,
   TextField,
 } from 'components';
@@ -46,11 +48,13 @@ type View =
  * bare-shell card the emailed link opens. It reads the invitation, asks for a name and a password,
  * and on joining shows "You're in" and opens the calendar, signed in. Fields validate on blur once,
  * then on every change; a submit attempt with errors shows the summary, moves focus to it and sends
- * nothing. A used, replaced, expired or unknown link shows the expired state.
+ * nothing. A used, replaced, expired or unknown link shows the expired state. "Join with Google"
+ * (identity-and-access/sign-in-with-google, L2-052) joins with the Google account that carries the
+ * invited address instead of a password.
  */
 @Component({
   selector: 'app-accept-invite-page',
-  imports: [AuthCard, TextField, FormSummary, Button, Alert, Skeleton],
+  imports: [AuthCard, AuthDivider, TextField, FormSummary, Button, GoogleButton, Alert, Skeleton],
   template: `
     @switch (view().kind) {
       @case ('loading') {
@@ -92,9 +96,26 @@ type View =
             [title]="'Join ' + inv.teamName"
             [lead]="inv.managerName + ' invited you to share the team’s time off.'"
           >
+            <gl-google-button
+              [busy]="googleBusy()"
+              [disabled]="busy()"
+              (pressed)="joinWithGoogle()"
+            >
+              Join with Google
+            </gl-google-button>
+            <gl-auth-divider />
             <form class="stack" novalidate (submit)="submit($event)">
               @if (submitted() && summaryItems().length) {
                 <gl-form-summary [items]="summaryItems()" />
+              } @else if (failure() === 'mismatch') {
+                <gl-alert tone="danger" title="That Google account doesn’t match your invitation">
+                  Choose the Google account for {{ inv.email }}, or join with a password instead.
+                </gl-alert>
+              } @else if (failure() === 'unverified') {
+                <gl-alert tone="danger" title="That Google account doesn’t match your invitation">
+                  Google hasn’t verified that email address. Verify it with Google, or join with a
+                  password instead.
+                </gl-alert>
               } @else if (failure() === 'exists') {
                 <gl-alert tone="danger" title="You already have a Greenlit account">
                   Sign in with this email to continue.
@@ -110,7 +131,7 @@ type View =
                 autocomplete="name"
                 [(value)]="name"
                 [error]="shown('name') ? nameError() : ''"
-                [readonly]="busy()"
+                [readonly]="locked()"
                 (blurred)="touch('name')"
               />
               <gl-text-field
@@ -128,7 +149,7 @@ type View =
                 autocomplete="new-password"
                 [(value)]="password"
                 [error]="shown('password') ? passwordError() : ''"
-                [readonly]="busy()"
+                [readonly]="locked()"
                 (blurred)="touch('password')"
               />
               <gl-text-field
@@ -138,7 +159,7 @@ type View =
                 autocomplete="new-password"
                 [(value)]="confirm"
                 [error]="shown('confirm') ? confirmError() : ''"
-                [readonly]="busy()"
+                [readonly]="locked()"
                 (blurred)="touch('confirm')"
               />
               <gl-button
@@ -146,7 +167,7 @@ type View =
                 variant="primary"
                 [block]="true"
                 [busy]="busy()"
-                [disabled]="busy()"
+                [disabled]="locked()"
               >
                 Join the team
               </gl-button>
@@ -173,6 +194,7 @@ type View =
 })
 export class AcceptInvitePage implements OnInit {
   private readonly invitations = inject(INVITATION_SERVICE);
+  private readonly google = inject(GOOGLE_IDENTITY);
   private readonly router = inject(Router);
   private readonly injector = inject(Injector);
   private readonly destroyRef = inject(DestroyRef);
@@ -191,8 +213,12 @@ export class AcceptInvitePage implements OnInit {
   protected readonly submitted = signal(false);
   /** True while the accept request runs (pages/accept-invite/submitting). */
   protected readonly busy = signal(false);
-  /** Why the last attempt failed (pages/accept-invite/failed); null before one has. */
-  protected readonly failure = signal<'exists' | 'failed' | null>(null);
+  /** True while Google's window is open or the Google join runs (pages/accept-invite/google-busy). */
+  protected readonly googleBusy = signal(false);
+  /** Why the last attempt failed (pages/accept-invite/failed, google-mismatch, google-error); null before one has. */
+  protected readonly failure = signal<'exists' | 'failed' | 'mismatch' | 'unverified' | null>(null);
+  /** Fields and buttons are locked while either way in is running, so two joins never race. */
+  protected readonly locked = computed(() => this.busy() || this.googleBusy());
   private readonly touched = signal<ReadonlySet<Field>>(new Set());
 
   /** The invitation while the form shows (also while it is being submitted). */
@@ -265,7 +291,7 @@ export class AcceptInvitePage implements OnInit {
   protected submit(event: Event): void {
     event.preventDefault();
     const invitation = this.invitation();
-    if (this.busy() || !invitation) return;
+    if (this.locked() || !invitation) return;
     this.submitted.set(true);
     if (this.summaryItems().length) {
       afterNextRender(() => this.summary()?.focus(), { injector: this.injector });
@@ -276,16 +302,9 @@ export class AcceptInvitePage implements OnInit {
     this.invitations.accept(this.token, this.name().trim(), this.password()).subscribe((result) => {
       this.busy.set(false);
       switch (result.outcome) {
-        case 'joined': {
-          this.view.set({
-            kind: 'joined',
-            firstName: result.session.displayName.split(' ')[0],
-            teamName: invitation.teamName,
-          });
-          const timer = setTimeout(() => this.router.navigateByUrl('/'), SIGNED_IN_PAUSE_MS);
-          this.destroyRef.onDestroy(() => clearTimeout(timer));
+        case 'joined':
+          this.joined(result.session.displayName, invitation.teamName);
           break;
-        }
         case 'expired':
           this.view.set({ kind: 'expired', managerName: result.managerName });
           break;
@@ -293,5 +312,44 @@ export class AcceptInvitePage implements OnInit {
           this.failure.set(result.outcome);
       }
     });
+  }
+
+  /** Join with Google (L2-052): Google's window, then the join; a closed window changes nothing. */
+  protected joinWithGoogle(): void {
+    const invitation = this.invitation();
+    if (this.locked() || !invitation) return;
+    this.failure.set(null);
+    this.googleBusy.set(true);
+    this.google.requestAccessToken().subscribe((token) => {
+      if (token.outcome === 'dismissed') {
+        this.googleBusy.set(false);
+        return;
+      }
+      if (token.outcome === 'failed') {
+        this.googleBusy.set(false);
+        this.failure.set('failed');
+        return;
+      }
+      this.invitations.acceptWithGoogle(this.token, token.accessToken).subscribe((result) => {
+        this.googleBusy.set(false);
+        switch (result.outcome) {
+          case 'joined':
+            this.joined(result.session.displayName, invitation.teamName);
+            break;
+          case 'expired':
+            this.view.set({ kind: 'expired', managerName: result.managerName });
+            break;
+          default:
+            this.failure.set(result.outcome);
+        }
+      });
+    });
+  }
+
+  /** Shows "You're in", then opens the calendar. */
+  private joined(displayName: string, teamName: string): void {
+    this.view.set({ kind: 'joined', firstName: displayName.split(' ')[0], teamName });
+    const timer = setTimeout(() => this.router.navigateByUrl('/'), SIGNED_IN_PAUSE_MS);
+    this.destroyRef.onDestroy(() => clearTimeout(timer));
   }
 }

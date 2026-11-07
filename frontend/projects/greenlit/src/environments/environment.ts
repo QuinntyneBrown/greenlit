@@ -8,6 +8,8 @@
  */
 export const environment = {
   apiBaseUrl: 'http://localhost:5100',
+  /** The Google OAuth 2.0 web client id (public; the API checks tokens against the same value, ADR-012). */
+  googleClientId: '1011940213681-6jtgouf5971gknkdaf7amgl9rlf2a1ef.apps.googleusercontent.com',
   /** Dev-only `?state=` overrides and galleries; compile-time false in production. */
   galleryRoutes: true,
 };

@@ -12,6 +12,15 @@ export type SignInResult =
   /** The API could not be reached or failed. */
   | { readonly outcome: 'failed' };
 
+/** What continuing with Google came to (identity-and-access/sign-in-with-google). */
+export type GoogleSignInResult =
+  /** Signed in; `newAccount` is true when the API created a manager account for a newcomer (L2-051 AC4). */
+  | { readonly outcome: 'signed-in'; readonly session: Session; readonly newAccount: boolean }
+  /** Google has not verified the account's email (code `google_email_unverified`). */
+  | { readonly outcome: 'unverified' }
+  /** The API refused the token, failed or could not be reached. */
+  | { readonly outcome: 'failed' };
+
 /** What asking for a password reset link came to. */
 export type RequestPasswordResetResult =
   /** The same answer whether or not the address has an account. */
@@ -45,6 +54,8 @@ export interface AuthService {
   /** Ends the session: tells the API and forgets the token, whether or not the API could be told. Always completes. */
   signOut(): Observable<void>;
   signIn(email: string, password: string): Observable<SignInResult>;
+  /** Exchanges a Google access token for a session, creating a manager account for a newcomer. */
+  signInWithGoogle(accessToken: string): Observable<GoogleSignInResult>;
   requestPasswordReset(email: string): Observable<RequestPasswordResetResult>;
   checkResetLink(token: string): Observable<CheckResetLinkResult>;
   resetPassword(

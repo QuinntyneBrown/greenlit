@@ -8,6 +8,7 @@ import { API_BASE_URL, apiUrl } from './api-base-url';
 import {
   AuthService,
   CheckResetLinkResult,
+  GoogleSignInResult,
   RequestPasswordResetResult,
   ResetPasswordResult,
   SignInResult,
@@ -48,6 +49,30 @@ export class HttpAuthService implements AuthService {
               error.status === 401 &&
               error.error?.code === 'invalid_credentials'
               ? { outcome: 'invalid-credentials' }
+              : { outcome: 'failed' },
+          ),
+        ),
+      );
+  }
+
+  signInWithGoogle(accessToken: string): Observable<GoogleSignInResult> {
+    return this.http
+      .post<Session & { newAccount: boolean }>(apiUrl(this.baseUrl, 'api/auth/google'), {
+        accessToken,
+      })
+      .pipe(
+        tap((session) => this.store.setToken(session.accessToken)),
+        map((session): GoogleSignInResult => ({
+          outcome: 'signed-in',
+          session,
+          newAccount: session.newAccount === true,
+        })),
+        catchError((error: unknown) =>
+          of<GoogleSignInResult>(
+            error instanceof HttpErrorResponse &&
+              error.status === 401 &&
+              problemCode(error) === 'google_email_unverified'
+              ? { outcome: 'unverified' }
               : { outcome: 'failed' },
           ),
         ),

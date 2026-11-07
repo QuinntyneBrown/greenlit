@@ -21,6 +21,8 @@ export * from './lib/switch/switch';
 
 // forms and account pages
 export * from './lib/auth-card/auth-card';
+export * from './lib/auth-divider/auth-divider';
+export * from './lib/google-button/google-button';
 export * from './lib/text-field/text-field';
 export * from './lib/textarea-field/textarea-field';
 export * from './lib/select-field/select-field';

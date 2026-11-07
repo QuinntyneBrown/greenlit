@@ -11,13 +11,15 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { AUTH_SERVICE, safeReturnUrl } from 'api';
+import { AUTH_SERVICE, GOOGLE_IDENTITY, safeReturnUrl } from 'api';
 import {
   Alert,
   AuthCard,
+  AuthDivider,
   Button,
   FormSummary,
   FormSummaryItem,
+  GoogleButton,
   ProgressBar,
   TextField,
 } from 'components';
@@ -36,20 +38,42 @@ export const SIGNED_IN_PAUSE_MS = 1500;
  * then on every change; a submit attempt with errors shows the summary,
  * moves focus to it and sends nothing. A successful sign-in shows "Signed
  * in" and then opens the page the visitor was going to (`returnUrl`), or the
- * calendar.
+ * calendar. "Continue with Google" (identity-and-access/sign-in-with-google, L2-051)
+ * asks Google for an access token and exchanges it for a session; a newcomer
+ * gets a manager account and "Account created", then the create-team page.
  */
 @Component({
   selector: 'app-sign-in-page',
-  imports: [AuthCard, TextField, FormSummary, Button, RouterLink, Alert, ProgressBar],
+  imports: [
+    AuthCard,
+    AuthDivider,
+    TextField,
+    FormSummary,
+    Button,
+    GoogleButton,
+    RouterLink,
+    Alert,
+    ProgressBar,
+  ],
   template: `
-    @if (welcomeName(); as name) {
-      <gl-auth-card title="Signed in" lead="You’re all set.">
-        <gl-alert tone="success" [title]="'Welcome back, ' + name"
-          >Taking you to your calendar…</gl-alert
-        >
-        <gl-progress-bar label="Signing you in" />
-        <gl-button [link]="destination()" [block]="true">Go to the calendar now</gl-button>
-      </gl-auth-card>
+    @if (welcome(); as welcome) {
+      @if (welcome.newAccount) {
+        <gl-auth-card title="Account created" lead="You’re all set.">
+          <gl-alert tone="success" [title]="'Welcome, ' + welcome.name"
+            >Taking you to set up your team…</gl-alert
+          >
+          <gl-progress-bar label="Signing you in" />
+          <gl-button link="/create-team" [block]="true">Set up your team now</gl-button>
+        </gl-auth-card>
+      } @else {
+        <gl-auth-card title="Signed in" lead="You’re all set.">
+          <gl-alert tone="success" [title]="'Welcome back, ' + welcome.name"
+            >Taking you to your calendar…</gl-alert
+          >
+          <gl-progress-bar label="Signing you in" />
+          <gl-button [link]="destination()" [block]="true">Go to the calendar now</gl-button>
+        </gl-auth-card>
+      }
     } @else {
       <gl-auth-card title="Sign in" lead="Welcome back. Your team’s time off is waiting.">
         <form class="stack" novalidate (submit)="submit($event)">
@@ -63,6 +87,15 @@ export const SIGNED_IN_PAUSE_MS = 1500;
             <gl-alert tone="danger" title="We couldn’t sign you in">
               Something went wrong on our side. Try again in a moment.
             </gl-alert>
+          } @else if (failure() === 'google-unverified') {
+            <gl-alert tone="danger" title="We couldn’t sign you in with Google">
+              Google hasn’t verified that email address. Verify it with Google, or sign in with your
+              email and password.
+            </gl-alert>
+          } @else if (failure() === 'google-failed') {
+            <gl-alert tone="danger" title="We couldn’t sign you in with Google">
+              Something went wrong on our side. Try again in a moment.
+            </gl-alert>
           }
           <gl-text-field
             label="Email"
@@ -71,7 +104,7 @@ export const SIGNED_IN_PAUSE_MS = 1500;
             autocomplete="username"
             [(value)]="email"
             [error]="shown('email') ? emailError() : ''"
-            [readonly]="busy()"
+            [readonly]="locked()"
             (blurred)="touch('email')"
           />
           <gl-text-field
@@ -81,7 +114,7 @@ export const SIGNED_IN_PAUSE_MS = 1500;
             autocomplete="current-password"
             [(value)]="password"
             [error]="shown('password') ? passwordError() : ''"
-            [readonly]="busy()"
+            [readonly]="locked()"
             (blurred)="touch('password')"
           />
           <gl-button
@@ -89,14 +122,23 @@ export const SIGNED_IN_PAUSE_MS = 1500;
             variant="primary"
             [block]="true"
             [busy]="busy()"
-            [disabled]="busy()"
+            [disabled]="locked()"
           >
             Sign in
           </gl-button>
           <div class="auth-links"><a routerLink="/forgot-password">Forgot your password?</a></div>
         </form>
+        <gl-auth-divider />
+        <gl-google-button
+          [busy]="googleBusy()"
+          [disabled]="busy()"
+          (pressed)="continueWithGoogle()"
+        >
+          Continue with Google
+        </gl-google-button>
         <p slot="note" class="text-caption note">
-          New here? Greenlit is invite-only. Ask your manager to send you an invitation.
+          New here? Continue with Google to set up a team, or ask your manager to send you an
+          invitation.
         </p>
       </gl-auth-card>
     }
@@ -130,6 +172,7 @@ export const SIGNED_IN_PAUSE_MS = 1500;
 })
 export class SignInPage {
   private readonly auth = inject(AUTH_SERVICE);
+  private readonly google = inject(GOOGLE_IDENTITY);
   private readonly router = inject(Router);
   private readonly injector = inject(Injector);
   private readonly destroyRef = inject(DestroyRef);
@@ -143,10 +186,16 @@ export class SignInPage {
   protected readonly submitted = signal(false);
   /** True while the sign-in request runs (pages/sign-in/submitting). */
   protected readonly busy = signal(false);
-  /** Why the last attempt failed (pages/sign-in/error); null before one has. */
-  protected readonly failure = signal<'invalid-credentials' | 'failed' | null>(null);
-  /** The first name to welcome once signed in. */
-  protected readonly welcomeName = signal<string | null>(null);
+  /** True while Google's window is open or the Google sign-in runs (pages/sign-in/google-busy). */
+  protected readonly googleBusy = signal(false);
+  /** Why the last attempt failed (pages/sign-in/error, google-error, google-unverified); null before one has. */
+  protected readonly failure = signal<
+    'invalid-credentials' | 'failed' | 'google-unverified' | 'google-failed' | null
+  >(null);
+  /** The first name to welcome once signed in, and whether the account was just created (pages/sign-in/google-new-account). */
+  protected readonly welcome = signal<{ name: string; newAccount: boolean } | null>(null);
+  /** Fields and buttons are locked while either way in is running, so two sign-ins never race. */
+  protected readonly locked = computed(() => this.busy() || this.googleBusy());
   /** Where to go after signing in, as a URL tree so its query survives. */
   protected readonly destination = signal(
     this.router.parseUrl(
@@ -181,7 +230,7 @@ export class SignInPage {
 
   protected submit(event: Event): void {
     event.preventDefault();
-    if (this.busy()) return;
+    if (this.locked()) return;
     this.submitted.set(true);
     if (this.summaryItems().length) {
       afterNextRender(() => this.summary()?.focus(), { injector: this.injector });
@@ -195,12 +244,43 @@ export class SignInPage {
         this.failure.set(result.outcome);
         return;
       }
-      this.welcomeName.set(result.session.displayName.split(' ')[0]);
-      const timer = setTimeout(
-        () => this.router.navigateByUrl(this.destination()),
-        SIGNED_IN_PAUSE_MS,
-      );
-      this.destroyRef.onDestroy(() => clearTimeout(timer));
+      this.signedIn(result.session.displayName, false);
     });
+  }
+
+  /** Continue with Google (L2-051): Google's window, then the exchange; a closed window changes nothing. */
+  protected continueWithGoogle(): void {
+    if (this.locked()) return;
+    this.failure.set(null);
+    this.googleBusy.set(true);
+    this.google.requestAccessToken().subscribe((token) => {
+      if (token.outcome === 'dismissed') {
+        this.googleBusy.set(false);
+        return;
+      }
+      if (token.outcome === 'failed') {
+        this.googleBusy.set(false);
+        this.failure.set('google-failed');
+        return;
+      }
+      this.auth.signInWithGoogle(token.accessToken).subscribe((result) => {
+        this.googleBusy.set(false);
+        if (result.outcome !== 'signed-in') {
+          this.failure.set(result.outcome === 'unverified' ? 'google-unverified' : 'google-failed');
+          return;
+        }
+        this.signedIn(result.session.displayName, result.newAccount);
+      });
+    });
+  }
+
+  /** Shows the welcome panel, then opens the destination (the calendar, or create-team for a new account). */
+  private signedIn(displayName: string, newAccount: boolean): void {
+    this.welcome.set({ name: displayName.split(' ')[0], newAccount });
+    const timer = setTimeout(
+      () => this.router.navigateByUrl(newAccount ? '/create-team' : this.destination()),
+      SIGNED_IN_PAUSE_MS,
+    );
+    this.destroyRef.onDestroy(() => clearTimeout(timer));
   }
 }

@@ -8,6 +8,9 @@ import {
   AUTH_SERVICE,
   HttpAccountService,
   HttpAuthService,
+  GisGoogleIdentity,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_IDENTITY,
   HttpHolidayService,
   HttpInvitationService,
   HttpRequestService,
@@ -60,6 +63,7 @@ export const appConfig: ApplicationConfig = {
       ]),
     ),
     { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
+    { provide: GOOGLE_CLIENT_ID, useValue: environment.googleClientId },
 
     // Composition root: pages depend on service tokens from `api`; the
     // production host binds each token to its real implementation here.
@@ -68,6 +72,7 @@ export const appConfig: ApplicationConfig = {
     { provide: SHEET_SERVICE, useExisting: HttpSheetService },
     { provide: AUTH_SERVICE, useExisting: HttpAuthService },
     { provide: ACCOUNT_SERVICE, useExisting: HttpAccountService },
+    { provide: GOOGLE_IDENTITY, useExisting: GisGoogleIdentity },
     { provide: TEAM_SERVICE, useExisting: HttpTeamService },
     { provide: HOLIDAY_SERVICE, useExisting: HttpHolidayService },
     { provide: WORKING_DAYS_SERVICE, useExisting: HttpWorkingDaysService },

@@ -7,6 +7,7 @@ import { Session } from '../models/session';
 import { API_BASE_URL, apiUrl } from './api-base-url';
 import {
   AcceptInvitationResult,
+  AcceptWithGoogleResult,
   GetInvitationResult,
   InvitationService,
 } from './invitation.service';
@@ -40,6 +41,27 @@ export class HttpInvitationService implements InvitationService {
         return of<AcceptInvitationResult>({
           outcome: problemCode(error) === 'account_exists' ? 'exists' : 'failed',
         });
+      }),
+    );
+  }
+
+  acceptWithGoogle(token: string, accessToken: string): Observable<AcceptWithGoogleResult> {
+    return this.http.post<Session>(`${this.url(token)}/accept-google`, { accessToken }).pipe(
+      tap((session) => this.store.setToken(session.accessToken)),
+      map((session): AcceptWithGoogleResult => ({ outcome: 'joined', session })),
+      catchError((error: unknown) => {
+        const expired = expiredOutcome(error);
+        if (expired) return of<AcceptWithGoogleResult>(expired);
+        switch (problemCode(error)) {
+          case 'google_email_mismatch':
+            return of<AcceptWithGoogleResult>({ outcome: 'mismatch' });
+          case 'google_email_unverified':
+            return of<AcceptWithGoogleResult>({ outcome: 'unverified' });
+          case 'account_exists':
+            return of<AcceptWithGoogleResult>({ outcome: 'exists' });
+          default:
+            return of<AcceptWithGoogleResult>({ outcome: 'failed' });
+        }
       }),
     );
   }
