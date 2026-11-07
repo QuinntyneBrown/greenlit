@@ -207,6 +207,11 @@ account menu, and the pending count arrive with the journeys that need them.
 - Journey 29 is built as its own Angular application (`frontend/projects/marketing`, port 4300 in
   development) with behaviour specs in `e2e/tests/marketing.spec.ts`; visual parity with the mock is
   still by eye until `e2e/tests/visual/` exists.
+- Journey 26 is built (ADR-012): `ConnectivityService` (contract, token, `BrowserConnectivityService` and
+  `connectivityInterceptor` in `api`) drives `app-connection-banner` in the shell and makes the calendar read-only
+  (sheet rows not editable, paint picker disabled) while offline or reconnecting. No backend change. Left for
+  later: the full-page offline state for a page with nothing loaded (L2-046 AC4, with the error pages) and any
+  offline writes.
 - Journey 21 is built: `GET /api/year?year=yyyy` (`YearController`, `GetYearQueryHandler`) returns each member's twelve
   months (a confirmed count and one status per calendar day) and their `AllowanceFigures` for the leave year that starts
   in that year, the caller's row first. `AllowanceCalculator.ComputeAsync` gained an optional `leaveYear`. The year page
