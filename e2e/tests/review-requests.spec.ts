@@ -7,6 +7,8 @@
 //       reason; Ana's cancelled request is listed with them. Specs that approve put everything back.
 
 import { test, expect } from "../fixtures/gl-test.js";
+import { clearDays } from "../fixtures/days.js";
+import { confirmDays, memberId, reopenApproved } from "../fixtures/requests.js";
 
 const LONG_NOTE =
   "A week in Lisbon for a friend's wedding and a few days either side to see the coast, which we have been planning since spring";
@@ -239,5 +241,199 @@ test.describe("The request detail", () => {
     await expect(detail.approve()).toBeInViewport();
     await detail.body().evaluate((body) => body.scrollTo(0, body.scrollHeight));
     await expect(detail.approve()).toBeInViewport();
+  });
+});
+
+test.describe("Approving several requests at once", () => {
+  // Every test approves some of Cleo's (12-13 Nov), Ana's (16-20 Nov), Dev's (18-19 Nov) and Elif's (29-31 Dec) requests and puts them back.
+  test.afterEach(async ({ request }) => {
+    for (const [member, first] of [
+      ["Cleo Park", "2026-11-12"],
+      ["Ana Ruiz", "2026-11-16"],
+      ["Dev Patel", "2026-11-18"],
+      ["Elif Yılmaz", "2026-12-29"],
+    ])
+      await reopenApproved(request, member, first);
+    await clearDays(request, "Ben Okafor", ["2026-11-18"]);
+    await clearDays(request, "Cleo Park", ["2026-11-18"]);
+  });
+
+  test("ticking requests shows how many the bulk button approves (L2-026 AC1)", async ({ goto, pages }) => {
+    test.skip(test.info().project.name === "mobile", "The mock shows a tick on each row from tablet width up; on a phone Select all is the way (L2-026 AC2).");
+    await goto("requests");
+    await pages.requests.waitForReady();
+    await expect(pages.requests.approveSelected()).toHaveText("Approve");
+    await expect(pages.requests.approveSelected()).toBeDisabled();
+
+    await pages.requests.select("Ana Ruiz").check();
+    await pages.requests.select("Dev Patel").check();
+
+    await expect(pages.requests.approveSelected()).toHaveText("Approve 2");
+    await expect(pages.requests.approveSelected()).toBeEnabled();
+    await expect(pages.requests.row("Ana Ruiz")).toHaveAttribute("data-selected", "");
+    await expect(pages.requests.row("Cleo Park")).not.toHaveAttribute("data-selected", "");
+
+    await pages.requests.select("Ana Ruiz").uncheck();
+
+    await expect(pages.requests.approveSelected()).toHaveText("Approve 1");
+  });
+
+  test("Select all ticks every pending request, and ticking them one by one ticks it (L2-026 AC2)", async ({ goto, pages }) => {
+    test.skip(test.info().project.name === "mobile", "The mock shows a tick on each row from tablet width up; on a phone Select all is the way (L2-026 AC2).");
+    await goto("requests");
+    await pages.requests.waitForReady();
+
+    await pages.requests.selectAll().check();
+
+    for (const member of ["Cleo Park", "Ana Ruiz", "Dev Patel", "Elif Yılmaz"]) await expect(pages.requests.select(member)).toBeChecked();
+    await expect(pages.requests.approveSelected()).toHaveText("Approve 4");
+
+    await pages.requests.selectAll().uncheck();
+
+    await expect(pages.requests.select("Ana Ruiz")).not.toBeChecked();
+    await expect(pages.requests.approveSelected()).toHaveText("Approve");
+
+    for (const member of ["Cleo Park", "Ana Ruiz", "Dev Patel", "Elif Yılmaz"]) await pages.requests.select(member).check();
+    await expect(pages.requests.selectAll()).toBeChecked();
+  });
+
+  test("Approve 3 approves the three together, as one approval each, and says so once (L2-026 AC3)", async ({ goto, pages, requestsApi }) => {
+    test.skip(test.info().project.name === "mobile", "The mock shows a tick on each row from tablet width up; on a phone Select all is the way (L2-026 AC2).");
+    await goto("requests");
+    await pages.requests.waitForReady();
+    for (const member of ["Cleo Park", "Ana Ruiz", "Dev Patel"]) await pages.requests.select(member).check();
+
+    await pages.requests.approveSelected().click();
+
+    const toast = "Approved 3 requests";
+    await expect(pages.requests.toast(toast)).toBeVisible();
+    await expect(pages.requests.toastText(toast)).toHaveText("Their days are green on the calendar and everyone has been emailed.");
+    await expect(pages.requests.toastAction(toast, "Undo")).toBeVisible();
+    expect(requestsApi.approvals()).toBe(1);
+    expect(requestsApi.lastApproved()).toHaveLength(3);
+    await expect(pages.requests.rows()).toHaveCount(1);
+    await expect(pages.requests.row("Elif Yılmaz")).toBeVisible();
+    await expect(pages.requests.tabs()).toHaveText(["Pending 1", "Approved 6", "Declined 2"]);
+    await expect(pages.requests.pendingPill()).toHaveText("1 pending");
+    await expect(pages.requests.approveSelected()).toBeDisabled();
+
+    await goto("calendar", { month: "2026-11" });
+    await pages.calendar.waitForReady();
+    await expect(pages.calendar.cell("Cleo Park", "Thu 12 Nov")).toHaveAttribute("data-status", "confirmed");
+    await expect(pages.calendar.cell("Ana Ruiz", "Mon 16 Nov")).toHaveAttribute("data-status", "confirmed");
+    await expect(pages.calendar.cell("Dev Patel", "Wed 18 Nov")).toHaveAttribute("data-status", "confirmed");
+  });
+
+  test("Undo on the summary toast puts all of them back to pending", async ({ goto, pages }) => {
+    await goto("requests");
+    await pages.requests.waitForReady();
+    await pages.requests.selectAll().check();
+    await pages.requests.approveSelected().click();
+    await expect(pages.requests.toast("Approved 4 requests")).toBeVisible();
+    await expect(pages.requests.rows()).toHaveCount(0);
+
+    await pages.requests.toastAction("Approved 4 requests", "Undo").click();
+
+    await expect(pages.requests.toast("Approved 4 requests")).toHaveCount(0);
+    await expect(pages.requests.rows()).toHaveCount(4);
+    await expect(pages.requests.tabs()).toHaveText(["Pending 4", "Approved 3", "Declined 2"]);
+  });
+
+  test("while they are approved the button says Approving… and cannot be pressed twice", async ({ goto, pages, requestsApi }) => {
+    test.skip(test.info().project.name === "mobile", "The mock shows a tick on each row from tablet width up; on a phone Select all is the way (L2-026 AC2).");
+    const release = await requestsApi.holdApprove();
+    await goto("requests");
+    await pages.requests.waitForReady();
+    await pages.requests.select("Ana Ruiz").check();
+    await pages.requests.select("Dev Patel").check();
+
+    await pages.requests.approveSelected().click();
+
+    await expect(pages.requests.approveSelected()).toHaveText("Approving…");
+    await expect(pages.requests.approveSelected()).toHaveAttribute("aria-busy", "true");
+    await expect(pages.requests.approveSelected()).toBeDisabled();
+    expect(requestsApi.approvals()).toBe(1);
+
+    release();
+    await expect(pages.requests.toast("Approved 2 requests")).toBeVisible();
+    expect(requestsApi.approvals()).toBe(1);
+  });
+
+  test("when it fails nothing is approved, the ticks stay and Try again approves them", async ({ goto, pages, requestsApi }) => {
+    test.skip(test.info().project.name === "mobile", "The mock shows a tick on each row from tablet width up; on a phone Select all is the way (L2-026 AC2).");
+    await requestsApi.failApprove();
+    await goto("requests");
+    await pages.requests.waitForReady();
+    await pages.requests.select("Ana Ruiz").check();
+    await pages.requests.select("Dev Patel").check();
+
+    await pages.requests.approveSelected().click();
+
+    const failed = "We couldn’t approve 2 requests";
+    await expect(pages.requests.toast(failed)).toBeVisible();
+    await expect(pages.requests.toastText(failed)).toHaveText("They’re still pending. Check your connection and try again.");
+    await expect(pages.requests.select("Ana Ruiz")).toBeChecked();
+    await expect(pages.requests.approveSelected()).toHaveText("Approve 2");
+
+    await requestsApi.recoverApprove();
+    await pages.requests.toastAction(failed, "Try again").click();
+
+    await expect(pages.requests.toast("Approved 2 requests")).toBeVisible();
+  });
+
+  test("approving two that leave the team short warns the manager and still approves both (L2-042 AC2)", async ({ goto, pages, request }) => {
+    test.skip(test.info().project.name === "mobile", "The mock shows a tick on each row from tablet width up; on a phone Select all is the way (L2-026 AC2).");
+    // Ben and Cleo confirmed on 18 Nov, with Ana and Dev: 4 out and 3 in against a minimum of 4.
+    await confirmDays(request, await memberId(request, "Ben Okafor"), ["2026-11-18"]);
+    await confirmDays(request, await memberId(request, "Cleo Park"), ["2026-11-18"]);
+    await goto("requests");
+    await pages.requests.waitForReady();
+    await pages.requests.select("Ana Ruiz").check();
+    await pages.requests.select("Dev Patel").check();
+
+    await pages.requests.approveSelected().click();
+
+    const toast = "Approved 2 requests, but only 3 people will be in on 18 Nov";
+    await expect(pages.requests.toast(toast)).toBeVisible();
+    await expect(pages.requests.toastText(toast)).toHaveText("That’s below your minimum of 4.");
+    await expect(pages.requests.toastAction(toast, "Undo")).toBeVisible();
+  });
+
+  test("one ticked request is approved like any single approval", async ({ goto, pages }) => {
+    test.skip(test.info().project.name === "mobile", "The mock shows a tick on each row from tablet width up; on a phone Select all is the way (L2-026 AC2).");
+    await goto("requests");
+    await pages.requests.waitForReady();
+    await pages.requests.select("Ana Ruiz").check();
+
+    await pages.requests.approveSelected().click();
+
+    await expect(pages.requests.toast("Approved Ana’s time off")).toBeVisible();
+  });
+
+  test("the ticks do not follow the manager to another tab", async ({ goto, pages }) => {
+    test.skip(test.info().project.name === "mobile", "The mock shows a tick on each row from tablet width up; on a phone Select all is the way (L2-026 AC2).");
+    await goto("requests");
+    await pages.requests.waitForReady();
+    await pages.requests.select("Ana Ruiz").check();
+
+    await pages.requests.openTab("Approved");
+    await pages.requests.openTab("Pending");
+
+    await expect(pages.requests.select("Ana Ruiz")).not.toBeChecked();
+    await expect(pages.requests.approveSelected()).toHaveText("Approve");
+  });
+
+  test("the keyboard ticks and approves: Space on a checkbox, then Enter on the button", async ({ goto, page, pages }) => {
+    test.skip(test.info().project.name === "mobile", "The mock shows a tick on each row from tablet width up; on a phone Select all is the way (L2-026 AC2).");
+    await goto("requests");
+    await pages.requests.waitForReady();
+    await pages.requests.select("Dev Patel").focus();
+
+    await page.keyboard.press("Space");
+    await expect(pages.requests.approveSelected()).toHaveText("Approve 1");
+    await pages.requests.approveSelected().focus();
+    await page.keyboard.press("Enter");
+
+    await expect(pages.requests.toast("Approved Dev’s time off")).toBeVisible();
   });
 });
