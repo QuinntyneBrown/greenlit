@@ -45,6 +45,18 @@ public static class DependencyInjection
             if (!string.IsNullOrWhiteSpace(envKey)) o.SigningKey = envKey;
         });
 
+        // Google sign-in (ADR-012): the client id from config or env var; the fake reader only where config asks for it.
+        services.Configure<GoogleOptions>(o =>
+        {
+            configuration.GetSection(GoogleOptions.SectionName).Bind(o);
+            var envClientId = Environment.GetEnvironmentVariable(GoogleOptions.ClientIdEnvironmentVariable);
+            if (!string.IsNullOrWhiteSpace(envClientId)) o.ClientId = envClientId;
+        });
+        if (UsesFakeGoogle(configuration))
+            services.AddSingleton<IGoogleAccounts, FakeGoogleAccounts>();
+        else
+            services.AddSingleton<IGoogleAccounts, GoogleAccounts>();
+
         services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
         services.AddSingleton<ITokenService, JwtTokenService>();
         services.AddSingleton<IPublicHolidayProvider, RuleBasedPublicHolidayProvider>();
@@ -54,6 +66,10 @@ public static class DependencyInjection
 
         return services;
     }
+
+    /// <summary>True when <c>Greenlit:Google:Accounts</c> asks for the fake Google reader, which the tests and the e2e API use (ADR-012).</summary>
+    public static bool UsesFakeGoogle(IConfiguration configuration) =>
+        string.Equals(configuration[$"{GoogleOptions.SectionName}:Accounts"], GoogleOptions.FakeReader, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// True when <see cref="DatabaseProviderKey"/> selects SQLite, the provider the API

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Greenlit.Api.Controllers;
 
-/// <summary>Sign-in (docs/detailed-designs/identity-and-access/sign-in).</summary>
+/// <summary>Sign-in (docs/detailed-designs/identity-and-access/sign-in, and sign-in-with-google).</summary>
 [ApiController]
 [Route("api/auth")]
 public sealed class AuthController : ControllerBase
@@ -20,6 +20,15 @@ public sealed class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<SessionDto>> SignIn([FromBody] SignInRequest request, CancellationToken ct) =>
         Ok(await _sender.Send(new SignInCommand(request.Email, request.Password), ct));
+
+    /// <summary>
+    /// Exchanges a Google access token for a session, creating a manager account for a newcomer (L2-051, ADR-012).
+    /// Anonymous by design: it is how a session starts.
+    /// </summary>
+    [HttpPost("google")]
+    [AllowAnonymous]
+    public async Task<ActionResult<GoogleSessionDto>> SignInWithGoogle([FromBody] GoogleSignInRequest request, CancellationToken ct) =>
+        Ok(await _sender.Send(new SignInWithGoogleCommand(request.AccessToken), ct));
 
     /// <summary>Who the caller is, for the account menu. Authenticated by the fallback policy.</summary>
     [HttpGet("me")]
@@ -67,3 +76,5 @@ public sealed record ResetPasswordRequest(string? Token, string? Password, strin
 public sealed record RequestPasswordResetRequest(string? Email);
 
 public sealed record SignInRequest(string? Email, string? Password);
+
+public sealed record GoogleSignInRequest(string? AccessToken);
