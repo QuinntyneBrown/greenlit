@@ -73,6 +73,16 @@ export class SettingsPage extends BasePage {
     return this.main.locator(".alert--success.banner");
   }
 
+  /** The "Fix 1 thing to continue" summary the Team section shows for invalid fields. */
+  teamSummary(): Locator {
+    return this.teamSection().locator(".form-summary");
+  }
+
+  /** The inline error under the Team name field. */
+  teamNameError(): Locator {
+    return this.teamSection().locator("#team-name-err");
+  }
+
   inviteButton(): Locator {
     return control(this.teamSection(), "Invite a member");
   }

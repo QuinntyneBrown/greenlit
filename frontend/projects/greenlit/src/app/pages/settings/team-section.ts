@@ -11,12 +11,14 @@ import {
 
 import {
   TEAM_SETTINGS_SERVICE,
+  SaveTeamSettingsInput,
   TIME_ZONE_OPTIONS,
   TeamSettingsMember,
   TeamSettingsTeam,
 } from 'api';
 import {
   Button,
+  FormSummary,
   MemberList,
   MemberListItem,
   MemberRoleChange,
@@ -25,6 +27,8 @@ import {
   TextField,
 } from 'components';
 
+import { ToastService } from '../../toasts/toast.service';
+
 /**
  * The Team section of Settings (pages/settings/default; docs/detailed-designs/teams/team-settings): the team's
  * name and time zone, and a row per member with their role and yearly days. A member sees the same values
@@ -32,7 +36,7 @@ import {
  */
 @Component({
   selector: 'app-team-section',
-  imports: [Button, MemberList, SelectField, TextField],
+  imports: [Button, FormSummary, MemberList, SelectField, TextField],
   template: `
     <h2 id="team-title" class="section-title" tabindex="-1">Team</h2>
     <p>Everyone who appears on the calendar. Managers can approve requests and edit any row.</p>
@@ -42,15 +46,25 @@ import {
         updating.
       </p>
     }
+    @if (nameError()) {
+      <gl-form-summary class="summary" [items]="[{ field: 'team-name', message: nameError() }]" />
+    }
     <fieldset [disabled]="!team().canEdit">
       <div class="form-grid">
-        <gl-text-field label="Team name" inputId="team-name" [(value)]="name" />
+        <gl-text-field
+          label="Team name"
+          inputId="team-name"
+          [error]="nameError()"
+          [(value)]="name"
+          (valueChange)="edited()"
+        />
         <gl-select-field
           label="Time zone"
           selectId="team-zone"
           help="Weekends and holidays are worked out in this time zone."
           [options]="zones"
           [(value)]="zone"
+          (valueChange)="edited()"
         />
       </div>
       <gl-member-list
@@ -110,6 +124,9 @@ import {
         grid-template-columns: 1fr 1fr;
       }
     }
+    .summary {
+      margin-top: var(--space-4);
+    }
     .members {
       margin-top: var(--space-6);
     }
@@ -146,6 +163,8 @@ export class TeamSection {
   );
   protected readonly busy = signal(false);
   protected readonly status = signal('');
+  protected readonly nameError = signal('');
+  private readonly toasts = inject(ToastService);
 
   protected readonly members = computed<MemberListItem[]>(() =>
     this.team().members.map((m) => ({
@@ -157,6 +176,24 @@ export class TeamSection {
       ...(this.team().canEdit ? { action: 'Edit working days' } : {}),
     })),
   );
+  /** Any edit clears "Saved" and the name's error. */
+  protected edited(): void {
+    this.status.set('');
+    this.nameError.set('');
+  }
+
+  private changed(entered: SaveTeamSettingsInput): boolean {
+    const team = this.team();
+    return (
+      entered.name !== team.name ||
+      entered.timeZone !== team.timeZone ||
+      entered.members.some((m, i) => {
+        const before = team.members[i];
+        return m.role !== before.role || m.yearlyDays !== before.yearlyDays;
+      })
+    );
+  }
+
   protected setRole(change: MemberRoleChange): void {
     this.roles.update((roles) => ({
       ...roles,
@@ -183,10 +220,30 @@ export class TeamSection {
         yearlyDays: this.days()[m.id],
       })),
     };
+    if (!entered.name) {
+      this.nameError.set('Give your team a name.');
+      return;
+    }
+    if (!this.changed(entered)) {
+      this.toasts.show({
+        tone: 'info',
+        title: 'No changes to save',
+        body: 'Everything already matches what you entered.',
+      });
+      return;
+    }
     this.busy.set(true);
     this.service.saveTeam(entered).subscribe((result) => {
       this.busy.set(false);
-      if (!result.ok) return;
+      if (!result.ok) {
+        this.toasts.show({
+          tone: 'danger',
+          title: 'We couldn’t save your changes',
+          body: 'Nothing was changed. Check your connection and try again.',
+          action: { label: 'Try again', run: () => this.save() },
+        });
+        return;
+      }
       this.status.set('Saved');
       this.saved.emit({
         ...team,

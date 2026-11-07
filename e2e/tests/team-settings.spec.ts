@@ -79,4 +79,70 @@ test.describe("The Team section", () => {
     expect(saved.name).toBe("Product team");
     expect(saved.members.find((m) => m.name === "Teammate Holiday")?.yearlyDays).toBe(22);
   });
+
+  test("Save changes with no edits says so and sends nothing, even after an edit is undone (L2-009 AC4)", async ({
+    pages,
+    teamSettingsApi,
+  }) => {
+    const settings = pages.settings;
+
+    await settings.saveTeamButton().click();
+
+    await expect(settings.toast("No changes to save")).toBeVisible();
+    await expect(settings.toastText("No changes to save")).toHaveText("Everything already matches what you entered.");
+    await settings.teamNameField().fill("Something else");
+    await settings.teamNameField().fill(TEAM);
+    await settings.saveTeamButton().click();
+    await expect(settings.toasts()).toHaveCount(2);
+    expect(teamSettingsApi.teamSaves()).toBe(0);
+  });
+
+  test("a failed save keeps the values as entered and Try again saves them (L2-009 AC5)", async ({
+    pages,
+    request,
+    teamSettingsApi,
+  }, testInfo) => {
+    const settings = pages.settings;
+    await teamSettingsApi.failTeam();
+    await settings.teamNameField().fill("Product team");
+    await settings.yearlyDaysField("Teammate Holiday").fill("22");
+
+    await settings.saveTeamButton().click();
+
+    await expect(settings.toast("We couldn’t save your changes")).toBeVisible();
+    await expect(settings.toastText("We couldn’t save your changes")).toHaveText(
+      "Nothing was changed. Check your connection and try again.",
+    );
+    await expect(settings.teamNameField()).toHaveValue("Product team");
+    await expect(settings.yearlyDaysField("Teammate Holiday")).toHaveValue("22");
+    await expect(settings.saveTeamButton()).toHaveText("Save changes");
+    await expect(settings.saveTeamButton()).toBeEnabled();
+    await expect(settings.savedBanner()).toHaveCount(0);
+    expect((await readTeamSection(request, inviterFor(testInfo.project.name))).name).toBe(TEAM);
+
+    await teamSettingsApi.recoverTeam();
+    await settings.toastAction("We couldn’t save your changes", "Try again").click();
+
+    await expect(settings.saveTeamStatus()).toHaveText("Saved");
+    expect((await readTeamSection(request, inviterFor(testInfo.project.name))).name).toBe("Product team");
+  });
+
+  test("an empty team name is flagged and nothing is sent (mock pages/settings/invalid)", async ({
+    pages,
+    teamSettingsApi,
+  }) => {
+    const settings = pages.settings;
+    await settings.teamNameField().fill("");
+
+    await settings.saveTeamButton().click();
+
+    await expect(settings.teamSummary()).toContainText("Fix 1 thing to continue");
+    await expect(settings.teamSummary().getByRole("link", { name: "Give your team a name." })).toBeVisible();
+    await expect(settings.teamNameField()).toHaveAttribute("aria-invalid", "true");
+    await expect(settings.teamNameError()).toHaveText("Give your team a name.");
+    expect(teamSettingsApi.teamSaves()).toBe(0);
+
+    await settings.teamNameField().fill(TEAM);
+    await expect(settings.teamSummary()).toHaveCount(0);
+  });
 });
