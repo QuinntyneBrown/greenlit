@@ -110,6 +110,15 @@ export class PersonPage extends BasePage {
     return control(this.main.locator(".facts-bar"), "Request time off");
   }
 
+  /** The manager's "Adjust allowance" section: heading, hint and the button. */
+  adjustAllowanceSection(): Locator {
+    return this.main.locator("section", { has: this.page.getByRole("heading", { level: 2, name: "Adjust allowance" }) });
+  }
+
+  adjustAllowance(): Locator {
+    return control(this.adjustAllowanceSection(), "Adjust allowance");
+  }
+
   /** The manager's Working days section: heading, hint, the days and "Edit working days". */
   workingDaysSection(): Locator {
     return this.main.locator("section", { has: this.page.getByRole("heading", { level: 2, name: "Working days" }) });
