@@ -189,7 +189,7 @@ test.describe("The request detail", () => {
     await expect(detail.cell("Dev Patel", "Thu 19 Nov")).toHaveAttribute("data-status", "requested");
     await expect(detail.out(0)).toHaveAttribute("aria-label", "1 out, 6 in");
     await expect(detail.out(2)).toHaveAttribute("aria-label", "2 out, 5 in");
-    await expect(detail.actions()).toHaveText(["Approve"]);
+    await expect(detail.actions()).toHaveText(["Decline", "Approve"]);
   });
 
   test("an approved request shows its status and offers no decision (L2-023 AC3)", async ({ goto, pages }) => {
