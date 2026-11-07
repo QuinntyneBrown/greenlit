@@ -48,6 +48,8 @@ everyone sees the same month.
 - **Holidays.** Public holidays for GB, IE and US on team creation, plus the team's own.
 - **Teams and invitations.** Create a team, invite members by email, accept with a link.
 - **Sign-in and password reset.** Eight-hour sessions with email-based password recovery.
+- **Sign in with Google.** Continue with Google to sign in or to start a manager account; join an
+  invitation with Google instead of a password.
 
 Greenlit is under active development. See [docs/estimates](docs/estimates/README.md) for the
 current percentage complete and the roadmap.
@@ -104,6 +106,21 @@ Sign in as `maya@northwind.studio` with the password `greenlit-demo` to act as t
 
 To run against SQL Server LocalDB instead, `pwsh eng/Start-FreshStack.ps1` resets and seeds the
 database and then starts both the API and the dev server. Pass `-Sqlite` to use SQLite.
+
+#### Google sign-in
+
+"Continue with Google" needs a Google OAuth 2.0 web client (ADR-012). The project `greenlit-514017`
+in Google Cloud holds one, `Greenlit web`, whose client id is compiled into the Angular
+environments (`googleClientId`) and set on the API as `GREENLIT_GOOGLE_CLIENT_ID` (or
+`Greenlit:Google:ClientId`); the two must match. The client's authorised JavaScript origins are
+`http://localhost`, `http://localhost:4200` and `https://app.greenlit.rocks`. There is no client
+secret: the browser gets an access token from Google and the API checks it with Google's
+`tokeninfo` endpoint.
+
+The app is in Google's *Testing* publishing status until it is published from the OAuth consent
+screen, so only the test users listed there can continue with Google in the meantime. Tests and the
+e2e API never reach Google: `Greenlit:Google:Accounts=Fake` makes the API read made-up tokens
+(`eng/Start-E2eApi.ps1` sets it).
 
 The API does not apply migrations on startup. Use the CLI:
 
