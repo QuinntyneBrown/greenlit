@@ -73,5 +73,7 @@ signed-in person on no team is sent to `/create-team` (sign in as `noor@northwin
 paint colour, press or drag across your own row (the manager's: any row), and a toast offers Undo;
 the API refuses what ADR-003 forbids. Inviting a member is built (journey 5, `teams/invite-member`): Settings has a Team section whose
 "Invite a member" dialog adds a row and emails a link that works for seven days (the emails are written
-to the API log until a provider is chosen, ADR-006). The rest of the sheet lands feature by feature, each from a requirement in
+to the API log until a provider is chosen, ADR-006). Accepting an invitation is built (journey 6, `identity-and-access/accept-invitation`): the emailed
+link opens `/accept-invite/:token`, where the invitee sets a name and password and lands signed in on the
+calendar. The rest of the sheet lands feature by feature, each from a requirement in
 `docs/specs/`, a detailed design and a mock, following the process in `AGENTS.md`.
