@@ -11,6 +11,10 @@ namespace Greenlit.Api.Tests.Support;
 /// </summary>
 public class GreenlitApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    public const string Issuer = "greenlit-test";
+    public const string Audience = "greenlit-test-clients";
+    public const string SigningKey = "test-only-signing-key-must-be-at-least-32-bytes-long";
+
     public string DatabaseName { get; } = $"Greenlit_Api_{Guid.NewGuid():N}";
 
     /// <summary>A named shared-cache database: every DbContext the API opens reaches the same one.</summary>
@@ -28,9 +32,9 @@ public class GreenlitApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
             {
                 ["ConnectionStrings:Greenlit"] = ConnectionString,
                 [Greenlit.Infrastructure.DependencyInjection.DatabaseProviderKey] = "Sqlite",
-                ["Greenlit:Jwt:Issuer"] = "greenlit-test",
-                ["Greenlit:Jwt:Audience"] = "greenlit-test-clients",
-                ["Greenlit:Jwt:SigningKey"] = "test-only-signing-key-must-be-at-least-32-bytes-long",
+                ["Greenlit:Jwt:Issuer"] = Issuer,
+                ["Greenlit:Jwt:Audience"] = Audience,
+                ["Greenlit:Jwt:SigningKey"] = SigningKey,
                 ["Greenlit:Jwt:AccessTokenMinutes"] = "15",
                 ["Greenlit:App:Origin"] = "https://app.example.com",
             });

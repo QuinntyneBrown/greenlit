@@ -2,7 +2,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
+using Greenlit.Api.Authentication;
 using Greenlit.Api.Middleware;
+using Greenlit.Application.Abstractions;
 using Greenlit.Application;
 using Greenlit.Domain.Enums;
 using Greenlit.Infrastructure;
@@ -38,6 +40,8 @@ try
     builder.Services.AddInfrastructure(builder.Configuration);
 
     builder.Services.AddHttpContextAccessor();
+    builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
+    builder.Services.AddSingleton(TimeProvider.System);
 
     builder.Services.AddControllers()
         .AddJsonOptions(opt =>
