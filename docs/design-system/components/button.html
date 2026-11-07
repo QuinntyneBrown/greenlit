@@ -182,7 +182,7 @@
 <ul>
   <li><b>Loading</b> keeps the button's width, hides the label, shows a spinner, sets <code>aria-busy="true"</code> and ignores clicks. Use it on the button that was pressed (the dialog's confirm button), not on the whole form.</li>
   <li><b>Disabled</b> uses the native <code>disabled</code> attribute: 50% opaque, not focusable. In a form, prefer leaving the submit enabled and explaining the problem on press.</li>
-  <li><b>Pressed</b> (toggle) uses <code>aria-pressed</code> and belongs to the <a href="segmented-control.html">segmented control</a> and the <a href="sheet-cell.html">sheet cell</a>, not to ordinary buttons.</li>
+  <li><b>Pressed</b> (toggle) uses <code>aria-pressed</code> and belongs to the <a href="segmented-control.html">segmented control</a>, the <a href="sheet-cell.html">sheet cell</a> and a single on/off toggle such as "Most days left first" on the year page (<code>gl-button [pressed]</code>), which takes the accent fill while on. It does not belong to ordinary action buttons.</li>
 </ul>
     </section>
     <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>

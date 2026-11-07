@@ -36,7 +36,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 18 | Edit team settings | Manager edits name, time zone, roles, yearly days; members read-only. | 3 |
 | 19 | Reset a forgotten password | Emailed one-hour, single-use link to choose a new password. | 2.5 |
 | 20 | Use the account menu and sign out | Account menu, confirmed sign-out, and a clear expired-session page. | 0 (built) |
-| 21 | View the team's year | Twelve months per member plus a sortable allowance usage table. | 4 |
+| 21 | View the team's year | Twelve months per member plus a sortable allowance usage table. | 0 (built) |
 | 22 | View a person's page | Allowance, year at a glance and time off for one member. | 4 |
 | 23 | Adjust a member's allowance | Manager adds or removes days with a required reason. | 2 |
 | 24 | Remove a member | Manager removes someone, keeping history and blocking their sign-in. | 2 |
@@ -45,7 +45,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
 | 29 | Visit the marketing page | The public page that explains Greenlit and sends a manager to create a team or sign in. | 0 (built) |
-| | **Total remaining** | | **38.5** |
+| | **Total remaining** | | **34.5** |
 
 ## Notes
 
@@ -203,3 +203,8 @@ account menu, and the pending count arrive with the journeys that need them.
 - Journey 29 is built as its own Angular application (`frontend/projects/marketing`, port 4300 in
   development) with behaviour specs in `e2e/tests/marketing.spec.ts`; visual parity with the mock is
   still by eye until `e2e/tests/visual/` exists.
+- Journey 21 is built: `GET /api/year?year=yyyy` (`YearController`, `GetYearQueryHandler`) returns each member's twelve
+  months (a confirmed count and one status per calendar day) and their `AllowanceFigures` for the leave year that starts
+  in that year, the caller's row first. `AllowanceCalculator.ComputeAsync` gained an optional `leaveYear`. The year page
+  (`gl-year-grid`, `gl-allowance-table`) shows the table to members as well as the manager, as the year mocks do. Names
+  are not yet links to the person page (journey 22). `gl-button` gained `pressed` for the sort toggle.
