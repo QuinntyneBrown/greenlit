@@ -27,11 +27,11 @@ module.exports = defineConfig([
       '@typescript-eslint/no-empty-function': ['error', { allow: ['arrowFunctions'] }],
       '@angular-eslint/directive-selector': [
         'error',
-        { type: 'attribute', prefix: ['gl', 'app'], style: 'camelCase' },
+        { type: 'attribute', prefix: ['gl', 'app', 'mk'], style: 'camelCase' },
       ],
       '@angular-eslint/component-selector': [
         'error',
-        { type: 'element', prefix: ['gl', 'app'], style: 'kebab-case' },
+        { type: 'element', prefix: ['gl', 'app', 'mk'], style: 'kebab-case' },
       ],
     },
   },

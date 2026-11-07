@@ -84,7 +84,9 @@ jobs:
 
       - name: ng build (production)
         working-directory: frontend
-        run: npx ng build greenlit --configuration production
+        run: |
+          npx ng build greenlit --configuration production
+          npx ng build marketing --configuration production
 
   e2e:
     name: Playwright behaviour tests
