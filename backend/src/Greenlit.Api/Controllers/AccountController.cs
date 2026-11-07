@@ -20,4 +20,12 @@ public sealed class AccountController : ControllerBase
     [HttpPut("profile")]
     public Task<AccountDto> UpdateProfile([FromBody] UpdateProfileCommand command, CancellationToken ct) =>
         _sender.Send(command, ct);
+
+    /// <summary>Changes the password; the current one must match.</summary>
+    [HttpPut("password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command, CancellationToken ct)
+    {
+        await _sender.Send(command, ct);
+        return NoContent();
+    }
 }
