@@ -10,11 +10,32 @@ public sealed record MonthDto(
     string Today,
     bool IsManager,
     int? CoverageMinimum,
-    IReadOnlyList<MemberRowDto> Members);
+    IReadOnlyList<MemberRowDto> Members,
+    IReadOnlyList<CoverageDto> Coverage);
 
 public sealed record MemberRowDto(
     Guid Id,
     string Name,
     string Initials,
     bool IsYou,
-    int? DaysLeft);
+    int? DaysLeft,
+    IReadOnlyList<CellDto> Cells);
+
+/// <summary>One member's day. <c>HolidayName</c> is set when <c>Kind</c> is <see cref="CellKind.Holiday"/>.</summary>
+public sealed record CellDto(string Date, CellKind Kind, string? HolidayName);
+
+/// <summary>
+/// Red days are separate from time off, so a cell never needs a stored row to be red.
+/// </summary>
+public enum CellKind
+{
+    Working,
+    NotWorking,
+    Holiday,
+    Tentative,
+    Requested,
+    Confirmed,
+}
+
+/// <summary>The Out row for one team working day: members out (requested or confirmed) and in.</summary>
+public sealed record CoverageDto(string Date, int Out, int In, bool BelowMinimum);

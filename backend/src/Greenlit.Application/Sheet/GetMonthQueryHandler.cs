@@ -1,6 +1,7 @@
 using System.Globalization;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Exceptions;
+using Greenlit.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,17 +52,66 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
             }
         }
 
+        // One round trip each for the month's days and holidays (ADR-003).
+        var last = month.AddMonths(1).AddDays(-1);
+        var memberIds = ordered.Select(m => m.Id).ToList();
+        var stored = await _db.TimeOffDays.AsNoTracking()
+            .Where(d => memberIds.Contains(d.TeamMemberId) && d.Date >= month && d.Date <= last)
+            .ToListAsync(ct);
+        var holidays = await _db.Holidays.AsNoTracking()
+            .Where(h => h.TeamId == team.Id && h.Date >= month && h.Date <= last)
+            .ToDictionaryAsync(h => h.Date, h => h.Name, ct);
+        var statusOf = stored.ToDictionary(d => (d.TeamMemberId, d.Date), d => d.Status);
+
+        var dates = Enumerable.Range(0, last.Day).Select(month.AddDays).ToList();
+
         var members = ordered
-            .Select(m => new MemberRowDto(m.Id, m.Name, Initials(m.Name), m.UserId == userId, DaysLeft: null))
+            .Select(m => new MemberRowDto(
+                m.Id, m.Name, Initials(m.Name), m.UserId == userId, DaysLeft: null,
+                dates.Select(date => CellFor(m.Id, date, holidays, statusOf)).ToList()))
+            .ToList();
+
+        // L2-014 AC2: on each day the team works, who is out (requested or confirmed) and who is in.
+        var coverage = dates
+            .Where(date => !WorkingDayRule.IsWeekend(date) && !holidays.ContainsKey(date))
+            .Select(date =>
+            {
+                var kinds = members.Select(m => m.Cells[date.Day - 1].Kind).ToList();
+                var outCount = kinds.Count(k => k is CellKind.Requested or CellKind.Confirmed);
+                var inCount = kinds.Count(k => k is CellKind.Working or CellKind.Tentative);
+                return new CoverageDto(Iso(date), outCount, inCount, BelowMinimum: false);
+            })
             .ToList();
 
         return new MonthDto(
             month.ToString("yyyy-MM", CultureInfo.InvariantCulture),
-            today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+            Iso(today),
             isManager,
             CoverageMinimum: null,
-            members);
+            members,
+            coverage);
     }
+
+    private static CellDto CellFor(
+        Guid memberId,
+        DateOnly date,
+        IReadOnlyDictionary<DateOnly, string> holidays,
+        IReadOnlyDictionary<(Guid, DateOnly), DayStatus> statusOf)
+    {
+        if (holidays.TryGetValue(date, out var holiday)) return new CellDto(Iso(date), CellKind.Holiday, holiday);
+        if (WorkingDayRule.IsWeekend(date)) return new CellDto(Iso(date), CellKind.NotWorking, null);
+        if (!statusOf.TryGetValue((memberId, date), out var status)) return new CellDto(Iso(date), CellKind.Working, null);
+        var kind = status switch
+        {
+            DayStatus.Tentative => CellKind.Tentative,
+            DayStatus.Requested => CellKind.Requested,
+            DayStatus.Confirmed => CellKind.Confirmed,
+            _ => throw new ArgumentOutOfRangeException(nameof(statusOf), status, "Unknown day status."),
+        };
+        return new CellDto(Iso(date), kind, null);
+    }
+
+    private static string Iso(DateOnly date) => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
     private DateOnly TodayIn(string timeZone)
     {
