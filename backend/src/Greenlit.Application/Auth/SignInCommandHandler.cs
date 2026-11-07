@@ -44,6 +44,9 @@ public sealed class SignInCommandHandler : IRequestHandler<SignInCommand, Sessio
         }
         if (!_hasher.Verify(user, user.PasswordHash, request.Password!)) throw Mismatch();
 
+        if (await RemovedMembers.IsRemovedAsync(_db, user.Id, ct))
+            throw new UnauthorizedException(RemovedMembers.Code, RemovedMembers.Detail);
+
         var member = await _db.TeamMembers.AsNoTracking().FirstOrDefaultAsync(m => m.UserId == user.Id, ct);
         return _tokens.Issue(user, member);
     }
