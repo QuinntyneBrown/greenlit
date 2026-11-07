@@ -59,5 +59,7 @@ internal static class TeamSettings
             await db.TeamMembers.AsNoTracking().CountAsync(m => m.TeamId == team.Id && m.YearlyDays == null, ct),
             WorkingDaysNames.ToNames(team.WorkingDays),
             team.CoverageMinimum,
-            await db.TeamMembers.AsNoTracking().CountAsync(m => m.TeamId == team.Id, ct));
+            await db.TeamMembers.AsNoTracking().CountAsync(m => m.TeamId == team.Id, ct),
+            team.NotifyNewRequests,
+            team.NotifyDecisions);
 }

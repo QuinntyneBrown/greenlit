@@ -184,6 +184,12 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("nvarchar(120)");
 
+                    b.Property<bool>("NotifyDecisions")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("NotifyNewRequests")
+                        .HasColumnType("bit");
+
                     b.Property<string>("TimeZone")
                         .IsRequired()
                         .HasMaxLength(64)
