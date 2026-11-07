@@ -1,4 +1,5 @@
 using Greenlit.Application.Invitations;
+using Greenlit.Application.Teams;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,4 +23,11 @@ public sealed class MembersController : ControllerBase
         var invited = await _sender.Send(command, ct);
         return StatusCode(invited.Resent ? StatusCodes.Status200OK : StatusCodes.Status201Created, invited);
     }
+
+    /// <summary>Sets the days a part-timer works (docs/detailed-designs/teams/working-days).</summary>
+    [HttpPut("{id:guid}/working-days")]
+    public Task<MemberWorkingDaysDto> SetWorkingDays(Guid id, [FromBody] WorkingDaysBody body, CancellationToken ct) =>
+        _sender.Send(new SetMemberWorkingDaysCommand(id, body.Days), ct);
+
+    public sealed record WorkingDaysBody(IReadOnlyList<string>? Days);
 }

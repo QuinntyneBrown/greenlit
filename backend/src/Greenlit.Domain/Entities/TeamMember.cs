@@ -24,6 +24,9 @@ public class TeamMember
     /// <summary>The member's own yearly days; null means the team's default applies.</summary>
     public int? YearlyDays { get; set; }
 
+    /// <summary>The weekdays this member works, for a part-timer; null means the team's work week applies (teams/working-days).</summary>
+    public WorkingDays? WorkingDays { get; set; }
+
     public ICollection<AllowanceAdjustment> Adjustments { get; set; } = new List<AllowanceAdjustment>();
     public ICollection<Invitation> Invitations { get; set; } = new List<Invitation>();
     public ICollection<TimeOffRequest> Requests { get; set; } = new List<TimeOffRequest>();

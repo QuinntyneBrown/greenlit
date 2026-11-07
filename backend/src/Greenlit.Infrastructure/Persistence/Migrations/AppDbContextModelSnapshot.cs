@@ -200,6 +200,9 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("WorkingDays")
+                        .HasColumnType("int");
+
                     b.Property<int?>("YearlyDays")
                         .HasColumnType("int");
 

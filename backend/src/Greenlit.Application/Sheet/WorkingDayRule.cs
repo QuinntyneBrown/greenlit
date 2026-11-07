@@ -1,3 +1,4 @@
+using Greenlit.Domain.Entities;
 using Greenlit.Domain.Enums;
 
 namespace Greenlit.Application.Sheet;
@@ -13,6 +14,9 @@ public static class WorkingDayRule
 
     /// <summary>True when the weekday of <paramref name="date"/> is not one of <paramref name="workingDays"/>.</summary>
     public static bool IsOffDay(DateOnly date, WorkingDays workingDays) => (workingDays & Flag(date)) == 0;
+
+    /// <summary>The weekdays the member works: their own when they have any, otherwise the team's.</summary>
+    public static WorkingDays For(Team team, TeamMember member) => member.WorkingDays ?? team.WorkingDays;
 
     public static WorkingDays Flag(DateOnly date) => date.DayOfWeek switch
     {
