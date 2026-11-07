@@ -12,7 +12,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { catchError, map, of, startWith, switchMap, tap } from 'rxjs';
 
-import { ApprovalResult, REQUEST_SERVICE, RequestSummary } from 'api';
+import { ApprovalResult, DeclineResult, REQUEST_SERVICE, RequestSummary } from 'api';
 import {
   Button,
   EmptyState,
@@ -25,6 +25,10 @@ import {
 
 import { AppDialogs } from '../../dialogs/app-dialogs';
 import {
+  DeclineRequestData,
+  DeclineRequestDialog,
+} from '../../dialogs/decline-request/decline-request.dialog';
+import {
   RequestDetailData,
   RequestDetailDialog,
 } from '../../dialogs/request-detail/request-detail.dialog';
@@ -36,6 +40,8 @@ import {
   bulkApproveFailedToast,
   bulkApprovedToast,
   bulkUndoFailedToast,
+  declinedToast,
+  declineUndoFailedToast,
   undoFailedToast,
 } from '../calendar/request-toasts';
 import { requestRow } from './request-rows';
@@ -58,8 +64,9 @@ const STATUS: Record<TabId, RequestSummary['status']> = {
  * status. The tabs Pending, Approved and Declined carry their counts; a row says who asked, for which
  * days, the note and who else is out, and a pending one has "Approve" and a name that opens its detail.
  * Approving shows "Approving…" on that row, then a toast with "Undo" (and the coverage warning when the
- * team will be short); a failure leaves the request pending and offers "Try again". A member has nothing
- * to decide and is sent to the calendar. Decline is journey 10.
+ * team will be short); a failure leaves the request pending and offers "Try again". Decline opens a dialog for
+ * the optional reason, then a toast with "Undo" says the request was declined (docs/detailed-designs/requests/decline-request).
+ * A member has nothing to decide and is sent to the calendar.
  */
 @Component({
   selector: 'app-requests-page',
@@ -133,6 +140,7 @@ const STATUS: Record<TabId, RequestSummary['status']> = {
                 [selectable]="tab() === 'pending'"
                 [selected]="selected()"
                 (opened)="open($event)"
+                (declined)="decline($event)"
                 (approved)="approve($event)"
                 (toggled)="toggle($event.id, $event.selected)"
               />
@@ -380,6 +388,36 @@ export class RequestsPage {
         error: () =>
           this.toasts.show(approveFailedToast(request.memberName, () => this.approve(id))),
       });
+  }
+
+  /** Decline: asks for the reason in a dialog, then confirms with a toast that can take it back. */
+  protected decline(id: string): void {
+    const request = this.listed().find((r) => r.id === id);
+    if (!request || this.busy().includes(id)) return;
+    this.askToDecline(request);
+  }
+
+  private askToDecline(request: RequestSummary): void {
+    const data: DeclineRequestData = { request };
+    this.dialogs
+      .open<DeclineResult | null>(DeclineRequestDialog, '#dc-reason', data)
+      .closed.subscribe((result) => {
+        if (result) this.declined(result);
+      });
+  }
+
+  /** The request is declined: confirm with a toast that can take it back, and refresh the list. */
+  private declined(result: DeclineResult): void {
+    this.toasts.show(declinedToast(result, () => this.undoDecline(result)));
+    this.refresh();
+  }
+
+  private undoDecline(result: DeclineResult): void {
+    this.requests.reopen(result.requestId).subscribe({
+      next: () => this.refresh(),
+      error: () =>
+        this.toasts.show(declineUndoFailedToast(result.memberName, () => this.undoDecline(result))),
+    });
   }
 
   protected open(id: string): void {

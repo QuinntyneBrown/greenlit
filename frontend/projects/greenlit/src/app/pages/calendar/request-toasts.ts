@@ -1,4 +1,4 @@
-import { ApprovalResult, SentRequest } from 'api';
+import { ApprovalResult, DeclineResult, SentRequest } from 'api';
 import { ToastRequest } from '../../toasts/toast.service';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -157,6 +157,40 @@ export function bulkUndoFailedToast(
     tone: 'danger',
     title: 'We couldn’t undo that',
     body: 'Some of that time off is still approved. Check your connection and try again.',
+    action: { label: 'Try again', run: retry },
+  };
+}
+
+/**
+ * A decline (notifications/request-toast/with-action, L2-025 AC3). The body says the member was emailed
+ * and, when the manager gave a reason, that it went with the email.
+ */
+export function declinedToast(
+  result: DeclineResult,
+  undo: () => void,
+): Pick<ToastRequest, 'tone' | 'title' | 'body' | 'action'> {
+  const name = firstName(result.memberName);
+  return {
+    tone: 'success',
+    title: `Declined ${name}’s request`,
+    body: result.emailed
+      ? result.reason
+        ? `${name} has been emailed your reason.`
+        : `${name} has been emailed.`
+      : `${rangeLabel(result.firstDay, result.lastDay)} is blue again on the calendar.`,
+    action: { label: 'Undo', run: undo },
+  };
+}
+
+/** Undo of a decline did not go through; the request stays declined. */
+export function declineUndoFailedToast(
+  memberName: string,
+  retry: () => void,
+): Pick<ToastRequest, 'tone' | 'title' | 'body' | 'action'> {
+  return {
+    tone: 'danger',
+    title: 'We couldn’t undo that',
+    body: `${firstName(memberName)}’s request is still declined. Check your connection and try again.`,
     action: { label: 'Try again', run: retry },
   };
 }

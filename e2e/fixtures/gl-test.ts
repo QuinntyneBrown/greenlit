@@ -18,6 +18,7 @@ import { Person, SESSION_KEY, signIn } from "./session.js";
 import { AcceptInvitePage } from "../pages/accept-invite.page.js";
 import { CalendarPage } from "../pages/calendar.page.js";
 import { CreateTeamPage } from "../pages/create-team.page.js";
+import { DeclineRequestDialog } from "../pages/decline-request.dialog.js";
 import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
 import { NewRequestDialog } from "../pages/new-request.dialog.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
@@ -34,6 +35,7 @@ interface Pages {
   newRequest: NewRequestDialog;
   notFound: NotFoundPage;
   requestDetail: RequestDetailDialog;
+  declineRequest: DeclineRequestDialog;
   requests: RequestsPage;
   settings: SettingsPage;
   signIn: SignInPage;
@@ -131,6 +133,13 @@ interface RequestsApi {
   /** Approve requests fail with a 500 until `recoverApprove()`. */
   failApprove(): Promise<void>;
   recoverApprove(): Promise<void>;
+  /** How many decline requests (POST /api/requests/{id}/decline) the page has made so far. */
+  declines(): number;
+  /** Holds decline requests until the returned function is called. */
+  holdDecline(): Promise<() => void>;
+  /** Decline requests fail with a 500 until `recoverDecline()`. */
+  failDecline(): Promise<void>;
+  recoverDecline(): Promise<void>;
   /** Undo (POST /api/requests/{id}/reopen) fails with a 500 until `recoverReopen()`. */
   failReopen(): Promise<void>;
   recoverReopen(): Promise<void>;
@@ -206,6 +215,8 @@ export const test = base.extend<GlFixtures>({
     const pattern = "**/api/requests";
     const approve = "**/api/requests/approve";
     const reopen = "**/api/requests/*/reopen";
+    const decline = "**/api/requests/*/decline";
+    let declines = 0;
     let sends = 0;
     let approvals = 0;
     let approved: string[] = [];
@@ -213,6 +224,7 @@ export const test = base.extend<GlFixtures>({
     page.on("request", (request) => {
       const path = new URL(request.url()).pathname;
       if (request.method() === "POST" && path === "/api/requests") sends++;
+      if (request.method() === "POST" && /^\/api\/requests\/[^/]+\/decline$/.test(path)) declines++;
       if (request.method() === "POST" && path === "/api/requests/approve") {
         approvals++;
         approved = (request.postDataJSON() as { ids: string[] }).ids;
@@ -283,6 +295,20 @@ export const test = base.extend<GlFixtures>({
         await page.route(approve, (route) => route.fulfill({ status: 500, body: "" }));
       },
       recoverApprove: () => page.unroute(approve),
+      declines: () => declines,
+      holdDecline: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(decline, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      failDecline: async () => {
+        await page.route(decline, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recoverDecline: () => page.unroute(decline),
       failReopen: async () => {
         await page.route(reopen, (route) => route.fulfill({ status: 500, body: "" }));
       },
@@ -400,6 +426,7 @@ export const test = base.extend<GlFixtures>({
       newRequest: new NewRequestDialog(page),
       notFound: new NotFoundPage(page),
       requestDetail: new RequestDetailDialog(page),
+      declineRequest: new DeclineRequestDialog(page),
       requests: new RequestsPage(page),
       settings: new SettingsPage(page),
       signIn: new SignInPage(page),

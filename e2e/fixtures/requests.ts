@@ -27,6 +27,16 @@ export async function reopenApproved(request: APIRequestContext, member: string,
   }
 }
 
+/** Puts every declined request of `member` that starts on `firstDay` back to pending, as Undo does. */
+export async function reopenDeclined(request: APIRequestContext, member: string, firstDay: string): Promise<void> {
+  const token = await signIn(request, "manager");
+  const headers = { Authorization: `Bearer ${token}` };
+  const declined = (await (await request.get(`${API_BASE_URL}/api/requests?status=Declined`, { headers })).json()) as (Listed & { status: string })[];
+  for (const r of declined.filter((a) => a.status === "Declined" && a.memberName === member && a.firstDay === firstDay)) {
+    await request.post(`${API_BASE_URL}/api/requests/${r.id}/reopen`, { headers });
+  }
+}
+
 /** Confirms `dates` (`yyyy-MM-dd`) on `memberId`'s row, as the manager would. */
 export async function confirmDays(request: APIRequestContext, memberId: string, dates: string[]): Promise<void> {
   const token = await signIn(request, "manager");

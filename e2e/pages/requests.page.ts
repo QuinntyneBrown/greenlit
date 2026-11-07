@@ -49,6 +49,11 @@ export class RequestsPage extends BasePage {
     return this.row(member).locator(".btn--approve");
   }
 
+  /** The row's Decline button, which opens the Decline request dialog. */
+  decline(member: string): Locator {
+    return this.row(member).getByRole("button", { name: "Decline", exact: true });
+  }
+
   /** The name button that opens the request's detail. */
   open(member: string): Locator {
     return this.row(member).locator(".request-row__who");

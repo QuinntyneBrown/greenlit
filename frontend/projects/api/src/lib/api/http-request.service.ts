@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import {
   ApprovalResult,
+  DeclineResult,
   NewRequest,
   RequestCounts,
   RequestDetail,
@@ -14,7 +15,7 @@ import {
 import { API_BASE_URL, apiUrl } from './api-base-url';
 import { RequestService } from './request.service';
 
-/** The requests endpoints (api/requests, counts, {id}, quote, approve, reopen). Responses are the view models; no mapping is needed. */
+/** The requests endpoints (api/requests, counts, {id}, quote, approve, decline, reopen). Responses are the view models; no mapping is needed. */
 @Injectable({ providedIn: 'root' })
 export class HttpRequestService implements RequestService {
   private readonly http = inject(HttpClient);
@@ -44,6 +45,12 @@ export class HttpRequestService implements RequestService {
 
   approve(ids: readonly string[]): Observable<readonly ApprovalResult[]> {
     return this.http.post<ApprovalResult[]>(apiUrl(this.baseUrl, 'api/requests/approve'), { ids });
+  }
+
+  decline(id: string, reason: string | null): Observable<DeclineResult> {
+    return this.http.post<DeclineResult>(apiUrl(this.baseUrl, `api/requests/${id}/decline`), {
+      reason,
+    });
   }
 
   reopen(id: string): Observable<void> {

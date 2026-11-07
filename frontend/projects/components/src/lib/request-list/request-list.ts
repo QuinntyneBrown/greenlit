@@ -32,7 +32,8 @@ export interface RequestToggle {
  * With `selectable`, a pending row has the checkbox "Select {name}'s request" and a ticked row is
  * highlighted (`data-selected`). While a request is being approved its button says "Approving…"
  * (`aria-busy`) and stays off; the other rows stay usable. A long note keeps to one line and carries
- * itself as its tooltip. Decline arrives with journey 10.
+ * itself as its tooltip. A pending row also has Decline, before Approve, which asks the page to open the
+ * Decline request dialog (`declined`); it goes off with Approve while that request is being approved.
  */
 @Component({
   selector: 'gl-request-list',
@@ -80,6 +81,12 @@ export interface RequestToggle {
           </div>
           <div class="request-row__actions">
             @if (item.state === 'pending') {
+              <gl-button size="sm" [disabled]="isBusy(item.id)" (click)="declined.emit(item.id)">
+                <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M6 6l12 12M18 6 6 18" />
+                </svg>
+                Decline
+              </gl-button>
               <gl-button
                 variant="approve"
                 size="sm"
@@ -233,6 +240,8 @@ export class RequestList {
 
   /** The name was pressed: open this request's detail. */
   readonly opened = output<string>();
+  /** Decline was pressed on this request. */
+  readonly declined = output<string>();
   /** Approve was pressed on this request. */
   readonly approved = output<string>();
   /** A row's checkbox was ticked or cleared. */
