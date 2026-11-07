@@ -12,7 +12,10 @@ public sealed record ApprovalResult(
     string MemberName,
     string FirstDay,
     string LastDay,
-    int Days);
+    int Days,
+    int CoverageMinimum,
+    string? FirstShortDate,
+    int? InOnShortDate);
 
 public sealed class ApproveRequestsCommandValidator : AbstractValidator<ApproveRequestsCommand>
 {

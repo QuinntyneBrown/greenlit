@@ -14,6 +14,12 @@ public class Team
 
     public DateTimeOffset CreatedUtc { get; set; }
 
+    /// <summary>
+    /// The fewest members who should be in on any working day (docs/detailed-designs/teams/coverage-minimum);
+    /// 0 means no minimum, so no day is ever short.
+    /// </summary>
+    public int CoverageMinimum { get; set; }
+
     public ICollection<TeamMember> Members { get; set; } = new List<TeamMember>();
     public ICollection<Holiday> Holidays { get; set; } = new List<Holiday>();
 }

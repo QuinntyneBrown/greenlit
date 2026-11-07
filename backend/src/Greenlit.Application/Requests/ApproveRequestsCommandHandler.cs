@@ -1,4 +1,5 @@
 using Greenlit.Application.Abstractions;
+using Greenlit.Application.Coverage;
 using Greenlit.Application.Exceptions;
 using Greenlit.Domain.Enums;
 using MediatR;
@@ -43,10 +44,23 @@ public sealed class ApproveRequestsCommandHandler : IRequestHandler<ApproveReque
         foreach (var request in requests) request.Approve(team.ManagerUserId, now);
         await _db.SaveChangesAsync(ct);
 
+        // The approval stands whatever coverage says (L2-042 AC2): this only informs the manager.
+        var allDates = requests.SelectMany(r => r.Days.Select(d => d.Date)).ToList();
+        var inOn = allDates.Count == 0 || team.CoverageMinimum == 0
+            ? new Dictionary<DateOnly, int>()
+            : await CoverageCalculator.InOnAsync(_db, team, allDates, ct);
+
         return ids
             .Select(id => requests.Single(r => r.Id == id))
-            .Select(r => new ApprovalResult(
-                r.Id, r.TeamMember.Name, RequestInput.Iso(r.FirstDay), RequestInput.Iso(r.LastDay), r.Days.Count))
+            .Select(r =>
+            {
+                var shortDay = CoverageCalculator.FirstShort(team, r.Days.Select(d => d.Date), inOn);
+                return new ApprovalResult(
+                    r.Id, r.TeamMember.Name, RequestInput.Iso(r.FirstDay), RequestInput.Iso(r.LastDay), r.Days.Count,
+                    team.CoverageMinimum,
+                    shortDay is { } s ? RequestInput.Iso(s.Date) : null,
+                    shortDay?.In);
+            })
             .ToList();
     }
 }
