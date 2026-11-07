@@ -13,6 +13,8 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         b.HasIndex(x => x.Email).IsUnique();
         b.Property(x => x.DisplayName).HasMaxLength(120).IsRequired();
         b.Property(x => x.PasswordHash).HasMaxLength(512).IsRequired();
+        b.Property(x => x.GoogleSubject).HasMaxLength(255);
+        b.HasIndex(x => x.GoogleSubject).IsUnique().HasFilter("[GoogleSubject] IS NOT NULL");
         b.Property(x => x.Role).HasConversion<string>().HasMaxLength(32);
     }
 }

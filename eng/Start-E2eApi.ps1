@@ -50,6 +50,8 @@ if ($Build) {
 $env:ASPNETCORE_ENVIRONMENT = 'Development'
 $env:Greenlit__Database__Provider = 'Sqlite'
 $env:GREENLIT_CONNECTION = $connection
+# Google is stood in for by the fake accounts reader (ADR-012): the Playwright suite makes its own tokens.
+$env:Greenlit__Google__Accounts = 'Fake'
 
 $out = Join-Path $logDir 'e2e-api.out.log'
 $err = Join-Path $logDir 'e2e-api.err.log'

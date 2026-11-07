@@ -42,6 +42,13 @@ public sealed class SignInCommandHandler : IRequestHandler<SignInCommand, Sessio
             _hasher.Verify(NoOne, _noOnesHash, request.Password!);
             throw Mismatch();
         }
+        // A Google-only account has no password (ADR-012): it costs the dummy check, like an unknown email.
+        if (user.PasswordHash.Length == 0)
+        {
+            _noOnesHash ??= _hasher.Hash(NoOne, Guid.NewGuid().ToString());
+            _hasher.Verify(NoOne, _noOnesHash, request.Password!);
+            throw Mismatch();
+        }
         if (!_hasher.Verify(user, user.PasswordHash, request.Password!)) throw Mismatch();
 
         if (await RemovedMembers.IsRemovedAsync(_db, user.Id, ct))

@@ -107,6 +107,10 @@ try
         await scope.ServiceProvider.GetRequiredService<AppDbContext>().EnsureSqliteSchemaAsync();
     }
 
+    // The fake Google reader mints accounts from hand-made tokens; it is for tests and e2e runs only (ADR-012).
+    if (Greenlit.Infrastructure.DependencyInjection.UsesFakeGoogle(app.Configuration) && app.Environment.IsProduction())
+        throw new InvalidOperationException("Greenlit:Google:Accounts=Fake is for tests and e2e runs; Production reads accounts from Google.");
+
     WarnOnMissingProductionConfig(app, corsOrigins);
 
     // Request logging sits outside the exception handler so the completion
@@ -170,6 +174,13 @@ static void WarnOnMissingProductionConfig(WebApplication app, string[] corsOrigi
     {
         app.Logger.LogWarning(
             "Cors:AllowedOrigins is empty; browsers on other origins will be rejected outside Development.");
+    }
+
+    var google = app.Services.GetRequiredService<IOptions<GoogleOptions>>().Value;
+    if (!google.UsesFake && (string.IsNullOrWhiteSpace(google.ClientId) || google.ClientId.StartsWith("REPLACE_VIA_", StringComparison.Ordinal)))
+    {
+        app.Logger.LogWarning(
+            "Google client id is unset or still the placeholder; Continue with Google will refuse every token. Set GREENLIT_GOOGLE_CLIENT_ID.");
     }
 }
 
