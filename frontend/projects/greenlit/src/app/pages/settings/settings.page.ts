@@ -14,6 +14,7 @@ import {
   Holiday,
   SHEET_SERVICE,
   SheetMonth,
+  AllowanceDefaults,
   TEAM_SETTINGS_SERVICE,
   TeamSettingsTeam,
   TeamHolidays,
@@ -42,6 +43,7 @@ import { InviteMemberDialog } from '../../dialogs/invite-member/invite-member.di
 import { AddHolidayDialog, AddHolidayOutcome } from '../../dialogs/add-holiday/add-holiday.dialog';
 import { RemoveHolidayDialog } from '../../dialogs/remove-holiday/remove-holiday.dialog';
 import { ToastService } from '../../toasts/toast.service';
+import { AllowancesSection } from './allowances-section';
 import { TeamSection } from './team-section';
 
 type Load =
@@ -70,6 +72,7 @@ type HolidaysLoad =
     Counter,
     DayChips,
     EmptyState,
+    AllowancesSection,
     HolidayList,
     SettingsNav,
     Skeleton,
@@ -136,6 +139,16 @@ type HolidaysLoad =
             }
           }
         </section>
+        @if (isManager()) {
+          <section id="allowances" class="settings-section" aria-labelledby="allowances-title">
+            @if (allowances(); as defaults) {
+              <app-allowances-section [defaults]="defaults" />
+            } @else {
+              <h2 id="allowances-title" class="section-title" tabindex="-1">Allowances</h2>
+              <gl-skeleton />
+            }
+          </section>
+        }
         @if (isManager()) {
           <section id="work-week" class="settings-section" aria-labelledby="work-week-title">
             <h2 id="work-week-title" class="section-title" tabindex="-1">
@@ -391,6 +404,7 @@ export class SettingsPage {
     { id: 'team', label: 'Team' },
     ...(this.isManager()
       ? [
+          { id: 'allowances', label: 'Allowances' },
           { id: 'work-week', label: 'Work week & holidays' },
           { id: 'coverage', label: 'Coverage' },
         ]
@@ -399,6 +413,20 @@ export class SettingsPage {
 
   protected readonly isManager = computed(() => this.ready()?.isManager ?? false);
   protected readonly managerName = computed(() => this.ready()?.managerName ?? '');
+
+  /** The allowance defaults, the manager's to read; null until they have loaded. */
+  protected readonly allowances = toSignal(
+    toObservable(this.isManager).pipe(
+      switchMap((manager) =>
+        manager
+          ? this.teamSettings
+              .allowances()
+              .pipe(catchError(() => of<AllowanceDefaults | null>(null)))
+          : of(null),
+      ),
+    ),
+    { initialValue: null },
+  );
 
   /** The holidays are the manager's: a member never asks for them. */
   protected readonly holidaysLoad = toSignal(

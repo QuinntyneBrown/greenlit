@@ -124,6 +124,53 @@ export class SettingsPage extends BasePage {
     await this.inviteButton().click();
   }
 
+  // --- Allowances (docs/detailed-designs/allowances/allowance-defaults) ----------------------------
+
+  allowancesSection(): Locator {
+    return this.main.locator("section#allowances");
+  }
+
+  allowancesIntro(): Locator {
+    return this.allowancesSection().locator("p").first();
+  }
+
+  daysPerYearField(): Locator {
+    return this.allowancesSection().getByLabel("Days per year", { exact: true });
+  }
+
+  leaveYearStartField(): Locator {
+    return this.allowancesSection().getByLabel("Leave year starts", { exact: true });
+  }
+
+  maxCarryOverField(): Locator {
+    return this.allowancesSection().getByLabel("Max carry-over", { exact: true });
+  }
+
+  /** The allowances section's "Save changes"; it reads "Saving…" while busy. */
+  saveAllowancesButton(): Locator {
+    return this.allowancesSection().locator(".settings-actions .btn--primary");
+  }
+
+  /** The polite status next to "Save changes": "Saved" after a save. */
+  saveAllowancesStatus(): Locator {
+    return this.allowancesSection().locator(".settings-actions [aria-live='polite']");
+  }
+
+  /** The "Fix 1 thing to continue" summary of invalid allowance fields. */
+  allowancesSummary(): Locator {
+    return this.allowancesSection().locator(".form-summary");
+  }
+
+  /** The inline error under Days per year. */
+  daysPerYearError(): Locator {
+    return this.allowancesSection().locator("#allow-days-err");
+  }
+
+  /** The warning banner: "Two members have no allowance set". */
+  noAllowanceBanner(): Locator {
+    return this.main.locator(".alert--warning.banner");
+  }
+
   // --- Coverage (docs/detailed-designs/teams/coverage-minimum) ------------------------------------
 
   coverageSection(): Locator {

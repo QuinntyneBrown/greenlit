@@ -1,7 +1,11 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { SaveTeamSettingsInput, TeamSettingsTeam } from '../models/team-settings';
+import {
+  AllowanceDefaults,
+  SaveTeamSettingsInput,
+  TeamSettingsTeam,
+} from '../models/team-settings';
 
 /** What saving a settings section came to. */
 export interface SaveSettingsResult {
@@ -14,6 +18,10 @@ export interface TeamSettingsService {
   team(): Observable<TeamSettingsTeam>;
   /** Saves the name, the time zone and each listed member's role and yearly days as one request. */
   saveTeam(input: SaveTeamSettingsInput): Observable<SaveSettingsResult>;
+  /** The allowance defaults. Managers only. */
+  allowances(): Observable<AllowanceDefaults>;
+  /** Saves the allowance defaults as one request. */
+  saveAllowances(input: AllowanceDefaults): Observable<SaveSettingsResult>;
 }
 
 export const TEAM_SETTINGS_SERVICE = new InjectionToken<TeamSettingsService>(

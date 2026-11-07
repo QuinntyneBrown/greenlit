@@ -30,3 +30,12 @@ export interface SaveTeamSettingsInput {
     readonly yearlyDays: number | null;
   }[];
 }
+
+/** What a new person gets (GET /api/team/settings): the Allowances section of Settings. */
+export interface AllowanceDefaults {
+  /** Yearly days of a member who has none of their own. */
+  readonly defaultYearlyDays: number;
+  /** 1 (January) to 12 (December). */
+  readonly leaveYearStartMonth: number;
+  readonly maxCarryOver: number;
+}
