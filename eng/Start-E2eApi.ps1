@@ -55,9 +55,17 @@ $env:Greenlit__Google__Accounts = 'Fake'
 
 $out = Join-Path $logDir 'e2e-api.out.log'
 $err = Join-Path $logDir 'e2e-api.err.log'
-$api = Start-Process -FilePath 'dotnet' -PassThru -WorkingDirectory $backend `
-    -RedirectStandardOutput $out -RedirectStandardError $err `
-    -ArgumentList 'run', '--project', (Join-Path $backend 'src/Greenlit.Api'), '--no-build', '--urls', "http://localhost:$Port"
+$apiProject = Join-Path $backend 'src/Greenlit.Api'
+if ($IsWindows) {
+    $api = Start-Process -FilePath 'dotnet' -PassThru -WorkingDirectory $backend `
+        -RedirectStandardOutput $out -RedirectStandardError $err `
+        -ArgumentList 'run', '--project', $apiProject, '--no-build', '--urls', "http://localhost:$Port"
+} else {
+    # On Linux and macOS PowerShell's redirected output reaches the file late, and the Playwright
+    # fixtures read the emailed links from it (ADR-006), so the shell does the redirecting.
+    $api = Start-Process -FilePath 'bash' -PassThru -WorkingDirectory $backend -ArgumentList '-c', `
+        ("exec dotnet run --project '{0}' --no-build --urls 'http://localhost:{1}' > '{2}' 2> '{3}'" -f $apiProject, $Port, $out, $err)
+}
 Write-Host "API starting on SQLite (pid $($api.Id)); database $database; logs in $logDir"
 
 $deadline = (Get-Date).AddSeconds(60)
