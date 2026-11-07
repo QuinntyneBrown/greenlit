@@ -11,6 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, combineLatest, map, of, startWith, switchMap, tap } from 'rxjs';
 
 import {
+  CONNECTIVITY_SERVICE,
   CellKind,
   ChangeSet,
   DayStatus,
@@ -164,7 +165,7 @@ function localMonth(): string {
             class="region"
             [label]="view().label"
             [columns]="view().columns"
-            [rows]="view().rows"
+            [rows]="gridRows()"
             [cover]="view().cover"
             [loading]="load().state === 'loading'"
             [paint]="gridPaint()"
@@ -236,6 +237,7 @@ function localMonth(): string {
 })
 export class CalendarPage {
   private readonly sheetApi = inject(SHEET_SERVICE);
+  private readonly connectivity = inject(CONNECTIVITY_SERVICE);
   private readonly toasts = inject(ToastService);
   private readonly dialogs = inject(AppDialogs);
   private readonly router = inject(Router);
@@ -300,6 +302,12 @@ export class CalendarPage {
     };
   });
 
+  /** While offline nothing on the sheet may be painted or selected (L2-045 AC1). */
+  protected readonly gridRows = computed(() => {
+    const rows = this.view().rows;
+    return this.connectivity.readOnly() ? rows.map((row) => ({ ...row, editable: false })) : rows;
+  });
+
   // ---- painting days (docs/detailed-designs/sheet/mark-days) ----
 
   protected readonly showPicker = computed(() => this.loaded() !== null && !this.isEmpty());
@@ -308,15 +316,20 @@ export class CalendarPage {
   protected readonly paintChoice = this.choice.asReadonly();
 
   /** L2-015 AC1-2: the manager also offers Confirmed. */
-  protected readonly paintOptions = computed((): SegmentedOption[] => [
-    { value: 'select', label: 'Select', pointer: true },
-    ...(this.isManager()
-      ? [{ value: 'confirmed', label: 'Confirmed', swatch: 'confirmed' } as const]
-      : []),
-    { value: 'requested', label: 'Requested', swatch: 'requested' },
-    { value: 'tentative', label: 'Tentative', swatch: 'tentative' },
-    { value: 'clear', label: 'Clear', swatch: 'empty' },
-  ]);
+  protected readonly paintOptions = computed((): SegmentedOption[] => {
+    const disabled = this.connectivity.readOnly();
+    const hint = disabled ? 'You�re offline' : undefined;
+    const options: SegmentedOption[] = [
+      { value: 'select', label: 'Select', pointer: true },
+      ...(this.isManager()
+        ? [{ value: 'confirmed', label: 'Confirmed', swatch: 'confirmed' } as const]
+        : []),
+      { value: 'requested', label: 'Requested', swatch: 'requested' },
+      { value: 'tentative', label: 'Tentative', swatch: 'tentative' },
+      { value: 'clear', label: 'Clear', swatch: 'empty' },
+    ];
+    return options.map((option) => ({ ...option, disabled, hint }));
+  });
 
   // ---- selecting days (docs/detailed-designs/sheet/select-days) ----
 

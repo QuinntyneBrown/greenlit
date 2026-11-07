@@ -29,6 +29,8 @@ import {
   PERSON_SERVICE,
   HttpPersonService,
   YEAR_SERVICE,
+  CONNECTIVITY_SERVICE,
+  BrowserConnectivityService,
   HttpYearService,
   authInterceptor,
   sessionExpiredInterceptor,
@@ -63,5 +65,6 @@ export const appConfig: ApplicationConfig = {
     { provide: REQUEST_SERVICE, useExisting: HttpRequestService },
     { provide: YEAR_SERVICE, useExisting: HttpYearService },
     { provide: PERSON_SERVICE, useExisting: HttpPersonService },
+    { provide: CONNECTIVITY_SERVICE, useExisting: BrowserConnectivityService },
   ],
 };

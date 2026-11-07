@@ -17,6 +17,7 @@ import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { personIdOf } from "./people.js";
 import { Person, SESSION_KEY, expiredToken, signIn } from "./session.js";
 import { AccountMenu } from "../pages/account-menu.js";
+import { ConnectionBanner } from "../pages/connection-banner.js";
 import { SessionExpiredPage } from "../pages/session-expired.page.js";
 import { SignOutDialog } from "../pages/sign-out.dialog.js";
 import { RemoveHolidayDialog } from "../pages/remove-holiday.dialog.js";
@@ -43,6 +44,7 @@ import { SignInPage } from "../pages/sign-in.page.js";
 import { YearPage } from "../pages/year.page.js";
 
 interface Pages {
+  connection: ConnectionBanner;
   sessionExpired: SessionExpiredPage;
   signOutDialog: SignOutDialog;
   accountMenu: AccountMenu;
@@ -1216,6 +1218,7 @@ export const test = base.extend<GlFixtures>({
   pages: async ({ page }, use) => {
     await use({
       accountMenu: new AccountMenu(page),
+      connection: new ConnectionBanner(page),
       acceptInvite: new AcceptInvitePage(page),
       forgotPassword: new ForgotPasswordPage(page),
       resetPassword: new ResetPasswordPage(page),
