@@ -1,3 +1,4 @@
+using Greenlit.Application.Sheet;
 using Greenlit.Application.Abstractions;
 using Greenlit.Domain.Entities;
 using Greenlit.Domain.Enums;
@@ -41,7 +42,7 @@ internal static class RequestSummaries
             // A declined or cancelled request may have no days left to count: its range's working days stand in.
             var days = r.Days.Count > 0
                 ? r.Days.Count
-                : (await RequestCaller.WorkingDaysAsync(db, team.Id, r.FirstDay, r.LastDay, ct)).Working.Count;
+                : (await RequestCaller.WorkingDaysAsync(db, team.Id, WorkingDayRule.For(team, r.TeamMember), r.FirstDay, r.LastDay, ct)).Working.Count;
             summaries.Add(new RequestSummaryDto(
                 r.Id, r.TeamMemberId, r.TeamMember.Name,
                 RequestInput.Iso(r.FirstDay), RequestInput.Iso(r.LastDay),

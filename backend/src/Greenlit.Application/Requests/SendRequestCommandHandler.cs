@@ -1,3 +1,4 @@
+using Greenlit.Application.Sheet;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Exceptions;
 using Greenlit.Domain.Entities;
@@ -31,7 +32,7 @@ public sealed class SendRequestCommandHandler : IRequestHandler<SendRequestComma
         var (team, member) = await RequestCaller.FindAsync(_db, _currentUser, ct);
         var (first, last) = RequestInput.Range(command.FirstDay!, command.LastDay!);
 
-        var (working, allHolidays) = await RequestCaller.WorkingDaysAsync(_db, team.Id, first, last, ct);
+        var (working, allHolidays) = await RequestCaller.WorkingDaysAsync(_db, team.Id, WorkingDayRule.For(team, member), first, last, ct);
         if (working.Count == 0)
         {
             // ADR-003: a range of holidays is rejected as such; weekends alone are just non-working.

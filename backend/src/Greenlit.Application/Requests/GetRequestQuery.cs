@@ -76,7 +76,7 @@ public sealed class GetRequestQueryHandler : IRequestHandler<GetRequestQuery, Re
 
         var coverage = dates
             .Select((date, i) => (date, i))
-            .Where(x => !WorkingDayRule.IsWeekend(x.date) && !holidays.ContainsKey(x.date))
+            .Where(x => !holidays.ContainsKey(x.date) && rows.Any(r => r.Cells[x.i].Kind != CellKind.NotWorking))
             .Select(x =>
             {
                 var kinds = rows.Select(r => r.Cells[x.i].Kind).ToList();

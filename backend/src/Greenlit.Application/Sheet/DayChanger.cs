@@ -61,7 +61,7 @@ internal sealed class DayChanger
             .ToHashSet();
         var working = targets
             .DistinctBy(t => t.Date)
-            .Where(t => !WorkingDayRule.IsWeekend(t.Date) && !holidays.Contains(t.Date))
+            .Where(t => !WorkingDayRule.IsOffDay(t.Date, WorkingDayRule.For(team, member)) && !holidays.Contains(t.Date))
             .ToList();
         if (working.Count == 0)
         {

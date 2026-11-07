@@ -1,3 +1,4 @@
+using Greenlit.Domain.Enums;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Exceptions;
 using Greenlit.Application.Sheet;
@@ -48,9 +49,9 @@ internal static class RequestCaller
             .Select(m => m.Name).FirstOrDefaultAsync(ct)
         ?? await db.Users.AsNoTracking().Where(u => u.Id == team.ManagerUserId).Select(u => u.DisplayName).FirstAsync(ct);
 
-    /// <summary>The dates from <paramref name="first"/> to <paramref name="last"/> that are neither weekends nor the team's holidays.</summary>
+    /// <summary>The dates from <paramref name="first"/> to <paramref name="last"/> that are neither off days of the member nor the team's holidays.</summary>
     public static async Task<(List<DateOnly> Working, bool AllHolidays)> WorkingDaysAsync(
-        IAppDbContext db, Guid teamId, DateOnly first, DateOnly last, CancellationToken ct)
+        IAppDbContext db, Guid teamId, WorkingDays workingDays, DateOnly first, DateOnly last, CancellationToken ct)
     {
         var holidays = (await db.Holidays.AsNoTracking()
                 .Where(h => h.TeamId == teamId && h.Date >= first && h.Date <= last)
@@ -58,7 +59,7 @@ internal static class RequestCaller
                 .ToListAsync(ct))
             .ToHashSet();
         var all = Enumerable.Range(0, last.DayNumber - first.DayNumber + 1).Select(first.AddDays).ToList();
-        var working = all.Where(d => !WorkingDayRule.IsWeekend(d) && !holidays.Contains(d)).ToList();
+        var working = all.Where(d => !WorkingDayRule.IsOffDay(d, workingDays) && !holidays.Contains(d)).ToList();
         return (working, all.All(holidays.Contains));
     }
 }
