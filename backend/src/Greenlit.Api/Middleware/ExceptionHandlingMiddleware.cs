@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Greenlit.Application.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -54,9 +55,18 @@ public sealed class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unhandled exception processing {Path}", context.Request.Path);
-            await WriteAsync(context, StatusCodes.Status500InternalServerError, "Server error", "An unexpected error occurred.");
+            var reference = NewReference();
+            _logger.LogError(ex, "Unhandled exception processing {Path}. Error reference {Reference}", context.Request.Path, reference);
+            await WriteAsync(context, StatusCodes.Status500InternalServerError, "Server error", "An unexpected error occurred.",
+                extensions: new Dictionary<string, object?> { ["reference"] = reference });
         }
+    }
+
+    /// <summary>A short identifier for one failure, such as <c>7F3A-91C2</c>, shown to the person and written to the log (L2-046 AC3).</summary>
+    private static string NewReference()
+    {
+        var hex = Convert.ToHexString(RandomNumberGenerator.GetBytes(4));
+        return $"{hex[..4]}-{hex[4..]}";
     }
 
     private static async Task WriteAsync(

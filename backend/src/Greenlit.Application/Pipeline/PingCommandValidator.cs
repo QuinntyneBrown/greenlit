@@ -8,7 +8,7 @@ public sealed class PingCommandValidator : AbstractValidator<PingCommand>
     {
         RuleFor(x => x.Mode)
             .NotEmpty()
-            .Must(m => m is "ok" or "notfound" or "conflict")
-            .WithMessage("Mode must be one of: ok, notfound, conflict.");
+            .Must(m => m is "ok" or "notfound" or "conflict" or "fail")
+            .WithMessage("Mode must be one of: ok, notfound, conflict, fail.");
     }
 }

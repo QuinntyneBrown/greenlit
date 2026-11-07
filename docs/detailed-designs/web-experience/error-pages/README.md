@@ -22,7 +22,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Backend**
 
-- **`ExceptionHandlingMiddleware`** — Existing middleware. For an unhandled exception it adds a `reference` extension to the ProblemDetails, derived from the request's trace identifier, and logs it with the exception. The exact format is `<TO SUPPLY>`; the mocks show `7F3A-91C2`.
+- **`ExceptionHandlingMiddleware`** — Existing middleware. For an unhandled exception it adds a `reference` extension to the ProblemDetails, a random eight-hex-digit code written `XXXX-XXXX` (the mocks show `7F3A-91C2`), and logs it with the exception.
 - **`Manager policy`** — Existing authorization policy; a member's call to a manager endpoint returns `403`.
 
 ## Requirements
