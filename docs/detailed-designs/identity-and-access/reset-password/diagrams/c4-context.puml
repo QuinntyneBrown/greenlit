@@ -8,5 +8,5 @@ System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacat
 System_Ext(email, "Email provider", "Delivers invitation, reset and notification emails")
 
 Rel(visitor, greenlit, "Resets password with")
-Rel(greenlit, email, "Sends email via", "SMTP <TO SUPPLY>")
+Rel(greenlit, email, "Sends email via", "Logged in development (ADR-006)")
 @enduml
