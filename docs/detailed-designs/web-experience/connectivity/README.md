@@ -16,10 +16,11 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Frontend**
 
-- **`ConnectivityService`** — Angular service that combines the browser `online`/`offline` events with the outcome of API calls into a `ConnectionState` signal. The thresholds for "unstable" and the probe for "Reconnecting…" are `<TO SUPPLY>`.
+- **`ConnectivityService`** — Angular service that combines the browser `online`/`offline` events with the outcome of API calls into a `ConnectionState` signal. Offline is the browser's `offline` event; the `online` event starts "Reconnecting…" with a `no-cors` `HEAD` probe of the API origin; one API call that fails with no response is "unstable", one answered 5xx is "sync-failed" (ADR-012).
 - **`ConnectionBanner`** — `gl-alert` banner in the app shell. Offline has no dismiss button; back online dismisses itself after 5 s; sync-failed offers "Retry" and the last sync time.
-- **`Read-only guard`** — `CalendarPage` and the editing directives read `ConnectionState` and disable `PaintController` and `SelectionController` while offline (`L2-045` AC1).
-- **`OfflinePage`** — Full-page state used when there is no cached data (`web-experience/error-pages`).
+- **`Read-only guard`** — `CalendarPage` and the editing directives read `ConnectionState` and make the sheet rows non-editable and disable the paint picker and "Request time off" while offline or reconnecting (`L2-045` AC1).
+- **`OfflinePage`** — Full-page state used when there is no cached data (`web-experience/error-pages`, not part of this journey).
+- **Retry** — "Retry" on the sync-failed banner probes the API and asks the open page to load again; back online shows when the probe answers. The last sync time is the browser-local time of the last successful API response.
 
 **Backend**
 
