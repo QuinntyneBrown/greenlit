@@ -39,4 +39,29 @@ export class AppDialogs {
       positionStrategy: sheet ? position.bottom() : position.centerVertically(),
     });
   }
+
+  /**
+   * Opens `component` as a drawer on the right edge (docs/design-system/components/drawer.html): the
+   * full height of the screen, 40rem wide at most, `dlg-title` and `dlg-desc` naming it. Same focus
+   * handling as `open`.
+   */
+  openDrawer<R>(
+    component: ComponentType<unknown>,
+    autoFocus: string,
+    data?: unknown,
+  ): DialogRef<R> {
+    return this.dialog.open<R>(component, {
+      ariaLabelledBy: 'dlg-title',
+      ariaDescribedBy: 'dlg-desc',
+      autoFocus,
+      data,
+      restoreFocus: true,
+      panelClass: 'gl-drawer-pane',
+      backdropClass: 'gl-backdrop',
+      width: 'min(100%, 40rem)',
+      height: '100%',
+      maxWidth: '100vw',
+      positionStrategy: this.overlay.position().global().right('0').top('0'),
+    });
+  }
 }

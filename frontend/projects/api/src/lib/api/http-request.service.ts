@@ -2,11 +2,17 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { NewRequest, RequestQuote, SentRequest } from '../models/time-off-request';
+import {
+  ApprovalResult,
+  NewRequest,
+  RequestQuote,
+  RequestSummary,
+  SentRequest,
+} from '../models/time-off-request';
 import { API_BASE_URL, apiUrl } from './api-base-url';
 import { RequestService } from './request.service';
 
-/** GET /api/requests/quote and POST /api/requests. Responses are the view models; no mapping is needed. */
+/** The requests endpoints (api/requests, quote, approve, reopen). Responses are the view models; no mapping is needed. */
 @Injectable({ providedIn: 'root' })
 export class HttpRequestService implements RequestService {
   private readonly http = inject(HttpClient);
@@ -19,5 +25,18 @@ export class HttpRequestService implements RequestService {
 
   send(request: NewRequest): Observable<SentRequest> {
     return this.http.post<SentRequest>(apiUrl(this.baseUrl, 'api/requests'), request);
+  }
+
+  list(status: SentRequest['status']): Observable<readonly RequestSummary[]> {
+    const params = new HttpParams().set('status', status);
+    return this.http.get<RequestSummary[]>(apiUrl(this.baseUrl, 'api/requests'), { params });
+  }
+
+  approve(ids: readonly string[]): Observable<readonly ApprovalResult[]> {
+    return this.http.post<ApprovalResult[]>(apiUrl(this.baseUrl, 'api/requests/approve'), { ids });
+  }
+
+  reopen(id: string): Observable<void> {
+    return this.http.post<void>(apiUrl(this.baseUrl, `api/requests/${id}/reopen`), null);
   }
 }
