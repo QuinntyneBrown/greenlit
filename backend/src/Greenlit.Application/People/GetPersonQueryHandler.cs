@@ -70,8 +70,22 @@ public sealed class GetPersonQueryHandler : IRequestHandler<GetPersonQuery, Pers
                     .ToList()))
             .ToList();
 
-        return new PersonDto(member.Id, member.Name, member.JobTitle, member.JoinedOn, WorkingDaysNames.ToNames(WorkingDayRule.For(team, member)), year, isYou, isManager, figures, figures.DaysOver(), months);
+        // Runs split at today as Used and Booked do: Taken is the confirmed days before it, Upcoming every day from it.
+        var today = _allowances.Today(team);
+        var days = months
+            .SelectMany(m => m.Days.Select((d, i) => (Date: new DateOnly(year, m.Month, i + 1), d.Status)))
+            .Where(d => d.Status != "off")
+            .Select(d => (d.Date, Status: d.Status == "empty" ? null : d.Status))
+            .ToList();
+        var upcoming = RunBuilder.Build(days.Where(d => d.Date >= today).Select(d => (d.Date, Name(d.Status))));
+        var taken = RunBuilder.Build(days.Where(d => d.Date < today).Select(d => (d.Date, d.Status == "confirmed" ? Name(d.Status) : null)))
+            .Reverse().ToList();
+
+        return new PersonDto(member.Id, member.Name, member.JobTitle, member.JoinedOn, WorkingDaysNames.ToNames(WorkingDayRule.For(team, member)), year, isYou, isManager, figures, figures.DaysOver(), months, upcoming, taken);
     }
+
+    /// <summary>The status as the API spells a <see cref="DayStatus"/>: "Confirmed", not "confirmed".</summary>
+    private static string? Name(string? status) => status is null ? null : char.ToUpperInvariant(status[0]) + status[1..];
 
     private static PersonDayDto DayOf(
         DateOnly date,

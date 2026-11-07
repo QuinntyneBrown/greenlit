@@ -18,7 +18,9 @@ public sealed record PersonDto(
     bool CanManage,
     AllowanceFigures Allowance,
     int DaysOver,
-    IReadOnlyList<PersonMonthDto> Months);
+    IReadOnlyList<PersonMonthDto> Months,
+    IReadOnlyList<RunDto> Upcoming,
+    IReadOnlyList<RunDto> Taken);
 
 /// <summary>One month of the year at a glance; <c>Days</c> has one entry per calendar day.</summary>
 public sealed record PersonMonthDto(int Month, IReadOnlyList<PersonDayDto> Days);
