@@ -20,7 +20,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 2 | Sign in | Email and password sign-in that opens the team's calendar. | 0 (built) |
 | 3 | Create a team | Manager sets name, time zone, public holidays and first members. | 0 (built) |
 | 4 | Mark days on the calendar | Members paint their days tentative, requested or clear; managers confirm; undo. | 0 (built) |
-| 5 | Invite a member | Manager adds a row and emails a seven-day invitation. | 3 |
+| 5 | Invite a member | Manager adds a row and emails a seven-day invitation. | 0 (built) |
 | 6 | Accept an invitation | Invitee sets name and password, then lands on the sheet. | 2.5 |
 | 7 | Send a time-off request | Member asks for days with a note; sees days left. | 3 |
 | 8 | Approve a request | Manager confirms requested days, member is emailed, coverage warned, undo. | 3 |
@@ -44,9 +44,21 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total remaining** | | **67** |
+| | **Total remaining** | | **64** |
 
 ## Notes
+
+- Journey 5 is built: `POST /api/team/members` (manager only) adds the row and emails a link that
+  works for seven days; only the token's hash is stored (ADR-006). Inviting an address that has not
+  joined sends a new link and retires the old one; one that has joined is refused with
+  `member_exists`; an email that cannot be sent leaves nothing behind. Create-team now invites its
+  first rows (L2-008 AC5, AC7). Emails go to the application log through `IEmailSender` until a
+  provider is chosen. The dialog opens from a minimal `/settings` Team section (member names and
+  "Invite a member"; the rest of Settings is journey 18) built on the new `gl-dialog` and
+  `gl-member-list`. The invitee's side is journey 6. The first EF migration (`InitialSchema`,
+  SQL Server) arrives with it, because no earlier journey had added any. `greenlit seed` adds Uma,
+  Vic and Wren, who each manage a team of their own for the invite spec, since nobody can be removed
+  from the demo team yet (journey 17).
 
 - Journey 4 is built: `PUT /api/sheet/days` and `POST /api/sheet/days/restore` apply ADR-003's
   rules in `DayChanger` and `DayChangePolicy`, and the calendar has the paint picker, press and
@@ -58,8 +70,8 @@ account menu, and the pending count arrive with the journeys that need them.
 
 - Journey 3 is built: `POST /api/teams`, the `/create-team` page with all its states, and
   `teamGuard`, which sends a signed-in person on no team there. Holidays come from offline rules
-  for GB, IE and US (ADR-005). Emailing the first rows their invitations (L2-008 AC5) arrives
-  with journey 5; the emails are stored on the rows meanwhile. `greenlit seed` adds four
+  for GB, IE and US (ADR-005). Emailing the first rows their invitations (L2-008 AC5) arrived
+  with journey 5. `greenlit seed` adds four
   newcomers on no team (Noor, Priya, Sam, Tomás); the e2e run that creates teams needs a fresh
   database from `eng/Start-E2eApi.ps1`.
 
