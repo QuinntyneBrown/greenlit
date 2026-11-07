@@ -1,5 +1,6 @@
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Allowances;
+using Greenlit.Application.Coverage;
 using Greenlit.Application.Exceptions;
 using Greenlit.Application.Sheet;
 using Greenlit.Application.Teams;
@@ -21,7 +22,8 @@ public sealed record RequestDetailDto(
     RequestSummaryDto Request,
     IReadOnlyList<MemberRowDto> Members,
     IReadOnlyList<CoverageDto> Coverage,
-    int DaysLeftAfter);
+    int DaysLeftAfter,
+    int? CoverageMinimum);
 
 /// <summary>
 /// Opens a request of the manager's own team (docs/detailed-designs/requests/review-requests). An id that is
@@ -82,12 +84,12 @@ public sealed class GetRequestQueryHandler : IRequestHandler<GetRequestQuery, Re
                 var kinds = rows.Select(r => r.Cells[x.i].Kind).ToList();
                 var outCount = kinds.Count(k => k is CellKind.Requested or CellKind.Confirmed);
                 var inCount = kinds.Count(k => k is CellKind.Working or CellKind.Tentative);
-                return new CoverageDto(RequestInput.Iso(x.date), outCount, inCount, BelowMinimum: false);
+                return new CoverageDto(RequestInput.Iso(x.date), outCount, inCount, BelowMinimum: CoverageFlag.IsShort(team.CoverageMinimum, inCount));
             })
             .ToList();
 
         var asker = (await _allowances.ComputeAsync(team, [request.TeamMember], ct))[request.TeamMemberId];
-        return new RequestDetailDto(summary, rows, coverage, asker.Left - asker.Requested);
+        return new RequestDetailDto(summary, rows, coverage, asker.Left - asker.Requested, CoverageFlag.Minimum(team.CoverageMinimum));
     }
 
     /// <summary>0 for Monday through 6 for Sunday.</summary>
