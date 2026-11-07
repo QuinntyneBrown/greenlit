@@ -1,4 +1,5 @@
 using Greenlit.Application.Abstractions;
+using Greenlit.Application.Allowances;
 using Greenlit.Application.Exceptions;
 using Greenlit.Application.Sheet;
 using Greenlit.Domain.Enums;
@@ -13,11 +14,13 @@ public sealed record GetRequestQuery(Guid Id) : IRequest<RequestDetailDto>;
 /// <summary>
 /// The request, and every member's days from the Monday of the request's first week to the Sunday of its
 /// last, so the manager sees who else is out. <c>Members</c> and <c>Coverage</c> are the sheet's own shapes.
+/// <c>DaysLeftAfter</c> is the requester's days left once their requests are approved (Left minus Requested; L2-023 AC1).
 /// </summary>
 public sealed record RequestDetailDto(
     RequestSummaryDto Request,
     IReadOnlyList<MemberRowDto> Members,
-    IReadOnlyList<CoverageDto> Coverage);
+    IReadOnlyList<CoverageDto> Coverage,
+    int DaysLeftAfter);
 
 /// <summary>
 /// Opens a request of the manager's own team (docs/detailed-designs/requests/review-requests). An id that is
@@ -27,11 +30,13 @@ public sealed class GetRequestQueryHandler : IRequestHandler<GetRequestQuery, Re
 {
     private readonly IAppDbContext _db;
     private readonly ICurrentUser _currentUser;
+    private readonly AllowanceCalculator _allowances;
 
-    public GetRequestQueryHandler(IAppDbContext db, ICurrentUser currentUser)
+    public GetRequestQueryHandler(IAppDbContext db, ICurrentUser currentUser, AllowanceCalculator allowances)
     {
         _db = db;
         _currentUser = currentUser;
+        _allowances = allowances;
     }
 
     public async Task<RequestDetailDto> Handle(GetRequestQuery query, CancellationToken ct)
@@ -79,7 +84,8 @@ public sealed class GetRequestQueryHandler : IRequestHandler<GetRequestQuery, Re
             })
             .ToList();
 
-        return new RequestDetailDto(summary, rows, coverage);
+        var asker = (await _allowances.ComputeAsync(team, [request.TeamMember], ct))[request.TeamMemberId];
+        return new RequestDetailDto(summary, rows, coverage, asker.Left - asker.Requested);
     }
 
     /// <summary>0 for Monday through 6 for Sunday.</summary>
