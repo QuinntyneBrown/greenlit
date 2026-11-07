@@ -2,11 +2,16 @@ import {
   ChangeDetectionStrategy,
   Component,
   DOCUMENT,
+  ElementRef,
+  Injector,
+  afterNextRender,
   computed,
+  effect,
   inject,
   input,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 
 import { initialsOf } from '../avatar/avatar';
@@ -150,11 +155,9 @@ export interface TeamGridStroke {
                   [attr.data-editable]="row.editable ? '' : null"
                   [attr.data-row]="r"
                   [attr.data-col]="c"
-                  [attr.tabindex]="row.editable ? 0 : null"
+                  [attr.tabindex]="cell.status === 'off' ? null : isActive(r, c) ? 0 : -1"
                   [attr.aria-label]="cell.label"
                   [attr.title]="cell.label"
-                  (keydown.enter)="press($event, r, c)"
-                  (keydown.space)="press($event, r, c)"
                 ></div>
               }
               @if (showLeft()) {
@@ -433,6 +436,7 @@ export interface TeamGridStroke {
       box-shadow: inset 0 0 0 1px var(--color-danger-solid);
     }
   `,
+  host: { '(keydown)': 'onKey($event)', '(focusin)': 'onFocusIn($event)' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeamGrid {
@@ -449,8 +453,46 @@ export class TeamGrid {
   readonly paint = input<TeamGridCellStatus | null>(null);
   /** A stroke ended on an editable row. */
   readonly stroke = output<TeamGridStroke>();
+  /** PageUp (-1) or PageDown (1): the person asks for the previous or next month. */
+  readonly monthStep = output<-1 | 1>();
 
   private readonly document = inject(DOCUMENT);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
+
+  /** Roving focus: the one cell that is a tab stop. Null until a cell is focused. */
+  private readonly focusAt = signal<{ row: number; col: number } | null>(null);
+  /** After a month change: the row and day of the month to put focus back on. */
+  private pendingFocus: { row: number; day: number } | null = null;
+
+  protected readonly active = computed(() => {
+    const at = this.focusAt();
+    if (at && this.focusable(at.row, at.col)) return at;
+    const rows = this.rows();
+    for (let row = 0; row < rows.length; row++) {
+      const col = rows[row].cells.findIndex((c) => c.status !== 'off');
+      if (col >= 0) return { row, col };
+    }
+    return null;
+  });
+
+  constructor() {
+    // A month change (PageUp, PageDown) re-renders the rows; focus returns to the same row and day.
+    effect(() => {
+      const rows = this.rows();
+      if (this.loading() || rows.length === 0) return;
+      untracked(() => {
+        const pending = this.pendingFocus;
+        if (!pending) return;
+        this.pendingFocus = null;
+        const row = Math.min(pending.row, rows.length - 1);
+        const col = this.nearestWorkingColumn(row, pending.day - 1);
+        if (col === null) return;
+        this.focusAt.set({ row, col });
+        afterNextRender(() => this.focusCell(row, col), { injector: this.injector });
+      });
+    });
+  }
   protected readonly drag = signal<{ row: number; from: number; to: number } | null>(null);
 
   protected readonly placeholderRows = Array.from({ length: 5 });
@@ -492,9 +534,127 @@ export class TeamGrid {
     if (drag) this.emit(drag.row, drag.from, drag.to);
   }
 
-  protected press(event: Event, row: number, col: number): void {
+  protected isActive(row: number, col: number): boolean {
+    const active = this.active();
+    return active?.row === row && active.col === col;
+  }
+
+  protected onFocusIn(event: FocusEvent): void {
+    const cell = this.cellAt(event.target as Element | null);
+    if (cell && this.focusable(cell.row, cell.col)) this.focusAt.set(cell);
+  }
+
+  /** The keyboard model (APG grid): arrows, Home, End, PageUp, PageDown; Enter or Space on a cell. */
+  protected onKey(event: KeyboardEvent): void {
+    const here = this.cellAt(event.target as Element | null);
+    if (!here) return;
+    let target: { row: number; col: number } | null;
+    switch (event.key) {
+      case 'ArrowRight':
+        target = this.step(here.row, here.col, 1);
+        break;
+      case 'ArrowLeft':
+        target = this.step(here.row, here.col, -1);
+        break;
+      case 'ArrowDown':
+        target = this.vertical(here.row, here.col, 1);
+        break;
+      case 'ArrowUp':
+        target = this.vertical(here.row, here.col, -1);
+        break;
+      case 'Home':
+        target = event.ctrlKey ? this.edge(1) : this.rowEdge(here.row, 1);
+        break;
+      case 'End':
+        target = event.ctrlKey ? this.edge(-1) : this.rowEdge(here.row, -1);
+        break;
+      case 'PageUp':
+      case 'PageDown': {
+        event.preventDefault();
+        const date = this.rows()[here.row]?.cells[here.col]?.date;
+        if (!date) return;
+        this.pendingFocus = { row: here.row, day: Number(date.slice(8, 10)) };
+        this.monthStep.emit(event.key === 'PageUp' ? -1 : 1);
+        return;
+      }
+      case 'Enter':
+      case ' ':
+        event.preventDefault();
+        if (this.paint()) this.emit(here.row, here.col, here.col);
+        return;
+      default:
+        return;
+    }
     event.preventDefault();
-    if (this.paint()) this.emit(row, col, col);
+    if (target) {
+      this.focusAt.set(target);
+      this.focusCell(target.row, target.col);
+    }
+  }
+
+  private focusable(row: number, col: number): boolean {
+    const status = this.rows()[row]?.cells[col]?.status;
+    return status !== undefined && status !== 'off';
+  }
+
+  /** The next working cell along the row, or null at its end. */
+  private step(row: number, from: number, direction: 1 | -1): { row: number; col: number } | null {
+    const cells = this.rows()[row]?.cells ?? [];
+    for (let col = from + direction; col >= 0 && col < cells.length; col += direction) {
+      if (cells[col].status !== 'off') return { row, col };
+    }
+    return null;
+  }
+
+  /** The same day on the nearest member row that works that day. */
+  private vertical(
+    from: number,
+    col: number,
+    direction: 1 | -1,
+  ): { row: number; col: number } | null {
+    for (let row = from + direction; row >= 0 && row < this.rows().length; row += direction) {
+      if (this.focusable(row, col)) return { row, col };
+    }
+    return null;
+  }
+
+  /** The first (1) or last (-1) working cell of a row. */
+  private rowEdge(row: number, direction: 1 | -1): { row: number; col: number } | null {
+    const cells = this.rows()[row]?.cells ?? [];
+    const order = cells.map((_, i) => i);
+    if (direction < 0) order.reverse();
+    const col = order.find((i) => cells[i].status !== 'off');
+    return col === undefined ? null : { row, col };
+  }
+
+  /** The first (1) or last (-1) working cell of the sheet. */
+  private edge(direction: 1 | -1): { row: number; col: number } | null {
+    const count = this.rows().length;
+    for (let row = direction > 0 ? 0 : count - 1; row >= 0 && row < count; row += direction) {
+      const found = this.rowEdge(row, direction);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  /** `col` if that cell works, else the closest working cell after it, else before it. */
+  private nearestWorkingColumn(row: number, col: number): number | null {
+    const cells = this.rows()[row]?.cells ?? [];
+    const start = Math.min(col, cells.length - 1);
+    for (let i = start; i < cells.length; i++) if (cells[i].status !== 'off') return i;
+    for (let i = start - 1; i >= 0; i--) if (cells[i].status !== 'off') return i;
+    return null;
+  }
+
+  private focusCell(row: number, col: number): void {
+    this.host.nativeElement
+      .querySelector<HTMLElement>(`.cell[data-row="${row}"][data-col="${col}"]`)
+      ?.focus();
+  }
+
+  private cellAt(element: Element | null): { row: number; col: number } | null {
+    const cell = element?.closest<HTMLElement>('.cell[data-row]');
+    return cell ? { row: Number(cell.dataset['row']), col: Number(cell.dataset['col']) } : null;
   }
 
   private emit(rowIndex: number, from: number, to: number): void {

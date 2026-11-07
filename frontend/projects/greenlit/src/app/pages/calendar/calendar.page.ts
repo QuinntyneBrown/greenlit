@@ -151,6 +151,7 @@ function localMonth(): string {
             [loading]="load().state === 'loading'"
             [paint]="gridPaint()"
             (stroke)="paintStroke($event)"
+            (monthStep)="go($event)"
           />
         }
       }

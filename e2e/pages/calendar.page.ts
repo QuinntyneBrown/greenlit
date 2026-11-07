@@ -192,6 +192,28 @@ export class CalendarPage extends BasePage {
     }
   }
 
+  // ---- the keyboard on the sheet (docs/detailed-designs/sheet/select-days) ----
+
+  /** The cells that are a tab stop: the sheet has exactly one (roving focus). */
+  tabStops(): Locator {
+    return this.grid().locator('.cell[tabindex="0"]');
+  }
+
+  /** The cell that has keyboard focus. */
+  focusedCell(): Locator {
+    return this.grid().locator(".cell:focus");
+  }
+
+  /** Puts keyboard focus on a cell, as Tab would land there. */
+  async focusCell(member: string, day: string): Promise<void> {
+    await this.cell(member, day).focus();
+  }
+
+  /** Presses a key (or chord such as "Shift+ArrowRight") with focus where it is. */
+  async press(key: string): Promise<void> {
+    await this.page.keyboard.press(key);
+  }
+
   // ---- requesting time off (docs/detailed-designs/requests/send-request) ----
 
   /** The member's "Request time off" button beside the paint picker; the manager does not get one. */
