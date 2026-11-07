@@ -32,7 +32,7 @@ try
         .ReadFrom.Configuration(ctx.Configuration)
         .ReadFrom.Services(services)
         .Enrich.FromLogContext()
-        .WriteTo.Console()
+        .WriteTo.Console(theme: Serilog.Sinks.SystemConsole.Themes.ConsoleTheme.None)
         .WriteTo.File("logs/greenlit-.log", rollingInterval: RollingInterval.Day),
         preserveStaticLogger: true);
 
