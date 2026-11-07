@@ -16,4 +16,15 @@ public sealed record PersonDto(
     int Year,
     bool IsYou,
     bool CanManage,
-    AllowanceFigures Allowance);
+    AllowanceFigures Allowance,
+    int DaysOver,
+    IReadOnlyList<PersonMonthDto> Months);
+
+/// <summary>One month of the year at a glance; <c>Days</c> has one entry per calendar day.</summary>
+public sealed record PersonMonthDto(int Month, IReadOnlyList<PersonDayDto> Days);
+
+/// <summary>
+/// One day: <c>off</c>, <c>empty</c>, <c>tentative</c>, <c>requested</c> or <c>confirmed</c>; <c>Holiday</c> names the
+/// team holiday that makes it off, so the colour is never the only carrier.
+/// </summary>
+public sealed record PersonDayDto(string Status, string? Holiday);

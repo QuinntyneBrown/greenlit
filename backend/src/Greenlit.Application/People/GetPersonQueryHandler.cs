@@ -1,8 +1,10 @@
+using System.Globalization;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Allowances;
 using Greenlit.Application.Exceptions;
 using Greenlit.Application.Sheet;
 using Greenlit.Application.Teams;
+using Greenlit.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,6 +48,42 @@ public sealed class GetPersonQueryHandler : IRequestHandler<GetPersonQuery, Pers
         var figures = (await _allowances.ComputeAsync(team, [member], ct))[member.Id];
         var (first, _) = AllowanceCalculator.LeaveYear(team, _allowances.Today(team));
 
-        return new PersonDto(member.Id, member.Name, member.JobTitle, member.JoinedOn, WorkingDaysNames.ToNames(WorkingDayRule.For(team, member)), first.Year, isYou, isManager, figures);
+        var year = first.Year;
+        var from = new DateOnly(year, 1, 1);
+        var to = new DateOnly(year, 12, 31);
+        var statusOf = (await _db.TimeOffDays.AsNoTracking()
+                .Where(d => d.TeamMemberId == member.Id && d.Date >= from && d.Date <= to)
+                .Select(d => new { d.Date, d.Status })
+                .ToListAsync(ct))
+            .ToDictionary(d => d.Date, d => d.Status);
+        var holidays = (await _db.Holidays.AsNoTracking()
+                .Where(h => h.TeamId == team.Id && h.Date >= from && h.Date <= to)
+                .Select(h => new { h.Date, h.Name })
+                .ToListAsync(ct))
+            .ToDictionary(h => h.Date, h => h.Name);
+        var workingDays = WorkingDayRule.For(team, member);
+        var months = Enumerable.Range(1, 12)
+            .Select(month => new PersonMonthDto(
+                month,
+                Enumerable.Range(1, DateTime.DaysInMonth(year, month))
+                    .Select(day => DayOf(new DateOnly(year, month, day), workingDays, holidays, statusOf))
+                    .ToList()))
+            .ToList();
+
+        return new PersonDto(member.Id, member.Name, member.JobTitle, member.JoinedOn, WorkingDaysNames.ToNames(WorkingDayRule.For(team, member)), year, isYou, isManager, figures, figures.DaysOver(), months);
+    }
+
+    private static PersonDayDto DayOf(
+        DateOnly date,
+        WorkingDays workingDays,
+        IReadOnlyDictionary<DateOnly, string> holidays,
+        IReadOnlyDictionary<DateOnly, DayStatus> statusOf)
+    {
+        holidays.TryGetValue(date, out var holiday);
+        var status =
+            holiday is not null || WorkingDayRule.IsOffDay(date, workingDays) ? "off"
+            : !statusOf.TryGetValue(date, out var s) ? "empty"
+            : s.ToString().ToLower(CultureInfo.InvariantCulture);
+        return new PersonDayDto(status, holiday);
     }
 }
