@@ -20,6 +20,7 @@ import { AccountMenu } from "../pages/account-menu.js";
 import { SessionExpiredPage } from "../pages/session-expired.page.js";
 import { SignOutDialog } from "../pages/sign-out.dialog.js";
 import { RemoveHolidayDialog } from "../pages/remove-holiday.dialog.js";
+import { AdjustAllowanceDialog } from "../pages/adjust-allowance.dialog.js";
 import { EditWorkingDaysDialog } from "../pages/edit-working-days.dialog.js";
 import { AddHolidayDialog } from "../pages/add-holiday.dialog.js";
 import { AcceptInvitePage } from "../pages/accept-invite.page.js";
@@ -44,6 +45,7 @@ interface Pages {
   sessionExpired: SessionExpiredPage;
   signOutDialog: SignOutDialog;
   accountMenu: AccountMenu;
+  adjustAllowance: AdjustAllowanceDialog;
   editWorkingDays: EditWorkingDaysDialog;
   removeHoliday: RemoveHolidayDialog;
   addHoliday: AddHolidayDialog;
@@ -352,7 +354,19 @@ interface CoverageApi {
   recoverSave(): Promise<void>;
 }
 
+/** Watches and steers adding an adjustment (POST /api/people/{id}/adjustments). */
+interface AdjustmentsApi {
+  /** How many adjustments the page has sent so far. */
+  adds(): number;
+  /** Holds adjustments until the returned function is called. */
+  hold(): Promise<() => void>;
+  /** Adjustments fail with a 500 until `recover()`. */
+  fail(): Promise<void>;
+  recover(): Promise<void>;
+}
+
 interface GlFixtures {
+  adjustmentsApi: AdjustmentsApi;
   coverageApi: CoverageApi;
   workingDaysApi: WorkingDaysApi;
   teamSettingsApi: TeamSettingsApi;
@@ -986,6 +1000,29 @@ export const test = base.extend<GlFixtures>({
       },
     });
   },
+  adjustmentsApi: async ({ page }, use) => {
+    const pattern = "**/api/people/*/adjustments";
+    let adds = 0;
+    page.on("request", (request) => {
+      if (request.method() === "POST" && /^\/api\/people\/[^/]+\/adjustments$/.test(new URL(request.url()).pathname)) adds++;
+    });
+    await use({
+      adds: () => adds,
+      hold: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      fail: async () => {
+        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recover: () => page.unroute(pattern),
+    });
+  },
   personApi: async ({ page }, use) => {
     const pattern = "**/api/people/**";
     let count = 0;
@@ -1099,6 +1136,7 @@ export const test = base.extend<GlFixtures>({
       acceptInvite: new AcceptInvitePage(page),
       forgotPassword: new ForgotPasswordPage(page),
       resetPassword: new ResetPasswordPage(page),
+      adjustAllowance: new AdjustAllowanceDialog(page),
       editWorkingDays: new EditWorkingDaysDialog(page),
       addHoliday: new AddHolidayDialog(page),
       removeHoliday: new RemoveHolidayDialog(page),

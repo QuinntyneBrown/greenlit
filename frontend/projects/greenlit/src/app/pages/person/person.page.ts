@@ -9,6 +9,7 @@ import { PERSON_SERVICE, Person, SentRequest } from 'api';
 import { Avatar, Button, EmptyState, Legend, MonthMini, RunList, Skeleton, Stat } from 'components';
 
 import { AppDialogs } from '../../dialogs/app-dialogs';
+import { AdjustAllowanceDialog } from '../../dialogs/adjust-allowance/adjust-allowance.dialog';
 import { EditWorkingDaysDialog } from '../../dialogs/edit-working-days/edit-working-days.dialog';
 import { NewRequestData, NewRequestDialog } from '../../dialogs/new-request/new-request.dialog';
 import { ToastService } from '../../toasts/toast.service';
@@ -131,6 +132,20 @@ function stateOf(error: unknown): 'forbidden' | 'notfound' | 'error' {
         </div>
         @if (p.canManage) {
           <div class="stack">
+            <section aria-labelledby="adjust-title">
+              <h2 id="adjust-title" class="section-title">Adjust allowance</h2>
+              <p class="text-muted text-sm hint">
+                Carry-over, extra days or corrections. Use a negative number to remove days.
+              </p>
+              <div class="action">
+                <gl-button (click)="adjustAllowance(p)">
+                  <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Adjust allowance
+                </gl-button>
+              </div>
+            </section>
             <section aria-labelledby="workdays-title">
               <h2 id="workdays-title" class="section-title">Working days</h2>
               <p class="text-muted text-sm hint">
@@ -412,6 +427,18 @@ export class PersonPage {
         if (!request) return;
         this.reload();
         this.toasts.show(requestSentToast(request, person.managerName));
+      });
+  }
+
+  /** "Adjust allowance": days added or removed with a reason, in a dialog (L2-028). */
+  protected adjustAllowance(person: Person): void {
+    this.dialogs
+      .open<boolean>(AdjustAllowanceDialog, '#aa-days', {
+        memberId: person.id,
+        firstName: person.name.split(' ')[0],
+      })
+      .closed.subscribe((saved) => {
+        if (saved) this.reload();
       });
   }
 
