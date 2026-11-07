@@ -136,4 +136,37 @@ export class MarketingPage extends BasePage {
       (v: HTMLVideoElement) => v.textTracks[0]?.mode,
     );
   }
+
+  // Why, how, screens
+
+  section(id: "why" | "how" | "screens" | "managers" | "start"): Locator {
+    return this.page.locator(`section#${id}`);
+  }
+
+  sectionTitle(id: "why" | "how" | "screens" | "managers" | "start"): Locator {
+    return this.section(id).getByRole("heading", { level: 2 });
+  }
+
+  cardTitles(id: "why" | "how"): Locator {
+    return this.section(id).locator(".mk-card h3");
+  }
+
+  stepLabels(): Locator {
+    return this.section("how").locator(".mk-card .mk-step__n");
+  }
+
+  whyCreateTeam(): Locator {
+    return this.section("why").getByRole("link", {
+      name: "Create your team",
+      exact: true,
+    });
+  }
+
+  screenshotTitles(): Locator {
+    return this.section("screens").locator(".mk-shot h3");
+  }
+
+  screenshotImages(): Locator {
+    return this.section("screens").locator(".mk-shot img");
+  }
 }

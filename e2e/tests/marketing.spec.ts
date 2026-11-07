@@ -116,4 +116,46 @@ test.describe("Marketing page", () => {
     await expect(m.captionTracks()).not.toHaveAttribute("default", /.*/);
     expect(await m.captionMode()).toBe("disabled");
   });
+
+  test("why Greenlit beats the spreadsheet (L2-050 AC6)", async ({ pages }) => {
+    const m = pages.marketing;
+    await expect(m.sectionTitle("why")).toHaveText("Goodbye, spreadsheet.");
+    await expect(m.cardTitles("why")).toHaveText([
+      "One month, one truth",
+      "Colour your own days",
+      "Confirm in one tap",
+    ]);
+    await expect(m.whyCreateTeam()).toHaveAttribute(
+      "href",
+      appLink("/create-team", "create-team"),
+    );
+  });
+
+  test("the three colours in three steps (L2-050 AC7)", async ({ pages }) => {
+    const m = pages.marketing;
+    await expect(m.sectionTitle("how")).toHaveText("Three colours, one yes.");
+    await expect(m.stepLabels()).toHaveText(["Step 1", "Step 2", "Step 3"]);
+    await expect(m.cardTitles("how")).toHaveText([
+      "Pencil it in",
+      "Request it",
+      "Get it greenlit",
+    ]);
+  });
+
+  test("real screens from the app (L2-050 AC8)", async ({ pages }) => {
+    const m = pages.marketing;
+    await expect(m.sectionTitle("screens")).toHaveText(
+      "The sheet you know. Only better.",
+    );
+    await expect(m.screenshotTitles()).toHaveText([
+      "The calendar",
+      "Requests",
+      "The year",
+      "Each person",
+    ]);
+    await expect(m.screenshotImages()).toHaveCount(4);
+    for (let i = 0; i < 4; i++) {
+      await expect(m.screenshotImages().nth(i)).toHaveAttribute("alt", /\S+/);
+    }
+  });
 });
