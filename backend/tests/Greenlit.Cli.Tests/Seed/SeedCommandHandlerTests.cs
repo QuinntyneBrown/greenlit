@@ -27,7 +27,7 @@ public class SeedCommandHandlerTests
         team.TimeZone.Should().Be("Europe/London");
         team.Members.OrderBy(m => m.SortOrder).Select(m => m.Name).Should().Equal(
             "Maya Chen", "Ana Ruiz", "Ben Okafor", "Cleo Park", "Dev Patel", "Elif Yılmaz", "Finn Murphy");
-        (await read.Users.CountAsync()).Should().Be(7);
+        (await read.Users.CountAsync()).Should().Be(11);
         (await read.Holidays.CountAsync()).Should().Be(8);
     }
 
@@ -45,6 +45,21 @@ public class SeedCommandHandlerTests
     }
 
     [Fact]
+    public async Task Four_newcomers_have_accounts_on_no_team_to_create_one_with()
+    {
+        // Journey 3: create-team needs signed-in people who are not on a team yet.
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        var newcomers = await read.Users
+            .Where(u => !read.TeamMembers.Any(m => m.UserId == u.Id) && !read.Teams.Any(t => t.ManagerUserId == u.Id))
+            .OrderBy(u => u.Email)
+            .Select(u => u.Email)
+            .ToListAsync();
+        newcomers.Should().Equal("noor@northwind.studio", "priya@northwind.studio", "sam@northwind.studio", "tomas@northwind.studio");
+    }
+
+    [Fact]
     public async Task Every_demo_account_signs_in_with_the_demo_password()
     {
         // Journey 2: the e2e suite signs in through the sign-in page as a seeded person.
@@ -53,7 +68,7 @@ public class SeedCommandHandlerTests
         await using var read = new AppDbContext(options);
         var hasher = new IdentityPasswordHasher();
         var users = await read.Users.ToListAsync();
-        users.Should().HaveCount(7).And.OnlyContain(u => hasher.Verify(u, u.PasswordHash, SeedCommandHandler.DemoPassword));
+        users.Should().HaveCount(11).And.OnlyContain(u => hasher.Verify(u, u.PasswordHash, SeedCommandHandler.DemoPassword));
         users.Select(u => u.PasswordHash).Should().OnlyHaveUniqueItems("each hash has its own salt");
     }
 

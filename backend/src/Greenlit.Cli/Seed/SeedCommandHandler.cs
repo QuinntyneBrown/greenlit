@@ -37,6 +37,18 @@ public sealed class SeedCommandHandler
         ("Finn Murphy", "finn@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000007")),
     ];
 
+    /// <summary>
+    /// Accounts on no team yet, for create-team (docs/detailed-designs/teams/create-team):
+    /// Noor only opens the page; Priya, Sam and Tomás each create a team, one per e2e viewport.
+    /// </summary>
+    private static readonly (string Name, string Email, Guid UserId)[] Newcomers =
+    [
+        ("Noor Haddad", "noor@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000101")),
+        ("Priya Shah", "priya@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000102")),
+        ("Sam Lee", "sam@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000103")),
+        ("Tomás Silva", "tomas@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000104")),
+    ];
+
     /// <summary>Public holidays: United Kingdom, 2026 (docs/mocks/README.md).</summary>
     private static readonly (DateOnly Date, string Name)[] Holidays =
     [
@@ -79,7 +91,7 @@ public sealed class SeedCommandHandler
     {
         var now = DateTimeOffset.UtcNow;
 
-        foreach (var (name, email, userId) in Cast)
+        foreach (var (name, email, userId) in Cast.Concat(Newcomers))
         {
             var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId, ct);
             if (user is null)
