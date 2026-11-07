@@ -297,4 +297,48 @@ export class CalendarPage extends BasePage {
   toastAction(title: string, name: string): Locator {
     return this.toast(title).getByRole("button", { name, exact: true });
   }
+
+  /** The toast's Dismiss button. */
+  toastDismiss(title: string): Locator {
+    return this.toast(title).getByRole("button", { name: "Dismiss", exact: true });
+  }
+
+  /** Moves the pointer onto the toast, or away from every toast. */
+  async hoverToast(title: string): Promise<void> {
+    await this.toast(title).hover();
+  }
+
+  async leaveToasts(): Promise<void> {
+    await this.page.mouse.move(1, 1);
+  }
+
+  /** Takes keyboard focus out of the toast (back to the page). */
+  async blurToast(): Promise<void> {
+    await this.page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  }
+
+  /** The live region that announces the toast: "polite" or "assertive". */
+  toastAnnouncedAs(title: string): Locator {
+    return this.page.locator("[aria-live]").filter({ has: this.toast(title) });
+  }
+
+  /** Scrolls the cell to the foot of the viewport and gives it keyboard focus, where a toast would sit. */
+  async focusCellAtViewportFoot(member: string, day: string): Promise<void> {
+    const cell = this.cell(member, day);
+    await cell.evaluate((el) => el.scrollIntoView({ block: "end" }));
+    await cell.focus();
+  }
+
+  /** Whether the focused element lies under any toast on screen. */
+  async focusIsCoveredByToast(): Promise<boolean> {
+    return this.page.evaluate(() => {
+      const focused = document.activeElement;
+      if (!focused) return false;
+      const f = focused.getBoundingClientRect();
+      return [...document.querySelectorAll(".toast")].some((t) => {
+        const r = t.getBoundingClientRect();
+        return f.left < r.right && f.right > r.left && f.top < r.bottom && f.bottom > r.top;
+      });
+    });
+  }
 }
