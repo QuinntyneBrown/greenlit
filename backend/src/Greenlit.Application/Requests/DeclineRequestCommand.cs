@@ -40,9 +40,11 @@ public sealed class DeclineRequestCommandHandler : IRequestHandler<DeclineReques
     private readonly IAppDbContext _db;
     private readonly ICurrentUser _currentUser;
     private readonly TimeProvider _time;
+    private readonly RequestNotifier _notifier;
 
-    public DeclineRequestCommandHandler(IAppDbContext db, ICurrentUser currentUser, TimeProvider time)
+    public DeclineRequestCommandHandler(IAppDbContext db, ICurrentUser currentUser, TimeProvider time, RequestNotifier notifier)
     {
+        _notifier = notifier;
         _db = db;
         _currentUser = currentUser;
         _time = time;
@@ -62,8 +64,12 @@ public sealed class DeclineRequestCommandHandler : IRequestHandler<DeclineReques
         request.Decline(team.ManagerUserId, command.Reason, _time.GetUtcNow());
         await _db.SaveChangesAsync(ct);
 
+        // The decline stands whatever the mail server does: this only says whether the member was told.
+        var managerName = await RequestCaller.ManagerNameAsync(_db, team, ct);
+        var emailed = await _notifier.DeclinedAsync(managerName, request, ct);
+
         return new DeclineResult(
             request.Id, request.TeamMember.Name, RequestInput.Iso(request.FirstDay), RequestInput.Iso(request.LastDay),
-            request.Days.Count, request.DeclineReason, Emailed: false);
+            request.Days.Count, request.DeclineReason, emailed);
     }
 }

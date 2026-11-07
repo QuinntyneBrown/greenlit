@@ -25,7 +25,16 @@ public sealed class RequestNotifier
     }
 
     /// <summary>True when the approval email was sent; false when the member has no address or sending failed.</summary>
-    public async Task<bool> ApprovedAsync(Team team, string managerName, TimeOffRequest request, CancellationToken ct)
+    public Task<bool> ApprovedAsync(Team team, string managerName, TimeOffRequest request, CancellationToken ct) =>
+        SendAsync(request, "approval", address =>
+            ApprovalEmail.Compose(address, request.TeamMember.Name, managerName, request.FirstDay, request.LastDay), ct);
+
+    /// <summary>True when the decline email, with the reason when there is one, was sent; false when the member has no address or sending failed.</summary>
+    public Task<bool> DeclinedAsync(string managerName, TimeOffRequest request, CancellationToken ct) =>
+        SendAsync(request, "decline", address =>
+            DeclineEmail.Compose(address, request.TeamMember.Name, managerName, request.FirstDay, request.LastDay, request.DeclineReason), ct);
+
+    private async Task<bool> SendAsync(TimeOffRequest request, string kind, Func<string, EmailMessage> compose, CancellationToken ct)
     {
         var member = request.TeamMember;
         var address = member.Email;
@@ -35,13 +44,12 @@ public sealed class RequestNotifier
 
         try
         {
-            await _email.SendAsync(
-                ApprovalEmail.Compose(address, member.Name, managerName, request.FirstDay, request.LastDay), ct);
+            await _email.SendAsync(compose(address), ct);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "The approval email for request {RequestId} could not be sent.", request.Id);
+            _logger.LogWarning(ex, "The {Kind} email for request {RequestId} could not be sent.", kind, request.Id);
             return false;
         }
     }
