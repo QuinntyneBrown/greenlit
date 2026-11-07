@@ -133,4 +133,90 @@ test.describe("Connection banners", () => {
       await expect(pages.connection.banner()).toHaveCount(0);
     });
   });
+
+  test.describe("when requests fail while the browser is online", () => {
+    test("a request that gets no answer shows an unstable banner that can be dismissed (L2-045 AC4)", async ({
+      goto,
+      pages,
+      connectionApi,
+    }) => {
+      await goto("calendar", { as: "member", month: "2026-11" });
+      await pages.calendar.waitForReady();
+      await connectionApi.dropMonth();
+
+      await pages.calendar.nextMonth().click();
+
+      await expect(pages.connection.title()).toHaveText("Your connection is unstable");
+      await expect(pages.connection.text()).toHaveText("Changes may take a moment to save.");
+      await pages.connection.dismissButton().click();
+      await expect(pages.connection.banner()).toHaveCount(0);
+    });
+
+    test("the unstable banner leaves when a request gets through again", async ({ goto, pages, connectionApi }) => {
+      await goto("calendar", { as: "member", month: "2026-11" });
+      await pages.calendar.waitForReady();
+      await connectionApi.dropMonth();
+      await pages.calendar.nextMonth().click();
+      await expect(pages.connection.title()).toHaveText("Your connection is unstable");
+
+      await connectionApi.recoverMonth();
+      await pages.calendar.stateAction("Try again").click();
+
+      await expect(pages.calendar.title()).toHaveText("December 2026");
+      await expect(pages.connection.banner()).toHaveCount(0);
+    });
+
+    test("a request answered with a failure shows the sync banner with the last sync time and Retry (L2-045 AC5)", async ({
+      goto,
+      pages,
+      connectionApi,
+    }) => {
+      await goto("calendar", { as: "member", month: "2026-11" });
+      await pages.calendar.waitForReady();
+      const syncedAt = clock();
+      await connectionApi.failMonth();
+
+      await pages.calendar.nextMonth().click();
+
+      await expect(pages.connection.title()).toHaveText("We couldn’t sync the latest changes");
+      const text = (await pages.connection.text().innerText()).trim();
+      expect([`You’re looking at the calendar as of ${syncedAt}.`, `You’re looking at the calendar as of ${clock()}.`]).toContain(text);
+      await expect(pages.connection.retryButton()).toBeVisible();
+      await expect(pages.connection.dismissButton()).toHaveCount(0);
+    });
+
+    test("Retry brings the data back and says back online (L2-045 AC5)", async ({ goto, pages, connectionApi }) => {
+      await goto("calendar", { as: "member", month: "2026-11" });
+      await pages.calendar.waitForReady();
+      await connectionApi.failMonth();
+      await pages.calendar.nextMonth().click();
+      await expect(pages.connection.title()).toHaveText("We couldn’t sync the latest changes");
+
+      await connectionApi.recoverMonth();
+      await pages.connection.retryButton().click();
+
+      await expect(pages.connection.title()).toHaveText("You’re back online");
+      await expect(pages.calendar.title()).toHaveText("December 2026");
+      await expect(pages.calendar.errorState()).toHaveCount(0);
+    });
+
+    test("Retry while the failure goes on shows the sync banner again", async ({ goto, pages, connectionApi }) => {
+      await goto("calendar", { as: "member", month: "2026-11" });
+      await pages.calendar.waitForReady();
+      await connectionApi.failMonth();
+      await pages.calendar.nextMonth().click();
+      await expect(pages.connection.retryButton()).toBeVisible();
+
+      await pages.connection.retryButton().click();
+
+      await expect(pages.connection.title()).toHaveText("We couldn’t sync the latest changes");
+      await expect(pages.connection.retryButton()).toBeVisible();
+    });
+  });
 });
+
+/** The time as the banner writes it: 24-hour hours and minutes in the browser's time zone. */
+function clock(): string {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+}

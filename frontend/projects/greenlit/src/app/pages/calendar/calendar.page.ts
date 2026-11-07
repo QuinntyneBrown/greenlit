@@ -277,7 +277,8 @@ export class CalendarPage {
 
   /** The connection came back (L2-045 AC3): quietly read the month again so "Everything is up to date" is true. */
   private readonly reloadOnReturn = effect(() => {
-    if (this.connectivity.reloads() > 0) untracked(() => this.refresh());
+    if (this.connectivity.reloads() === 0) return;
+    untracked(() => (this.load().state === 'error' ? this.retry() : this.refresh()));
   });
 
   /** The month on screen: the loaded one, else the requested one, else this browser's. */

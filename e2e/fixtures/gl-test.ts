@@ -401,6 +401,11 @@ interface ConnectionApi {
   /** The check cannot reach the API until `recoverProbe()`. */
   failProbe(): Promise<void>;
   recoverProbe(): Promise<void>;
+  /** Month requests (GET /api/sheet) get no answer at all, as when the network drops, until `recoverMonth()`. */
+  dropMonth(): Promise<void>;
+  /** Month requests are answered with a 500 the page can read until `recoverMonth()`. */
+  failMonth(): Promise<void>;
+  recoverMonth(): Promise<void>;
 }
 
 interface GlFixtures {
@@ -1182,6 +1187,7 @@ export const test = base.extend<GlFixtures>({
   },
   connectionApi: async ({ page }, use) => {
     const pattern = "**/api/_ping";
+    const month = /\/api\/sheet\?/;
     await use({
       holdProbe: async () => {
         let release!: () => void;
@@ -1196,6 +1202,17 @@ export const test = base.extend<GlFixtures>({
         await page.route(pattern, (route) => route.abort("failed"));
       },
       recoverProbe: () => page.unroute(pattern),
+      dropMonth: async () => {
+        await page.route(month, (route) => route.abort("failed"));
+      },
+      failMonth: async () => {
+        await page.route(month, (route) =>
+          route.request().method() === "OPTIONS"
+            ? route.fallback()
+            : route.fulfill({ status: 500, headers: { "access-control-allow-origin": "*" }, body: "" }),
+        );
+      },
+      recoverMonth: () => page.unroute(month),
     });
   },
   sheetApi: async ({ page }, use) => {

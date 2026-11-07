@@ -51,6 +51,7 @@ export * from './lib/api/notifications.service';
 export * from './lib/api/year.service';
 export * from './lib/api/person.service';
 export * from './lib/api/connectivity.service';
+export * from './lib/api/connectivity.interceptor';
 export * from './lib/api/auth.interceptor';
 export * from './lib/api/session-expired.interceptor';
 

@@ -33,6 +33,7 @@ import {
   BrowserConnectivityService,
   HttpYearService,
   authInterceptor,
+  connectivityInterceptor,
   sessionExpiredInterceptor,
 } from 'api';
 
@@ -46,7 +47,10 @@ export const appConfig: ApplicationConfig = {
       routes,
       withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
     ),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor, sessionExpiredInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([authInterceptor, sessionExpiredInterceptor, connectivityInterceptor]),
+    ),
     { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
 
     // Composition root: pages depend on service tokens from `api`; the

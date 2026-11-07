@@ -16,6 +16,7 @@ export class BrowserConnectivityService implements ConnectivityService {
     this.window?.navigator.onLine === false ? 'offline' : 'online',
   );
   private readonly reloaded = signal(0);
+  private failedCall = '';
   private leaving: ReturnType<typeof setTimeout> | undefined;
 
   readonly state = this.current.asReadonly();
@@ -24,6 +25,8 @@ export class BrowserConnectivityService implements ConnectivityService {
     return state === 'offline' || state === 'reconnecting';
   });
   readonly reloads = this.reloaded.asReadonly();
+  private readonly synced = signal(new Date());
+  readonly lastSync = this.synced.asReadonly();
 
   constructor() {
     this.window?.addEventListener('offline', () => this.set('offline'));
@@ -31,7 +34,29 @@ export class BrowserConnectivityService implements ConnectivityService {
   }
 
   dismiss(): void {
-    if (this.current() === 'back-online') this.set('online');
+    const state = this.current();
+    if (state === 'back-online' || state === 'unstable') this.set('online');
+  }
+
+  /** A failure ends when the call that failed gets through; other calls going well say nothing about it. */
+  succeeded(call: string): void {
+    this.synced.set(new Date());
+    const state = this.current();
+    if ((state === 'unstable' || state === 'sync-failed') && call === this.failedCall)
+      this.set('online');
+  }
+
+  /** One call with no answer while the browser is online is "unstable"; one answered 5xx is "sync-failed" (ADR-012). */
+  failed(status: number, call: string): void {
+    const state = this.current();
+    if (state === 'offline' || state === 'reconnecting') return;
+    if (status !== 0 && status < 500) return;
+    this.failedCall = call;
+    this.set(status === 0 ? 'unstable' : 'sync-failed');
+  }
+
+  retry(): void {
+    void this.check();
   }
 
   /** The connection returned: ask the API whether it can be reached; any answer at all will do. */

@@ -19,8 +19,8 @@ probe open (`<TO SUPPLY>`). The API takes no part in the feature.
   A reachable API gives **back-online**, which dismisses itself after 5 s; a failed probe gives
   **offline** again. No endpoint is added.
 - **Unstable** is one API call that fails with no response (status 0) while the browser says it is
-  online. **Sync-failed** is one API call answered 5xx. A later successful call clears either state
-  silently. 4xx answers are the page's business and change nothing.
+  online. **Sync-failed** is one API call answered 5xx. The state stays until that same call (method and path) gets through again, the person dismisses
+  "unstable", or Retry runs; other calls going well say nothing about it. 4xx answers are the page's business and change nothing.
 - **Retry** on sync-failed runs the same probe and then asks the open page to load again
   (`reloads` counter); the calendar re-reads its month.
 - **Read-only** is `offline` or `reconnecting`: the calendar sheet rows are not editable, the paint
