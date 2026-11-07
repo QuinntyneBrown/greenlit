@@ -297,4 +297,28 @@ export class CalendarPage extends BasePage {
   toastAction(title: string, name: string): Locator {
     return this.toast(title).getByRole("button", { name, exact: true });
   }
+
+  /** The toast's Dismiss button. */
+  toastDismiss(title: string): Locator {
+    return this.toast(title).getByRole("button", { name: "Dismiss", exact: true });
+  }
+
+  /** Moves the pointer onto the toast, or away from every toast. */
+  async hoverToast(title: string): Promise<void> {
+    await this.toast(title).hover();
+  }
+
+  async leaveToasts(): Promise<void> {
+    await this.page.mouse.move(1, 1);
+  }
+
+  /** Takes keyboard focus out of the toast (back to the page). */
+  async blurToast(): Promise<void> {
+    await this.page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  }
+
+  /** The live region that announces the toast: "polite" or "assertive". */
+  toastAnnouncedAs(title: string): Locator {
+    return this.page.locator("[aria-live]").filter({ has: this.toast(title) });
+  }
 }
