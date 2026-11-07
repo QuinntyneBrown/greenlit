@@ -91,6 +91,22 @@ type HolidaysLoad =
         <gl-button slot="actions" size="sm" (click)="reviewHolidays()">Review holidays</gl-button>
       </gl-alert>
     }
+    @if (withoutAllowance(); as without) {
+      <gl-alert
+        class="review"
+        tone="warning"
+        [banner]="true"
+        [dismissible]="true"
+        [title]="
+          countWord(without.count) +
+          (without.count === 1 ? ' member has' : ' members have') +
+          ' no allowance set'
+        "
+        (dismissed)="noAllowanceDismissed.set(true)"
+      >
+        They’re using the default of {{ without.days }} days until you change it.
+      </gl-alert>
+    }
     @if (teamSavedBanner()) {
       <gl-alert
         class="review"
@@ -142,7 +158,7 @@ type HolidaysLoad =
         @if (isManager()) {
           <section id="allowances" class="settings-section" aria-labelledby="allowances-title">
             @if (allowances(); as defaults) {
-              <app-allowances-section [defaults]="defaults" />
+              <app-allowances-section [defaults]="defaults" (saved)="allowancesSaved($event)" />
             } @else {
               <h2 id="allowances-title" class="section-title" tabindex="-1">Allowances</h2>
               <gl-skeleton />
@@ -415,7 +431,7 @@ export class SettingsPage {
   protected readonly managerName = computed(() => this.ready()?.managerName ?? '');
 
   /** The allowance defaults, the manager's to read; null until they have loaded. */
-  protected readonly allowances = toSignal(
+  private readonly loadedAllowances = toSignal(
     toObservable(this.isManager).pipe(
       switchMap((manager) =>
         manager
@@ -427,6 +443,42 @@ export class SettingsPage {
     ),
     { initialValue: null },
   );
+
+  private readonly savedAllowances = signal<AllowanceDefaults | null>(null);
+  protected readonly allowances = computed(() => this.savedAllowances() ?? this.loadedAllowances());
+
+  protected readonly noAllowanceDismissed = signal(false);
+  private static readonly WORDS = [
+    'No',
+    'One',
+    'Two',
+    'Three',
+    'Four',
+    'Five',
+    'Six',
+    'Seven',
+    'Eight',
+    'Nine',
+    'Ten',
+  ];
+
+  protected countWord(count: number): string {
+    return SettingsPage.WORDS[count] ?? String(count);
+  }
+
+  /** Members who use the default days because they have none of their own (L2-027 AC4). */
+  protected readonly withoutAllowance = computed(() => {
+    const team = this.team();
+    const defaults = this.allowances();
+    if (this.noAllowanceDismissed() || !team?.canEdit || !defaults) return null;
+    const count = team.members.filter((m) => m.yearlyDays === null).length;
+    return count === 0 ? null : { count, days: defaults.defaultYearlyDays };
+  });
+
+  protected allowancesSaved(defaults: AllowanceDefaults): void {
+    this.savedAllowances.set(defaults);
+    this.teamSavedBanner.set(true);
+  }
 
   /** The holidays are the manager's: a member never asks for them. */
   protected readonly holidaysLoad = toSignal(

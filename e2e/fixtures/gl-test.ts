@@ -216,6 +216,17 @@ interface TeamSettingsApi {
   recoverLoad(): Promise<void>;
 }
 
+/** Puts saving the allowance defaults (PUT /api/team/settings/allowances) into states the seeded data cannot produce. */
+interface AllowanceApi {
+  /** How many allowance saves the page has sent so far. */
+  saves(): number;
+  /** Holds allowance saves until the returned function is called. */
+  hold(): Promise<() => void>;
+  /** Allowance saves fail with a 500 until `recover()`. */
+  fail(): Promise<void>;
+  recover(): Promise<void>;
+}
+
 interface WorkingDaysApi {
   /** How many work-week saves the page has sent so far. */
   weekSaves(): number;
@@ -248,6 +259,7 @@ interface GlFixtures {
   coverageApi: CoverageApi;
   workingDaysApi: WorkingDaysApi;
   teamSettingsApi: TeamSettingsApi;
+  allowanceApi: AllowanceApi;
   holidaysApi: HolidaysApi;
   requestsApi: RequestsApi;
   invitationsApi: InvitationsApi;
@@ -451,6 +463,29 @@ export const test = base.extend<GlFixtures>({
         await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
       },
       recoverSave: () => page.unroute(pattern),
+    });
+  },
+  allowanceApi: async ({ page }, use) => {
+    const pattern = "**/api/team/settings/allowances";
+    let saves = 0;
+    page.on("request", (request) => {
+      if (request.method() === "PUT" && new URL(request.url()).pathname === "/api/team/settings/allowances") saves++;
+    });
+    await use({
+      saves: () => saves,
+      hold: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      fail: async () => {
+        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recover: () => page.unroute(pattern),
     });
   },
   teamSettingsApi: async ({ page }, use) => {
