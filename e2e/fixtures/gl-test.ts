@@ -391,7 +391,20 @@ interface RemoveMemberApi {
   recover(): Promise<void>;
 }
 
+/**
+ * Steers the check Greenlit makes when the connection returns (a HEAD request to /api/_ping): any answer
+ * means the API can be reached.
+ */
+interface ConnectionApi {
+  /** Holds the check until the returned function is called. */
+  holdProbe(): Promise<() => void>;
+  /** The check cannot reach the API until `recoverProbe()`. */
+  failProbe(): Promise<void>;
+  recoverProbe(): Promise<void>;
+}
+
 interface GlFixtures {
+  connectionApi: ConnectionApi;
   removeMemberApi: RemoveMemberApi;
   adjustmentsApi: AdjustmentsApi;
   coverageApi: CoverageApi;
@@ -1165,6 +1178,24 @@ export const test = base.extend<GlFixtures>({
           await route.fulfill({ response, json: year });
         });
       },
+    });
+  },
+  connectionApi: async ({ page }, use) => {
+    const pattern = "**/api/_ping";
+    await use({
+      holdProbe: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      failProbe: async () => {
+        await page.route(pattern, (route) => route.abort("failed"));
+      },
+      recoverProbe: () => page.unroute(pattern),
     });
   },
   sheetApi: async ({ page }, use) => {

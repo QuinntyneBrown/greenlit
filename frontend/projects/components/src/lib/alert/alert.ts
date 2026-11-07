@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 export type AlertTone = 'info' | 'success' | 'warning' | 'danger';
 
 /** A picture that replaces the tone's icon, for connection banners. */
-export type AlertGlyph = 'offline';
+export type AlertGlyph = 'offline' | 'reconnecting';
 
 /**
  * Alert (docs/design-system/components/alert.html): a message that stays on
@@ -29,6 +29,11 @@ export type AlertGlyph = 'offline';
         @case ('offline') {
           <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
             <path d="M3 3l18 18M9 5a6 6 0 0 1 10 4 4 4 0 0 1 2 6M6 18a4 4 0 0 1 0-8" />
+          </svg>
+        }
+        @case ('reconnecting') {
+          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5" />
           </svg>
         }
         @case ('success') {

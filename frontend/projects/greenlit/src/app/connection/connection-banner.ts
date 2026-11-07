@@ -11,10 +11,28 @@ import { Alert } from 'components';
   selector: 'app-connection-banner',
   imports: [Alert],
   template: `
-    @if (state() === 'offline') {
-      <gl-alert [banner]="true" tone="warning" glyph="offline" title="You’re offline">
-        You can look at the calendar, but changes can’t be saved until you’re back.
-      </gl-alert>
+    @switch (state()) {
+      @case ('offline') {
+        <gl-alert [banner]="true" tone="warning" glyph="offline" title="You’re offline">
+          You can look at the calendar, but changes can’t be saved until you’re back.
+        </gl-alert>
+      }
+      @case ('reconnecting') {
+        <gl-alert [banner]="true" tone="info" glyph="reconnecting" title="Reconnecting…">
+          Hang on while we check your connection.
+        </gl-alert>
+      }
+      @case ('back-online') {
+        <gl-alert
+          [banner]="true"
+          tone="success"
+          title="You’re back online"
+          [dismissible]="true"
+          (dismissed)="connectivity.dismiss()"
+        >
+          Everything is up to date.
+        </gl-alert>
+      }
     }
   `,
   styles: `
@@ -25,6 +43,6 @@ import { Alert } from 'components';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConnectionBanner {
-  private readonly connectivity = inject(CONNECTIVITY_SERVICE);
+  protected readonly connectivity = inject(CONNECTIVITY_SERVICE);
   protected readonly state = computed(() => this.connectivity.state());
 }

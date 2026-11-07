@@ -2,8 +2,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -273,6 +275,11 @@ export class CalendarPage {
 
   private readonly loaded = computed(() => (this.load().state === 'ready' ? this.current() : null));
 
+  /** The connection came back (L2-045 AC3): quietly read the month again so "Everything is up to date" is true. */
+  private readonly reloadOnReturn = effect(() => {
+    if (this.connectivity.reloads() > 0) untracked(() => this.refresh());
+  });
+
   /** The month on screen: the loaded one, else the requested one, else this browser's. */
   protected readonly month = computed(
     () => this.loaded()?.month ?? this.requested() ?? localMonth(),
@@ -318,7 +325,7 @@ export class CalendarPage {
   /** L2-015 AC1-2: the manager also offers Confirmed. */
   protected readonly paintOptions = computed((): SegmentedOption[] => {
     const disabled = this.connectivity.readOnly();
-    const hint = disabled ? 'You�re offline' : undefined;
+    const hint = disabled ? 'You’re offline' : undefined;
     const options: SegmentedOption[] = [
       { value: 'select', label: 'Select', pointer: true },
       ...(this.isManager()
