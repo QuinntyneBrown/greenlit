@@ -4,7 +4,7 @@
 
 A member's Requests page is titled My requests. It lists the member's requests in two groups: Upcoming (pending and future) and Past (decided or cancelled). Each entry shows the dates, the number of days, when it was sent, the note, any overlap with teammates and its status.
 
-A member may cancel a request the manager has not decided. Cancelling removes the request and clears its yellow days from the member's row.
+A member may cancel a request the manager has not decided. Cancelling withdraws the request: it moves to Past as Cancelled and its yellow days go back to blue (Tentative) on the member's row.
 
 **overlap** — teammate whose requested or confirmed days fall inside the request's range, shown as "Dev also out 18–19 Nov"
 
@@ -21,9 +21,9 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Backend**
 
-- **`RequestsController`** — `GET /api/requests/mine` and `POST /api/requests/{id}/cancel`.
-- **`GetMyRequestsQueryHandler`** — Returns the caller's requests split into upcoming and past, each with its overlaps from `OverlapFinder`.
-- **`CancelRequestCommandHandler`** — Allows only the request's own member and only while `Pending` (code `not_pending`). It calls `TimeOffRequest.Cancel` and deletes the linked `TimeOffDay` rows.
+- **`RequestsController`** — `GET /api/requests/mine` (any member of a team; the caller's own requests only) and `POST /api/requests/{id}/cancel`.
+- **`GetMyRequestsQueryHandler`** — Returns `{ managerName, upcoming, past }` for the caller's own row. Upcoming is the Pending requests, oldest first; Past is every decided or cancelled request, most recently sent first (L2-020 AC2, AC3). Overlaps are listed for pending requests only.
+- **`CancelRequestCommandHandler`** — Allows only the request's own member and only while `Pending`. It calls `TimeOffRequest.Cancel` and returns the linked `TimeOffDay` rows to Tentative. A request that is someone else's, on another team, unknown or the manager's to read is the same 404 `request_not_found`; one that is not Pending is a 409 `request_not_pending`. The response is 204.
 - **`OverlapFinder`** — Domain service: for a range, lists each other member with requested or confirmed days inside it and the dates they cover.
 
 **Shared plumbing (exists today)**
@@ -32,7 +32,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **`ValidationBehavior`** — MediatR pipeline behaviour in Greenlit.Application. It runs each request's FluentValidation validator before the handler and raises `ValidationException` on failure.
 - **`IAppDbContext`** — Greenlit.Application abstraction over the EF Core context, implemented by `AppDbContext` in Greenlit.Infrastructure. Handlers read and write through it in one unit of work.
 
-**Request lifecycle.** A `TimeOffRequest` starts `Pending`. The manager moves it to `Approved` or `Declined`; the member moves a pending request to `Cancelled`. Undo after a decision calls `Reopen`, which returns it to `Pending`. Each transition updates the request's `TimeOffDay` rows in the same unit of work: Pending = Requested, Approved = Confirmed, Declined = Tentative (from the mocks' declined request, whose days show tentative), Cancelled = row removed.
+**Request lifecycle.** A `TimeOffRequest` starts `Pending`. The manager moves it to `Approved` or `Declined`; the member moves a pending request to `Cancelled`. Undo after a decision calls `Reopen`, which returns it to `Pending`. Each transition updates the request's `TimeOffDay` rows in the same unit of work: Pending = Requested, Approved = Confirmed, Declined = Tentative (from the mocks' declined request, whose days show tentative), Cancelled = Tentative (the days are pencilled in again and stay linked to the cancelled request, as for a declined one; a cancelled request is stamped decided at the moment it was cancelled, which is what "Sent 20 Sep · decided 25 Sep" shows).
 
 ## Requirements
 
@@ -74,3 +74,11 @@ The query handler groups the requests and adds overlaps; the cancel handler enfo
 Only a pending request offers cancel (`L2-021` AC4). Cancelling clears the yellow days from the member's row (`L2-021` AC2).
 
 ![Sequence diagram: cancel a pending request](diagrams/sequence-cancel.png)
+
+## Decisions
+
+- **Page choice.** `/requests` has two routes: the manager's ledger (`managerMatch`) and `MyRequestsPage` for everyone else. Both stamp `page: 'requests'`.
+- **Rows.** `gl-request-list` gains a `mine` mode (range as title, "Sent …" under it, status on every row, "Cancel request" on pending ones, no avatar or tick).
+- **Cancelled days are Tentative**, not removed: the journey brief asks for blue cells and it matches Decline.
+- **Deferred: member request detail** (`dialogs/request-detail/member`). No acceptance criterion of L2-020 or L2-021 needs it and the detail endpoint is manager only; in My requests the title is plain text, not a button.
+- **A 409 on cancel** (already decided elsewhere) is shown as the generic failure alert; the list is not refreshed.

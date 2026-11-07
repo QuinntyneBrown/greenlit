@@ -58,6 +58,10 @@ export class HttpRequestService implements RequestService {
     });
   }
 
+  cancel(id: string): Observable<void> {
+    return this.http.post<void>(apiUrl(this.baseUrl, `api/requests/${id}/cancel`), null);
+  }
+
   reopen(id: string): Observable<void> {
     return this.http.post<void>(apiUrl(this.baseUrl, `api/requests/${id}/reopen`), null);
   }

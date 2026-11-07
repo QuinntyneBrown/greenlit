@@ -31,6 +31,8 @@ export interface RequestService {
   approve(ids: readonly string[]): Observable<readonly ApprovalResult[]>;
   /** Declines a pending request with an optional reason: its days return to Tentative and the member is emailed. Manager only. */
   decline(id: string, reason: string | null): Observable<DeclineResult>;
+  /** Withdraws the caller's own pending request: it becomes Cancelled and its days Tentative. Errors with 404 for anyone else's, 409 when it is no longer pending. */
+  cancel(id: string): Observable<void>;
   /** Undo of a decision: the request is Pending again and its days Requested. Manager only. */
   reopen(id: string): Observable<void>;
 }

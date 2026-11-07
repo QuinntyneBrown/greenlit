@@ -6,6 +6,10 @@ import { MyRequests, REQUEST_SERVICE, SentRequest } from 'api';
 import { Button, EmptyState, RequestList, RequestListItem, Skeleton } from 'components';
 
 import { AppDialogs } from '../../dialogs/app-dialogs';
+import {
+  CancelRequestData,
+  CancelRequestDialog,
+} from '../../dialogs/cancel-request/cancel-request.dialog';
 import { NewRequestData, NewRequestDialog } from '../../dialogs/new-request/new-request.dialog';
 import { ToastService } from '../../toasts/toast.service';
 import { requestSentToast } from '../calendar/request-toasts';
@@ -61,7 +65,12 @@ type Load =
             <h2 class="text-muted text-sm group-title">Upcoming</h2>
             <div class="card-plain">
               @if (upcoming().length) {
-                <gl-request-list label="Upcoming requests" [mine]="true" [items]="upcoming()" />
+                <gl-request-list
+                  label="Upcoming requests"
+                  [mine]="true"
+                  [items]="upcoming()"
+                  (cancelled)="cancel($event)"
+                />
               } @else {
                 <p class="text-muted nothing">Nothing planned yet.</p>
               }
@@ -160,6 +169,19 @@ export class MyRequestsPage {
 
   protected reload(): void {
     this.want.set({});
+  }
+
+  /** Cancel request: asks first in a dialog; a cancelled request moves to Past (L2-021). */
+  protected cancel(id: string): void {
+    const mine = this.mine();
+    const request = mine?.upcoming.find((r) => r.id === id);
+    if (!mine || !request) return;
+    const data: CancelRequestData = { request, managerName: mine.managerName };
+    this.dialogs
+      .open<boolean>(CancelRequestDialog, '.dialog__footer .btn', data)
+      .closed.subscribe((cancelled) => {
+        if (cancelled) this.reload();
+      });
   }
 
   /** Opens the Request time off dialog (L2-020 AC1); a sent request is announced and listed. */

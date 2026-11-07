@@ -79,3 +79,18 @@ export async function emailsTo(address: string, mark: number): Promise<string[]>
   }
   return [];
 }
+
+/** Ana sends a request of her own through the real API, so a spec can cancel it without touching the seeded one. */
+export async function sendOwnRequest(
+  request: APIRequestContext,
+  firstDay: string,
+  lastDay: string,
+  note: string,
+): Promise<void> {
+  const token = await signIn(request, "member");
+  const response = await request.post(`${API_BASE_URL}/api/requests`, {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { firstDay, lastDay, note },
+  });
+  if (!response.ok()) throw new Error(`Sending ${firstDay}-${lastDay} answered ${response.status()}.`);
+}
