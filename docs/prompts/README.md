@@ -5,6 +5,8 @@ One ready-to-run prompt per journey in [`docs/journeys.md`](../journeys.md), wri
 aligning the requirement, design and mock through ATDD implementation to a PR. Run them in order: each
 prompt names the journeys it builds on.
 
+Every prompt mandates that its PR is merged immediately after it is created.
+
 | # | Journey | Effort (days) | Prompt |
 |---|---|---|---|
 | 1 | View the team's month | 8 | [01-view-the-teams-month.md](01-view-the-teams-month.md) |
