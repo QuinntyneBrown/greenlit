@@ -20,8 +20,8 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 **Backend**
 
 - **`PeopleController`** — `POST /api/people/{id}/adjustments` behind the `Manager` policy.
-- **`AddAdjustmentCommandHandler`** — Stores an `AllowanceAdjustment` with `EffectiveOn` = today in the team's time zone. `<TO SUPPLY>`: whether the manager may date an adjustment, as the mock's "1 Jan 2026" suggests.
-- **`AddAdjustmentCommandValidator`** — Days other than 0 ("Enter a number other than 0."), a reason ("Give a reason so the history makes sense later.").
+- **`AddAdjustmentCommandHandler`** — Stores an `AllowanceAdjustment` with `EffectiveOn` = today in the team's time zone. The manager cannot date an adjustment: it always counts from today, so it lands in the current leave year and the history cannot be rewritten. The mock's "1 Jan 2026" is seeded data. It answers `201` with the stored adjustment; a member of another team is a `404` `person_not_found`, a non-manager a `403`.
+- **`AddAdjustmentCommandValidator`** — Days a whole number other than 0 (half days stay out of scope, ADR-003/ADR-007) ("Enter a number other than 0."), a reason ("Give a reason so the history makes sense later.").
 - **`AllowanceAdjustment`** — New entity listed in the class diagram.
 
 **Shared plumbing (exists today)**
@@ -30,7 +30,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **`ValidationBehavior`** — MediatR pipeline behaviour in Greenlit.Application. It runs each request's FluentValidation validator before the handler and raises `ValidationException` on failure.
 - **`IAppDbContext`** — Greenlit.Application abstraction over the EF Core context, implemented by `AppDbContext` in Greenlit.Infrastructure. Handlers read and write through it in one unit of work.
 
-**Decision record.** ADR-003 states that balances are out of scope. The requirements in `docs/specs` (from the mocks) introduce allowances, so this subsystem needs a new ADR that supersedes that clause before implementation: `<TO SUPPLY>`.
+**Decision record.** ADR-003 states that balances are out of scope. The requirements in `docs/specs` (from the mocks) introduce allowances, so ADR-007 (`docs/adr/ADR-007-allowances.md`) supersedes that clause: adjustments are rows summed by `AllowanceCalculator`, never a stored balance.
 
 ## Requirements
 
