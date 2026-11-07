@@ -199,7 +199,26 @@ interface RequestsApi {
   changeDetail(change: (detail: any) => void): Promise<void>;
 }
 
+/** Watches and steers the working-days saves (PUT /api/team/settings/work-week and /api/team/members/{id}/working-days). */
+interface WorkingDaysApi {
+  /** How many work-week saves the page has sent so far. */
+  weekSaves(): number;
+  /** Holds work-week saves until the returned function is called. */
+  holdWeek(): Promise<() => void>;
+  /** Work-week saves fail with a 500 until `recoverWeek()`. */
+  failWeek(): Promise<void>;
+  recoverWeek(): Promise<void>;
+  /** How many member working-days saves the page has sent so far. */
+  memberSaves(): number;
+  /** Holds member working-days saves until the returned function is called. */
+  holdMember(): Promise<() => void>;
+  /** Member working-days saves fail with a 500 until `recoverMember()`. */
+  failMember(): Promise<void>;
+  recoverMember(): Promise<void>;
+}
+
 interface GlFixtures {
+  workingDaysApi: WorkingDaysApi;
   holidaysApi: HolidaysApi;
   requestsApi: RequestsApi;
   invitationsApi: InvitationsApi;
@@ -380,6 +399,41 @@ export const test = base.extend<GlFixtures>({
         await page.route(reopen, (route) => route.fulfill({ status: 500, body: "" }));
       },
       recoverReopen: () => page.unroute(reopen),
+    });
+  },
+  workingDaysApi: async ({ page }, use) => {
+    const week = "**/api/team/settings/work-week";
+    const member = "**/api/team/members/*/working-days";
+    let weekSaves = 0;
+    let memberSaves = 0;
+    page.on("request", (request) => {
+      if (request.method() !== "PUT") return;
+      const path = new URL(request.url()).pathname;
+      if (path === "/api/team/settings/work-week") weekSaves++;
+      if (/^\/api\/team\/members\/[^/]+\/working-days$/.test(path)) memberSaves++;
+    });
+    const hold = async (pattern: string) => {
+      let release!: () => void;
+      const released = new Promise<void>((resolve) => (release = resolve));
+      await page.route(pattern, async (route) => {
+        await released;
+        await route.continue();
+      });
+      return release;
+    };
+    await use({
+      weekSaves: () => weekSaves,
+      holdWeek: () => hold(week),
+      failWeek: async () => {
+        await page.route(week, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recoverWeek: () => page.unroute(week),
+      memberSaves: () => memberSaves,
+      holdMember: () => hold(member),
+      failMember: async () => {
+        await page.route(member, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recoverMember: () => page.unroute(member),
     });
   },
   holidaysApi: async ({ page }, use) => {

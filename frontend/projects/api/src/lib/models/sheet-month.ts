@@ -1,4 +1,5 @@
 import { AllowanceFigures } from './allowance-figures';
+import { WeekDay } from './week-day';
 
 /** What a day cell is (mirrors `Greenlit.Application.Sheet.CellKind`). Red days are separate from time off. */
 export type CellKind =
@@ -24,6 +25,8 @@ export interface SheetMember {
   readonly allowance: AllowanceFigures | null;
   /** One cell per day of the month, in date order. */
   readonly cells: readonly SheetCell[];
+  /** The weekdays this person works: their own, else the team's (teams/working-days). */
+  readonly workingDays: readonly WeekDay[];
 }
 
 /** The Out row for one team working day. Weekends and holidays have no entry. */

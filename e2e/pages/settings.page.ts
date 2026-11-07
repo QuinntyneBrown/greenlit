@@ -64,6 +64,26 @@ export class SettingsPage extends BasePage {
     return this.workWeekSection().getByRole('group', { name: 'Working days', exact: true }).locator('.chip--day');
   }
 
+  /** The chip for `day` ("Fri") in the Working days group. */
+  workingDay(day: string): Locator {
+    return this.workingDays().filter({ hasText: day });
+  }
+
+  /** The work-week section's "Save changes"; it reads "Saving…" while busy. */
+  saveWorkWeekButton(): Locator {
+    return this.workWeekSection().locator(".settings-actions .btn--primary");
+  }
+
+  /** The polite status next to "Save changes": "Saved" after a save. */
+  saveWorkWeekStatus(): Locator {
+    return this.workWeekSection().locator(".settings-actions [aria-live='polite']");
+  }
+
+  /** The hint under the chips when none is on: "Pick at least one working day." */
+  workingDaysError(): Locator {
+    return this.workWeekSection().locator(".field__error");
+  }
+
   /** "Public holidays: United Kingdom" */
   holidaySource(): Locator {
     return this.workWeekSection().locator('.text-caption');

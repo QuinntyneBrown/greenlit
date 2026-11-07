@@ -15,7 +15,10 @@ import {
   SHEET_SERVICE,
   SheetMonth,
   TeamHolidays,
+  WORKING_DAYS_SERVICE,
   holidayDateLabel,
+  weekDayNames,
+  weekDayNumbers,
 } from 'api';
 import {
   Alert,
@@ -45,9 +48,6 @@ type HolidaysLoad =
   | { readonly state: 'loading' }
   | { readonly state: 'ready'; readonly holidays: TeamHolidays }
   | { readonly state: 'error' };
-
-/** The team's work week until it can be edited (teams/working-days): Monday to Friday. */
-const WORKING_DAYS = [1, 2, 3, 4, 5];
 
 /**
  * Settings (pages/settings/default). Journey 5 builds the Team section far enough to invite
@@ -125,7 +125,14 @@ const WORKING_DAYS = [1, 2, 3, 4, 5];
           Non-working days and holidays show red on the calendar and never count against allowance.
         </p>
         <p class="label label--days">Working days</p>
-        <gl-day-chips [pressed]="workingDays" />
+        <gl-day-chips
+          [pressed]="pressedDays()"
+          [disabled]="weekBusy() || savedWeek() === null"
+          (toggled)="toggleDay($event)"
+        />
+        @if (noDays()) {
+          <span class="field__error">Pick at least one working day.</span>
+        }
         @switch (holidaysLoad().state) {
           @case ('error') {
             <div class="card-plain holidays">
@@ -184,6 +191,18 @@ const WORKING_DAYS = [1, 2, 3, 4, 5];
             <gl-skeleton />
           }
         }
+        <div class="settings-actions">
+          <gl-button
+            variant="primary"
+            size="sm"
+            [busy]="weekBusy()"
+            [disabled]="!canSaveWeek()"
+            (click)="saveWorkWeek()"
+          >
+            {{ weekBusy() ? 'Saving…' : 'Save changes' }}
+          </gl-button>
+          <span aria-live="polite">{{ weekStatus() }}</span>
+        </div>
       </section>
     }
   `,
@@ -233,6 +252,18 @@ const WORKING_DAYS = [1, 2, 3, 4, 5];
     .holidays {
       margin-top: var(--space-2);
     }
+    .field__error {
+      display: block;
+      margin-top: var(--space-2);
+      font: var(--text-caption);
+      color: var(--color-danger-fg);
+    }
+    .settings-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-top: var(--space-6);
+    }
     .review {
       margin-bottom: var(--space-6);
     }
@@ -247,6 +278,7 @@ const WORKING_DAYS = [1, 2, 3, 4, 5];
 export class SettingsPage {
   private readonly sheet = inject(SHEET_SERVICE);
   private readonly holidayService = inject(HOLIDAY_SERVICE);
+  private readonly workingDaysService = inject(WORKING_DAYS_SERVICE);
   private readonly dialogs = inject(AppDialogs);
   private readonly toasts = inject(ToastService);
   private readonly document = inject(DOCUMENT);
@@ -293,7 +325,36 @@ export class SettingsPage {
     { initialValue: { state: 'idle' } as HolidaysLoad },
   );
 
-  protected readonly workingDays = WORKING_DAYS;
+  /** The team's work week as saved; null until it has loaded (the chips wait). */
+  private readonly loadedWeek = toSignal(
+    toObservable(this.isManager).pipe(
+      switchMap((manager) =>
+        manager
+          ? this.workingDaysService.workWeek().pipe(
+              map((days) => weekDayNumbers(days)),
+              catchError(() => of(null)),
+            )
+          : of(null),
+      ),
+    ),
+    { initialValue: null },
+  );
+  private readonly savedOverride = signal<readonly number[] | null>(null);
+  protected readonly savedWeek = computed(() => this.savedOverride() ?? this.loadedWeek());
+  /** What the chips show while the manager edits (L2-039); null while they match what is saved. */
+  private readonly draftWeek = signal<readonly number[] | null>(null);
+  protected readonly pressedDays = computed(() => this.draftWeek() ?? this.savedWeek() ?? []);
+  protected readonly weekBusy = signal(false);
+  protected readonly weekStatus = signal('');
+  protected readonly noDays = computed(
+    () => this.savedWeek() !== null && this.pressedDays().length === 0,
+  );
+  protected readonly canSaveWeek = computed(() => {
+    const draft = this.draftWeek();
+    const saved = this.savedWeek();
+    if (draft === null || saved === null || this.weekBusy() || draft.length === 0) return false;
+    return draft.join() !== saved.join();
+  });
 
   private readonly loadedHolidays = computed(() => {
     const load = this.holidaysLoad();
@@ -321,6 +382,35 @@ export class SettingsPage {
   protected readonly members = computed<MemberListItem[]>(() =>
     (this.ready()?.members ?? []).map((m) => ({ name: m.name })),
   );
+
+  protected toggleDay(day: number): void {
+    const days = this.pressedDays();
+    const next = days.includes(day) ? days.filter((d) => d !== day) : [...days, day].sort();
+    this.draftWeek.set(next);
+    this.weekStatus.set('');
+  }
+
+  /** "Save changes" of Work week & holidays; a failure keeps the chips as entered and offers Try again. */
+  protected saveWorkWeek(): void {
+    const draft = this.draftWeek();
+    if (draft === null || this.weekBusy()) return;
+    this.weekBusy.set(true);
+    this.workingDaysService.saveWorkWeek(weekDayNames(draft)).subscribe((result) => {
+      this.weekBusy.set(false);
+      if (result.ok) {
+        this.savedOverride.set(draft);
+        this.draftWeek.set(null);
+        this.weekStatus.set('Saved');
+        return;
+      }
+      this.toasts.show({
+        tone: 'danger',
+        title: 'We couldn’t save your changes',
+        body: 'Nothing was changed. Check your connection and try again.',
+        action: { label: 'Try again', run: () => this.saveWorkWeek() },
+      });
+    });
+  }
 
   protected retry(): void {
     this.attempt.update((n) => n + 1);

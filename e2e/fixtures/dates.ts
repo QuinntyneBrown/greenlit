@@ -50,6 +50,11 @@ export function wednesdayFor(project: string, slot: number): Day {
   return onOrAfter(thisYear(), month, 1 + 7 * slot, 3);
 }
 
+/** The first Friday of February this year: a day working-days specs turn red, in a month no other spec paints. */
+export function februaryFriday(): Day {
+  return onOrAfter(thisYear(), 2, 1, 5);
+}
+
 /** Christmas Day of this year: a holiday every United Kingdom team made through the API holds. */
 export function christmas(): Day {
   return onOrAfter(thisYear(), 12, 25, new Date(Date.UTC(thisYear(), 11, 25)).getUTCDay());

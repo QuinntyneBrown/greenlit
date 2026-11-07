@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 /**
  * Day chips (docs/design-system/components/chip.html, "Day chips"): the seven weekdays as pressed or not,
- * in a labelled group. `pressed` lists the day numbers that are on, Monday as 1 to Sunday as 7. They are
- * read-only until the team's work week can be edited (teams/working-days).
+ * in a labelled group. `pressed` lists the day numbers that are on, Monday as 1 to Sunday as 7; pressing a
+ * chip emits its number as `toggled` and the owner decides what is on (teams/working-days). `disabled`
+ * freezes the group while a save runs.
  */
 @Component({
   selector: 'gl-day-chips',
@@ -15,8 +16,9 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         <button
           class="chip chip--day"
           type="button"
-          disabled
+          [disabled]="disabled()"
           [attr.aria-pressed]="pressed().includes(i + 1)"
+          (click)="toggled.emit(i + 1)"
         >
           {{ day }}
         </button>
@@ -47,6 +49,7 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     }
     .chip:disabled {
       cursor: default;
+      opacity: 0.6;
     }
     .chip[aria-pressed='true'] {
       background: var(--color-accent-subtle);
@@ -60,4 +63,6 @@ export class DayChips {
   protected readonly days = DAYS;
   readonly label = input<string>('Working days');
   readonly pressed = input.required<readonly number[]>();
+  readonly disabled = input<boolean>(false);
+  readonly toggled = output<number>();
 }
