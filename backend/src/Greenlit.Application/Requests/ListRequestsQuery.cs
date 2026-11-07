@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Greenlit.Application.Requests;
 
-/// <summary>The team's requests that have this status (default Pending), oldest first.</summary>
-public sealed record ListRequestsQuery(string? Status) : IRequest<IReadOnlyList<RequestDto>>;
+/// <summary>The team's requests that have this status (default Pending), oldest first. Declined also lists Cancelled (L2-022 AC4).</summary>
+public sealed record ListRequestsQuery(string? Status) : IRequest<IReadOnlyList<RequestSummaryDto>>;
 
 public sealed class ListRequestsQueryValidator : AbstractValidator<ListRequestsQuery>
 {
@@ -21,7 +21,7 @@ public sealed class ListRequestsQueryValidator : AbstractValidator<ListRequestsQ
 }
 
 /// <summary>The manager's list (docs/detailed-designs/requests/approve-request): only the caller's own team is read.</summary>
-public sealed class ListRequestsQueryHandler : IRequestHandler<ListRequestsQuery, IReadOnlyList<RequestDto>>
+public sealed class ListRequestsQueryHandler : IRequestHandler<ListRequestsQuery, IReadOnlyList<RequestSummaryDto>>
 {
     private readonly IAppDbContext _db;
     private readonly ICurrentUser _currentUser;
@@ -32,7 +32,7 @@ public sealed class ListRequestsQueryHandler : IRequestHandler<ListRequestsQuery
         _currentUser = currentUser;
     }
 
-    public async Task<IReadOnlyList<RequestDto>> Handle(ListRequestsQuery query, CancellationToken ct)
+    public async Task<IReadOnlyList<RequestSummaryDto>> Handle(ListRequestsQuery query, CancellationToken ct)
     {
         var team = await RequestCaller.FindManagedTeamAsync(_db, _currentUser, ct);
         var status = string.IsNullOrEmpty(query.Status)
@@ -42,15 +42,11 @@ public sealed class ListRequestsQueryHandler : IRequestHandler<ListRequestsQuery
         var requests = await _db.TimeOffRequests.AsNoTracking()
             .Include(r => r.TeamMember)
             .Include(r => r.Days)
-            .Where(r => r.TeamMember.TeamId == team.Id && r.Status == status)
+            .Where(r => r.TeamMember.TeamId == team.Id
+                && (r.Status == status || (status == RequestStatus.Declined && r.Status == RequestStatus.Cancelled)))
             .ToListAsync(ct);
         // Ordered here: SQLite cannot sort DateTimeOffset in SQL.
-        return requests
-            .OrderBy(r => r.CreatedUtc).ThenBy(r => r.FirstDay)
-            .Select(r => new RequestDto(
-                r.Id, r.TeamMemberId, r.TeamMember.Name,
-                RequestInput.Iso(r.FirstDay), RequestInput.Iso(r.LastDay),
-                r.Days.Count, r.Note, r.Status.ToString(), r.CreatedUtc))
-            .ToList();
+        var ordered = requests.OrderBy(r => r.CreatedUtc).ThenBy(r => r.FirstDay).ToList();
+        return await RequestSummaries.BuildAsync(_db, team, ordered, ct);
     }
 }

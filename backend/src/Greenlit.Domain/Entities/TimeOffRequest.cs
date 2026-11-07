@@ -28,6 +28,9 @@ public class TimeOffRequest
     /// <summary>The manager's user id, set with <see cref="DecidedUtc"/>.</summary>
     public Guid? DecidedByUserId { get; set; }
 
+    /// <summary>Why the manager declined it, when they said; set by Decline (journey 10).</summary>
+    public string? DeclineReason { get; set; }
+
     public ICollection<TimeOffDay> Days { get; set; } = new List<TimeOffDay>();
 
     /// <summary>

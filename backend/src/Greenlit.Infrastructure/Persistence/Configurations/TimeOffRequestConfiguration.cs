@@ -12,6 +12,7 @@ public sealed class TimeOffRequestConfiguration : IEntityTypeConfiguration<TimeO
     {
         b.HasKey(x => x.Id);
         b.Property(x => x.Note).HasMaxLength(NoteMaxLength);
+        b.Property(x => x.DeclineReason).HasMaxLength(NoteMaxLength);
         b.Property(x => x.Status).HasConversion<string>().HasMaxLength(32);
         b.HasIndex(x => new { x.TeamMemberId, x.Status });
         b.HasOne(x => x.TeamMember).WithMany(m => m.Requests).HasForeignKey(x => x.TeamMemberId).OnDelete(DeleteBehavior.Cascade);
