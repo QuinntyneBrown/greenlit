@@ -1,0 +1,34 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* 300 DPI. Bleed canvas 3.75x2.25 in = 1125x675. Trim 3.5x2 in = 1050x600. Bleed 37.5px each side. */
+html,body{margin:0}
+body{width:1125px;height:675px;overflow:hidden;font-family:Inter,sans-serif;color:#0f1a14;-webkit-font-smoothing:antialiased}
+.card{position:absolute;inset:0;container-type:inline-size}
+.safe{position:absolute;left:75px;top:75px;right:75px;bottom:75px} /* bleed 37.5 + safety 37.5 ≈ 1/8in each */
+.front{background:#f6f7f3}
+.back{background:#179c52}
+.front .safe{display:flex;flex-direction:column;justify-content:space-between}
+.logo{display:inline-flex;align-items:center;gap:.28em;font-size:54px;font-family:'Plus Jakarta Sans',Inter,sans-serif;font-weight:800;letter-spacing:-0.045em;line-height:1}
+.logo svg{height:.72em;width:.984em}
+.logo .w{padding-bottom:.04em;position:relative}
+.logo .i{position:relative;display:inline-block}
+.logo .i b{position:absolute;left:50%;top:.04em;height:.17em;width:.17em;transform:translateX(-50%);border-radius:.035em;background:#179c52}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;column-gap:42px}
+.name{font-family:'Plus Jakarta Sans',sans-serif;font-size:50px;font-weight:800;line-height:1;letter-spacing:-0.025em;white-space:nowrap;margin:0}
+.title{margin:15px 0 0;font-size:28px;font-weight:500;line-height:1;color:#566055}
+.contact{text-align:right;font-size:26px;line-height:1}
+.contact p{margin:0;white-space:nowrap}.contact p+p{margin-top:12px;color:#566055}.contact p:first-child{font-weight:500}
+.back .safe{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:52px}
+.back svg{width:200px}
+.tag{margin:0;font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:700;line-height:1;letter-spacing:-0.01em;color:#0f1a14}
+</style></head><body>
+<div id="front" class="card front"><div class="safe">
+ <span class="logo"><svg viewBox="0 0 41 30"><rect x="0" y="0" width="8" height="8" rx="1.75" fill="#0F1A14" fill-opacity="0.12"/><rect x="11" y="0" width="8" height="8" rx="1.75" fill="#0F1A14" fill-opacity="0.12"/><rect x="22" y="0" width="8" height="8" rx="1.75" fill="#0F1A14" fill-opacity="0.12"/><rect x="33" y="0" width="8" height="8" rx="1.75" fill="#179C52" fill-opacity="1"/><rect x="0" y="11" width="8" height="8" rx="1.75" fill="#179C52" fill-opacity="1"/><rect x="11" y="11" width="8" height="8" rx="1.75" fill="#0F1A14" fill-opacity="0.12"/><rect x="22" y="11" width="8" height="8" rx="1.75" fill="#179C52" fill-opacity="1"/><rect x="33" y="11" width="8" height="8" rx="1.75" fill="#0F1A14" fill-opacity="0.12"/><rect x="0" y="22" width="8" height="8" rx="1.75" fill="#0F1A14" fill-opacity="0.12"/><rect x="11" y="22" width="8" height="8" rx="1.75" fill="#179C52" fill-opacity="1"/><rect x="22" y="22" width="8" height="8" rx="1.75" fill="#0F1A14" fill-opacity="0.12"/><rect x="33" y="22" width="8" height="8" rx="1.75" fill="#0F1A14" fill-opacity="0.12"/></svg><span class="w">greenl<span class="i">ı<b></b></span>t</span></span>
+ <div class="row"><div><p class="name">Quinntyne Brown</p><p class="title">Founder</p></div>
+ <div class="contact"><p>www.greenlit.rocks</p><p>quinntyne@greenlit.rocks</p></div></div>
+</div></div>
+<div id="back" class="card back" style="display:none"><div class="safe">
+ <svg viewBox="0 0 41 30"><rect x="0" y="0" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="0.28"/><rect x="11" y="0" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="0.28"/><rect x="22" y="0" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="0.28"/><rect x="33" y="0" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="1"/><rect x="0" y="11" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="1"/><rect x="11" y="11" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="0.28"/><rect x="22" y="11" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="1"/><rect x="33" y="11" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="0.28"/><rect x="0" y="22" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="0.28"/><rect x="11" y="22" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="1"/><rect x="22" y="22" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="0.28"/><rect x="33" y="22" width="8" height="8" rx="1.75" fill="#FFFFFF" fill-opacity="0.28"/></svg><p class="tag">Every day off, greenlit.</p>
+</div></div>
+</body></html>
