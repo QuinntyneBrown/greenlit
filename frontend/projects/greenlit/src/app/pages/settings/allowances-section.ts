@@ -30,7 +30,7 @@ const MONTHS = [
 ];
 
 /**
- * The Allowances section of Settings (pages/settings/default; docs/detailed-designs/allowances/allowance-defaults):
+ * The Allowances section of Settings (pages/settings/default; docs/detailed-designs/allowances/allowance-figures):
  * the days a new person gets, the month the leave year starts and the most days to carry over. Saved on its own.
  */
 @Component({
