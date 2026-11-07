@@ -39,6 +39,11 @@ export class SettingsPage extends BasePage {
     return this.teamSection().getByText("Only managers can change team settings.");
   }
 
+  /** The "Edit working days" button on the row of `name` (a manager's, for a part-timer). */
+  editWorkingDaysButton(name: string): Locator {
+    return this.teamSection().getByRole("button", { name: `Edit working days for ${name}`, exact: true });
+  }
+
   async openInviteDialog(): Promise<void> {
     await this.inviteButton().click();
   }

@@ -11,7 +11,13 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 @Component({
   selector: 'gl-day-chips',
   template: `
-    <div class="cluster" role="group" [attr.aria-label]="label()">
+    <div
+      class="cluster"
+      role="group"
+      [attr.aria-label]="label()"
+      [attr.id]="groupId() || null"
+      [attr.tabindex]="groupId() ? -1 : null"
+    >
       @for (day of days; track day; let i = $index) {
         <button
           class="chip chip--day"
@@ -63,6 +69,8 @@ export class DayChips {
   protected readonly days = DAYS;
   readonly label = input<string>('Working days');
   readonly pressed = input.required<readonly number[]>();
+  /** An id for the group, so an error summary can link to it. */
+  readonly groupId = input<string>('');
   readonly disabled = input<boolean>(false);
   readonly toggled = output<number>();
 }

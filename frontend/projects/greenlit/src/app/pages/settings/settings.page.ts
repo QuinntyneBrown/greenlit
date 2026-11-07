@@ -33,6 +33,7 @@ import {
 } from 'components';
 
 import { AppDialogs } from '../../dialogs/app-dialogs';
+import { EditWorkingDaysDialog } from '../../dialogs/edit-working-days/edit-working-days.dialog';
 import { InviteMemberDialog } from '../../dialogs/invite-member/invite-member.dialog';
 import { AddHolidayDialog, AddHolidayOutcome } from '../../dialogs/add-holiday/add-holiday.dialog';
 import { RemoveHolidayDialog } from '../../dialogs/remove-holiday/remove-holiday.dialog';
@@ -101,7 +102,11 @@ type HolidaysLoad =
               updating.
             </p>
           }
-          <gl-member-list label="Team members" [members]="members()" />
+          <gl-member-list
+            label="Team members"
+            [members]="members()"
+            (actioned)="editWorkingDays($event)"
+          />
           @if (isManager()) {
             <div class="actions">
               <gl-button (click)="invite()">
@@ -380,7 +385,11 @@ export class SettingsPage {
 
   /** Rows in the sheet's display order. */
   protected readonly members = computed<MemberListItem[]>(() =>
-    (this.ready()?.members ?? []).map((m) => ({ name: m.name })),
+    (this.ready()?.members ?? []).map((m) => ({
+      id: m.id,
+      name: m.name,
+      ...(this.isManager() ? { action: 'Edit working days' } : {}),
+    })),
   );
 
   protected toggleDay(day: number): void {
@@ -473,6 +482,21 @@ export class SettingsPage {
         action: { label: 'Try again', run: () => this.restoreHoliday(holiday) },
       });
     });
+  }
+
+  /** "Edit working days" on a member's row: a part-timer's days in a dialog (L2-040). */
+  protected editWorkingDays(item: MemberListItem): void {
+    const member = this.ready()?.members.find((m) => m.id === item.id);
+    if (!member) return;
+    this.dialogs
+      .open<boolean>(EditWorkingDaysDialog, '.chip--day', {
+        memberId: member.id,
+        firstName: member.name.split(' ')[0],
+        days: member.workingDays,
+      })
+      .closed.subscribe((saved) => {
+        if (saved) this.retry();
+      });
   }
 
   protected invite(): void {

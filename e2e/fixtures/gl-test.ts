@@ -16,6 +16,7 @@ import { test as base, expect, TestInfo } from "@playwright/test";
 import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { Person, SESSION_KEY, signIn } from "./session.js";
 import { RemoveHolidayDialog } from "../pages/remove-holiday.dialog.js";
+import { EditWorkingDaysDialog } from "../pages/edit-working-days.dialog.js";
 import { AddHolidayDialog } from "../pages/add-holiday.dialog.js";
 import { AcceptInvitePage } from "../pages/accept-invite.page.js";
 import { CalendarPage } from "../pages/calendar.page.js";
@@ -31,6 +32,7 @@ import { SettingsPage } from "../pages/settings.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
 
 interface Pages {
+  editWorkingDays: EditWorkingDaysDialog;
   removeHoliday: RemoveHolidayDialog;
   addHoliday: AddHolidayDialog;
   acceptInvite: AcceptInvitePage;
@@ -602,6 +604,7 @@ export const test = base.extend<GlFixtures>({
   pages: async ({ page }, use) => {
     await use({
       acceptInvite: new AcceptInvitePage(page),
+      editWorkingDays: new EditWorkingDaysDialog(page),
       addHoliday: new AddHolidayDialog(page),
       removeHoliday: new RemoveHolidayDialog(page),
       calendar: new CalendarPage(page),

@@ -1,9 +1,14 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 import { Avatar } from '../avatar/avatar';
+import { Button } from '../button/button';
 
 export interface MemberListItem {
+  /** Who the row is, when an action needs to say which row it came from. */
+  readonly id?: string;
   readonly name: string;
+  /** The label of a button at the end of the row, such as "Edit working days"; its accessible name adds the person. */
+  readonly action?: string;
   /** A second line under the name, such as the email address. */
   readonly detail?: string;
 }
@@ -15,7 +20,7 @@ export interface MemberListItem {
  */
 @Component({
   selector: 'gl-member-list',
-  imports: [Avatar],
+  imports: [Avatar, Button],
   template: `
     <ul class="member-list" [attr.aria-label]="label() || null">
       @for (member of members(); track member.name) {
@@ -27,6 +32,15 @@ export interface MemberListItem {
               <span class="member-list__detail">{{ member.detail }}</span>
             }
           </div>
+          @if (member.action) {
+            <gl-button
+              size="sm"
+              [ariaLabel]="member.action + ' for ' + member.name"
+              (click)="actioned.emit(member)"
+            >
+              {{ member.action }}
+            </gl-button>
+          }
         </li>
       }
     </ul>
@@ -78,4 +92,6 @@ export interface MemberListItem {
 export class MemberList {
   readonly members = input.required<readonly MemberListItem[]>();
   readonly label = input<string>('');
+  /** The row's action button was pressed. */
+  readonly actioned = output<MemberListItem>();
 }
