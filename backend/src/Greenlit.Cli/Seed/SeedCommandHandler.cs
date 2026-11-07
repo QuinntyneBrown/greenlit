@@ -1,5 +1,7 @@
+using Greenlit.Application.Abstractions;
 using Greenlit.Domain.Entities;
 using Greenlit.Domain.Enums;
+using Greenlit.Infrastructure.Authentication;
 using Greenlit.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,6 +18,9 @@ public sealed class SeedCommandHandler
 {
     public const string DemoManagerEmail = "maya@northwind.studio";
     public const string DemoTeamName = "Design team";
+
+    /// <summary>The password of every demo account (docs/detailed-designs/identity-and-access/sign-in).</summary>
+    public const string DemoPassword = "greenlit-demo";
 
     /// <summary>Stable ids so the e2e fixture can sign in as the manager or a member.</summary>
     public static readonly Guid MayaUserId = Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000001");
@@ -57,6 +62,10 @@ public sealed class SeedCommandHandler
         ("Dev Patel", 18, DayStatus.Requested), ("Dev Patel", 19, DayStatus.Requested),
     ];
 
+    /// <summary>What seeds before sign-in stored instead of a hash.</summary>
+    private const string LegacyPlaceholder = "seed-placeholder";
+
+    private readonly IPasswordHasher _hasher = new IdentityPasswordHasher();
     private readonly AppDbContext _db;
     private readonly ILogger<SeedCommandHandler> _logger;
 
@@ -72,17 +81,23 @@ public sealed class SeedCommandHandler
 
         foreach (var (name, email, userId) in Cast)
         {
-            if (await _db.Users.AnyAsync(u => u.Id == userId, ct)) continue;
-            _db.Users.Add(new User
+            var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId, ct);
+            if (user is null)
             {
-                Id = userId,
-                Email = email,
-                DisplayName = name,
-                // Not a usable credential: the password flow sets a real hash when it lands.
-                PasswordHash = "seed-placeholder",
-                Role = userId == MayaUserId ? UserRole.Manager : UserRole.Member,
-                CreatedUtc = now,
-            });
+                user = new User
+                {
+                    Id = userId,
+                    Email = email,
+                    DisplayName = name,
+                    Role = userId == MayaUserId ? UserRole.Manager : UserRole.Member,
+                    CreatedUtc = now,
+                };
+                _db.Users.Add(user);
+            }
+
+            // Earlier seeds stored a placeholder; a real hash someone set is left alone.
+            if (string.IsNullOrEmpty(user.PasswordHash) || user.PasswordHash == LegacyPlaceholder)
+                user.PasswordHash = _hasher.Hash(user, DemoPassword);
         }
 
         var team = await _db.Teams.Include(t => t.Members).Include(t => t.Holidays)

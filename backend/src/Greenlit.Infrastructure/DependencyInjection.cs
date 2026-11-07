@@ -43,6 +43,9 @@ public static class DependencyInjection
             if (!string.IsNullOrWhiteSpace(envKey)) o.SigningKey = envKey;
         });
 
+        services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
+        services.AddSingleton<ITokenService, JwtTokenService>();
+
         return services;
     }
 

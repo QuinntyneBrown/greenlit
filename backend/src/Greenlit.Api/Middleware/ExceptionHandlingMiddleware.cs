@@ -28,6 +28,10 @@ public sealed class ExceptionHandlingMiddleware
         {
             await WriteAsync(context, StatusCodes.Status400BadRequest, "Bad request", ex.Message, code: ex.Code);
         }
+        catch (UnauthorizedException ex)
+        {
+            await WriteAsync(context, StatusCodes.Status401Unauthorized, "Unauthorized", ex.Message, code: ex.Code);
+        }
         catch (ForbiddenException ex)
         {
             await WriteAsync(context, StatusCodes.Status403Forbidden, "Forbidden", ex.Message, code: ex.Code);

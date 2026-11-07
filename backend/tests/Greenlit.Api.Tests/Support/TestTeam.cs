@@ -5,6 +5,7 @@ using System.Text;
 using Greenlit.Domain.Entities;
 using Greenlit.Domain.Enums;
 using Greenlit.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
@@ -95,6 +96,17 @@ public sealed class TestTeam
 
     public Task AddHolidayAsync(DateOnly date, string name) =>
         _factory.WriteAsync(db => db.Holidays.Add(new Holiday { Id = Guid.NewGuid(), TeamId = Team.Id, Date = date, Name = name }));
+
+    /// <summary>The named person's account email.</summary>
+    public string EmailOf(string name) => _users[name].Email;
+
+    /// <summary>Gives the named person's account <paramref name="password"/>, hashed as the API verifies it.</summary>
+    public async Task SetPasswordAsync(string name, string password)
+    {
+        var user = _users[name];
+        var hash = new PasswordHasher<User>().HashPassword(user, password);
+        await _factory.WriteAsync(db => db.Users.Single(u => u.Id == user.Id).PasswordHash = hash);
+    }
 
     /// <summary>An HTTP client signed in as the named person.</summary>
     public HttpClient ClientFor(string name) => _factory.ClientFor(_users[name]);

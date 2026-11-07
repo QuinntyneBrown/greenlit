@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Greenlit.Cli.Seed;
 using Greenlit.Domain.Enums;
+using Greenlit.Infrastructure.Authentication;
 using Greenlit.Infrastructure.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +42,41 @@ public class SeedCommandHandlerTests
         var ana = await read.TeamMembers.SingleAsync(m => m.Name == "Ana Ruiz");
         ana.UserId.Should().Be(SeedCommandHandler.AnaUserId);
         (await read.Users.SingleAsync(u => u.Id == SeedCommandHandler.MayaUserId)).Email.Should().Be(SeedCommandHandler.DemoManagerEmail);
+    }
+
+    [Fact]
+    public async Task Every_demo_account_signs_in_with_the_demo_password()
+    {
+        // Journey 2: the e2e suite signs in through the sign-in page as a seeded person.
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        var hasher = new IdentityPasswordHasher();
+        var users = await read.Users.ToListAsync();
+        users.Should().HaveCount(7).And.OnlyContain(u => hasher.Verify(u, u.PasswordHash, SeedCommandHandler.DemoPassword));
+        users.Select(u => u.PasswordHash).Should().OnlyHaveUniqueItems("each hash has its own salt");
+    }
+
+    [Fact]
+    public async Task Seeding_never_replaces_a_password_someone_has_set()
+    {
+        var options = await SeedTwiceAsync();
+        var hasher = new IdentityPasswordHasher();
+        await using (var db = new AppDbContext(options))
+        {
+            var maya = await db.Users.SingleAsync(u => u.Id == SeedCommandHandler.MayaUserId);
+            maya.PasswordHash = hasher.Hash(maya, "my-own-password");
+            await db.SaveChangesAsync();
+        }
+
+        await using (var db = new AppDbContext(options))
+        {
+            await new SeedCommandHandler(db, NullLogger<SeedCommandHandler>.Instance).ExecuteAsync(CancellationToken.None);
+        }
+
+        await using var read = new AppDbContext(options);
+        var after = await read.Users.SingleAsync(u => u.Id == SeedCommandHandler.MayaUserId);
+        hasher.Verify(after, after.PasswordHash, "my-own-password").Should().BeTrue();
     }
 
     [Fact]
