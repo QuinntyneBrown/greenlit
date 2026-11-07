@@ -10,16 +10,19 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   styles: `
     .skip-link {
       position: absolute;
-      left: 1rem;
-      top: -100%;
-      padding: 0.5rem 0.75rem;
-      background: #fff;
-      color: #111;
+      left: var(--space-4);
+      top: calc(-1 * var(--space-24));
+      z-index: var(--z-tooltip);
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-bg-surface-raised);
+      color: var(--color-fg-default);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-3);
       text-decoration: none;
-      z-index: 100;
+      transition: top var(--duration-fast) var(--ease-standard);
     }
-    .skip-link:focus {
-      top: 1rem;
+    .skip-link:focus-visible {
+      top: var(--space-4);
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
