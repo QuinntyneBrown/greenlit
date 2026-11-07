@@ -2,6 +2,14 @@
 @if (shell() === 'app') {
   <gl-top-bar>
     <gl-app-nav [items]="mainNav()" />
+    @if (accountState.signedIn()) {
+      <gl-user-menu
+        slot="end"
+        [name]="accountState.account()?.displayName ?? null"
+        [detail]="accountState.detail()"
+        (signOut)="signOut()"
+      />
+    }
   </gl-top-bar>
 }
 <!--

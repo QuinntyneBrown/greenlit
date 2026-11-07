@@ -196,6 +196,27 @@ file sealed class JwtBearerPostConfigure : IPostConfigureOptions<JwtBearerOption
         if (name != JwtBearerDefaults.AuthenticationScheme) return;
         var j = _jwt.Value;
         options.RequireHttpsMetadata = !_env.IsDevelopment();
+        // A lapsed token says so (L2-007), so the client can send the person to sign in again; any other
+        // failure keeps the plain 401 and reveals nothing.
+        options.Events = new JwtBearerEvents
+        {
+            OnChallenge = async context =>
+            {
+                if (context.AuthenticateFailure is not SecurityTokenExpiredException) return;
+                context.HandleResponse();
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                await context.Response.WriteAsJsonAsync(
+                    new Microsoft.AspNetCore.Mvc.ProblemDetails
+                    {
+                        Status = StatusCodes.Status401Unauthorized,
+                        Title = "Unauthorized",
+                        Detail = "Your session has expired.",
+                        Extensions = { ["code"] = "session_expired" },
+                    },
+                    options: null,
+                    contentType: "application/problem+json");
+            },
+        };
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,

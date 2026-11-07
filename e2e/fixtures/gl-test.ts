@@ -14,7 +14,10 @@
 
 import { test as base, expect, TestInfo } from "@playwright/test";
 import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
-import { Person, SESSION_KEY, signIn } from "./session.js";
+import { Person, SESSION_KEY, expiredToken, signIn } from "./session.js";
+import { AccountMenu } from "../pages/account-menu.js";
+import { SessionExpiredPage } from "../pages/session-expired.page.js";
+import { SignOutDialog } from "../pages/sign-out.dialog.js";
 import { RemoveHolidayDialog } from "../pages/remove-holiday.dialog.js";
 import { EditWorkingDaysDialog } from "../pages/edit-working-days.dialog.js";
 import { AddHolidayDialog } from "../pages/add-holiday.dialog.js";
@@ -35,6 +38,9 @@ import { SettingsPage } from "../pages/settings.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
 
 interface Pages {
+  sessionExpired: SessionExpiredPage;
+  signOutDialog: SignOutDialog;
+  accountMenu: AccountMenu;
   editWorkingDays: EditWorkingDaysDialog;
   removeHoliday: RemoveHolidayDialog;
   addHoliday: AddHolidayDialog;
@@ -62,6 +68,8 @@ interface GotoOptions {
   month?: string;
   /** Open a guarded route with no session, to see where it sends a visitor. */
   signedOut?: boolean;
+  /** Open the route with a session the browser kept but whose time has run out. */
+  expiredSession?: boolean;
   /** Open sign-in with this `returnUrl`, as the guard does. */
   returnUrl?: string;
   /** The invitation token of an `acceptInvite` route (the one in the emailed link). */
@@ -96,6 +104,20 @@ interface AuthApi {
   hold(): Promise<() => void>;
   /** Every sign-in request fails with a 500. */
   fail(): Promise<void>;
+  /** Reading who is signed in (GET /api/auth/me) fails with a 500, for the account menu. */
+  failAccount(): Promise<void>;
+  /** How many sign-out requests (POST /api/auth/sign-out) the app has sent so far. */
+  signOuts(): number;
+  /** Holds sign-out requests until the returned function is called. */
+  holdSignOut(): Promise<() => void>;
+  /** Every sign-out request fails with a 500. */
+  failSignOut(): Promise<void>;
+  /** Every call to the API but sign-in is answered 401 `session_expired`, as for a token the API has let lapse. */
+  expireSession(): Promise<void>;
+  /** Every call to the API but sign-in is answered 401 with no code, as for a token the API does not accept. */
+  rejectSession(): Promise<void>;
+  /** The API answers as it really does again. */
+  restoreSession(): Promise<void>;
 }
 
 /**
@@ -311,6 +333,9 @@ export function isPhone(testInfo: TestInfo): boolean {
   return (testInfo.project.use.viewport?.width ?? 1440) < 720;
 }
 
+/** Every call to the Greenlit API except signing in. */
+const callsButSignIn = /\/api\/(?!auth\/sign-in)/;
+
 export const test = base.extend<GlFixtures>({
   goto: async ({ page }, use) => {
     await use(async (key, options = {}) => {
@@ -320,6 +345,12 @@ export const test = base.extend<GlFixtures>({
         await page.addInitScript(
           ([k, t]) => window.localStorage.setItem(k, t),
           [SESSION_KEY, token],
+        );
+      }
+      if (options.expiredSession && !isBaseline) {
+        await page.addInitScript(
+          ([k, t]) => window.localStorage.setItem(k, t),
+          [SESSION_KEY, expiredToken()],
         );
       }
       const path = pathFor(key).replace(
@@ -336,15 +367,62 @@ export const test = base.extend<GlFixtures>({
   authApi: async ({ page }, use) => {
     const pattern = "**/api/auth/sign-in";
     let count = 0;
+    let signOuts = 0;
     page.on("request", (request) => {
       if (
         request.method() === "POST" &&
         new URL(request.url()).pathname === "/api/auth/sign-in"
       )
         count++;
+      if (
+        request.method() === "POST" &&
+        new URL(request.url()).pathname === "/api/auth/sign-out"
+      )
+        signOuts++;
     });
     await use({
       requests: () => count,
+      signOuts: () => signOuts,
+      holdSignOut: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route("**/api/auth/sign-out", async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      expireSession: async () => {
+        await page.route(callsButSignIn, (route) =>
+          route.request().method() === "OPTIONS"
+            ? route.fallback()
+            : route.fulfill({
+                status: 401,
+                contentType: "application/problem+json",
+                headers: { "access-control-allow-origin": "*" },
+                body: JSON.stringify({ status: 401, title: "Unauthorized", code: "session_expired" }),
+              }),
+        );
+      },
+      rejectSession: async () => {
+        await page.route(callsButSignIn, (route) =>
+          route.request().method() === "OPTIONS"
+            ? route.fallback()
+            : route.fulfill({
+                status: 401,
+                headers: { "access-control-allow-origin": "*" },
+                body: "",
+              }),
+        );
+      },
+      restoreSession: async () => {
+        await page.unroute(callsButSignIn);
+      },
+      failSignOut: async () => {
+        await page.route("**/api/auth/sign-out", (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
+      },
       hold: async () => {
         let release!: () => void;
         const released = new Promise<void>((resolve) => (release = resolve));
@@ -356,6 +434,11 @@ export const test = base.extend<GlFixtures>({
       },
       fail: async () => {
         await page.route(pattern, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
+      },
+      failAccount: async () => {
+        await page.route("**/api/auth/me", (route) =>
           route.fulfill({ status: 500, body: "" }),
         );
       },
@@ -903,6 +986,7 @@ export const test = base.extend<GlFixtures>({
   },
   pages: async ({ page }, use) => {
     await use({
+      accountMenu: new AccountMenu(page),
       acceptInvite: new AcceptInvitePage(page),
       forgotPassword: new ForgotPasswordPage(page),
       resetPassword: new ResetPasswordPage(page),
@@ -920,7 +1004,9 @@ export const test = base.extend<GlFixtures>({
       cancelRequest: new CancelRequestDialog(page),
       requests: new RequestsPage(page),
       settings: new SettingsPage(page),
+      sessionExpired: new SessionExpiredPage(page),
       signIn: new SignInPage(page),
+      signOutDialog: new SignOutDialog(page),
     });
   },
   settle: async ({ page }, use) => {

@@ -53,6 +53,11 @@ export abstract class BasePage {
     return this.page.locator("a.skip-link");
   }
 
+  /** The session token the browser keeps (`greenlit.session`), or null when the person is signed out. */
+  async storedSession(): Promise<string | null> {
+    return this.page.evaluate(() => window.localStorage.getItem("greenlit.session"));
+  }
+
   /** The Greenlit logo in the top bar: a link home labelled "Greenlit, team calendar". */
   logo(): Locator {
     return this.page.locator("header.topbar").getByRole("link", { name: "Greenlit, team calendar", exact: true });
