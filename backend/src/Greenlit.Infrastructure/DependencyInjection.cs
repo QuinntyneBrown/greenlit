@@ -6,6 +6,7 @@ using Greenlit.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Greenlit.Infrastructure;
 
@@ -52,10 +53,11 @@ public static class DependencyInjection
             var envClientId = Environment.GetEnvironmentVariable(GoogleOptions.ClientIdEnvironmentVariable);
             if (!string.IsNullOrWhiteSpace(envClientId)) o.ClientId = envClientId;
         });
-        if (UsesFakeGoogle(configuration))
-            services.AddSingleton<IGoogleAccounts, FakeGoogleAccounts>();
-        else
-            services.AddSingleton<IGoogleAccounts, GoogleAccounts>();
+        // Resolved lazily, like the database provider: the test host adds its configuration after this runs.
+        services.AddSingleton<IGoogleAccounts>(sp =>
+            sp.GetRequiredService<IOptions<GoogleOptions>>().Value.UsesFake
+                ? new FakeGoogleAccounts()
+                : ActivatorUtilities.CreateInstance<GoogleAccounts>(sp));
 
         services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
         services.AddSingleton<ITokenService, JwtTokenService>();
