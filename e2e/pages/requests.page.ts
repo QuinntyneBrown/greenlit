@@ -18,7 +18,7 @@ export class RequestsPage extends BasePage {
   }
 
   protected readyAnchor(): Locator {
-    return this.rows().or(this.main.locator(".empty, .alert"));
+    return this.rows().or(this.main.locator(".empty, .alert, section[aria-label='Upcoming']"));
   }
 
   heading(): Locator {
@@ -73,6 +73,58 @@ export class RequestsPage extends BasePage {
   /** Placeholders shown while the requests load. */
   loading(): Locator {
     return this.main.locator("[aria-busy='true']");
+  }
+
+  // ---- My requests (a member) ----
+
+  /** "My requests", the member's title. */
+  mineHeading(): Locator {
+    return this.main.getByRole("heading", { level: 1, name: "My requests", exact: true });
+  }
+
+  /** "You can also request days straight from the calendar." */
+  mineIntro(): Locator {
+    return this.main.locator(".page-title-row p");
+  }
+
+  /** The "New request" button, which opens the Request time off dialog. */
+  newRequest(): Locator {
+    return this.main.getByRole("button", { name: "New request", exact: true });
+  }
+
+  /** One of the two groups, "Upcoming" or "Past". */
+  group(name: "Upcoming" | "Past"): Locator {
+    return this.main.locator(`section[aria-label='${name}']`);
+  }
+
+  /** The requests in a group. */
+  mine(group: "Upcoming" | "Past"): Locator {
+    return this.group(group).locator("li.request-row");
+  }
+
+  /** A member's own request in a group, found by its title, "16–20 Nov · 5 days". */
+  myRequest(group: "Upcoming" | "Past", summary: string): Locator {
+    return this.mine(group).filter({ has: this.page.locator(".request-row__title", { hasText: summary }) });
+  }
+
+  /** The title of a request in My requests: its range and days. */
+  mySummary(row: Locator): Locator {
+    return row.locator(".request-row__title");
+  }
+
+  /** "Sent 3 Nov" under the title. */
+  mySent(row: Locator): Locator {
+    return row.locator(".request-row__sub");
+  }
+
+  /** The row's "Cancel request" button; only a pending request has one. */
+  cancelRequest(row: Locator): Locator {
+    return row.getByRole("button", { name: "Cancel request", exact: true });
+  }
+
+  /** The text shown in a group with nothing in it ("Nothing planned yet."). */
+  groupEmpty(group: "Upcoming" | "Past"): Locator {
+    return this.group(group).locator("p.text-muted");
   }
 
   // ---- tabs ----

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import {
   ApprovalResult,
   DeclineResult,
+  MyRequests,
   NewRequest,
   RequestCounts,
   RequestDetail,
@@ -20,6 +21,8 @@ export interface RequestService {
   send(request: NewRequest): Observable<SentRequest>;
   /** The team's requests with this status, oldest first; `Declined` also lists the cancelled ones. Manager only. */
   list(status: SentRequest['status']): Observable<readonly RequestSummary[]>;
+  /** The signed-in person's own requests, Upcoming and Past. */
+  mine(): Observable<MyRequests>;
   /** How many requests each ledger tab holds. Manager only. */
   counts(): Observable<RequestCounts>;
   /** One request with the team for the weeks around it. Manager only; an unknown id errors with 404. */
@@ -28,6 +31,8 @@ export interface RequestService {
   approve(ids: readonly string[]): Observable<readonly ApprovalResult[]>;
   /** Declines a pending request with an optional reason: its days return to Tentative and the member is emailed. Manager only. */
   decline(id: string, reason: string | null): Observable<DeclineResult>;
+  /** Withdraws the caller's own pending request: it becomes Cancelled and its days Tentative. Errors with 404 for anyone else's, 409 when it is no longer pending. */
+  cancel(id: string): Observable<void>;
   /** Undo of a decision: the request is Pending again and its days Requested. Manager only. */
   reopen(id: string): Observable<void>;
 }

@@ -1,6 +1,12 @@
 import { Routes } from '@angular/router';
 
-import { authGuard, noTeamGuard, signedOutGuard, teamGuard } from './guards/auth.guard';
+import {
+  authGuard,
+  managerMatch,
+  noTeamGuard,
+  signedOutGuard,
+  teamGuard,
+} from './guards/auth.guard';
 
 /**
  * Greenlit application routes.
@@ -25,8 +31,15 @@ export const routes: Routes = [
   {
     path: 'requests',
     data: { page: 'requests' },
+    canMatch: [managerMatch],
     canActivate: [authGuard, teamGuard],
     loadComponent: () => import('./pages/requests/requests.page').then((m) => m.RequestsPage),
+  },
+  {
+    path: 'requests',
+    data: { page: 'requests' },
+    canActivate: [authGuard, teamGuard],
+    loadComponent: () => import('./pages/requests/my-requests.page').then((m) => m.MyRequestsPage),
   },
   {
     path: 'settings',

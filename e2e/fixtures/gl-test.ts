@@ -18,6 +18,7 @@ import { Person, SESSION_KEY, signIn } from "./session.js";
 import { AcceptInvitePage } from "../pages/accept-invite.page.js";
 import { CalendarPage } from "../pages/calendar.page.js";
 import { CreateTeamPage } from "../pages/create-team.page.js";
+import { CancelRequestDialog } from "../pages/cancel-request.dialog.js";
 import { DeclineRequestDialog } from "../pages/decline-request.dialog.js";
 import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
 import { NewRequestDialog } from "../pages/new-request.dialog.js";
@@ -36,6 +37,7 @@ interface Pages {
   notFound: NotFoundPage;
   requestDetail: RequestDetailDialog;
   declineRequest: DeclineRequestDialog;
+  cancelRequest: CancelRequestDialog;
   requests: RequestsPage;
   settings: SettingsPage;
   signIn: SignInPage;
@@ -145,6 +147,17 @@ interface RequestsApi {
   /** Undo (POST /api/requests/{id}/reopen) fails with a 500 until `recoverReopen()`. */
   failReopen(): Promise<void>;
   recoverReopen(): Promise<void>;
+  /** How many cancel requests (POST /api/requests/{id}/cancel) the page has made so far. */
+  cancels(): number;
+  /** Holds cancel requests until the returned function is called. */
+  holdCancel(): Promise<() => void>;
+  /** Cancel requests fail with a 500 until `recoverCancel()`. */
+  failCancel(): Promise<void>;
+  recoverCancel(): Promise<void>;
+  /** The member's own requests (GET /api/requests/mine) come back as `body`, whatever the database holds. */
+  stubMine(body: object): Promise<void>;
+  /** The member's own requests fail with a 500. */
+  failMine(): Promise<void>;
   /** The ids of the last approve request (POST /api/requests/approve) the page made. */
   lastApproved(): string[];
   /** Pending requests (GET /api/requests) fail with a 500 until `recoverList()`. */
@@ -218,6 +231,8 @@ export const test = base.extend<GlFixtures>({
     const approve = "**/api/requests/approve";
     const reopen = "**/api/requests/*/reopen";
     const decline = "**/api/requests/*/decline";
+    const cancel = "**/api/requests/*/cancel";
+    let cancels = 0;
     let declines = 0;
     let sends = 0;
     let approvals = 0;
@@ -227,6 +242,7 @@ export const test = base.extend<GlFixtures>({
       const path = new URL(request.url()).pathname;
       if (request.method() === "POST" && path === "/api/requests") sends++;
       if (request.method() === "POST" && /^\/api\/requests\/[^/]+\/decline$/.test(path)) declines++;
+      if (request.method() === "POST" && /^\/api\/requests\/[^/]+\/cancel$/.test(path)) cancels++;
       if (request.method() === "POST" && path === "/api/requests/approve") {
         approvals++;
         approved = (request.postDataJSON() as { ids: string[] }).ids;
@@ -234,6 +250,26 @@ export const test = base.extend<GlFixtures>({
     });
     await use({
       lastApproved: () => approved,
+      cancels: () => cancels,
+      holdCancel: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(cancel, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      failCancel: async () => {
+        await page.route(cancel, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recoverCancel: () => page.unroute(cancel),
+      stubMine: async (body) => {
+        await page.route("**/api/requests/mine", (route) => route.fulfill({ json: body }));
+      },
+      failMine: async () => {
+        await page.route("**/api/requests/mine", (route) => route.fulfill({ status: 500, body: "" }));
+      },
       failList: async () => {
         await page.route(list, (route) => (route.request().method() === "GET" ? route.fulfill({ status: 500, body: "" }) : route.fallback()));
       },
@@ -439,6 +475,7 @@ export const test = base.extend<GlFixtures>({
       notFound: new NotFoundPage(page),
       requestDetail: new RequestDetailDialog(page),
       declineRequest: new DeclineRequestDialog(page),
+      cancelRequest: new CancelRequestDialog(page),
       requests: new RequestsPage(page),
       settings: new SettingsPage(page),
       signIn: new SignInPage(page),

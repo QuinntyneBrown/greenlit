@@ -1,7 +1,7 @@
 // Acceptance Test
 // Traces to: L2-024 ("from the list"); the full ledger is review-requests.spec.ts
 // Description: The manager opens Requests and sees the pending requests of the team, each with an
-//              Approve button; a member has no business there and is sent to the calendar.
+//              Approve button; a member sees their own requests instead (my-requests.spec.ts).
 // Data: the demo seed. Cleo Park (12-13 Nov), Ana Ruiz (16-20 Nov, "Visiting family in Seville") and
 //       Dev Patel (18-19 Nov) each have a pending request.
 
@@ -32,11 +32,12 @@ test.describe("The pending requests", () => {
     expect(names.indexOf("Ana Ruiz")).toBeLessThan(names.indexOf("Dev Patel"));
   });
 
-  test("a member is sent to the calendar", async ({ goto, page, pages }) => {
+  test("a member has no ledger: the page is their own My requests", async ({ goto, page, pages }) => {
     await goto("requests", { as: "member" });
 
-    await pages.calendar.waitForReady();
-    await expect(page).toHaveURL(/\/$/);
+    await pages.requests.waitForReady();
+    await expect(pages.requests.mineHeading()).toBeVisible();
+    await expect(page).toHaveURL(/\/requests$/);
   });
 
   test("a visitor with no session is sent to sign-in and back", async ({ goto, page }) => {

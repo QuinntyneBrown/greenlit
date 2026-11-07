@@ -23,6 +23,11 @@ public sealed class RequestsController : ControllerBase
     public async Task<ActionResult<IReadOnlyList<RequestSummaryDto>>> List([FromQuery] string? status, CancellationToken ct) =>
         Ok(await _sender.Send(new ListRequestsQuery(status), ct));
 
+    /// <summary>The caller's own requests, Upcoming (pending) and Past (decided or cancelled); any member of a team.</summary>
+    [HttpGet("mine")]
+    public async Task<ActionResult<MyRequestsDto>> Mine(CancellationToken ct) =>
+        Ok(await _sender.Send(new GetMyRequestsQuery(), ct));
+
     /// <summary>How many requests each ledger tab holds (Declined includes Cancelled); manager only.</summary>
     [HttpGet("counts")]
     public async Task<ActionResult<RequestCountsDto>> Counts(CancellationToken ct) =>
@@ -47,6 +52,14 @@ public sealed class RequestsController : ControllerBase
     [HttpPost("{id:guid}/decline")]
     public async Task<ActionResult<DeclineResult>> Decline(Guid id, [FromBody] DeclineBody? body, CancellationToken ct) =>
         Ok(await _sender.Send(new DeclineRequestCommand(id, body?.Reason), ct));
+
+    /// <summary>The caller withdraws their own pending request: it becomes Cancelled and its days Tentative.</summary>
+    [HttpPost("{id:guid}/cancel")]
+    public async Task<IActionResult> Cancel(Guid id, CancellationToken ct)
+    {
+        await _sender.Send(new CancelRequestCommand(id), ct);
+        return NoContent();
+    }
 
     /// <summary>Undo of an approval: the request is Pending again and its days Requested.</summary>
     [HttpPost("{id:guid}/reopen")]

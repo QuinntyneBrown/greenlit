@@ -28,7 +28,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 10 | Decline a request | Manager declines with optional reason; days return to tentative. | 0 (built) |
 | 11 | Compute allowances | Yearly days, used, booked, requested and left; over-allowance warnings. | 0 (built) |
 | 12 | Select days and use the keyboard | Select ranges by drag or arrow keys; act from selection bar. | 0 (built) |
-| 13 | Follow and cancel own requests | Member sees upcoming and past requests and cancels pending ones. | 2.5 |
+| 13 | Follow and cancel own requests | Member sees upcoming and past requests and cancels pending ones. | 0 (built) |
 | 14 | Manage team holidays | Manager adds and removes team holidays, shown red for everyone. | 3 |
 | 15 | Set working days | Team work week and part-time days per member, never booked. | 3 |
 | 16 | Get feedback on actions | Toasts confirm every change, with undo and retry where possible. | 2 |
@@ -44,10 +44,16 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total remaining** | | **44.5** |
+| | **Total remaining** | | **42** |
 
 ## Notes
 
+- Journey 13 is built. A member's `/requests` is My requests (`GET /api/requests/mine`: `managerName`, Upcoming = pending,
+  Past = decided or cancelled), served by a second route after the manager's ledger (`managerMatch`). `gl-request-list` has
+  a `mine` mode. "Cancel request" opens the cancel dialog (`POST /api/requests/{id}/cancel`, 204; 404 `request_not_found`
+  for anyone else's, 409 `request_not_pending`); a cancelled request is Past, stamped decided, and its days return to
+  Tentative (blue). Deferred: the member's request detail drawer (`dialogs/request-detail/member`), which no acceptance
+  criterion needs.
 - Journey 12 is built. Select is the default mode: a click, a drag (mouse or finger) or Enter then the arrow
   keys (or Shift+arrows) selects a range on one row, and `gl-selection-bar` ("Selected days", a toolbar
   after the sheet) offers Confirm (manager only), Request, Tentative, Clear and Clear selection, with

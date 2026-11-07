@@ -17,6 +17,8 @@ export interface RequestListItem {
   readonly meta: readonly string[];
   /** Draw the people icon before each line of `meta` (who else is out). */
   readonly metaIcon?: boolean;
+  /** In a member's own list, the line under the summary: "Sent 3 Nov". */
+  readonly sent?: string;
 }
 
 /** A row's checkbox was ticked or cleared. */
@@ -34,6 +36,9 @@ export interface RequestToggle {
  * (`aria-busy`) and stays off; the other rows stay usable. A long note keeps to one line and carries
  * itself as its tooltip. A pending row also has Decline, before Approve, which asks the page to open the
  * Decline request dialog (`declined`); it goes off with Approve while that request is being approved.
+ * With `mine` the list is a member's own (pages/requests/member): no avatar, no tick, the range and days
+ * as each row's title with "Sent …" under it, the status on every row and, on a pending one, "Cancel
+ * request" (`cancelled`), which goes off while that request is being cancelled.
  */
 @Component({
   selector: 'gl-request-list',
@@ -52,13 +57,22 @@ export interface RequestToggle {
               />
             }
           </span>
-          <button class="request-row__who" type="button" (click)="opened.emit(item.id)">
-            <gl-avatar [name]="item.name" />
-            <span class="request-row__text">
-              <span class="request-row__title">{{ item.name }}</span>
-              <span class="request-row__sub">{{ item.summary }}</span>
-            </span>
-          </button>
+          @if (mine()) {
+            <div class="request-row__who">
+              <span class="request-row__text">
+                <span class="request-row__title">{{ item.summary }}</span>
+                <span class="request-row__sub">{{ item.sent }}</span>
+              </span>
+            </div>
+          } @else {
+            <button class="request-row__who" type="button" (click)="opened.emit(item.id)">
+              <gl-avatar [name]="item.name" />
+              <span class="request-row__text">
+                <span class="request-row__title">{{ item.name }}</span>
+                <span class="request-row__sub">{{ item.summary }}</span>
+              </span>
+            </button>
+          }
           <div class="request-text">
             @if (item.note) {
               <p class="request-row__note" [attr.title]="item.note">“{{ item.note }}”</p>
@@ -80,7 +94,14 @@ export interface RequestToggle {
             }
           </div>
           <div class="request-row__actions">
-            @if (item.state === 'pending') {
+            @if (mine()) {
+              <gl-request-status [state]="item.state" />
+              @if (item.state === 'pending') {
+                <gl-button size="sm" [disabled]="isBusy(item.id)" (click)="cancelled.emit(item.id)">
+                  Cancel request
+                </gl-button>
+              }
+            } @else if (item.state === 'pending') {
               <gl-button size="sm" [disabled]="isBusy(item.id)" (click)="declined.emit(item.id)">
                 <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
                   <path d="M6 6l12 12M18 6 6 18" />
@@ -235,6 +256,8 @@ export class RequestList {
   readonly busy = input<readonly string[]>([]);
   /** Pending rows carry a checkbox. */
   readonly selectable = input<boolean>(false);
+  /** A member's own list: see the class comment. */
+  readonly mine = input<boolean>(false);
   /** Ids of the ticked rows. */
   readonly selected = input<readonly string[]>([]);
 
@@ -242,6 +265,8 @@ export class RequestList {
   readonly opened = output<string>();
   /** Decline was pressed on this request. */
   readonly declined = output<string>();
+  /** Cancel request was pressed on this request (a member's own list). */
+  readonly cancelled = output<string>();
   /** Approve was pressed on this request. */
   readonly approved = output<string>();
   /** A row's checkbox was ticked or cleared. */

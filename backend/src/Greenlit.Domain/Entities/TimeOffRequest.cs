@@ -74,6 +74,24 @@ public class TimeOffRequest
     }
 
     /// <summary>
+    /// The member withdraws their Pending request: it becomes Cancelled, stamped as decided now, and its days go
+    /// back to Tentative (docs/detailed-designs/requests/my-requests). Load <see cref="Days"/> first.
+    /// </summary>
+    public void Cancel(DateTimeOffset now)
+    {
+        if (Status != RequestStatus.Pending)
+            throw new InvalidOperationException($"A {Status} request cannot be cancelled.");
+        Status = RequestStatus.Cancelled;
+        DecidedUtc = now;
+        foreach (var day in Days)
+        {
+            day.Status = DayStatus.Tentative;
+            day.ConfirmedUtc = null;
+            day.UpdatedUtc = now;
+        }
+    }
+
+    /// <summary>
     /// Undo of a decision: the request is Pending again. After an approval its days still Confirmed return to
     /// Requested; after a decline its days still Tentative and linked to it do, and the reason goes. A day changed
     /// since is not in that state and is left alone. Load <see cref="Days"/> first.

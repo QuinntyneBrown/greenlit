@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn, CanMatchFn, Router } from '@angular/router';
 
 import { SESSION_STORE } from 'api';
 
@@ -26,3 +26,9 @@ export const teamGuard: CanActivateFn = () =>
 /** Create-team is for people on no team; anyone already on one goes to the calendar. */
 export const noTeamGuard: CanActivateFn = () =>
   inject(SESSION_STORE).teamId() ? inject(Router).createUrlTree(['/']) : true;
+
+/**
+ * A route only a manager's session matches: the next route with the same path then serves everyone else
+ * (Requests is the manager's ledger, and a member's My requests). What the API allows is up to the API.
+ */
+export const managerMatch: CanMatchFn = () => inject(SESSION_STORE).isManager();
