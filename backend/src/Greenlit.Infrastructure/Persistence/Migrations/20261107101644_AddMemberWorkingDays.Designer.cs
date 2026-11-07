@@ -390,7 +390,7 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.HasOne("Greenlit.Domain.Entities.TimeOffRequest", "TimeOffRequest")
                         .WithMany("Days")
                         .HasForeignKey("TimeOffRequestId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.ClientSetNull);
 
                     b.Navigation("TeamMember");
 

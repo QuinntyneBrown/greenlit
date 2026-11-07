@@ -55,8 +55,7 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                 table: "TimeOffDays",
                 column: "TimeOffRequestId",
                 principalTable: "TimeOffRequests",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                principalColumn: "Id");
         }
 
         /// <inheritdoc />
