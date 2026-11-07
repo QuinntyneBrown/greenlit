@@ -122,5 +122,10 @@ Requirements: L2-015 (Paint mode), L2-017 (Who can change which days), L2-018 (U
 - The requirement, design, mocks, design-system pages and estimates agree with the code.
 - The work is on a branch with a PR to `main`, following the repo's conventions. Fetch and rebase onto
   `main` first, because another session may have pushed to it.
+- **MANDATORY: merge the PR IMMEDIATELY after creating it.** Do not wait for review, do not leave it
+  open, and do not end the run with an open PR. Run `gh pr merge <number> --squash` (without
+  `--delete-branch`) straight after `gh pr create`; if it conflicts, rebase onto `main`, resolve the
+  conflicts, force-push with lease and merge. Confirm with `gh pr view <number> --json state` that
+  it reads `MERGED`.
 - Only then end the run, with a short summary of what was built, the decisions made along the way, and
   anything deferred.
