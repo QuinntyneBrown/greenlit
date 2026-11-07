@@ -2,6 +2,9 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 
 export type AlertTone = 'info' | 'success' | 'warning' | 'danger';
 
+/** A picture that replaces the tone's icon, for connection banners. */
+export type AlertGlyph = 'offline' | 'reconnecting';
+
 /**
  * Alert (docs/design-system/components/alert.html): a message that stays on
  * the page until the situation changes. Four tones, an optional title,
@@ -22,7 +25,17 @@ export type AlertTone = 'info' | 'success' | 'warning' | 'danger';
       [attr.tabindex]="summary() ? -1 : null"
       [attr.role]="tone() === 'danger' ? 'alert' : 'status'"
     >
-      @switch (tone()) {
+      @switch (glyph() ?? tone()) {
+        @case ('offline') {
+          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M3 3l18 18M9 5a6 6 0 0 1 10 4 4 4 0 0 1 2 6M6 18a4 4 0 0 1 0-8" />
+          </svg>
+        }
+        @case ('reconnecting') {
+          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5" />
+          </svg>
+        }
         @case ('success') {
           <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="9" />
@@ -165,6 +178,8 @@ export type AlertTone = 'info' | 'success' | 'warning' | 'danger';
 export class Alert {
   readonly tone = input<AlertTone>('info');
   readonly title = input<string>('');
+  /** Replaces the tone's icon. */
+  readonly glyph = input<AlertGlyph | null>(null);
   /** Full-width page-level form. */
   readonly banner = input<boolean>(false);
   /** The error summary of a form (`form-summary`), focusable from script; see `gl-form-summary`. */

@@ -17,6 +17,7 @@ import { AccountState } from './account/account-state';
 import { AppDialogs } from './dialogs/app-dialogs';
 import { SignOutDialog } from './dialogs/sign-out/sign-out.dialog';
 
+import { ConnectionBanner } from './connection/connection-banner';
 import { RequestCountsState } from './requests/request-counts';
 import { ToastOutlet } from './toasts/toast-outlet';
 
@@ -53,7 +54,7 @@ export const MAIN_NAV: readonly AppNavItem[] = [
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SkipLink, TopBar, AppNav, UserMenu, ToastOutlet],
+  imports: [RouterOutlet, SkipLink, ConnectionBanner, TopBar, AppNav, UserMenu, ToastOutlet],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

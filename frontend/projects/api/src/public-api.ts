@@ -50,12 +50,15 @@ export * from './lib/api/coverage.service';
 export * from './lib/api/notifications.service';
 export * from './lib/api/year.service';
 export * from './lib/api/person.service';
+export * from './lib/api/connectivity.service';
+export * from './lib/api/connectivity.interceptor';
 export * from './lib/api/auth.interceptor';
 export * from './lib/api/session-expired.interceptor';
 
 // Concrete implementations (imported only by composition roots)
 export * from './lib/api/local-storage-session-store';
 export * from './lib/api/http-sheet.service';
+export * from './lib/api/browser-connectivity.service';
 export * from './lib/api/http-auth.service';
 export * from './lib/api/http-team.service';
 export * from './lib/api/http-invitation.service';

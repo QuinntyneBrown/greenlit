@@ -230,7 +230,7 @@
   <div class="ds-pair"><span>Danger border on page surface</span><span class="ds-pair__ratio" data-contrast="--color-danger-border|--color-bg-surface" data-min="1.5"></span></div>
 </div>
 <h3>Motion</h3>
-<p>Alerts do not animate; they appear and disappear. The connection banner's spinner or refresh icon is the only moving element, and a spinner keeps turning under <code>prefers-reduced-motion</code> because it is a status indicator (see <a href="spinner.html">spinner</a>). Do not auto-dismiss alerts: a message the person has not read in time would be lost (WCAG 2.2.1).</p>
+<p>Alerts do not animate; they appear and disappear. The connection banner's spinner or refresh icon is the only moving element, and a spinner keeps turning under <code>prefers-reduced-motion</code> because it is a status indicator (see <a href="spinner.html">spinner</a>). Do not auto-dismiss alerts: a message the person has not read in time would be lost (WCAG 2.2.1). The one exception is the “You’re back online” banner, which leaves after 5 s because it only confirms that the offline banner is over (it also keeps its Dismiss button).</p>
 <h3>Touch</h3>
 <p>The dismiss button is <code>--target-min</code> square with a negative margin that keeps the alert compact; actions are text buttons with 8px or more between them. Neither requires a gesture, and the alert never blocks the sheet underneath.</p>
     </section>

@@ -17,6 +17,7 @@ import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { personIdOf } from "./people.js";
 import { Person, SESSION_KEY, expiredToken, signIn } from "./session.js";
 import { AccountMenu } from "../pages/account-menu.js";
+import { ConnectionBanner } from "../pages/connection-banner.js";
 import { SessionExpiredPage } from "../pages/session-expired.page.js";
 import { SignOutDialog } from "../pages/sign-out.dialog.js";
 import { RemoveHolidayDialog } from "../pages/remove-holiday.dialog.js";
@@ -43,6 +44,7 @@ import { SignInPage } from "../pages/sign-in.page.js";
 import { YearPage } from "../pages/year.page.js";
 
 interface Pages {
+  connection: ConnectionBanner;
   sessionExpired: SessionExpiredPage;
   signOutDialog: SignOutDialog;
   accountMenu: AccountMenu;
@@ -389,7 +391,25 @@ interface RemoveMemberApi {
   recover(): Promise<void>;
 }
 
+/**
+ * Steers the check Greenlit makes when the connection returns (a HEAD request to /api/_ping): any answer
+ * means the API can be reached.
+ */
+interface ConnectionApi {
+  /** Holds the check until the returned function is called. */
+  holdProbe(): Promise<() => void>;
+  /** The check cannot reach the API until `recoverProbe()`. */
+  failProbe(): Promise<void>;
+  recoverProbe(): Promise<void>;
+  /** Month requests (GET /api/sheet) get no answer at all, as when the network drops, until `recoverMonth()`. */
+  dropMonth(): Promise<void>;
+  /** Month requests are answered with a 500 the page can read until `recoverMonth()`. */
+  failMonth(): Promise<void>;
+  recoverMonth(): Promise<void>;
+}
+
 interface GlFixtures {
+  connectionApi: ConnectionApi;
   removeMemberApi: RemoveMemberApi;
   adjustmentsApi: AdjustmentsApi;
   coverageApi: CoverageApi;
@@ -1165,6 +1185,36 @@ export const test = base.extend<GlFixtures>({
       },
     });
   },
+  connectionApi: async ({ page }, use) => {
+    const pattern = "**/api/_ping";
+    const month = /\/api\/sheet\?/;
+    await use({
+      holdProbe: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      failProbe: async () => {
+        await page.route(pattern, (route) => route.abort("failed"));
+      },
+      recoverProbe: () => page.unroute(pattern),
+      dropMonth: async () => {
+        await page.route(month, (route) => route.abort("failed"));
+      },
+      failMonth: async () => {
+        await page.route(month, (route) =>
+          route.request().method() === "OPTIONS"
+            ? route.fallback()
+            : route.fulfill({ status: 500, headers: { "access-control-allow-origin": "*" }, body: "" }),
+        );
+      },
+      recoverMonth: () => page.unroute(month),
+    });
+  },
   sheetApi: async ({ page }, use) => {
     const pattern = "**/api/sheet**";
     await use({
@@ -1216,6 +1266,7 @@ export const test = base.extend<GlFixtures>({
   pages: async ({ page }, use) => {
     await use({
       accountMenu: new AccountMenu(page),
+      connection: new ConnectionBanner(page),
       acceptInvite: new AcceptInvitePage(page),
       forgotPassword: new ForgotPasswordPage(page),
       resetPassword: new ResetPasswordPage(page),
