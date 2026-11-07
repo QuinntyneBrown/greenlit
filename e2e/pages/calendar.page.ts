@@ -77,9 +77,30 @@ export class CalendarPage extends BasePage {
       .locator(".grid-left");
   }
 
+  /** The glyph a cell draws over its colour ("✓", "…", "?"; empty for working and red days). */
+  async glyphOf(cell: Locator): Promise<string> {
+    return cell.evaluate((el) => getComputedStyle(el, "::after").content.replace(/^"|"$/g, "").replace(/^none$/, ""));
+  }
+
   /** The Out row's cells that carry a count, in day order. */
   outCells(): Locator {
     return this.grid().locator(".cover");
+  }
+
+  /**
+   * The Out row's count under the day `day` ("Wed 4 Nov"); matches nothing under a day nobody
+   * works. The Out row (the last row) has the header row's columns, so the cell is found by the
+   * day's column position.
+   */
+  async outCell(day: string): Promise<Locator> {
+    const labels = await this.grid()
+      .getByRole("row")
+      .first()
+      .getByRole("columnheader")
+      .evaluateAll((headers) => headers.map((h) => h.getAttribute("aria-label")));
+    const column = labels.indexOf(day);
+    if (column < 1) throw new Error(`No day column "${day}".`);
+    return this.grid().getByRole("row").last().getByRole("gridcell").nth(column - 1).locator(".cover");
   }
 
   /** Placeholder rows shown while the month loads. */

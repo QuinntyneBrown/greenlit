@@ -30,7 +30,23 @@ interface GotoOptions {
   month?: string;
 }
 
+/**
+ * Puts the month request (GET /api/sheet) into states the seeded data cannot
+ * produce: a failing API, a slow one, or a team of one.
+ */
+interface SheetApi {
+  /** Every month request fails with a 500 until `recover()`. */
+  fail(): Promise<void>;
+  /** Lets month requests through again. */
+  recover(): Promise<void>;
+  /** Holds month requests until the returned function is called. */
+  hold(): Promise<() => void>;
+  /** Answers with the real month, keeping only the signed-in person's row. */
+  onlyMe(): Promise<void>;
+}
+
 interface GlFixtures {
+  sheetApi: SheetApi;
   goto: (key: RouteKey, options?: GotoOptions) => Promise<void>;
   pages: Pages;
   /** Pause until web fonts have loaded and the network is idle so visual diffs are stable. */
@@ -52,6 +68,32 @@ export const test = base.extend<GlFixtures>({
       }
       const path = pathFor(key);
       await page.goto(options.month && !isBaseline ? `${path}?month=${options.month}` : path);
+    });
+  },
+  sheetApi: async ({ page }, use) => {
+    const pattern = "**/api/sheet**";
+    await use({
+      fail: async () => {
+        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recover: () => page.unroute(pattern),
+      hold: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      onlyMe: async () => {
+        await page.route(pattern, async (route) => {
+          const response = await route.fetch();
+          const month = await response.json();
+          month.members = month.members.filter((m: { isYou: boolean }) => m.isYou);
+          await route.fulfill({ response, json: month });
+        });
+      },
     });
   },
   pages: async ({ page }, use) => {
