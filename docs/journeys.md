@@ -32,7 +32,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 14 | Manage team holidays | Manager adds and removes team holidays, shown red for everyone. | 0 (built) |
 | 15 | Set working days | Team work week and part-time days per member, never booked. | 0 (built) |
 | 16 | Get feedback on actions | Toasts confirm every change, with undo and retry where possible. | 2 |
-| 17 | Set the coverage minimum | Manager sets fewest people in; short days flagged on sheet. | 2 |
+| 17 | Set the coverage minimum | Manager sets fewest people in; short days flagged on sheet. | 0 (built) |
 | 18 | Edit team settings | Manager edits name, time zone, roles, yearly days; members read-only. | 3 |
 | 19 | Reset a forgotten password | Emailed one-hour, single-use link to choose a new password. | 2.5 |
 | 20 | Use the account menu and sign out | Account menu, confirmed sign-out, and a clear expired-session page. | 1.5 |
@@ -44,10 +44,11 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total remaining** | | **42** |
+| | **Total remaining** | | **40** |
 
 ## Notes
 
+- Journey 17 is built. `PUT /api/team/settings/coverage` takes `{ minimum }` (manager only; 400 `errors.Minimum` "Choose between 0 and {team size} people." outside 0 to the number of members, 403 for a member) and `GET /api/team/settings` also returns `coverageMinimum` and `teamSize`. 0 means no minimum. The month and the request detail now report `coverageMinimum` (null at 0) and per-day `belowMinimum` (minimum above 0 and fewer Working or Tentative cells than it), so the calendar's Out cell is outlined and named "{n} out, {m} in. Below the minimum of {min}" and the request dialog's Team those weeks flags the same days; the approval warning (journey 8) already used the same minimum. Settings has a manager-only Coverage section with the new `gl-counter` and its own Save changes. Also fixed: `.gitignore` ignored `backend/src/**/Coverage`, which left `CoverageCalculator.cs` untracked. Deferred: the approval's own count (team size minus those out) still counts a part-timer on a non-working day as in, where the Out row does not.
 - Journey 15 is built (ADR-009). `WorkingDays` is a `[Flags]` weekday set: `Team.WorkingDays` (default Mon-Fri) and a nullable `TeamMember.WorkingDays` override, spelled `"Mon"`..`"Sun"` in the API. `GET /api/team/settings` returns `workingDays`; `PUT /api/team/settings/work-week` and `PUT /api/team/members/{id}/working-days` (manager only, 400 `errors.Days` when empty, 404 for another team's member) save them, and every sheet row carries its effective `workingDays`. Off days read `NotWorking` per member, are dropped by set-days (`all_non_working` when nothing is left), are refused in requests, and count in no allowance figure or Out row; stored days there are kept. Settings has editable working-day chips with their own Save changes, and an "Edit working days" button on each Team row opens the dialog until the person page (22). Deferred: a run of a part-timer's requested days across their off days is not joined into one request, and a holiday may still be added on a non-working weekday.
 - Journey 14 is built (ADR-008). `GET /api/team/holidays` (manager only) lists the current year's holidays, the source (`Team.HolidayCountry`, set at creation) and a `review` for next year; `POST` adds a day off (409 `holiday_exists`, 400 `day_is_weekend`, and it clears days members already booked on the date); `DELETE .../{id}` soft-deletes (`RemovedUtc`) and `POST .../{id}/restore` is Undo. Settings shows Work week & holidays to the manager only, with the working-day chips read-only until journey 15. New `gl-*` components: `gl-holiday-list`, `gl-day-chips`. Deferred: importing a public-holiday calendar after creation ("Review holidays" only jumps to the section).
 - Journey 13 is built. A member's `/requests` is My requests (`GET /api/requests/mine`: `managerName`, Upcoming = pending,
