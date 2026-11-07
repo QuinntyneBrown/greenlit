@@ -20,7 +20,11 @@ public sealed record PersonDto(
     int DaysOver,
     IReadOnlyList<PersonMonthDto> Months,
     IReadOnlyList<RunDto> Upcoming,
-    IReadOnlyList<RunDto> Taken);
+    IReadOnlyList<RunDto> Taken,
+    IReadOnlyList<AdjustmentDto> Adjustments);
+
+/// <summary>One allowance adjustment: days added (or removed, when negative), why, and from when.</summary>
+public sealed record AdjustmentDto(Guid Id, int Days, string Reason, DateOnly EffectiveDate);
 
 /// <summary>One month of the year at a glance; <c>Days</c> has one entry per calendar day.</summary>
 public sealed record PersonMonthDto(int Month, IReadOnlyList<PersonDayDto> Days);

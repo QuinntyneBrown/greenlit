@@ -46,7 +46,7 @@ public sealed class GetPersonQueryHandler : IRequestHandler<GetPersonQuery, Pers
             throw new ForbiddenException("own_details_only", "Only your own details are visible.");
 
         var figures = (await _allowances.ComputeAsync(team, [member], ct))[member.Id];
-        var (first, _) = AllowanceCalculator.LeaveYear(team, _allowances.Today(team));
+        var (first, last) = AllowanceCalculator.LeaveYear(team, _allowances.Today(team));
 
         var year = first.Year;
         var from = new DateOnly(year, 1, 1);
@@ -81,7 +81,14 @@ public sealed class GetPersonQueryHandler : IRequestHandler<GetPersonQuery, Pers
         var taken = RunBuilder.Build(days.Where(d => d.Date < today).Select(d => (d.Date, d.Status == "confirmed" ? Name(d.Status) : null)))
             .Reverse().ToList();
 
-        return new PersonDto(member.Id, member.Name, member.JobTitle, member.JoinedOn, WorkingDaysNames.ToNames(WorkingDayRule.For(team, member)), year, isYou, isManager, figures, figures.DaysOver(), months, upcoming, taken);
+        var adjustments = (await _db.AllowanceAdjustments.AsNoTracking()
+                .Where(a => a.TeamMemberId == member.Id && a.EffectiveDate >= first && a.EffectiveDate <= last)
+                .ToListAsync(ct))
+            .OrderBy(a => a.EffectiveDate).ThenBy(a => a.CreatedUtc)
+            .Select(a => new AdjustmentDto(a.Id, a.Days, a.Reason, a.EffectiveDate))
+            .ToList();
+
+        return new PersonDto(member.Id, member.Name, member.JobTitle, member.JoinedOn, WorkingDaysNames.ToNames(WorkingDayRule.For(team, member)), year, isYou, isManager, figures, figures.DaysOver(), months, upcoming, taken, adjustments);
     }
 
     /// <summary>The status as the API spells a <see cref="DayStatus"/>: "Confirmed", not "confirmed".</summary>
