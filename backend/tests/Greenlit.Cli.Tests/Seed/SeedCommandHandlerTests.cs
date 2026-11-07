@@ -55,6 +55,21 @@ public class SeedCommandHandlerTests
     }
 
     [Fact]
+    public async Task The_cast_has_the_job_titles_of_the_mocks_and_Ana_joined_in_March_2022()
+    {
+        // Journey 22: the person page's head reads "Product Designer · Joined Mar 2022" (pages/person/default).
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        var members = await read.TeamMembers.ToListAsync();
+        members.Single(m => m.Name == "Maya Chen").JobTitle.Should().Be("Design Lead");
+        var ana = members.Single(m => m.Name == "Ana Ruiz");
+        ana.JobTitle.Should().Be("Product Designer");
+        ana.JoinedOn.Should().Be(new DateOnly(2022, 3, 14));
+        members.Single(m => m.Name == "Finn Murphy").JoinedOn.Should().Be(new DateOnly(2025, 9, 1));
+    }
+
+    [Fact]
     public async Task Seven_newcomers_have_accounts_on_no_team_to_create_one_with()
     {
         // Journey 3: create-team needs signed-in people who are not on a team yet; journey 5: so does the invite spec.

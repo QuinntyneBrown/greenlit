@@ -57,6 +57,18 @@ public sealed class SeedCommandHandler
         ("Wren Fox", "wren@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000107")),
     ];
 
+    /// <summary>The mocks' job titles and join dates (docs/mocks/README.md); the person page shows them.</summary>
+    private static readonly (string Member, string JobTitle, DateOnly JoinedOn)[] Details =
+    [
+        ("Maya Chen", "Design Lead", new(2021, 1, 11)),
+        ("Ana Ruiz", "Product Designer", new(2022, 3, 14)),
+        ("Ben Okafor", "Senior Designer", new(2020, 6, 1)),
+        ("Cleo Park", "UX Researcher", new(2023, 9, 4)),
+        ("Dev Patel", "Content Designer", new(2024, 1, 15)),
+        ("Elif Yılmaz", "Design Engineer", new(2023, 2, 6)),
+        ("Finn Murphy", "Junior Designer", new(2025, 9, 1)),
+    ];
+
     /// <summary>Public holidays: United Kingdom, 2026 (docs/mocks/README.md).</summary>
     private static readonly (DateOnly Date, string Name)[] Holidays =
     [
@@ -168,6 +180,13 @@ public sealed class SeedCommandHandler
             {
                 team.Members.Add(new TeamMember { Id = Guid.NewGuid(), Name = name, Email = email, UserId = userId, SortOrder = order });
             }
+        }
+
+        foreach (var (name, title, joined) in Details)
+        {
+            var member = team.Members.Single(m => m.Name == name);
+            member.JobTitle ??= title;
+            member.JoinedOn ??= joined;
         }
 
         foreach (var (date, name) in Holidays)
