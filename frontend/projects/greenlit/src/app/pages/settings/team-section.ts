@@ -17,6 +17,7 @@ import {
   TeamSettingsTeam,
 } from 'api';
 import {
+  Alert,
   Button,
   FormSummary,
   MemberList,
@@ -36,15 +37,14 @@ import { ToastService } from '../../toasts/toast.service';
  */
 @Component({
   selector: 'app-team-section',
-  imports: [Button, FormSummary, MemberList, SelectField, TextField],
+  imports: [Alert, Button, FormSummary, MemberList, SelectField, TextField],
   template: `
     <h2 id="team-title" class="section-title" tabindex="-1">Team</h2>
     <p>Everyone who appears on the calendar. Managers can approve requests and edit any row.</p>
     @if (!team().canEdit) {
-      <p class="note">
-        Only managers can change team settings. Ask {{ team().managerName }} if something needs
-        updating.
-      </p>
+      <gl-alert class="note" title="Only managers can change team settings.">
+        Ask {{ team().managerName }} if something needs updating.
+      </gl-alert>
     }
     @if (nameError()) {
       <gl-form-summary class="summary" [items]="[{ field: 'team-name', message: nameError() }]" />
@@ -123,6 +123,9 @@ import { ToastService } from '../../toasts/toast.service';
       .form-grid {
         grid-template-columns: 1fr 1fr;
       }
+    }
+    .note {
+      margin-top: var(--space-4);
     }
     .summary {
       margin-top: var(--space-4);

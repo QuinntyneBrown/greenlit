@@ -154,9 +154,8 @@ test.describe("Settings for a member", () => {
     await goto("settings", { as: "member" });
     await pages.settings.waitForReady();
 
-    await expect(pages.settings.readOnlyNote()).toHaveText(
-      "Only managers can change team settings. Ask Maya Chen if something needs updating.",
-    );
+    await expect(pages.settings.readOnlyTitle()).toHaveText("Only managers can change team settings.");
+    await expect(pages.settings.readOnlyBody()).toHaveText("Ask Maya Chen if something needs updating.");
     await expect(pages.settings.inviteButton()).toHaveCount(0);
     await expect(pages.settings.memberNames().first()).toBeVisible();
   });

@@ -146,3 +146,22 @@ test.describe("The Team section", () => {
     await expect(settings.teamSummary()).toHaveCount(0);
   });
 });
+
+test.describe("The Team section for a member", () => {
+  test("is read-only, names the manager to ask and has no Save button (L2-009 AC3)", async ({ goto, pages }) => {
+    const settings = pages.settings;
+    await goto("settings", { as: "member" });
+    await settings.waitForReady();
+
+    await expect(settings.readOnlyTitle()).toHaveText("Only managers can change team settings.");
+    await expect(settings.readOnlyBody()).toHaveText("Ask Maya Chen if something needs updating.");
+    await expect(settings.teamNameField()).toHaveValue("Design team");
+    await expect(settings.teamNameField()).toBeDisabled();
+    await expect(settings.timeZoneField()).toBeDisabled();
+    await expect(settings.roleField("Ana Ruiz")).toBeDisabled();
+    await expect(settings.roleField("Maya Chen")).toHaveValue("Manager");
+    await expect(settings.yearlyDaysField("Ana Ruiz")).toBeDisabled();
+    await expect(settings.saveTeamButton()).toHaveCount(0);
+    await expect(settings.inviteButton()).toHaveCount(0);
+  });
+});

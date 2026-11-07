@@ -89,7 +89,17 @@ export class SettingsPage extends BasePage {
 
   /** The read-only note a member sees instead of the controls (L2-009 AC3). */
   readOnlyNote(): Locator {
-    return this.teamSection().getByText("Only managers can change team settings.");
+    return this.teamSection().locator(".alert");
+  }
+
+  /** "Only managers can change team settings." */
+  readOnlyTitle(): Locator {
+    return this.readOnlyNote().locator(".alert__title");
+  }
+
+  /** "Ask Maya Chen if something needs updating." */
+  readOnlyBody(): Locator {
+    return this.readOnlyNote().locator(".alert__body > div:not(.alert__title):not(.alert__actions)");
   }
 
   /** The "Edit working days" button on the row of `name` (a manager's, for a part-timer). */
