@@ -23,6 +23,11 @@ public sealed class RequestsController : ControllerBase
     public async Task<ActionResult<IReadOnlyList<RequestSummaryDto>>> List([FromQuery] string? status, CancellationToken ct) =>
         Ok(await _sender.Send(new ListRequestsQuery(status), ct));
 
+    /// <summary>The caller's own requests, Upcoming (pending) and Past (decided or cancelled); any member of a team.</summary>
+    [HttpGet("mine")]
+    public async Task<ActionResult<MyRequestsDto>> Mine(CancellationToken ct) =>
+        Ok(await _sender.Send(new GetMyRequestsQuery(), ct));
+
     /// <summary>How many requests each ledger tab holds (Declined includes Cancelled); manager only.</summary>
     [HttpGet("counts")]
     public async Task<ActionResult<RequestCountsDto>> Counts(CancellationToken ct) =>
