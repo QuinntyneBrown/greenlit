@@ -32,6 +32,16 @@ public class SeedCommandHandlerTests
     }
 
     [Fact]
+    public async Task The_design_team_wants_four_of_its_seven_in_as_the_mocks_show()
+    {
+        // Journey 8: approving can warn "below your minimum of 4" (notifications/request-toast/warning).
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        (await read.Teams.SingleAsync()).CoverageMinimum.Should().Be(4);
+    }
+
+    [Fact]
     public async Task The_manager_and_a_member_have_stable_ids_for_the_e2e_session()
     {
         var options = await SeedTwiceAsync();

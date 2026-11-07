@@ -19,6 +19,9 @@ public sealed class SeedCommandHandler
     public const string DemoManagerEmail = "maya@northwind.studio";
     public const string DemoTeamName = "Design team";
 
+    /// <summary>The fewest people the mocks want in (notifications/request-toast/warning); set when the team is first seeded.</summary>
+    public const int DemoCoverageMinimum = 4;
+
     /// <summary>The password of every demo account (docs/detailed-designs/identity-and-access/sign-in).</summary>
     public const string DemoPassword = "greenlit-demo";
 
@@ -127,6 +130,7 @@ public sealed class SeedCommandHandler
                 Name = DemoTeamName,
                 ManagerUserId = MayaUserId,
                 TimeZone = "Europe/London",
+                CoverageMinimum = DemoCoverageMinimum,
                 CreatedUtc = now,
             };
             _db.Teams.Add(team);
