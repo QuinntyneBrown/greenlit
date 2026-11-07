@@ -142,7 +142,7 @@ public sealed class SeedCommandHandler
                 user.PasswordHash = _hasher.Hash(user, DemoPassword);
         }
 
-        var team = await _db.Teams.Include(t => t.Members).Include(t => t.Holidays)
+        var team = await _db.Teams.IgnoreQueryFilters().Include(t => t.Members).Include(t => t.Holidays)
             .SingleOrDefaultAsync(t => t.ManagerUserId == MayaUserId && t.Name == DemoTeamName, ct);
         if (team is null)
         {
@@ -158,6 +158,8 @@ public sealed class SeedCommandHandler
             _db.Teams.Add(team);
             _logger.LogInformation("Added {Team}.", DemoTeamName);
         }
+
+        team.HolidayCountry ??= "GB";
 
         for (var order = 0; order < Cast.Length; order++)
         {

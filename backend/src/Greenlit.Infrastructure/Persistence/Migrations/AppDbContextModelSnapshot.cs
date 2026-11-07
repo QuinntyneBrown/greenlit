@@ -66,6 +66,9 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("nvarchar(120)");
 
+                    b.Property<DateTimeOffset?>("RemovedUtc")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<Guid>("TeamId")
                         .HasColumnType("uniqueidentifier");
 
@@ -132,6 +135,10 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("DefaultYearlyDays")
                         .HasColumnType("int");
+
+                    b.Property<string>("HolidayCountry")
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
 
                     b.Property<int>("LeaveYearStartMonth")
                         .HasColumnType("int");

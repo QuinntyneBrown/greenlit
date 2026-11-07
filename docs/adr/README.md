@@ -13,6 +13,7 @@ or infrastructure choice is made or revisited.
 | [ADR-005](ADR-005-public-holidays-from-rules.md)          | Public holidays are worked out offline from each country's rules                   |
 | [ADR-006](ADR-006-invitation-emails-logged-tokens-hashed.md) | Invitation emails are logged, and invitation tokens are stored hashed           |
 | [ADR-007](ADR-007-allowances.md)                  | Allowances are computed from day rows, never stored as a balance                   |
+| [ADR-008](ADR-008-team-holidays.md) | A removed holiday is kept, a team remembers its calendar, and adding a day off clears booked days |
 
 ## Template
 

@@ -143,6 +143,8 @@ test.describe("Selecting days from the keyboard", () => {
     await pages.calendar.waitForReady();
     await pages.calendar.focusCell("Ana Ruiz", "Mon 23 Nov");
     await pages.calendar.press("Shift+ArrowRight");
+    // Tab only reaches the bar once it has rendered, so wait for the selection it belongs to.
+    await expect(pages.calendar.selectedCells()).toHaveCount(2);
 
     await pages.calendar.press("Tab");
     await expect(pages.calendar.focusedAction()).toHaveText("Confirm");

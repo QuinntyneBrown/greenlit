@@ -61,6 +61,7 @@ public sealed class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand
             Name = request.Name!.Trim(),
             ManagerUserId = user.Id,
             TimeZone = request.TimeZone!,
+            HolidayCountry = request.HolidayCountry == TeamOptions.NoHolidays ? null : request.HolidayCountry,
             CreatedUtc = now,
         };
 

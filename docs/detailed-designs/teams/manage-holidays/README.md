@@ -14,18 +14,20 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Frontend**
 
-- **`WorkWeekSection`** — Lists the holidays ("Thu 1 Jan New Year's Day") with "Remove {name}" buttons and "Add day off", or the empty state "No holidays yet".
+- **`WorkWeekSection`** — Part of `SettingsPage`, shown to the manager only: the seven working-day chips (read-only until `teams/working-days`), then the current year's holidays ("Thu 1 Jan New Year's Day") with "Remove {name}" buttons and "Add day off", or the empty state "No holidays yet". While the holidays load it shows a skeleton; when they cannot be read it shows "We couldn’t load the holidays" with "Try again" (the wording pattern of `pages/settings/error`). Built from `gl-holiday-list` and `gl-day-chips`.
+- **Review banner** — A dismissible banner above the page title, "2027 UK bank holidays are ready" with "Review holidays"; the button moves focus to the section heading. Dismissing hides it until the page is opened again.
 - **`AddHolidayDialog`** — CDK Dialog in `app/dialogs/add-holiday` with Date and Name.
-- **`RemoveHolidayDialog`** — CDK Dialog in `app/dialogs/remove-holiday`. On success the page shows the toast "Removed {name}" with Undo.
-- **`HolidayService / HOLIDAY_SERVICE`** — `add(date, name)`, `remove(id)` and `restore(id)`.
+- **`RemoveHolidayDialog`** — CDK Dialog in `app/dialogs/remove-holiday`. On success the page shows the toast "Removed {name}" with Undo. When Undo fails the page shows the danger toast "We couldn’t undo that" with Try again.
+- **`HolidayService / HOLIDAY_SERVICE`** — `list()`, `add(date, name)`, `remove(id)` and `restore(id)`.
+- **`GetTeamHolidaysQueryHandler`** — `GET /api/team/holidays`: the current year's holidays in date order, the source label (from `Team.HolidayCountry`) and the review banner, all manager-only.
 
 **Backend**
 
 - **`HolidaysController`** — `POST /api/team/holidays`, `DELETE /api/team/holidays/{id}` and `POST /api/team/holidays/{id}/restore`, behind the `Manager` policy.
-- **`AddHolidayCommandHandler`** — Rejects a date that is already a holiday (code `holiday_exists`, "Mon 25 May is already a holiday (Spring bank holiday).") and a weekend date (code `day_is_weekend`). Existing `TimeOffDay` rows on the new holiday are `<TO SUPPLY>`: ADR-003 forbids a day on a holiday.
-- **`RemoveHolidayCommandHandler / RestoreHolidayCommandHandler`** — Remove soft-deletes the row (`RemovedUtc`) so Undo can restore it with its name.
-- **`GetHolidayReviewQueryHandler`** — Reports whether `IPublicHolidayProvider` has the next year's holidays not yet reviewed, for the banner "2027 UK bank holidays are ready". The review flow behind "Review holidays" is `<TO SUPPLY>`.
-- **`WeekendRule`** — Domain service that decides whether a date is a non-working day for the team or a member (shared with `teams/working-days`).
+- **`AddHolidayCommandHandler`** — Rejects a date that is already a holiday (code `holiday_exists`, "Mon 25 May is already a holiday (Spring bank holiday).") and a weekend date (code `day_is_weekend`). Existing `TimeOffDay` rows on the new holiday are deleted in the same unit of work, in any status: ADR-003 forbids a day on a holiday (ADR-008). Adding a date whose holiday was removed revives that row. Validation messages: `Pick a date.`, `Give the day off a name.` (120 characters at most).
+- **`RemoveHolidayCommandHandler / RestoreHolidayCommandHandler`** — Remove soft-deletes the row (`RemovedUtc`) so Undo can restore it with its name; restoring also deletes days booked on the date meanwhile. A holiday that is not on the caller's team is a 404 and reveals nothing; a member gets 403.
+- **Review rule** — `GetTeamHolidaysQueryHandler` sets `review` when the team's calendar (`Team.HolidayCountry`) has next year's holidays in `IPublicHolidayProvider` and the team holds none of that year, removed ones included. "Review holidays" jumps to the Work week & holidays section; importing a calendar after creation is deferred (ADR-008).
+- **`WorkingDayRule`** — Application rule (exists today, `IsWeekend`) that decides whether a date is a weekend; `teams/working-days` extends it for per-team and per-member working days.
 
 **Shared plumbing (exists today)**
 
@@ -59,13 +61,13 @@ The section and its dialogs call the Greenlit API, which stores the holidays in 
 
 ### Components
 
-`AddHolidayCommandHandler` checks duplicates and weekends through `WeekendRule`; removal is a soft delete so Undo can restore it.
+`AddHolidayCommandHandler` checks duplicates and weekends through `WorkingDayRule`; removal is a soft delete so Undo can restore it.
 
 ![C4 component view for manage team holidays](diagrams/c4-component.png)
 
 ### Class structure
 
-`Holiday` gains `RemovedUtc`; `WeekendRule` is the one place that decides non-working days.
+`Holiday` gains `RemovedUtc`; `WorkingDayRule` is the one place that decides non-working days.
 
 ![Class diagram for manage team holidays](diagrams/class-structure.png)
 

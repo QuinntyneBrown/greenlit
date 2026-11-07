@@ -9,4 +9,7 @@ public class Holiday
 
     public DateOnly Date { get; set; }
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>When the manager removed it; null while it is a holiday. Undo clears it (ADR-008).</summary>
+    public DateTimeOffset? RemovedUtc { get; set; }
 }

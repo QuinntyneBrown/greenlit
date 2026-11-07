@@ -28,6 +28,8 @@ export * from './lib/well/well';
 // dialogs and lists
 export * from './lib/dialog/dialog';
 export * from './lib/member-list/member-list';
+export * from './lib/holiday-list/holiday-list';
+export * from './lib/day-chips/day-chips';
 
 // requests
 export * from './lib/tabs/tabs';

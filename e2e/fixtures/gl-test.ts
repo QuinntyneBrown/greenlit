@@ -15,6 +15,8 @@
 import { test as base, expect, TestInfo } from "@playwright/test";
 import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { Person, SESSION_KEY, signIn } from "./session.js";
+import { RemoveHolidayDialog } from "../pages/remove-holiday.dialog.js";
+import { AddHolidayDialog } from "../pages/add-holiday.dialog.js";
 import { AcceptInvitePage } from "../pages/accept-invite.page.js";
 import { CalendarPage } from "../pages/calendar.page.js";
 import { CreateTeamPage } from "../pages/create-team.page.js";
@@ -29,6 +31,8 @@ import { SettingsPage } from "../pages/settings.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
 
 interface Pages {
+  removeHoliday: RemoveHolidayDialog;
+  addHoliday: AddHolidayDialog;
   acceptInvite: AcceptInvitePage;
   calendar: CalendarPage;
   createTeam: CreateTeamPage;
@@ -106,6 +110,30 @@ interface MembersApi {
   fail(): Promise<void>;
 }
 
+/** Watches and steers the holiday calls (GET /api/team/holidays and its writes). */
+interface HolidaysApi {
+  /** The holiday list (GET /api/team/holidays) comes back as `body`, whatever the database holds. */
+  stubList(body: object): Promise<void>;
+  /** Reading the holiday list fails with a 500 until `recoverList()`. */
+  failList(): Promise<void>;
+  recoverList(): Promise<void>;
+  /** How many add requests (POST /api/team/holidays) the page has sent so far. */
+  adds(): number;
+  /** Holds add requests until the returned function is called. */
+  holdAdd(): Promise<() => void>;
+  /** Add requests fail with a 500 until `recoverAdd()`. */
+  failAdd(): Promise<void>;
+  recoverAdd(): Promise<void>;
+  /** Holds remove requests (DELETE /api/team/holidays/{id}) until the returned function is called. */
+  holdRemove(): Promise<() => void>;
+  /** Remove requests fail with a 500 until `recoverRemove()`. */
+  failRemove(): Promise<void>;
+  recoverRemove(): Promise<void>;
+  /** Undo (POST /api/team/holidays/{id}/restore) fails with a 500 until `recoverRestore()`. */
+  failRestore(): Promise<void>;
+  recoverRestore(): Promise<void>;
+}
+
 /** Watches and steers the invitation requests (GET /api/invitations/{token} and POST .../accept). */
 interface InvitationsApi {
   /** How many accept requests the page has sent so far. */
@@ -172,6 +200,7 @@ interface RequestsApi {
 }
 
 interface GlFixtures {
+  holidaysApi: HolidaysApi;
   requestsApi: RequestsApi;
   invitationsApi: InvitationsApi;
   authApi: AuthApi;
@@ -353,6 +382,57 @@ export const test = base.extend<GlFixtures>({
       recoverReopen: () => page.unroute(reopen),
     });
   },
+  holidaysApi: async ({ page }, use) => {
+    const list = (url: URL) => url.pathname === "/api/team/holidays";
+    let adds = 0;
+    page.on("request", (request) => {
+      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/team/holidays") adds++;
+    });
+    await use({
+      adds: () => adds,
+      holdAdd: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(list, async (route) => {
+          if (route.request().method() !== "POST") return route.fallback();
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      failAdd: async () => {
+        await page.route(list, (route) => (route.request().method() === "POST" ? route.fulfill({ status: 500, body: "" }) : route.fallback()));
+      },
+      recoverAdd: () => page.unroute(list),
+      holdRemove: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route("**/api/team/holidays/*", async (route) => {
+          if (route.request().method() !== "DELETE") return route.fallback();
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      failRemove: async () => {
+        await page.route("**/api/team/holidays/*", (route) =>
+          route.request().method() === "DELETE" ? route.fulfill({ status: 500, body: "" }) : route.fallback(),
+        );
+      },
+      recoverRemove: () => page.unroute("**/api/team/holidays/*"),
+      failRestore: async () => {
+        await page.route("**/api/team/holidays/*/restore", (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recoverRestore: () => page.unroute("**/api/team/holidays/*/restore"),
+      stubList: async (body) => {
+        await page.route(list, (route) => (route.request().method() === "GET" ? route.fulfill({ json: body }) : route.fallback()));
+      },
+      failList: async () => {
+        await page.route(list, (route) => (route.request().method() === "GET" ? route.fulfill({ status: 500, body: "" }) : route.fallback()));
+      },
+      recoverList: () => page.unroute(list),
+    });
+  },
   invitationsApi: async ({ page }, use) => {
     const read = "**/api/invitations/*";
     const accept = "**/api/invitations/*/accept";
@@ -468,6 +548,8 @@ export const test = base.extend<GlFixtures>({
   pages: async ({ page }, use) => {
     await use({
       acceptInvite: new AcceptInvitePage(page),
+      addHoliday: new AddHolidayDialog(page),
+      removeHoliday: new RemoveHolidayDialog(page),
       calendar: new CalendarPage(page),
       createTeam: new CreateTeamPage(page),
       inviteMember: new InviteMemberDialog(page),

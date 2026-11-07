@@ -17,3 +17,15 @@ export async function ensureOwnTeam(request: APIRequestContext, person: Person, 
   // The earlier token names no team; the next sign-in does.
   forgetSignIn(person);
 }
+
+/**
+ * Puts a second row on `manager`'s team through the real API, so the calendar shows a sheet instead of "No one on
+ * the team yet". Safe to run again: inviting a pending address again only sends a new link.
+ */
+export async function ensureMember(request: APIRequestContext, manager: Person, name: string): Promise<void> {
+  const token = await signIn(request, manager);
+  await request.post(`${API_BASE_URL}/api/team/members`, {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { name, email: `${name.toLowerCase().replace(/\s+/g, ".")}@holidays.example`, role: "Member" },
+  });
+}
