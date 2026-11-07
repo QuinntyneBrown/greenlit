@@ -15,6 +15,7 @@
 import { test as base, expect, TestInfo } from "@playwright/test";
 import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { Person, SESSION_KEY, signIn } from "./session.js";
+import { AccountMenu } from "../pages/account-menu.js";
 import { RemoveHolidayDialog } from "../pages/remove-holiday.dialog.js";
 import { EditWorkingDaysDialog } from "../pages/edit-working-days.dialog.js";
 import { AddHolidayDialog } from "../pages/add-holiday.dialog.js";
@@ -35,6 +36,7 @@ import { SettingsPage } from "../pages/settings.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
 
 interface Pages {
+  accountMenu: AccountMenu;
   editWorkingDays: EditWorkingDaysDialog;
   removeHoliday: RemoveHolidayDialog;
   addHoliday: AddHolidayDialog;
@@ -96,6 +98,8 @@ interface AuthApi {
   hold(): Promise<() => void>;
   /** Every sign-in request fails with a 500. */
   fail(): Promise<void>;
+  /** Reading who is signed in (GET /api/auth/me) fails with a 500, for the account menu. */
+  failAccount(): Promise<void>;
 }
 
 /**
@@ -356,6 +360,11 @@ export const test = base.extend<GlFixtures>({
       },
       fail: async () => {
         await page.route(pattern, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
+      },
+      failAccount: async () => {
+        await page.route("**/api/auth/me", (route) =>
           route.fulfill({ status: 500, body: "" }),
         );
       },
@@ -903,6 +912,7 @@ export const test = base.extend<GlFixtures>({
   },
   pages: async ({ page }, use) => {
     await use({
+      accountMenu: new AccountMenu(page),
       acceptInvite: new AcceptInvitePage(page),
       forgotPassword: new ForgotPasswordPage(page),
       resetPassword: new ResetPasswordPage(page),

@@ -1,6 +1,7 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { Account } from '../models/account';
 import { Session } from '../models/session';
 
 /** What a sign-in attempt came to. */
@@ -39,6 +40,8 @@ export type ResetPasswordResult =
  * (identity-and-access/reset-password). A successful sign-in stores the session.
  */
 export interface AuthService {
+  /** Who is signed in; null when that could not be read (the account menu then names no one). */
+  account(): Observable<Account | null>;
   signIn(email: string, password: string): Observable<SignInResult>;
   requestPasswordReset(email: string): Observable<RequestPasswordResetResult>;
   checkResetLink(token: string): Observable<CheckResetLinkResult>;

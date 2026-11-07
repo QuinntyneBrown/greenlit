@@ -11,7 +11,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 
-import { AppNav, AppNavItem, SkipLink, TopBar } from 'components';
+import { AppNav, AppNavItem, SkipLink, TopBar, UserMenu } from 'components';
+
+import { AccountState } from './account/account-state';
 
 import { RequestCountsState } from './requests/request-counts';
 import { ToastOutlet } from './toasts/toast-outlet';
@@ -49,7 +51,7 @@ export const MAIN_NAV: readonly AppNavItem[] = [
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SkipLink, TopBar, AppNav, ToastOutlet],
+  imports: [RouterOutlet, SkipLink, TopBar, AppNav, UserMenu, ToastOutlet],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -69,6 +71,7 @@ export class App {
 
   protected readonly shell = computed(() => this.shellData().shell);
   private readonly requestCounts = inject(RequestCountsState);
+  protected readonly accountState = inject(AccountState);
 
   /** The main navigation; Requests carries the manager's pending count (L2-022 AC8). */
   protected readonly mainNav = computed<readonly AppNavItem[]>(() =>
@@ -87,7 +90,12 @@ export class App {
     });
     // The pending count follows the person around: read again after every navigation inside the app.
     effect(() => {
-      if (this.shellData().shell === 'app') untracked(() => this.requestCounts.refresh());
+      if (this.shellData().shell === 'app') {
+        untracked(() => {
+          this.requestCounts.refresh();
+          this.accountState.refresh();
+        });
+      }
     });
   }
 

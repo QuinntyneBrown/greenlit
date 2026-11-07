@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 
+import { Account } from '../models/account';
 import { Session } from '../models/session';
 import { API_BASE_URL, apiUrl } from './api-base-url';
 import {
@@ -20,6 +21,12 @@ export class HttpAuthService implements AuthService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = inject(API_BASE_URL);
   private readonly store = inject(SESSION_STORE);
+
+  account(): Observable<Account | null> {
+    return this.http
+      .get<Account>(apiUrl(this.baseUrl, 'api/auth/me'))
+      .pipe(catchError(() => of(null)));
+  }
 
   signIn(email: string, password: string): Observable<SignInResult> {
     return this.http
