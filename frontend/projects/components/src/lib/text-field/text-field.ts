@@ -17,14 +17,19 @@ export type TextFieldType = 'text' | 'email' | 'password' | 'number' | 'search';
  * optional help, and an error sentence that is added below, sets
  * `aria-invalid` and is referenced from `aria-describedby`.
  *
- * `inputId` is the control's id, so an error summary can link to it. Busy
+ * `optional` marks a field that may stay empty. `inputId` is the control's id, so an error summary can link to it. Busy
  * forms set `readonly`, never `disabled`, so values stay announced.
  */
 @Component({
   selector: 'gl-text-field',
   template: `
     <div class="field">
-      <label class="field__label" [for]="inputId()">{{ label() }}</label>
+      <label class="field__label" [for]="inputId()"
+        >{{ label() }}
+        @if (optional()) {
+          <span class="optional">(optional)</span>
+        }
+      </label>
       <input
         #control
         class="input"
@@ -61,6 +66,10 @@ export type TextFieldType = 'text' | 'email' | 'password' | 'number' | 'search';
       color: var(--color-fg-default);
       display: flex;
       gap: var(--space-1);
+    }
+    .field__label .optional {
+      color: var(--color-fg-subtle);
+      font-weight: var(--font-weight-regular);
     }
     .field__help {
       font: var(--text-body-sm);
@@ -126,6 +135,8 @@ export class TextField {
   readonly type = input<TextFieldType>('text');
   readonly autocomplete = input<string>('');
   readonly help = input<string>('');
+  /** Adds "(optional)" to the label, which is then part of the accessible name. */
+  readonly optional = input<boolean>(false);
   /** The error sentence; empty when the field is valid. */
   readonly error = input<string>('');
   readonly readonly = input<boolean>(false);

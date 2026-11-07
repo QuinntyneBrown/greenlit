@@ -6,14 +6,15 @@ import { LogoLockup } from '../logo-lockup/logo-lockup';
  * Auth card (docs/design-system/patterns/forms.html, "Auth card"): the
  * bare-shell layout of sign-in and the other account pages. The logo links to
  * sign-in; the card carries the heading, the lead and the projected body; an
- * optional `[slot=note]` sits centred under the card.
+ * optional `[slot=note]` sits centred under the card. `wide` gives forms with
+ * two columns, such as create-team, the `auth-card--wide` width.
  */
 @Component({
   selector: 'gl-auth-card',
   imports: [LogoLockup],
   host: { class: 'auth-layout' },
   template: `
-    <div class="auth-card stack">
+    <div class="auth-card stack" [class.auth-card--wide]="wide()">
       <div class="logo">
         <gl-logo-lockup [brand]="true" link="/sign-in" label="Greenlit, sign in" />
       </div>
@@ -42,6 +43,9 @@ import { LogoLockup } from '../logo-lockup/logo-lockup';
     .auth-card {
       width: 100%;
       max-width: 26rem;
+    }
+    .auth-card--wide {
+      max-width: 36rem;
     }
     .logo {
       display: flex;
@@ -74,4 +78,5 @@ import { LogoLockup } from '../logo-lockup/logo-lockup';
 export class AuthCard {
   readonly title = input.required<string>();
   readonly lead = input<string>('');
+  readonly wide = input<boolean>(false);
 }

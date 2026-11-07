@@ -20,6 +20,7 @@ export * from './lib/button/button';
 // forms and account pages
 export * from './lib/auth-card/auth-card';
 export * from './lib/text-field/text-field';
+export * from './lib/select-field/select-field';
 export * from './lib/form-summary/form-summary';
 
 // the sheet
