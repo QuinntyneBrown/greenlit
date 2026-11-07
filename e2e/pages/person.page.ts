@@ -110,6 +110,25 @@ export class PersonPage extends BasePage {
     return control(this.main.locator(".facts-bar"), "Request time off");
   }
 
+  /** The manager's Working days section: heading, hint, the days and "Edit working days". */
+  workingDaysSection(): Locator {
+    return this.main.locator("section", { has: this.page.getByRole("heading", { level: 2, name: "Working days" }) });
+  }
+
+  /** The days the person works, e.g. "Mon, Tue, Wed, Thu, Fri". */
+  workingDays(): Locator {
+    return this.workingDaysSection().locator("p").nth(1);
+  }
+
+  editWorkingDays(): Locator {
+    return control(this.workingDaysSection(), "Edit working days");
+  }
+
+  /** True when the page is wider than the screen. */
+  async scrollsSideways(): Promise<boolean> {
+    return this.page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
+  }
+
   // ---- the states ----
 
   /** The page's heading when it is not the person's name: "Time off", "Person not found", "Loading time off". */

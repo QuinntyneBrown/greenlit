@@ -42,12 +42,32 @@ function monthAndYear(iso: string): string {
   return `${MONTHS_SHORT[month - 1]} ${year}`;
 }
 
-/** "Product Designer · Joined Mar 2022", with whichever of the parts the person has. */
+const MON_TO_FRI = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+
+/** "Works Mon, Tue, Wed, Thu" for a part-timer; empty for the usual Monday to Friday. */
+export function worksLabel(person: Person): string {
+  const usual =
+    person.workingDays.length === MON_TO_FRI.length &&
+    person.workingDays.every((d, i) => d === MON_TO_FRI[i]);
+  return usual ? '' : `Works ${person.workingDays.join(', ')}`;
+}
+
+/** "Product Designer · Joined Mar 2022 · Works Mon, Tue", with whichever of the parts apply. */
 export function subtitle(person: Person): string {
   const parts: string[] = [];
   if (person.jobTitle) parts.push(person.jobTitle);
   if (person.joinedOn) parts.push(`Joined ${monthAndYear(person.joinedOn)}`);
+  const works = worksLabel(person);
+  if (works) parts.push(works);
   return parts.join(' · ');
+}
+
+/** "days left in 2026", and how far over the requests would take them (ADR-007). */
+export function caption(person: Person): string {
+  const left = `days left in ${person.year}`;
+  if (person.daysOver <= 0) return left;
+  const days = person.daysOver === 1 ? '1 day' : `${person.daysOver} days`;
+  return `${left} · ${days} over once requests are approved`;
 }
 
 /** The figures of L2-033 AC1; the allowance says how much of it is adjustment. */

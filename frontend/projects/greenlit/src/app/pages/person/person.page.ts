@@ -9,10 +9,11 @@ import { PERSON_SERVICE, Person, SentRequest } from 'api';
 import { Avatar, Button, EmptyState, Legend, MonthMini, RunList, Skeleton, Stat } from 'components';
 
 import { AppDialogs } from '../../dialogs/app-dialogs';
+import { EditWorkingDaysDialog } from '../../dialogs/edit-working-days/edit-working-days.dialog';
 import { NewRequestData, NewRequestDialog } from '../../dialogs/new-request/new-request.dialog';
 import { ToastService } from '../../toasts/toast.service';
 import { requestSentToast } from '../calendar/request-toasts';
-import { adjustmentItems, facts, miniMonths, runItems, subtitle } from './person-view';
+import { adjustmentItems, caption, facts, miniMonths, runItems, subtitle } from './person-view';
 
 type Load =
   | { readonly state: 'loading' }
@@ -68,8 +69,10 @@ function stateOf(error: unknown): 'forbidden' | 'notfound' | 'error' {
           </div>
         </div>
         <div>
-          <p class="big-number">{{ p.allowance.left }}</p>
-          <p class="text-muted text-sm caption">days left in {{ p.year }}</p>
+          <p class="big-number" [attr.data-over]="p.daysOver > 0 ? '' : null">
+            {{ p.allowance.left }}
+          </p>
+          <p class="text-muted text-sm caption">{{ caption() }}</p>
         </div>
       </header>
       <gl-stat class="person-facts" [facts]="facts()">
@@ -97,7 +100,7 @@ function stateOf(error: unknown): 'forbidden' | 'notfound' | 'error' {
           </div>
         </div>
       </section>
-      <div class="person-columns">
+      <div class="person-columns" [class.person-columns--manager]="p.canManage">
         <div class="person-columns__main">
           <div class="stack">
             <section aria-labelledby="up-title">
@@ -126,6 +129,20 @@ function stateOf(error: unknown): 'forbidden' | 'notfound' | 'error' {
             </section>
           </div>
         </div>
+        @if (p.canManage) {
+          <div class="stack">
+            <section aria-labelledby="workdays-title">
+              <h2 id="workdays-title" class="section-title">Working days</h2>
+              <p class="text-muted text-sm hint">
+                For part-timers. Days they don't work show red on their row.
+              </p>
+              <p class="days">{{ workingDays() }}</p>
+              <div class="action">
+                <gl-button size="sm" (click)="editWorkingDays(p)">Edit working days</gl-button>
+              </div>
+            </section>
+          </div>
+        }
       </div>
     } @else {
       @switch (load().state) {
@@ -278,6 +295,21 @@ function stateOf(error: unknown): 'forbidden' | 'notfound' | 'error' {
       gap: var(--space-12);
       margin-top: var(--space-12);
     }
+    @media (min-width: 64rem) {
+      .person-columns--manager {
+        grid-template-columns: 1.3fr 1fr;
+      }
+    }
+    .hint {
+      margin-top: var(--space-1);
+    }
+    .days {
+      margin-top: var(--space-3);
+      font-weight: var(--font-weight-medium);
+    }
+    .action {
+      margin-top: var(--space-3);
+    }
     .person-columns__main {
       max-width: 48rem;
     }
@@ -383,6 +415,19 @@ export class PersonPage {
       });
   }
 
+  /** "Edit working days": a part-timer's days in a dialog (L2-034 AC1, L2-040). */
+  protected editWorkingDays(person: Person): void {
+    this.dialogs
+      .open<boolean>(EditWorkingDaysDialog, '.chip--day', {
+        memberId: person.id,
+        firstName: person.name.split(' ')[0],
+        days: person.workingDays,
+      })
+      .closed.subscribe((saved) => {
+        if (saved) this.reload();
+      });
+  }
+
   protected reload(): void {
     this.attempt.next(this.attempt.value + 1);
   }
@@ -404,6 +449,14 @@ export class PersonPage {
   protected readonly adjustments = computed(() =>
     adjustmentItems(this.person()?.adjustments ?? []),
   );
+  protected readonly caption = computed(() => {
+    const p = this.person();
+    return p ? caption(p) : '';
+  });
+  protected readonly workingDays = computed(() => {
+    const p = this.person();
+    return p ? p.workingDays.join(', ') : '';
+  });
   protected readonly facts = computed(() => {
     const p = this.person();
     return p ? facts(p) : [];
