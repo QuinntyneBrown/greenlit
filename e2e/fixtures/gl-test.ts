@@ -19,6 +19,7 @@ import { AcceptInvitePage } from "../pages/accept-invite.page.js";
 import { CalendarPage } from "../pages/calendar.page.js";
 import { CreateTeamPage } from "../pages/create-team.page.js";
 import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
+import { NewRequestDialog } from "../pages/new-request.dialog.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
 import { SettingsPage } from "../pages/settings.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
@@ -28,6 +29,7 @@ interface Pages {
   calendar: CalendarPage;
   createTeam: CreateTeamPage;
   inviteMember: InviteMemberDialog;
+  newRequest: NewRequestDialog;
   notFound: NotFoundPage;
   settings: SettingsPage;
   signIn: SignInPage;
@@ -109,7 +111,19 @@ interface InvitationsApi {
   failAccept(): Promise<void>;
 }
 
+/** Watches and steers the request calls (POST /api/requests and GET /api/requests/quote). */
+interface RequestsApi {
+  /** How many send requests the page has made so far. */
+  sends(): number;
+  /** Holds send requests until the returned function is called. */
+  hold(): Promise<() => void>;
+  /** Every send request fails with a 500 until `recover()`. */
+  fail(): Promise<void>;
+  recover(): Promise<void>;
+}
+
 interface GlFixtures {
+  requestsApi: RequestsApi;
   invitationsApi: InvitationsApi;
   authApi: AuthApi;
   membersApi: MembersApi;
@@ -161,6 +175,32 @@ export const test = base.extend<GlFixtures>({
       fail: async () => {
         await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
       },
+    });
+  },
+  requestsApi: async ({ page }, use) => {
+    const pattern = "**/api/requests";
+    let sends = 0;
+    page.on("request", (request) => {
+      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/requests") sends++;
+    });
+    await use({
+      sends: () => sends,
+      hold: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          if (route.request().method() !== "POST") return route.fallback();
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      fail: async () => {
+        await page.route(pattern, (route) =>
+          route.request().method() === "POST" ? route.fulfill({ status: 500, body: "" }) : route.fallback(),
+        );
+      },
+      recover: () => page.unroute(pattern),
     });
   },
   invitationsApi: async ({ page }, use) => {
@@ -271,6 +311,7 @@ export const test = base.extend<GlFixtures>({
       calendar: new CalendarPage(page),
       createTeam: new CreateTeamPage(page),
       inviteMember: new InviteMemberDialog(page),
+      newRequest: new NewRequestDialog(page),
       notFound: new NotFoundPage(page),
       settings: new SettingsPage(page),
       signIn: new SignInPage(page),

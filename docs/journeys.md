@@ -22,7 +22,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 4 | Mark days on the calendar | Members paint their days tentative, requested or clear; managers confirm; undo. | 0 (built) |
 | 5 | Invite a member | Manager adds a row and emails a seven-day invitation. | 0 (built) |
 | 6 | Accept an invitation | Invitee sets name and password, then lands on the sheet. | 0 (built) |
-| 7 | Send a time-off request | Member asks for days with a note; sees days left. | 3 |
+| 7 | Send a time-off request | Member asks for days with a note; sees days left. | 0 (built) |
 | 8 | Approve a request | Manager confirms requested days, member is emailed, coverage warned, undo. | 3 |
 | 9 | Review requests | Manager sees pending requests with overlaps, opens detail, approves in bulk. | 5 |
 | 10 | Decline a request | Manager declines with optional reason; days return to tentative. | 2 |
@@ -44,9 +44,21 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total remaining** | | **61.5** |
+| | **Total remaining** | | **58.5** |
 
 ## Notes
+
+- Journey 7 is built, except days left: `GET /api/requests/quote` and `POST /api/requests` (any signed-in
+  member, own row only) create a `TimeOffRequest` and turn its working days Requested; a last day before
+  the first is `400 end_before_start`, a range with no working day `400 all_non_working` or
+  `day_is_holiday`, and days already requested or confirmed `409 days_taken`. `RequestLedger` also makes
+  painted Requested days a pending request (L2-015 AC5), and the demo seed gives the November Requested
+  days their requests. The dialog opens from a "Request time off" button on the member's calendar (My
+  requests and the person page are journeys 8 and 13). The dialog counts working days but cannot say
+  "days left" or "N days over" until allowances exist (journey 11, which must add `daysLeftAfter` and
+  `over` to the quote and update the dialog's wording to the `default` and `over-allowance` mocks). One
+  mock was added (`dialogs/new-request/taken`) and the member calendar mock gained the button. The
+  toast "Request sent" does not link to the request yet, and the manager's email is journey 25.
 
 - Journey 6 is built: `GET /api/invitations/{token}` and `POST /api/invitations/{token}/accept` are
   anonymous (the token is the credential). An unknown token is `404 invitation_not_found` and names no

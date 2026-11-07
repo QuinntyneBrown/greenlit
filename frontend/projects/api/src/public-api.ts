@@ -27,6 +27,7 @@ export * from './lib/models/session';
 export * from './lib/models/new-team';
 export * from './lib/models/invited-member';
 export * from './lib/models/invitation';
+export * from './lib/models/time-off-request';
 
 // Service contracts (interface + InjectionToken)
 export * from './lib/api/session-store';
@@ -34,6 +35,7 @@ export * from './lib/api/auth.service';
 export * from './lib/api/sheet.service';
 export * from './lib/api/team.service';
 export * from './lib/api/invitation.service';
+export * from './lib/api/request.service';
 export * from './lib/api/auth.interceptor';
 
 // Concrete implementations (imported only by composition roots)
@@ -42,4 +44,5 @@ export * from './lib/api/http-sheet.service';
 export * from './lib/api/http-auth.service';
 export * from './lib/api/http-team.service';
 export * from './lib/api/http-invitation.service';
+export * from './lib/api/http-request.service';
 export * from './lib/api/problem';

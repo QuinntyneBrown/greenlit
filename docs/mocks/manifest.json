@@ -349,7 +349,8 @@
         "busy",
         "invalid",
         "failed",
-        "over-allowance"
+        "over-allowance",
+        "taken"
       ],
       "opens_from": "requests"
     },
