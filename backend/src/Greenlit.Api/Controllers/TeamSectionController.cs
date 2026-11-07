@@ -1,5 +1,6 @@
 using Greenlit.Application.Teams;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Greenlit.Api.Controllers;
@@ -18,4 +19,9 @@ public sealed class TeamSectionController : ControllerBase
 
     [HttpGet]
     public Task<TeamSectionDto> Get(CancellationToken ct) => _sender.Send(new GetTeamSectionQuery(), ct);
+
+    [HttpPut]
+    [Authorize(Policy = "Manager")]
+    public Task<TeamSectionDto> Save([FromBody] SaveTeamSectionCommand command, CancellationToken ct) =>
+        _sender.Send(command, ct);
 }
