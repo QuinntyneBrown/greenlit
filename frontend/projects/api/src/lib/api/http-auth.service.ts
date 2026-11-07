@@ -28,6 +28,14 @@ export class HttpAuthService implements AuthService {
       .pipe(catchError(() => of(null)));
   }
 
+  signOut(): Observable<void> {
+    return this.http.post<void>(apiUrl(this.baseUrl, 'api/auth/sign-out'), null).pipe(
+      // The person asked to leave: a call that fails never keeps them signed in.
+      catchError(() => of(undefined)),
+      tap(() => this.store.clear()),
+    );
+  }
+
   signIn(email: string, password: string): Observable<SignInResult> {
     return this.http
       .post<Session>(apiUrl(this.baseUrl, 'api/auth/sign-in'), { email, password })

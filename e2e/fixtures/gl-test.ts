@@ -16,6 +16,7 @@ import { test as base, expect, TestInfo } from "@playwright/test";
 import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { Person, SESSION_KEY, signIn } from "./session.js";
 import { AccountMenu } from "../pages/account-menu.js";
+import { SignOutDialog } from "../pages/sign-out.dialog.js";
 import { RemoveHolidayDialog } from "../pages/remove-holiday.dialog.js";
 import { EditWorkingDaysDialog } from "../pages/edit-working-days.dialog.js";
 import { AddHolidayDialog } from "../pages/add-holiday.dialog.js";
@@ -36,6 +37,7 @@ import { SettingsPage } from "../pages/settings.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
 
 interface Pages {
+  signOutDialog: SignOutDialog;
   accountMenu: AccountMenu;
   editWorkingDays: EditWorkingDaysDialog;
   removeHoliday: RemoveHolidayDialog;
@@ -100,6 +102,12 @@ interface AuthApi {
   fail(): Promise<void>;
   /** Reading who is signed in (GET /api/auth/me) fails with a 500, for the account menu. */
   failAccount(): Promise<void>;
+  /** How many sign-out requests (POST /api/auth/sign-out) the app has sent so far. */
+  signOuts(): number;
+  /** Holds sign-out requests until the returned function is called. */
+  holdSignOut(): Promise<() => void>;
+  /** Every sign-out request fails with a 500. */
+  failSignOut(): Promise<void>;
 }
 
 /**
@@ -340,15 +348,36 @@ export const test = base.extend<GlFixtures>({
   authApi: async ({ page }, use) => {
     const pattern = "**/api/auth/sign-in";
     let count = 0;
+    let signOuts = 0;
     page.on("request", (request) => {
       if (
         request.method() === "POST" &&
         new URL(request.url()).pathname === "/api/auth/sign-in"
       )
         count++;
+      if (
+        request.method() === "POST" &&
+        new URL(request.url()).pathname === "/api/auth/sign-out"
+      )
+        signOuts++;
     });
     await use({
       requests: () => count,
+      signOuts: () => signOuts,
+      holdSignOut: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route("**/api/auth/sign-out", async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      failSignOut: async () => {
+        await page.route("**/api/auth/sign-out", (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
+      },
       hold: async () => {
         let release!: () => void;
         const released = new Promise<void>((resolve) => (release = resolve));
@@ -931,6 +960,7 @@ export const test = base.extend<GlFixtures>({
       requests: new RequestsPage(page),
       settings: new SettingsPage(page),
       signIn: new SignInPage(page),
+      signOutDialog: new SignOutDialog(page),
     });
   },
   settle: async ({ page }, use) => {

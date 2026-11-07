@@ -7,6 +7,7 @@
         slot="end"
         [name]="accountState.account()?.displayName ?? null"
         [detail]="accountState.detail()"
+        (signOut)="signOut()"
       />
     }
   </gl-top-bar>

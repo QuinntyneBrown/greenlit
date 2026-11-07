@@ -14,6 +14,8 @@ import { filter, map, startWith } from 'rxjs';
 import { AppNav, AppNavItem, SkipLink, TopBar, UserMenu } from 'components';
 
 import { AccountState } from './account/account-state';
+import { AppDialogs } from './dialogs/app-dialogs';
+import { SignOutDialog } from './dialogs/sign-out/sign-out.dialog';
 
 import { RequestCountsState } from './requests/request-counts';
 import { ToastOutlet } from './toasts/toast-outlet';
@@ -72,6 +74,7 @@ export class App {
   protected readonly shell = computed(() => this.shellData().shell);
   private readonly requestCounts = inject(RequestCountsState);
   protected readonly accountState = inject(AccountState);
+  private readonly dialogs = inject(AppDialogs);
 
   /** The main navigation; Requests carries the manager's pending count (L2-022 AC8). */
   protected readonly mainNav = computed<readonly AppNavItem[]>(() =>
@@ -97,6 +100,11 @@ export class App {
         });
       }
     });
+  }
+
+  /** Sign out in the account menu: asks first (L2-006). */
+  protected signOut(): void {
+    this.dialogs.open<boolean>(SignOutDialog, '.dialog__footer .btn');
   }
 
   private readShellData(): ShellData {

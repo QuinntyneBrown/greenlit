@@ -42,6 +42,8 @@ export type ResetPasswordResult =
 export interface AuthService {
   /** Who is signed in; null when that could not be read (the account menu then names no one). */
   account(): Observable<Account | null>;
+  /** Ends the session: tells the API and forgets the token, whether or not the API could be told. Always completes. */
+  signOut(): Observable<void>;
   signIn(email: string, password: string): Observable<SignInResult>;
   requestPasswordReset(email: string): Observable<RequestPasswordResetResult>;
   checkResetLink(token: string): Observable<CheckResetLinkResult>;
