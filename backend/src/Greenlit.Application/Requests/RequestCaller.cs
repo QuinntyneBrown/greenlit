@@ -26,6 +26,22 @@ internal static class RequestCaller
         return (team, member);
     }
 
+    /// <summary>
+    /// The caller's team, when the caller manages it: a caller on no team is a 404, a member of
+    /// one a 403, so a member learns nothing beyond "managers only".
+    /// </summary>
+    public static async Task<Team> FindManagedTeamAsync(IAppDbContext db, ICurrentUser currentUser, CancellationToken ct)
+    {
+        var userId = currentUser.UserId ?? throw new NotFoundException("Team", "the signed-in user");
+        var team = await db.Teams.AsNoTracking()
+            .Where(t => t.ManagerUserId == userId || t.Members.Any(m => m.UserId == userId))
+            .FirstOrDefaultAsync(ct)
+            ?? throw new NotFoundException("Team", "the signed-in user");
+        if (team.ManagerUserId != userId)
+            throw new ForbiddenException("forbidden", "Only the team's manager can do that.");
+        return team;
+    }
+
     /// <summary>The dates from <paramref name="first"/> to <paramref name="last"/> that are neither weekends nor the team's holidays.</summary>
     public static async Task<(List<DateOnly> Working, bool AllHolidays)> WorkingDaysAsync(
         IAppDbContext db, Guid teamId, DateOnly first, DateOnly last, CancellationToken ct)

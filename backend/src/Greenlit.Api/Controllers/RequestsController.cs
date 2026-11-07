@@ -22,4 +22,9 @@ public sealed class RequestsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<RequestDto>> Send([FromBody] SendRequestCommand command, CancellationToken ct) =>
         StatusCode(StatusCodes.Status201Created, await _sender.Send(command, ct));
+
+    /// <summary>The manager approves pending requests: they become Approved and their days Confirmed.</summary>
+    [HttpPost("approve")]
+    public async Task<ActionResult<IReadOnlyList<ApprovalResult>>> Approve([FromBody] ApproveRequestsCommand command, CancellationToken ct) =>
+        Ok(await _sender.Send(command, ct));
 }
