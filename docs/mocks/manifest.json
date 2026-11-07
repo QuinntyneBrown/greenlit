@@ -75,9 +75,11 @@
         "error",
         "invalid",
         "submitting",
-        "success"
+        "success",
+        "failed",
+        "unavailable"
       ],
-      "route": "/invite/:token",
+      "route": "/accept-invite/:token",
       "not_applicable": {
         "empty": "A form has no collection that could be empty."
       }
