@@ -159,6 +159,11 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
+                    b.Property<int>("WorkingDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(31);
+
                     b.HasKey("Id");
 
                     b.HasIndex("ManagerUserId");

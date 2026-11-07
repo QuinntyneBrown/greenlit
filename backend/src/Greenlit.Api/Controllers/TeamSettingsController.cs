@@ -1,4 +1,5 @@
 using Greenlit.Application.Allowances;
+using Greenlit.Application.Teams;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,5 +21,10 @@ public sealed class TeamSettingsController : ControllerBase
 
     [HttpPut("allowances")]
     public Task<TeamSettingsDto> SaveAllowances([FromBody] SaveAllowanceDefaultsCommand command, CancellationToken ct) =>
+        _sender.Send(command, ct);
+
+    /// <summary>The team's work week (docs/detailed-designs/teams/working-days).</summary>
+    [HttpPut("work-week")]
+    public Task<TeamSettingsDto> SaveWorkWeek([FromBody] SaveWorkWeekCommand command, CancellationToken ct) =>
         _sender.Send(command, ct);
 }
