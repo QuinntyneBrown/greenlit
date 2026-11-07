@@ -74,17 +74,20 @@ public class TimeOffRequest
     }
 
     /// <summary>
-    /// Undo of an approval: the request is Pending again and its days still Confirmed return to Requested.
-    /// A day the manager has since changed is not in that state and is left alone. Load <see cref="Days"/> first.
+    /// Undo of a decision: the request is Pending again. After an approval its days still Confirmed return to
+    /// Requested; after a decline its days still Tentative and linked to it do, and the reason goes. A day changed
+    /// since is not in that state and is left alone. Load <see cref="Days"/> first.
     /// </summary>
     public void Reopen(DateTimeOffset now)
     {
-        if (Status != RequestStatus.Approved)
+        if (Status is not (RequestStatus.Approved or RequestStatus.Declined))
             throw new InvalidOperationException($"A {Status} request cannot be reopened.");
+        var from = Status == RequestStatus.Approved ? DayStatus.Confirmed : DayStatus.Tentative;
         Status = RequestStatus.Pending;
         DecidedUtc = null;
         DecidedByUserId = null;
-        foreach (var day in Days.Where(d => d.Status == DayStatus.Confirmed))
+        DeclineReason = null;
+        foreach (var day in Days.Where(d => d.Status == from))
         {
             day.Status = DayStatus.Requested;
             day.ConfirmedUtc = null;
