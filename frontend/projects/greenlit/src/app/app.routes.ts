@@ -7,14 +7,13 @@ import { Routes } from '@angular/router';
  * default, `bare` for auth), `page` the `<body data-page>` slug the e2e page
  * objects anchor on. Children inherit their parent's data.
  *
- * `/` and unknown paths go to `/sheet`, the team's time-off sheet.
+ * `/` is the calendar (L2-049). Screens join this table with their journeys.
  */
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: '/sheet' },
   {
-    path: 'sheet',
-    data: { page: 'sheet' },
-    loadComponent: () => import('./pages/sheet/sheet.page').then((m) => m.SheetPage),
+    path: '',
+    pathMatch: 'full',
+    data: { page: 'calendar' },
+    loadComponent: () => import('./pages/calendar/calendar.page').then((m) => m.CalendarPage),
   },
-  { path: '**', redirectTo: '/sheet' },
 ];

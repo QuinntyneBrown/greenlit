@@ -5,7 +5,7 @@
  *   - `goto(routeKey)`: navigates to the right URL for whichever target we're
  *     hitting (mocks vs Angular). Once sign-in lands, guarded routes sign in
  *     first here, so specs never spell out a login.
- *   - `pages`: namespaced page objects (e.g. `pages.sheet`).
+ *   - `pages`: namespaced page objects (e.g. `pages.calendar`).
  *   - `settle()`: wait for fonts + network idle so visual diffs are stable.
  *
  * Specs import `test` and `expect` from this file, not from
@@ -14,10 +14,10 @@
 
 import { test as base, expect, TestInfo } from "@playwright/test";
 import { pathFor, RouteKey } from "./routes.js";
-import { SheetPage } from "../pages/sheet.page.js";
+import { CalendarPage } from "../pages/calendar.page.js";
 
 interface Pages {
-  sheet: SheetPage;
+  calendar: CalendarPage;
 }
 
 interface GlFixtures {
@@ -39,7 +39,7 @@ export const test = base.extend<GlFixtures>({
     });
   },
   pages: async ({ page }, use) => {
-    await use({ sheet: new SheetPage(page) });
+    await use({ calendar: new CalendarPage(page) });
   },
   settle: async ({ page }, use) => {
     await use(async () => {

@@ -18,7 +18,7 @@
 export type RouteGuard = "auth" | "manager";
 
 /** `body[data-page]` value every screen stamps (route data in the app). */
-export type PageSlug = "sheet";
+export type PageSlug = "calendar" | "not-found";
 
 interface RouteEntry {
   readonly app: string;
@@ -28,7 +28,7 @@ interface RouteEntry {
 }
 
 export const ROUTES = {
-  sheet: { app: "/sheet", mock: "/pages/sheet.html", page: "sheet" },
+  calendar: { app: "/", mock: "/pages/calendar/default.html", page: "calendar" },
 } as const satisfies Record<string, RouteEntry>;
 
 export type RouteKey = keyof typeof ROUTES;
