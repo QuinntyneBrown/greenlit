@@ -6,4 +6,7 @@ public sealed class NotFoundException : Exception
         : base($"{entity} with id '{key}' was not found.") { }
 
     public NotFoundException(string message) : base(message) { }
+
+    /// <summary>A code the client can branch on; null for the plain 404.</summary>
+    public string? Code { get; init; }
 }

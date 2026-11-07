@@ -38,11 +38,15 @@ public sealed class ExceptionHandlingMiddleware
         }
         catch (NotFoundException ex)
         {
-            await WriteAsync(context, StatusCodes.Status404NotFound, "Not found", ex.Message);
+            await WriteAsync(context, StatusCodes.Status404NotFound, "Not found", ex.Message, code: ex.Code);
         }
         catch (ConflictException ex)
         {
             await WriteAsync(context, StatusCodes.Status409Conflict, "Conflict", ex.Message, code: ex.Code);
+        }
+        catch (GoneException ex)
+        {
+            await WriteAsync(context, StatusCodes.Status410Gone, "Gone", ex.Message, code: ex.Code, extensions: ex.Extensions);
         }
         catch (Exception ex)
         {
@@ -57,7 +61,8 @@ public sealed class ExceptionHandlingMiddleware
         string title,
         string detail,
         IReadOnlyDictionary<string, string[]>? errors = null,
-        string? code = null)
+        string? code = null,
+        IReadOnlyDictionary<string, object?>? extensions = null)
     {
         if (context.Response.HasStarted) return;
 
@@ -73,6 +78,7 @@ public sealed class ExceptionHandlingMiddleware
         pd.Type = $"https://httpstatuses.io/{statusCode}";
         pd.Instance = context.Request.Path;
         if (code is not null) pd.Extensions["code"] = code;
+        if (extensions is not null) foreach (var (key, value) in extensions) pd.Extensions[key] = value;
 
         await context.Response.WriteAsJsonAsync(pd, pd.GetType(), options: null, contentType: "application/problem+json");
     }
