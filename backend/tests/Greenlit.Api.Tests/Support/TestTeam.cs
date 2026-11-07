@@ -252,7 +252,7 @@ public static class GreenlitApiFactoryExtensions
 
     public static string TokenFor(User user) => TokenFor(user, DateTime.UtcNow.AddMinutes(15));
 
-    /// <summary>A token signed with the test key that stops working at <paramref name="expires"/> (and began an hour earlier).</summary>
+    /// <summary>A token signed with the test key that stops working at <paramref name="expires"/> (an hour after it began when that is already past).</summary>
     public static string TokenFor(User user, DateTime expires)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GreenlitApiFactory.SigningKey));
@@ -260,7 +260,7 @@ public static class GreenlitApiFactoryExtensions
             issuer: GreenlitApiFactory.Issuer,
             audience: GreenlitApiFactory.Audience,
             claims: [new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), new Claim(ClaimTypes.Role, user.Role.ToString())],
-            notBefore: expires.AddHours(-1),
+            notBefore: expires < DateTime.UtcNow ? expires.AddHours(-1) : null,
             expires: expires,
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
         return new JwtSecurityTokenHandler().WriteToken(token);
