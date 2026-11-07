@@ -86,6 +86,28 @@ export class SettingsPage extends BasePage {
     return control(this.workWeekSection(), 'Add day off');
   }
 
+  async openAddHolidayDialog(): Promise<void> {
+    await this.addDayOffButton().click();
+  }
+
+  /** Every toast on screen, newest first. */
+  toasts(): Locator {
+    return this.page.locator(".toast");
+  }
+
+  /** The toast whose title is `title`. */
+  toast(title: string): Locator {
+    return this.toasts().filter({ has: this.page.locator(".toast__title", { hasText: title }) });
+  }
+
+  toastText(title: string): Locator {
+    return this.toast(title).locator(".toast__text");
+  }
+
+  toastAction(title: string, name: string): Locator {
+    return this.toast(title).getByRole("button", { name, exact: true });
+  }
+
   emptyTitle(): Locator {
     return this.workWeekSection().locator('.empty__title');
   }

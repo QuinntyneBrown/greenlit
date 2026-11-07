@@ -16,6 +16,8 @@ import {
 
 import { AppDialogs } from '../../dialogs/app-dialogs';
 import { InviteMemberDialog } from '../../dialogs/invite-member/invite-member.dialog';
+import { AddHolidayDialog, AddHolidayOutcome } from '../../dialogs/add-holiday/add-holiday.dialog';
+import { ToastService } from '../../toasts/toast.service';
 
 type Load =
   | { readonly state: 'loading' }
@@ -137,7 +139,7 @@ const WORKING_DAYS = [1, 2, 3, 4, 5];
               </div>
             }
             <div class="actions">
-              <gl-button>
+              <gl-button (click)="addDayOff()">
                 <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
@@ -210,6 +212,7 @@ export class SettingsPage {
   private readonly sheet = inject(SHEET_SERVICE);
   private readonly holidayService = inject(HOLIDAY_SERVICE);
   private readonly dialogs = inject(AppDialogs);
+  private readonly toasts = inject(ToastService);
   private readonly attempt = signal(0);
   private readonly holidayAttempt = signal(0);
 
@@ -281,6 +284,21 @@ export class SettingsPage {
 
   protected retryHolidays(): void {
     this.holidayAttempt.update((n) => n + 1);
+  }
+
+  protected addDayOff(): void {
+    const holidays = this.loadedHolidays()?.holidays ?? [];
+    this.dialogs
+      .open<AddHolidayOutcome>(AddHolidayDialog, '#ah-date', { holidays })
+      .closed.subscribe((outcome) => {
+        if (outcome === 'added') this.retryHolidays();
+        if (outcome === 'weekend')
+          this.toasts.show({
+            tone: 'warning',
+            title: 'That day is already a weekend',
+            body: 'Nothing changes on the calendar, so we didn’t add it.',
+          });
+      });
   }
 
   protected invite(): void {
