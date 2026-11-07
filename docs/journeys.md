@@ -8,13 +8,15 @@ sheet needs first: see the month, colour days, then request and approve.
 Effort is in working days for one intermediate developer. Each estimate covers the backend
 (API, handlers, persistence), the Angular screens and components, and the acceptance tests the
 ATDD rule requires (API integration tests and Playwright with page objects). The estimates
-assume today's codebase, which has the solution skeleton, authentication plumbing and a ping
-endpoint but no features yet. The first journeys carry the shared app shell and the first
-`gl-*` components.
+assume today's codebase: the solution skeleton, authentication plumbing, a ping endpoint, and
+the app shell (L2-049) with the design tokens, the top bar, the Main navigation, the not-found
+page and the first reusable `gl-*` components (button, empty state, error page, avatar, badge,
+count pill, alert, inline message, skeleton). The calendar grid, the top bar's team name and
+account menu, and the pending count arrive with the journeys that need them.
 
 | # | Journey | Description | Effort (days) |
 |---|---|---|---|
-| 1 | View the team's month | Everyone sees the month sheet: coloured cells, days left, who's out. | 8 |
+| 1 | View the team's month | Everyone sees the month sheet: coloured cells, days left, who's out. | 7 |
 | 2 | Sign in | Email and password sign-in that opens the team's calendar. | 3 |
 | 3 | Create a team | Manager sets name, time zone, public holidays and first members. | 3 |
 | 4 | Mark days on the calendar | Members paint their days tentative, requested or clear; managers confirm; undo. | 6 |
@@ -41,8 +43,8 @@ endpoint but no features yet. The first journeys carry the shared app shell and 
 | 25 | Send email notifications | Switches for new-request emails to manager and decision emails to members. | 1.5 |
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
-| 28 | See clear error pages | Not found, forbidden, server error and offline pages with recovery. | 1.5 |
-| | **Total** | | **87.5** |
+| 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
+| | **Total** | | **86** |
 
 ## Notes
 

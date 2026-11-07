@@ -57,6 +57,10 @@ then starts both the API and the dev server.
 
 ## Status
 
-Scaffold. The request pipeline, persistence, CLI, shell, lint/format gates and the e2e harness
-are in place and green. The sheet itself lands feature by feature, each from a requirement in
+Scaffold. The request pipeline, persistence, CLI, lint/format gates and the e2e harness are in
+place and green. The app shell is built (L2-049): the calendar at `/` inside the top bar with the
+logo and the Main navigation, the skip link, and the not-found page for any unknown address. The
+design tokens and foundations load from the `components` library, which also holds the first
+reusable `gl-*` components (button, empty state, error page, avatar, badge, count pill, alert,
+inline message, skeleton). The sheet itself lands feature by feature, each from a requirement in
 `docs/specs/`, a detailed design and a mock, following the process in `AGENTS.md`.
