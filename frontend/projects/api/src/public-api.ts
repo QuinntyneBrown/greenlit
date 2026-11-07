@@ -46,6 +46,7 @@ export * from './lib/api/team-settings.service';
 export * from './lib/models/team-settings';
 export * from './lib/api/coverage.service';
 export * from './lib/api/auth.interceptor';
+export * from './lib/api/session-expired.interceptor';
 
 // Concrete implementations (imported only by composition roots)
 export * from './lib/api/local-storage-session-store';

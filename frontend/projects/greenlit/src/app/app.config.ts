@@ -25,6 +25,7 @@ import {
   SHEET_SERVICE,
   TEAM_SERVICE,
   authInterceptor,
+  sessionExpiredInterceptor,
 } from 'api';
 
 import { environment } from '../environments/environment';
@@ -37,7 +38,7 @@ export const appConfig: ApplicationConfig = {
       routes,
       withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
     ),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor, sessionExpiredInterceptor])),
     { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
 
     // Composition root: pages depend on service tokens from `api`; the

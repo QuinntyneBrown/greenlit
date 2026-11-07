@@ -81,3 +81,13 @@ export async function signIn(request: APIRequestContext, person: Person): Promis
   tokens.set(person, token);
   return token;
 }
+
+/**
+ * A token whose time has run out, as a browser would still have it in localStorage hours after signing in.
+ * Only the expiry is read by the app; the API is never asked to accept it.
+ */
+export function expiredToken(): string {
+  const encode = (value: object) => Buffer.from(JSON.stringify(value)).toString("base64url");
+  const exp = Math.floor(Date.now() / 1000) - 60;
+  return `${encode({ alg: "HS256", typ: "JWT" })}.${encode({ sub: "expired", role: "Manager", exp })}.signature`;
+}
