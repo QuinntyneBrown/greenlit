@@ -19,6 +19,8 @@ import {
   TeamSettingsTeam,
   TeamHolidays,
   COVERAGE_SERVICE,
+  NOTIFICATIONS_SERVICE,
+  NotificationSwitches,
   WORKING_DAYS_SERVICE,
   holidayDateLabel,
   weekDayNames,
@@ -35,6 +37,7 @@ import {
   MemberListItem,
   SettingsNav,
   Skeleton,
+  Switch,
 } from 'components';
 
 import { AppDialogs } from '../../dialogs/app-dialogs';
@@ -76,6 +79,7 @@ type HolidaysLoad =
     HolidayList,
     SettingsNav,
     Skeleton,
+    Switch,
     TeamSection,
   ],
   template: `
@@ -291,6 +295,50 @@ type HolidaysLoad =
             </div>
           </section>
         }
+        @if (isManager()) {
+          <section
+            id="notifications"
+            class="settings-section"
+            aria-labelledby="notifications-title"
+          >
+            <h2 id="notifications-title" class="section-title">Notifications</h2>
+            <p>Email only. Greenlit never sends daily digests.</p>
+            @if (notificationSettings(); as saved) {
+              <fieldset>
+                <div class="stack">
+                  <gl-switch
+                    label="New requests"
+                    [description]="'Email ' + managerName() + ' when someone requests time off.'"
+                    [checked]="newRequestsOn()"
+                    [disabled]="notificationsBusy()"
+                    (checkedChange)="flipNewRequests($event)"
+                  />
+                  <gl-switch
+                    label="Decisions"
+                    description="Email team members when their request is approved or declined."
+                    [checked]="decisionsOn()"
+                    [disabled]="notificationsBusy()"
+                    (checkedChange)="flipDecisions($event)"
+                  />
+                </div>
+              </fieldset>
+            } @else {
+              <gl-skeleton />
+            }
+            <div class="settings-actions">
+              <gl-button
+                variant="primary"
+                size="sm"
+                [busy]="notificationsBusy()"
+                [disabled]="!canSaveNotifications()"
+                (click)="saveNotifications()"
+              >
+                {{ notificationsBusy() ? 'Saving…' : 'Save changes' }}
+              </gl-button>
+              <span aria-live="polite">{{ notificationsStatus() }}</span>
+            </div>
+          </section>
+        }
       </div>
     </div>
   `,
@@ -382,6 +430,7 @@ export class SettingsPage {
   private readonly holidayService = inject(HOLIDAY_SERVICE);
   private readonly workingDaysService = inject(WORKING_DAYS_SERVICE);
   private readonly coverageService = inject(COVERAGE_SERVICE);
+  private readonly notificationsService = inject(NOTIFICATIONS_SERVICE);
   private readonly dialogs = inject(AppDialogs);
   private readonly toasts = inject(ToastService);
   private readonly document = inject(DOCUMENT);
@@ -423,6 +472,7 @@ export class SettingsPage {
           { id: 'allowances', label: 'Allowances' },
           { id: 'work-week', label: 'Work week & holidays' },
           { id: 'coverage', label: 'Coverage' },
+          { id: 'notifications', label: 'Notifications' },
         ]
       : []),
   ]);
@@ -581,6 +631,72 @@ export class SettingsPage {
         title: 'We couldn’t save your changes',
         body: 'Nothing was changed. Check your connection and try again.',
         action: { label: 'Try again', run: () => this.saveCoverage() },
+      });
+    });
+  }
+
+  /** The two email switches as saved; null until they have loaded (the switches wait). */
+  private readonly loadedNotifications = toSignal(
+    toObservable(this.isManager).pipe(
+      switchMap((manager) =>
+        manager ? this.notificationsService.settings().pipe(catchError(() => of(null))) : of(null),
+      ),
+    ),
+    { initialValue: null },
+  );
+  private readonly savedNotifications = signal<NotificationSwitches | null>(null);
+  protected readonly notificationSettings = computed(
+    () => this.savedNotifications() ?? this.loadedNotifications(),
+  );
+  /** What the switches show while the manager edits; null while they match what is saved. */
+  private readonly draftNotifications = signal<NotificationSwitches | null>(null);
+  protected readonly newRequestsOn = computed(
+    () => (this.draftNotifications() ?? this.notificationSettings())?.newRequests ?? false,
+  );
+  protected readonly decisionsOn = computed(
+    () => (this.draftNotifications() ?? this.notificationSettings())?.decisions ?? false,
+  );
+  protected readonly notificationsBusy = signal(false);
+  protected readonly notificationsStatus = signal('');
+  protected readonly canSaveNotifications = computed(() => {
+    const draft = this.draftNotifications();
+    const saved = this.notificationSettings();
+    return (
+      draft !== null &&
+      saved !== null &&
+      !this.notificationsBusy() &&
+      (draft.newRequests !== saved.newRequests || draft.decisions !== saved.decisions)
+    );
+  });
+
+  protected flipNewRequests(on: boolean): void {
+    this.draftNotifications.set({ newRequests: on, decisions: this.decisionsOn() });
+    this.notificationsStatus.set('');
+  }
+
+  protected flipDecisions(on: boolean): void {
+    this.draftNotifications.set({ newRequests: this.newRequestsOn(), decisions: on });
+    this.notificationsStatus.set('');
+  }
+
+  /** "Save changes" of Notifications; a failure keeps the switches as set and offers Try again. */
+  protected saveNotifications(): void {
+    const draft = this.draftNotifications();
+    if (draft === null || this.notificationsBusy()) return;
+    this.notificationsBusy.set(true);
+    this.notificationsService.save(draft).subscribe((result) => {
+      this.notificationsBusy.set(false);
+      if (result.ok) {
+        this.savedNotifications.set(draft);
+        this.draftNotifications.set(null);
+        this.notificationsStatus.set('Saved');
+        return;
+      }
+      this.toasts.show({
+        tone: 'danger',
+        title: 'We couldn’t save your changes',
+        body: 'Nothing was changed. Check your connection and try again.',
+        action: { label: 'Try again', run: () => this.saveNotifications() },
       });
     });
   }
