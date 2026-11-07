@@ -63,8 +63,11 @@ if ($IsWindows) {
 } else {
     # On Linux and macOS PowerShell's redirected output reaches the file late, and the Playwright
     # fixtures read the emailed links from it (ADR-006), so the shell does the redirecting.
-    $api = Start-Process -FilePath 'bash' -PassThru -WorkingDirectory $backend -ArgumentList '-c', `
-        ("exec dotnet run --project '{0}' --no-build --urls 'http://localhost:{1}' > '{2}' 2> '{3}'" -f $apiProject, $Port, $out, $err)
+    # One script file, because Start-Process joins its arguments with spaces and would hand bash the
+    # command as several words.
+    $launcher = Join-Path $logDir 'start-e2e-api.sh'
+    Set-Content -Path $launcher -Value ("exec dotnet run --project '{0}' --no-build --urls 'http://localhost:{1}' > '{2}' 2> '{3}'" -f $apiProject, $Port, $out, $err)
+    $api = Start-Process -FilePath 'bash' -PassThru -WorkingDirectory $backend -ArgumentList $launcher
 }
 Write-Host "API starting on SQLite (pid $($api.Id)); database $database; logs in $logDir"
 
