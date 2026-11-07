@@ -128,6 +128,37 @@ public class SeedCommandHandlerTests
     }
 
     [Fact]
+    public async Task Yearly_days_and_adjustments_match_the_cast_of_the_mocks()
+    {
+        // docs/mocks/README.md: Ana 25 (+3 carried over), Ben 27 (+2 long service), Dev 20, Finn 22 (+1 offsite Saturday).
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        var people = await read.TeamMembers.Include(m => m.Adjustments).Where(m => m.Team.Name == SeedCommandHandler.DemoTeamName)
+            .ToListAsync();
+        people.Select(m => (m.Name, m.YearlyDays, Adjusted: m.Adjustments.Sum(a => a.Days))).Should().BeEquivalentTo(new[]
+        {
+            ("Maya Chen", (int?)25, 0), ("Ana Ruiz", 25, 3), ("Ben Okafor", 27, 2), ("Cleo Park", 25, 0),
+            ("Dev Patel", 20, 0), ("Elif Yılmaz", 25, 0), ("Finn Murphy", 22, 1),
+        });
+        people.Single(m => m.Name == "Ana Ruiz").Adjustments.Single().Reason.Should().Be("Carried over from 2025");
+    }
+
+    [Fact]
+    public async Task Anas_year_matches_the_person_page_mock()
+    {
+        // pages/person/default: 17 confirmed days, 5 requested and 3 tentative in 2026, so 28 - 17 = 11 days left.
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        var days = await read.TimeOffDays.Where(d => d.TeamMember.Name == "Ana Ruiz" && d.Date.Year == 2026)
+            .Select(d => d.Status).ToListAsync();
+        days.Count(s => s == DayStatus.Confirmed).Should().Be(17);
+        days.Count(s => s == DayStatus.Requested).Should().Be(5);
+        days.Count(s => s == DayStatus.Tentative).Should().Be(3);
+    }
+
+    [Fact]
     public async Task The_ledger_matches_the_requests_mocks()
     {
         var options = await SeedTwiceAsync();
