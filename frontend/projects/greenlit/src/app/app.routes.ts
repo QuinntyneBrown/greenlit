@@ -23,6 +23,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/calendar/calendar.page').then((m) => m.CalendarPage),
   },
   {
+    path: 'requests',
+    data: { page: 'requests' },
+    canActivate: [authGuard, teamGuard],
+    loadComponent: () => import('./pages/requests/requests.page').then((m) => m.RequestsPage),
+  },
+  {
     path: 'settings',
     data: { page: 'settings' },
     canActivate: [authGuard, teamGuard],

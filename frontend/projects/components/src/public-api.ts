@@ -28,6 +28,11 @@ export * from './lib/well/well';
 export * from './lib/dialog/dialog';
 export * from './lib/member-list/member-list';
 
+// requests
+export * from './lib/request-list/request-list';
+export * from './lib/request-status/request-status';
+export * from './lib/drawer/drawer';
+
 // the sheet
 export * from './lib/segmented-control/segmented-control';
 export * from './lib/team-grid/team-grid';

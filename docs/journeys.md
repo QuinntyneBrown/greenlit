@@ -23,7 +23,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 5 | Invite a member | Manager adds a row and emails a seven-day invitation. | 0 (built) |
 | 6 | Accept an invitation | Invitee sets name and password, then lands on the sheet. | 0 (built) |
 | 7 | Send a time-off request | Member asks for days with a note; sees days left. | 0 (built) |
-| 8 | Approve a request | Manager confirms requested days, member is emailed, coverage warned, undo. | 3 |
+| 8 | Approve a request | Manager confirms requested days, member is emailed, coverage warned, undo. | 0 (built) |
 | 9 | Review requests | Manager sees pending requests with overlaps, opens detail, approves in bulk. | 5 |
 | 10 | Decline a request | Manager declines with optional reason; days return to tentative. | 2 |
 | 11 | Compute allowances | Yearly days, used, booked, requested and left; over-allowance warnings. | 4 |
@@ -44,9 +44,24 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total remaining** | | **58.5** |
+| | **Total remaining** | | **55.5** |
 
 ## Notes
+
+- Journey 8 is built, with a minimal Requests page. `GET /api/requests?status=` (manager only; default Pending, oldest
+  first), `POST /api/requests/approve` (`{ ids }`, manager only, own team only, all or nothing) and
+  `POST /api/requests/{id}/reopen` (Undo) are new. Approving sets the request Approved and every linked day
+  Confirmed in one save, then looks at coverage and emails the member through `IEmailSender` (`RequestNotifier`;
+  logged until a provider is chosen, ADR-006). The email is always sent: the Decisions switch is journey 25, which
+  must make `RequestNotifier` read it. A member with no address, or a mail failure, does not undo the approval
+  (`emailed` is false and the toast drops "and Ana has been emailed"). Undo sends no second email. `Team.CoverageMinimum`
+  (0 = none) is new, with a migration, so the warning "Approved, but only 3 people will be in on 18 Nov" can work; the
+  demo seed sets it to 4, and journey 17 adds the Settings control and the calendar's Out row flags (L2-042 AC1, AC3).
+  `/requests` shows the pending list only, with Approve per row and a name that opens the request detail drawer
+  (status, sent date, note, Approve with "Approving…" and "Try approving again"); a member who opens it is sent to the
+  calendar. Journey 9 adds the tabs, selection, overlaps, "Team those weeks" and bulk approve, journey 10 Decline,
+  journey 11 "Days left after", journey 13 My requests. New `gl-*` components: `gl-request-list`, `gl-request-status`,
+  `gl-drawer`, the button's `approve` variant; one mock was added (`pages/requests/approving`).
 
 - Journey 7 is built, except days left: `GET /api/requests/quote` and `POST /api/requests` (any signed-in
   member, own row only) create a `TimeOffRequest` and turn its working days Requested; a last day before
@@ -54,7 +69,7 @@ account menu, and the pending count arrive with the journeys that need them.
   `day_is_holiday`, and days already requested or confirmed `409 days_taken`. `RequestLedger` also makes
   painted Requested days a pending request (L2-015 AC5), and the demo seed gives the November Requested
   days their requests. The dialog opens from a "Request time off" button on the member's calendar (My
-  requests and the person page are journeys 8 and 13). The dialog counts working days but cannot say
+  requests and the person page are journeys 13 and 22). The dialog counts working days but cannot say
   "days left" or "N days over" until allowances exist (journey 11, which must add `daysLeftAfter` and
   `over` to the quote and update the dialog's wording to the `default` and `over-allowance` mocks). One
   mock was added (`dialogs/new-request/taken`) and the member calendar mock gained the button. The

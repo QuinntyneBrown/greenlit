@@ -22,4 +22,5 @@ public sealed record RequestDto(
     string LastDay,
     int Days,
     string? Note,
-    string Status);
+    string Status,
+    DateTimeOffset SentUtc);

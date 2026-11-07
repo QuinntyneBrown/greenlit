@@ -85,6 +85,6 @@ public sealed class SendRequestCommandHandler : IRequestHandler<SendRequestComma
         return new RequestDto(
             request.Id, member.Id, member.Name,
             RequestInput.Iso(request.FirstDay), RequestInput.Iso(request.LastDay),
-            working.Count, request.Note, request.Status.ToString());
+            working.Count, request.Note, request.Status.ToString(), request.CreatedUtc);
     }
 }

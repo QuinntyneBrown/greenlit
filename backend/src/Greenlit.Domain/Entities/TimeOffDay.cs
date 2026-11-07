@@ -17,7 +17,7 @@ public class TimeOffDay
 
     public DateTimeOffset UpdatedUtc { get; set; }
 
-    /// <summary>The pending request a Requested day belongs to; null for every other status.</summary>
+    /// <summary>The request a day belongs to: the pending one for a Requested day, the approved one for the days it confirmed; null for every other day.</summary>
     public Guid? TimeOffRequestId { get; set; }
     public TimeOffRequest? TimeOffRequest { get; set; }
 

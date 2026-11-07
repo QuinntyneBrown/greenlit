@@ -95,6 +95,10 @@ public sealed class TestTeam
             UpdatedUtc = DateTimeOffset.UtcNow,
         }));
 
+    /// <summary>Sets the team's coverage minimum, which journey 17 lets the manager set in Settings.</summary>
+    public Task SetCoverageMinimumAsync(int minimum) =>
+        _factory.WriteAsync(db => db.Teams.Single(t => t.Id == Team.Id).CoverageMinimum = minimum);
+
     public Task AddHolidayAsync(DateOnly date, string name) =>
         _factory.WriteAsync(db => db.Holidays.Add(new Holiday { Id = Guid.NewGuid(), TeamId = Team.Id, Date = date, Name = name }));
 

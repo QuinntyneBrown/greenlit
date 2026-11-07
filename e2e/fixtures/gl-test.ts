@@ -21,6 +21,8 @@ import { CreateTeamPage } from "../pages/create-team.page.js";
 import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
 import { NewRequestDialog } from "../pages/new-request.dialog.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
+import { RequestDetailDialog } from "../pages/request-detail.dialog.js";
+import { RequestsPage } from "../pages/requests.page.js";
 import { SettingsPage } from "../pages/settings.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
 
@@ -31,6 +33,8 @@ interface Pages {
   inviteMember: InviteMemberDialog;
   newRequest: NewRequestDialog;
   notFound: NotFoundPage;
+  requestDetail: RequestDetailDialog;
+  requests: RequestsPage;
   settings: SettingsPage;
   signIn: SignInPage;
 }
@@ -120,6 +124,16 @@ interface RequestsApi {
   /** Every send request fails with a 500 until `recover()`. */
   fail(): Promise<void>;
   recover(): Promise<void>;
+  /** How many approve requests (POST /api/requests/approve) the page has made so far. */
+  approvals(): number;
+  /** Holds approve requests until the returned function is called. */
+  holdApprove(): Promise<() => void>;
+  /** Approve requests fail with a 500 until `recoverApprove()`. */
+  failApprove(): Promise<void>;
+  recoverApprove(): Promise<void>;
+  /** Undo (POST /api/requests/{id}/reopen) fails with a 500 until `recoverReopen()`. */
+  failReopen(): Promise<void>;
+  recoverReopen(): Promise<void>;
 }
 
 interface GlFixtures {
@@ -179,9 +193,14 @@ export const test = base.extend<GlFixtures>({
   },
   requestsApi: async ({ page }, use) => {
     const pattern = "**/api/requests";
+    const approve = "**/api/requests/approve";
+    const reopen = "**/api/requests/*/reopen";
     let sends = 0;
+    let approvals = 0;
     page.on("request", (request) => {
-      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/requests") sends++;
+      const path = new URL(request.url()).pathname;
+      if (request.method() === "POST" && path === "/api/requests") sends++;
+      if (request.method() === "POST" && path === "/api/requests/approve") approvals++;
     });
     await use({
       sends: () => sends,
@@ -201,6 +220,24 @@ export const test = base.extend<GlFixtures>({
         );
       },
       recover: () => page.unroute(pattern),
+      approvals: () => approvals,
+      holdApprove: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(approve, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      failApprove: async () => {
+        await page.route(approve, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recoverApprove: () => page.unroute(approve),
+      failReopen: async () => {
+        await page.route(reopen, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recoverReopen: () => page.unroute(reopen),
     });
   },
   invitationsApi: async ({ page }, use) => {
@@ -313,6 +350,8 @@ export const test = base.extend<GlFixtures>({
       inviteMember: new InviteMemberDialog(page),
       newRequest: new NewRequestDialog(page),
       notFound: new NotFoundPage(page),
+      requestDetail: new RequestDetailDialog(page),
+      requests: new RequestsPage(page),
       settings: new SettingsPage(page),
       signIn: new SignInPage(page),
     });

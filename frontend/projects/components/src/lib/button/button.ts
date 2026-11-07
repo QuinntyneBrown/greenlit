@@ -2,7 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink, UrlTree } from '@angular/router';
 
-export type ButtonVariant = 'default' | 'primary' | 'danger' | 'ghost' | 'link';
+export type ButtonVariant = 'default' | 'primary' | 'approve' | 'danger' | 'ghost' | 'link';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 /**
@@ -89,6 +89,12 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
     .btn--primary:hover {
       border-color: var(--color-accent-hover);
       box-shadow: var(--shadow-1);
+    }
+    .btn--approve {
+      --btn-bg: var(--color-brand-strong);
+      --btn-fg: var(--color-fg-on-brand-strong);
+      --btn-border: var(--color-brand-strong);
+      --btn-bg-hover: var(--color-success-fg);
     }
     .btn--danger {
       --btn-bg: var(--color-danger-solid);

@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
         services.AddScoped<Greenlit.Application.Invitations.InvitationIssuer>();
+        services.AddScoped<Greenlit.Application.Requests.RequestNotifier>();
         return services;
     }
 }
