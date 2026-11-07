@@ -14,6 +14,7 @@
 
 import { test as base, expect, TestInfo } from "@playwright/test";
 import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
+import { personIdOf } from "./people.js";
 import { Person, SESSION_KEY, expiredToken, signIn } from "./session.js";
 import { AccountMenu } from "../pages/account-menu.js";
 import { SessionExpiredPage } from "../pages/session-expired.page.js";
@@ -32,6 +33,7 @@ import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
 import { NewRequestDialog } from "../pages/new-request.dialog.js";
 import { MarketingPage } from "../pages/marketing.page.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
+import { PersonPage } from "../pages/person.page.js";
 import { RequestDetailDialog } from "../pages/request-detail.dialog.js";
 import { RequestsPage } from "../pages/requests.page.js";
 import { SettingsPage } from "../pages/settings.page.js";
@@ -57,6 +59,7 @@ interface Pages {
   requestDetail: RequestDetailDialog;
   declineRequest: DeclineRequestDialog;
   cancelRequest: CancelRequestDialog;
+  person: PersonPage;
   requests: RequestsPage;
   settings: SettingsPage;
   signIn: SignInPage;
@@ -76,6 +79,10 @@ interface GotoOptions {
   expiredSession?: boolean;
   /** Open sign-in with this `returnUrl`, as the guard does. */
   returnUrl?: string;
+  /** Open a person route on this member's page, found by name through the API (an `as` viewer, the manager by default). */
+  person?: string;
+  /** Open a person route on this id, as given (for an id no one has). */
+  personId?: string;
   /** The invitation token of an `acceptInvite` route (the one in the emailed link). */
   token?: string;
 }
@@ -373,10 +380,14 @@ export const test = base.extend<GlFixtures>({
           [SESSION_KEY, expiredToken()],
         );
       }
-      const path = pathFor(key).replace(
+      let path = pathFor(key).replace(
         ":token",
         encodeURIComponent(options.token ?? "none"),
       );
+      if (!isBaseline && (options.person || options.personId)) {
+        const id = options.personId ?? (await personIdOf(page.request, options.as ?? "manager", options.person!));
+        path = path.replace(":id", id);
+      }
       const query = new URLSearchParams();
       if (options.month && !isBaseline) query.set("month", options.month);
       if (options.year && !isBaseline) query.set("year", options.year);
@@ -1057,6 +1068,7 @@ export const test = base.extend<GlFixtures>({
       signIn: new SignInPage(page),
       signOutDialog: new SignOutDialog(page),
       year: new YearPage(page),
+      person: new PersonPage(page),
     });
   },
   settle: async ({ page }, use) => {

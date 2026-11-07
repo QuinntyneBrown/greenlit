@@ -35,6 +35,18 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/year/year.page').then((m) => m.YearPage),
   },
   {
+    path: 'people/:id',
+    data: { page: 'person' },
+    canActivate: [authGuard, teamGuard],
+    loadComponent: () => import('./pages/person/person.page').then((m) => m.PersonPage),
+  },
+  {
+    path: 'person',
+    data: { page: 'person' },
+    canActivate: [authGuard, teamGuard],
+    loadComponent: () => import('./pages/person/person.page').then((m) => m.PersonPage),
+  },
+  {
     path: 'requests',
     data: { page: 'requests' },
     canMatch: [managerMatch],

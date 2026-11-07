@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { initialsOf } from '../avatar/avatar';
 import { Button } from '../button/button';
@@ -27,7 +28,7 @@ export interface AllowanceTableRow {
  */
 @Component({
   selector: 'gl-allowance-table',
-  imports: [Button],
+  imports: [Button, RouterLink],
   template: `
     <section aria-labelledby="allowance-title">
       <div class="toolbar-row">
@@ -68,7 +69,13 @@ export interface AllowanceTableRow {
                 <td>
                   <span class="cluster">
                     <span class="avatar" aria-hidden="true">{{ initials(row.name) }}</span>
-                    <span class="person">{{ row.name }}</span>
+                    @if (linkNames()) {
+                      <a class="person person--link" [routerLink]="['/people', row.memberId]">{{
+                        row.name
+                      }}</a>
+                    } @else {
+                      <span class="person">{{ row.name }}</span>
+                    }
                   </span>
                 </td>
                 <td class="num">{{ row.allowance }}</td>
@@ -162,6 +169,13 @@ export interface AllowanceTableRow {
     .person {
       font-weight: var(--font-weight-medium);
     }
+    .person--link {
+      color: inherit;
+      text-decoration: none;
+    }
+    .person--link:hover {
+      text-decoration: underline;
+    }
     .avatar {
       display: inline-grid;
       place-items: center;
@@ -206,6 +220,8 @@ export class AllowanceTable {
   readonly rows = input.required<readonly AllowanceTableRow[]>();
   /** The rows are ordered by days left, most first. */
   readonly sorted = model<boolean>(false);
+  /** Names link to the person's page (the manager's year; a member's names stay text). */
+  readonly linkNames = input<boolean>(false);
 
   protected initials(name: string): string {
     return initialsOf(name);

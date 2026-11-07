@@ -114,6 +114,11 @@ export class YearPage extends BasePage {
     return this.table().locator("tbody tr td:first-child .cluster > :not(.avatar)");
   }
 
+  /** The link on a person's name in the allowance table; only the manager gets one. */
+  tablePerson(person: string): Locator {
+    return this.tableRow(person).getByRole("link", { name: person, exact: true });
+  }
+
   /** A person's row. */
   tableRow(person: string): Locator {
     return this.table().locator("tbody tr", { has: this.page.locator("td:first-child", { hasText: person }) });

@@ -67,6 +67,7 @@ type Load =
             class="summary"
             [title]="'Allowance in ' + year()"
             [rows]="summary()"
+            [linkNames]="isManager()"
             [(sorted)]="sorted"
           />
         }
@@ -140,6 +141,7 @@ export class YearPage {
   /** L2-031 AC5: nobody on the team but the manager. */
   protected readonly isEmpty = computed(() => (this.loaded()?.members.length ?? 0) <= 1);
 
+  protected readonly isManager = computed(() => this.loaded()?.isManager ?? false);
   protected readonly columns = computed(() => yearColumns(this.year()));
   protected readonly rows = computed(() => {
     const year = this.loaded();

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-export type AvatarSize = 'sm' | 'md' | 'lg';
+export type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
 
 /** Initials for a member's name: first letter of the first and last words. */
 export function initialsOf(name: string): string {
@@ -37,6 +37,11 @@ export function initialsOf(name: string): string {
       width: 2rem;
       height: 2rem;
       font-size: var(--font-size-xs);
+    }
+    .avatar--xl {
+      width: 4rem;
+      height: 4rem;
+      font-size: var(--font-size-xl);
     }
     .avatar--lg {
       width: 3.5rem;

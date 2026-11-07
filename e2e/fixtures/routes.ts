@@ -25,6 +25,7 @@ export type PageSlug =
   | "forgot-password"
   | "marketing"
   | "not-found"
+  | "person"
   | "requests"
   | "reset-password"
   | "session-expired"
@@ -77,6 +78,27 @@ export const ROUTES = {
     app: "/no-such-page",
     mock: "/pages/not-found/default.html",
     page: "not-found",
+  },
+  /** A person's page as the manager sees it: `:id` is a member's id (docs/detailed-designs/allowances/person-page). */
+  person: {
+    app: "/people/:id",
+    mock: "/pages/person/default.html",
+    guard: "auth",
+    page: "person",
+  },
+  /** A member's own person page: read-only adjustments and "Request time off". */
+  memberPerson: {
+    app: "/people/:id",
+    mock: "/pages/person/member.html",
+    guard: "auth",
+    page: "person",
+  },
+  /** "My time off" in the account menu: the signed-in person's own page. */
+  myTimeOff: {
+    app: "/person",
+    mock: "/pages/person/member.html",
+    guard: "auth",
+    page: "person",
   },
   /** Requests as a member sees it: My requests (docs/detailed-designs/requests/my-requests). */
   myRequests: {
