@@ -1,6 +1,7 @@
 using System.Globalization;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Allowances;
+using Greenlit.Application.Coverage;
 using Greenlit.Application.Exceptions;
 using Greenlit.Application.Teams;
 using Greenlit.Domain.Enums;
@@ -87,7 +88,7 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
                 var kinds = members.Select(m => m.Cells[date.Day - 1].Kind).ToList();
                 var outCount = kinds.Count(k => k is CellKind.Requested or CellKind.Confirmed);
                 var inCount = kinds.Count(k => k is CellKind.Working or CellKind.Tentative);
-                return new CoverageDto(Iso(date), outCount, inCount, BelowMinimum: false);
+                return new CoverageDto(Iso(date), outCount, inCount, BelowMinimum: CoverageFlag.IsShort(team.CoverageMinimum, inCount));
             })
             .ToList();
 
@@ -96,7 +97,7 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
             Iso(today),
             isManager,
             managerName,
-            CoverageMinimum: null,
+            CoverageMinimum: CoverageFlag.Minimum(team.CoverageMinimum),
             members,
             coverage);
     }

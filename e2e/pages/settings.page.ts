@@ -48,6 +48,50 @@ export class SettingsPage extends BasePage {
     await this.inviteButton().click();
   }
 
+  // --- Coverage (docs/detailed-designs/teams/coverage-minimum) ------------------------------------
+
+  coverageSection(): Locator {
+    return this.main.locator("section#coverage");
+  }
+
+  /** "The fewest people who should be in on any working day. ..." */
+  coverageIntro(): Locator {
+    return this.coverageSection().locator("> p");
+  }
+
+  fewerPeopleButton(): Locator {
+    return this.coverageSection().getByRole("button", { name: "Fewer people", exact: true });
+  }
+
+  morePeopleButton(): Locator {
+    return this.coverageSection().getByRole("button", { name: "More people", exact: true });
+  }
+
+  /** The minimum the stepper shows, a number. */
+  coverageValue(): Locator {
+    return this.coverageSection().locator(".counter__value");
+  }
+
+  /** "of 7 people in": the team size. */
+  coverageTeamSize(): Locator {
+    return this.coverageSection().locator(".counter > span");
+  }
+
+  /** The coverage section's "Save changes"; it reads "Saving…" while busy. */
+  saveCoverageButton(): Locator {
+    return this.coverageSection().locator(".settings-actions .btn--primary");
+  }
+
+  /** The polite status next to "Save changes": "Saved" after a save. */
+  saveCoverageStatus(): Locator {
+    return this.coverageSection().locator(".settings-actions [aria-live='polite']");
+  }
+
+  /** Waits for the stepper to show the team's size, i.e. for the settings to have loaded. */
+  async waitForCoverage(): Promise<void> {
+    await this.coverageTeamSize().waitFor({ state: "visible", timeout: 10_000 });
+  }
+
   // --- Work week & holidays (docs/detailed-designs/teams/manage-holidays) -------------------------
 
   workWeekSection(): Locator {

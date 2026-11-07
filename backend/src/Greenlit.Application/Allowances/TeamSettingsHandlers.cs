@@ -57,5 +57,7 @@ internal static class TeamSettings
             team.LeaveYearStartMonth,
             team.MaxCarryOver,
             await db.TeamMembers.AsNoTracking().CountAsync(m => m.TeamId == team.Id && m.YearlyDays == null, ct),
-            WorkingDaysNames.ToNames(team.WorkingDays));
+            WorkingDaysNames.ToNames(team.WorkingDays),
+            team.CoverageMinimum,
+            await db.TeamMembers.AsNoTracking().CountAsync(m => m.TeamId == team.Id, ct));
 }

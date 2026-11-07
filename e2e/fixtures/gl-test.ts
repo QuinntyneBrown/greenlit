@@ -219,7 +219,19 @@ interface WorkingDaysApi {
   recoverMember(): Promise<void>;
 }
 
+/** Watches and steers the coverage saves (PUT /api/team/settings/coverage). */
+interface CoverageApi {
+  /** How many coverage saves the page has sent so far. */
+  saves(): number;
+  /** Holds coverage saves until the returned function is called. */
+  holdSave(): Promise<() => void>;
+  /** Coverage saves fail with a 500 until `recoverSave()`. */
+  failSave(): Promise<void>;
+  recoverSave(): Promise<void>;
+}
+
 interface GlFixtures {
+  coverageApi: CoverageApi;
   workingDaysApi: WorkingDaysApi;
   holidaysApi: HolidaysApi;
   requestsApi: RequestsApi;
@@ -401,6 +413,29 @@ export const test = base.extend<GlFixtures>({
         await page.route(reopen, (route) => route.fulfill({ status: 500, body: "" }));
       },
       recoverReopen: () => page.unroute(reopen),
+    });
+  },
+  coverageApi: async ({ page }, use) => {
+    const pattern = "**/api/team/settings/coverage";
+    let saves = 0;
+    page.on("request", (request) => {
+      if (request.method() === "PUT" && new URL(request.url()).pathname === "/api/team/settings/coverage") saves++;
+    });
+    await use({
+      saves: () => saves,
+      holdSave: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      failSave: async () => {
+        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recoverSave: () => page.unroute(pattern),
     });
   },
   workingDaysApi: async ({ page }, use) => {

@@ -201,7 +201,13 @@ export class RequestDetailDialog {
     return requestWeeks(
       weeks.state === 'ready'
         ? weeks.detail
-        : { request: this.request, members: [], coverage: [], daysLeftAfter: 0 },
+        : {
+            request: this.request,
+            members: [],
+            coverage: [],
+            daysLeftAfter: 0,
+            coverageMinimum: null,
+          },
     );
   });
 

@@ -56,3 +56,4 @@ export * from './lib/skeleton/skeleton';
 export * from './lib/progress-bar/progress-bar';
 export * from './lib/empty-state/empty-state';
 export * from './lib/error-page/error-page';
+export * from './lib/counter/counter';

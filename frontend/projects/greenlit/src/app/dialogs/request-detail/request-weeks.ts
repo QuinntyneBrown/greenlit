@@ -34,7 +34,7 @@ export function requestWeeks(detail: RequestDetail): RequestWeeks {
     })),
     cover: dates.map((date) => {
       const day = byDate.get(date);
-      return day ? coverOf(day, null) : null;
+      return day ? coverOf(day, detail.coverageMinimum) : null;
     }),
   };
 }
