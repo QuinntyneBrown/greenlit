@@ -13,3 +13,10 @@ export * from './lib/skip-link/skip-link';
 export * from './lib/logo-lockup/logo-lockup';
 export * from './lib/app-nav/app-nav';
 export * from './lib/top-bar/top-bar';
+
+// actions
+export * from './lib/button/button';
+
+// feedback
+export * from './lib/empty-state/empty-state';
+export * from './lib/error-page/error-page';

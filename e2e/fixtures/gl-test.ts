@@ -15,9 +15,11 @@
 import { test as base, expect, TestInfo } from "@playwright/test";
 import { pathFor, RouteKey } from "./routes.js";
 import { CalendarPage } from "../pages/calendar.page.js";
+import { NotFoundPage } from "../pages/not-found.page.js";
 
 interface Pages {
   calendar: CalendarPage;
+  notFound: NotFoundPage;
 }
 
 interface GlFixtures {
@@ -39,7 +41,7 @@ export const test = base.extend<GlFixtures>({
     });
   },
   pages: async ({ page }, use) => {
-    await use({ calendar: new CalendarPage(page) });
+    await use({ calendar: new CalendarPage(page), notFound: new NotFoundPage(page) });
   },
   settle: async ({ page }, use) => {
     await use(async () => {
