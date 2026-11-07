@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -7,20 +8,16 @@ import { RouterLink } from '@angular/router';
  * name with a green dot on the i.
  *
  * Rendered as a router link labelled "Greenlit, team calendar" by default; auth
- * pages link it to sign-in as "Greenlit, sign in". In the top bar and on auth
- * cards it also carries `topbar__brand`, as in the mocks.
+ * pages link it to sign-in as "Greenlit, sign in"; the marketing site gives it
+ * a plain `href` (`#top`). In the top bar and on auth cards it also carries
+ * `topbar__brand`, as in the mocks.
  */
 @Component({
   selector: 'gl-logo-lockup',
-  imports: [RouterLink],
+  imports: [NgTemplateOutlet, RouterLink],
   host: { style: 'display: contents' },
   template: `
-    <a
-      class="logo-lockup"
-      [class.topbar__brand]="brand()"
-      [routerLink]="link()"
-      [attr.aria-label]="label()"
-    >
+    <ng-template #mark>
       <svg class="logo-lockup__mark" viewBox="0 0 41 30" aria-hidden="true">
         <rect class="mark__n" x="0" y="0" width="8" height="8" rx="1.75" />
         <rect class="mark__n" x="11" y="0" width="8" height="8" rx="1.75" />
@@ -38,7 +35,26 @@ import { RouterLink } from '@angular/router';
       <span class="logo-lockup__word" aria-hidden="true"
         >greenl<span class="logo-lockup__i">ı</span>t</span
       >
-    </a>
+    </ng-template>
+    @if (href(); as url) {
+      <a
+        class="logo-lockup"
+        [class.topbar__brand]="brand()"
+        [href]="url"
+        [attr.aria-label]="label()"
+      >
+        <ng-container [ngTemplateOutlet]="mark" />
+      </a>
+    } @else {
+      <a
+        class="logo-lockup"
+        [class.topbar__brand]="brand()"
+        [routerLink]="link()"
+        [attr.aria-label]="label()"
+      >
+        <ng-container [ngTemplateOutlet]="mark" />
+      </a>
+    }
   `,
   styles: `
     .logo-lockup {
@@ -96,6 +112,8 @@ import { RouterLink } from '@angular/router';
 export class LogoLockup {
   /** Where the logo leads; the calendar by default. */
   readonly link = input<string>('/');
+  /** A plain address instead of a router link (the marketing site's `#top`). */
+  readonly href = input<string | null>(null);
   /** Set when the logo is the top bar's brand (`topbar__brand`). */
   readonly brand = input<boolean>(false);
   /** The link's accessible name. */

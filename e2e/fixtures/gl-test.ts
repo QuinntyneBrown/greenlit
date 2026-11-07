@@ -25,6 +25,7 @@ import { CancelRequestDialog } from "../pages/cancel-request.dialog.js";
 import { DeclineRequestDialog } from "../pages/decline-request.dialog.js";
 import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
 import { NewRequestDialog } from "../pages/new-request.dialog.js";
+import { MarketingPage } from "../pages/marketing.page.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
 import { RequestDetailDialog } from "../pages/request-detail.dialog.js";
 import { RequestsPage } from "../pages/requests.page.js";
@@ -40,6 +41,7 @@ interface Pages {
   createTeam: CreateTeamPage;
   inviteMember: InviteMemberDialog;
   newRequest: NewRequestDialog;
+  marketing: MarketingPage;
   notFound: NotFoundPage;
   requestDetail: RequestDetailDialog;
   declineRequest: DeclineRequestDialog;
@@ -284,12 +286,19 @@ export const test = base.extend<GlFixtures>({
       // Guarded routes start signed in, with a token from POST /api/auth/sign-in (fixtures/session.ts).
       if ((guardFor(key) || options.as) && !isBaseline && !options.signedOut) {
         const token = await signIn(page.request, options.as ?? "manager");
-        await page.addInitScript(([k, t]) => window.localStorage.setItem(k, t), [SESSION_KEY, token]);
+        await page.addInitScript(
+          ([k, t]) => window.localStorage.setItem(k, t),
+          [SESSION_KEY, token],
+        );
       }
-      const path = pathFor(key).replace(":token", encodeURIComponent(options.token ?? "none"));
+      const path = pathFor(key).replace(
+        ":token",
+        encodeURIComponent(options.token ?? "none"),
+      );
       const query = new URLSearchParams();
       if (options.month && !isBaseline) query.set("month", options.month);
-      if (options.returnUrl && !isBaseline) query.set("returnUrl", options.returnUrl);
+      if (options.returnUrl && !isBaseline)
+        query.set("returnUrl", options.returnUrl);
       await page.goto(query.size ? `${path}?${query}` : path);
     });
   },
@@ -297,7 +306,11 @@ export const test = base.extend<GlFixtures>({
     const pattern = "**/api/auth/sign-in";
     let count = 0;
     page.on("request", (request) => {
-      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/auth/sign-in") count++;
+      if (
+        request.method() === "POST" &&
+        new URL(request.url()).pathname === "/api/auth/sign-in"
+      )
+        count++;
     });
     await use({
       requests: () => count,
@@ -311,7 +324,9 @@ export const test = base.extend<GlFixtures>({
         return release;
       },
       fail: async () => {
-        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(pattern, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
     });
   },
@@ -330,8 +345,16 @@ export const test = base.extend<GlFixtures>({
     page.on("request", (request) => {
       const path = new URL(request.url()).pathname;
       if (request.method() === "POST" && path === "/api/requests") sends++;
-      if (request.method() === "POST" && /^\/api\/requests\/[^/]+\/decline$/.test(path)) declines++;
-      if (request.method() === "POST" && /^\/api\/requests\/[^/]+\/cancel$/.test(path)) cancels++;
+      if (
+        request.method() === "POST" &&
+        /^\/api\/requests\/[^/]+\/decline$/.test(path)
+      )
+        declines++;
+      if (
+        request.method() === "POST" &&
+        /^\/api\/requests\/[^/]+\/cancel$/.test(path)
+      )
+        cancels++;
       if (request.method() === "POST" && path === "/api/requests/approve") {
         approvals++;
         approved = (request.postDataJSON() as { ids: string[] }).ids;
@@ -350,17 +373,27 @@ export const test = base.extend<GlFixtures>({
         return release;
       },
       failCancel: async () => {
-        await page.route(cancel, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(cancel, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
       recoverCancel: () => page.unroute(cancel),
       stubMine: async (body) => {
-        await page.route("**/api/requests/mine", (route) => route.fulfill({ json: body }));
+        await page.route("**/api/requests/mine", (route) =>
+          route.fulfill({ json: body }),
+        );
       },
       failMine: async () => {
-        await page.route("**/api/requests/mine", (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route("**/api/requests/mine", (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
       failList: async () => {
-        await page.route(list, (route) => (route.request().method() === "GET" ? route.fulfill({ status: 500, body: "" }) : route.fallback()));
+        await page.route(list, (route) =>
+          route.request().method() === "GET"
+            ? route.fulfill({ status: 500, body: "" })
+            : route.fallback(),
+        );
       },
       recoverList: () => page.unroute(list),
       holdList: async () => {
@@ -375,12 +408,19 @@ export const test = base.extend<GlFixtures>({
       },
       stubPending: async (entries) => {
         await page.route(list, (route) => {
-          const status = new URL(route.request().url()).searchParams.get("status") ?? "Pending";
-          return route.request().method() === "GET" && status === "Pending" ? route.fulfill({ json: entries }) : route.fallback();
+          const status =
+            new URL(route.request().url()).searchParams.get("status") ??
+            "Pending";
+          return route.request().method() === "GET" && status === "Pending"
+            ? route.fulfill({ json: entries })
+            : route.fallback();
         });
         await page.route("**/api/requests/counts", async (route) => {
           const response = await route.fetch();
-          await route.fulfill({ response, json: { ...(await response.json()), pending: entries.length } });
+          await route.fulfill({
+            response,
+            json: { ...(await response.json()), pending: entries.length },
+          });
         });
       },
       changeDetail: async (change) => {
@@ -404,7 +444,9 @@ export const test = base.extend<GlFixtures>({
       },
       fail: async () => {
         await page.route(pattern, (route) =>
-          route.request().method() === "POST" ? route.fulfill({ status: 500, body: "" }) : route.fallback(),
+          route.request().method() === "POST"
+            ? route.fulfill({ status: 500, body: "" })
+            : route.fallback(),
         );
       },
       recover: () => page.unroute(pattern),
@@ -419,7 +461,9 @@ export const test = base.extend<GlFixtures>({
         return release;
       },
       failApprove: async () => {
-        await page.route(approve, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(approve, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
       recoverApprove: () => page.unroute(approve),
       declines: () => declines,
@@ -433,11 +477,15 @@ export const test = base.extend<GlFixtures>({
         return release;
       },
       failDecline: async () => {
-        await page.route(decline, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(decline, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
       recoverDecline: () => page.unroute(decline),
       failReopen: async () => {
-        await page.route(reopen, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(reopen, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
       recoverReopen: () => page.unroute(reopen),
     });
@@ -446,7 +494,11 @@ export const test = base.extend<GlFixtures>({
     const pattern = "**/api/team/settings/coverage";
     let saves = 0;
     page.on("request", (request) => {
-      if (request.method() === "PUT" && new URL(request.url()).pathname === "/api/team/settings/coverage") saves++;
+      if (
+        request.method() === "PUT" &&
+        new URL(request.url()).pathname === "/api/team/settings/coverage"
+      )
+        saves++;
     });
     await use({
       saves: () => saves,
@@ -460,7 +512,9 @@ export const test = base.extend<GlFixtures>({
         return release;
       },
       failSave: async () => {
-        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(pattern, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
       recoverSave: () => page.unroute(pattern),
     });
@@ -529,7 +583,8 @@ export const test = base.extend<GlFixtures>({
       if (request.method() !== "PUT") return;
       const path = new URL(request.url()).pathname;
       if (path === "/api/team/settings/work-week") weekSaves++;
-      if (/^\/api\/team\/members\/[^/]+\/working-days$/.test(path)) memberSaves++;
+      if (/^\/api\/team\/members\/[^/]+\/working-days$/.test(path))
+        memberSaves++;
     });
     const hold = async (pattern: string) => {
       let release!: () => void;
@@ -544,13 +599,17 @@ export const test = base.extend<GlFixtures>({
       weekSaves: () => weekSaves,
       holdWeek: () => hold(week),
       failWeek: async () => {
-        await page.route(week, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(week, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
       recoverWeek: () => page.unroute(week),
       memberSaves: () => memberSaves,
       holdMember: () => hold(member),
       failMember: async () => {
-        await page.route(member, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(member, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
       recoverMember: () => page.unroute(member),
     });
@@ -559,7 +618,11 @@ export const test = base.extend<GlFixtures>({
     const list = (url: URL) => url.pathname === "/api/team/holidays";
     let adds = 0;
     page.on("request", (request) => {
-      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/team/holidays") adds++;
+      if (
+        request.method() === "POST" &&
+        new URL(request.url()).pathname === "/api/team/holidays"
+      )
+        adds++;
     });
     await use({
       adds: () => adds,
@@ -574,7 +637,11 @@ export const test = base.extend<GlFixtures>({
         return release;
       },
       failAdd: async () => {
-        await page.route(list, (route) => (route.request().method() === "POST" ? route.fulfill({ status: 500, body: "" }) : route.fallback()));
+        await page.route(list, (route) =>
+          route.request().method() === "POST"
+            ? route.fulfill({ status: 500, body: "" })
+            : route.fallback(),
+        );
       },
       recoverAdd: () => page.unroute(list),
       holdRemove: async () => {
@@ -589,19 +656,31 @@ export const test = base.extend<GlFixtures>({
       },
       failRemove: async () => {
         await page.route("**/api/team/holidays/*", (route) =>
-          route.request().method() === "DELETE" ? route.fulfill({ status: 500, body: "" }) : route.fallback(),
+          route.request().method() === "DELETE"
+            ? route.fulfill({ status: 500, body: "" })
+            : route.fallback(),
         );
       },
       recoverRemove: () => page.unroute("**/api/team/holidays/*"),
       failRestore: async () => {
-        await page.route("**/api/team/holidays/*/restore", (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route("**/api/team/holidays/*/restore", (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
       recoverRestore: () => page.unroute("**/api/team/holidays/*/restore"),
       stubList: async (body) => {
-        await page.route(list, (route) => (route.request().method() === "GET" ? route.fulfill({ json: body }) : route.fallback()));
+        await page.route(list, (route) =>
+          route.request().method() === "GET"
+            ? route.fulfill({ json: body })
+            : route.fallback(),
+        );
       },
       failList: async () => {
-        await page.route(list, (route) => (route.request().method() === "GET" ? route.fulfill({ status: 500, body: "" }) : route.fallback()));
+        await page.route(list, (route) =>
+          route.request().method() === "GET"
+            ? route.fulfill({ status: 500, body: "" })
+            : route.fallback(),
+        );
       },
       recoverList: () => page.unroute(list),
     });
@@ -611,7 +690,13 @@ export const test = base.extend<GlFixtures>({
     const accept = "**/api/invitations/*/accept";
     let accepts = 0;
     page.on("request", (request) => {
-      if (request.method() === "POST" && /^\/api\/invitations\/[^/]+\/accept$/.test(new URL(request.url()).pathname)) accepts++;
+      if (
+        request.method() === "POST" &&
+        /^\/api\/invitations\/[^/]+\/accept$/.test(
+          new URL(request.url()).pathname,
+        )
+      )
+        accepts++;
     });
     const hold = async (pattern: string, method: string) => {
       let release!: () => void;
@@ -629,12 +714,16 @@ export const test = base.extend<GlFixtures>({
       holdAccept: () => hold(accept, "POST"),
       failRead: async () => {
         await page.route(read, (route) =>
-          route.request().method() === "GET" ? route.fulfill({ status: 500, body: "" }) : route.fallback(),
+          route.request().method() === "GET"
+            ? route.fulfill({ status: 500, body: "" })
+            : route.fallback(),
         );
       },
       recoverRead: () => page.unroute(read),
       failAccept: async () => {
-        await page.route(accept, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(accept, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
     });
   },
@@ -642,7 +731,11 @@ export const test = base.extend<GlFixtures>({
     const pattern = "**/api/team/members";
     let count = 0;
     page.on("request", (request) => {
-      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/team/members") count++;
+      if (
+        request.method() === "POST" &&
+        new URL(request.url()).pathname === "/api/team/members"
+      )
+        count++;
     });
     await use({
       requests: () => count,
@@ -656,7 +749,9 @@ export const test = base.extend<GlFixtures>({
         return release;
       },
       fail: async () => {
-        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(pattern, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
     });
   },
@@ -664,7 +759,11 @@ export const test = base.extend<GlFixtures>({
     const pattern = "**/api/teams";
     let count = 0;
     page.on("request", (request) => {
-      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/teams") count++;
+      if (
+        request.method() === "POST" &&
+        new URL(request.url()).pathname === "/api/teams"
+      )
+        count++;
     });
     await use({
       requests: () => count,
@@ -672,7 +771,9 @@ export const test = base.extend<GlFixtures>({
         await page.route(pattern, () => new Promise<void>(() => {}));
       },
       fail: async () => {
-        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(pattern, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
     });
   },
@@ -680,7 +781,9 @@ export const test = base.extend<GlFixtures>({
     const pattern = "**/api/sheet**";
     await use({
       fail: async () => {
-        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+        await page.route(pattern, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
       },
       recover: () => page.unroute(pattern),
       hold: async () => {
@@ -694,7 +797,9 @@ export const test = base.extend<GlFixtures>({
       },
       failSaves: async () => {
         await page.route("**/api/sheet/days", (route) =>
-          route.request().method() === "PUT" ? route.fulfill({ status: 500, body: "" }) : route.fallback(),
+          route.request().method() === "PUT"
+            ? route.fulfill({ status: 500, body: "" })
+            : route.fallback(),
         );
       },
       recoverSaves: () => page.unroute("**/api/sheet/days"),
@@ -712,7 +817,9 @@ export const test = base.extend<GlFixtures>({
         await page.route(pattern, async (route) => {
           const response = await route.fetch();
           const month = await response.json();
-          month.members = month.members.filter((m: { isYou: boolean }) => m.isYou);
+          month.members = month.members.filter(
+            (m: { isYou: boolean }) => m.isYou,
+          );
           await route.fulfill({ response, json: month });
         });
       },
@@ -728,6 +835,7 @@ export const test = base.extend<GlFixtures>({
       createTeam: new CreateTeamPage(page),
       inviteMember: new InviteMemberDialog(page),
       newRequest: new NewRequestDialog(page),
+      marketing: new MarketingPage(page),
       notFound: new NotFoundPage(page),
       requestDetail: new RequestDetailDialog(page),
       declineRequest: new DeclineRequestDialog(page),

@@ -1,9 +1,24 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-/** The marketing page (L2-050). Sections arrive one slice at a time. */
+import { Button, LogoLockup } from 'components';
+
+import { environment } from '../../../environments/environment';
+import { HERO_SHEET } from './hero-sheet';
+
+/**
+ * The marketing page (L2-050): the mock `pages/marketing/default.html` section
+ * by section, with the mock's `mk-*` classes. App links are absolute addresses
+ * into the Greenlit app from `environment.appUrl`.
+ */
 @Component({
   selector: 'mk-marketing-page',
-  template: ``,
+  imports: [Button, LogoLockup],
+  templateUrl: './marketing.page.html',
+  styleUrl: './marketing.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MarketingPage {}
+export class MarketingPage {
+  protected readonly signInUrl = `${environment.appUrl}/sign-in`;
+  protected readonly createTeamUrl = `${environment.appUrl}/create-team`;
+  protected readonly sheet = HERO_SHEET;
+}

@@ -8,9 +8,10 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 /**
  * Greenlit button (docs/design-system/components/button.html).
  *
- * Renders a router link (`<a class="btn">`) when `link` is set, otherwise a
+ * Renders a plain anchor when `href` is set (another origin or an in-page
+ * anchor), a router link (`<a class="btn">`) when `link` is set, otherwise a
  * native `<button>`. The label and any icon are projected once and rendered
- * in either branch through `ngTemplateOutlet`.
+ * in every branch through `ngTemplateOutlet`.
  */
 @Component({
   selector: 'gl-button',
@@ -18,7 +19,11 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
   host: { style: 'display: contents' },
   template: `
     <ng-template #content><ng-content /></ng-template>
-    @if (link(); as href) {
+    @if (href(); as url) {
+      <a class="btn" [class]="classes()" [href]="url" [attr.aria-label]="ariaLabel() || null"
+        ><ng-container [ngTemplateOutlet]="content"
+      /></a>
+    } @else if (link(); as href) {
       <a class="btn" [class]="classes()" [routerLink]="href" [attr.aria-label]="ariaLabel() || null"
         ><ng-container [ngTemplateOutlet]="content"
       /></a>
@@ -175,6 +180,8 @@ export class Button {
   readonly size = input<ButtonSize>('md');
   /** Router link (a path, or a URL tree that keeps a query); when set the button renders as `<a>`. */
   readonly link = input<string | UrlTree | null>(null);
+  /** Plain address (another origin, or `#anchor`); when set the button renders as `<a href>`. */
+  readonly href = input<string | null>(null);
   readonly type = input<'button' | 'submit' | 'reset'>('button');
   readonly disabled = input<boolean>(false);
   /** Shows the spinner and sets `aria-busy`. */

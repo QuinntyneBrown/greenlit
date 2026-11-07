@@ -58,30 +58,48 @@ export default defineConfig({
     },
   },
   use: {
-    baseURL: isBaselineCapture ? "http://localhost:5173" : "http://localhost:4200",
+    baseURL: isBaselineCapture
+      ? "http://localhost:5173"
+      : "http://localhost:4200",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "off",
   },
   webServer: isBaselineCapture
     ? {
-        command: "npx http-server ../docs/mocks -p 5173 -c-1 --cors --silent",
-        url: "http://localhost:5173/index.html",
+        // The mocks import ../design-system, so the docs folder is the root.
+        command: "npx http-server ../docs -p 5173 -c-1 --cors --silent",
+        url: "http://localhost:5173/mocks/index.html",
         reuseExistingServer: !process.env.CI,
         timeout: 30_000,
         cwd: __dirname,
       }
-    : {
-        command: "npm run start -- --port 4200",
-        url: "http://localhost:4200",
-        reuseExistingServer: !process.env.CI,
-        timeout: 180_000,
-        cwd: `${__dirname}/../frontend`,
-      },
+    : [
+        {
+          command: "npm run start -- --port 4200",
+          url: "http://localhost:4200",
+          reuseExistingServer: !process.env.CI,
+          timeout: 180_000,
+          cwd: `${__dirname}/../frontend`,
+        },
+        {
+          // The marketing site is a second application (L2-050); specs reach it by its origin in routes.ts.
+          command: "npm run start:marketing -- --port 4300",
+          url: "http://localhost:4300",
+          reuseExistingServer: !process.env.CI,
+          timeout: 180_000,
+          cwd: `${__dirname}/../frontend`,
+        },
+      ],
   projects: [
     {
       name: "mobile",
-      use: { ...devices["Desktop Chrome"], viewport: VIEWPORTS.mobile, isMobile: true, hasTouch: true },
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: VIEWPORTS.mobile,
+        isMobile: true,
+        hasTouch: true,
+      },
     },
     {
       name: "tablet",

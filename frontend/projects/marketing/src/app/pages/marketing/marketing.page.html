@@ -1,0 +1,74 @@
+<header class="mk-header">
+  <div class="mk-shell mk-header__inner">
+    <gl-logo-lockup href="#top" label="Greenlit, back to the top" />
+    <nav class="mk-nav" aria-label="Page sections">
+      <a href="#why">Why Greenlit</a>
+      <a href="#how">How it works</a>
+      <a href="#screens">Inside the app</a>
+      <a href="#managers">For managers</a>
+    </nav>
+    <gl-button variant="primary" size="sm" [href]="signInUrl">
+      Open the app
+      <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" /></svg>
+    </gl-button>
+  </div>
+</header>
+
+<section class="mk-hero" id="top" aria-labelledby="hero-h">
+  <div class="mk-shell mk-hero__grid">
+    <div class="mk-hero__copy">
+      <h1 id="hero-h">Every day off, <em>greenlit.</em></h1>
+      <p class="mk-lead">
+        Greenlit is the vacation sheet your team already keeps, made simple. Members colour their
+        own days, you confirm with a tap, and everyone sees the same month.
+      </p>
+      <div class="mk-cta-row">
+        <gl-button variant="primary" size="lg" [href]="createTeamUrl">
+          Create your team
+          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M7 17 17 7M8 7h9v9" />
+          </svg>
+        </gl-button>
+        <gl-button variant="link" size="lg" href="#how">See how it works ↓</gl-button>
+      </div>
+      <p class="mk-trust">Built for teams of under ten · Invite-only</p>
+    </div>
+    <div class="mk-sheet" aria-labelledby="sheet-t">
+      <div class="mk-sheet__title">
+        <span id="sheet-t">Design team · November</span><span>16–29</span>
+      </div>
+      <div class="mk-sheet__grid">
+        <span></span>
+        @for (day of sheet.days; track day.date) {
+          <span class="mk-sheet__head" [attr.data-off]="day.off ? '' : null">
+            <span>{{ day.weekday }}</span
+            ><span>{{ day.date }}</span>
+          </span>
+        }
+        @for (row of sheet.rows; track row.name) {
+          <span class="mk-sheet__name">{{ row.name }}</span>
+          @for (cell of row.cells; track $index) {
+            <span
+              class="cell"
+              [attr.data-status]="cell.status"
+              role="img"
+              [attr.aria-label]="cell.label"
+            ></span>
+          }
+        }
+      </div>
+      <div class="mk-sheet__legend" aria-label="Colour key">
+        <span data-status="confirmed"><i></i>Confirmed ✓</span>
+        <span data-status="requested"><i></i>Requested …</span>
+        <span data-status="tentative"><i></i>Tentative ?</span>
+        <span data-status="off"><i></i>Weekend</span>
+      </div>
+      <span class="mk-chip mk-chip--a" aria-hidden="true">
+        <span class="cell" data-status="confirmed"></span>Ana's 4–5 Nov confirmed
+      </span>
+      <span class="mk-chip mk-chip--b" aria-hidden="true">
+        <span class="cell" data-status="requested"></span>Ana requested 16–20 Nov
+      </span>
+    </div>
+  </div>
+</section>
