@@ -192,6 +192,13 @@ export class CalendarPage extends BasePage {
     }
   }
 
+  // ---- requesting time off (docs/detailed-designs/requests/send-request) ----
+
+  /** The member's "Request time off" button beside the paint picker; the manager does not get one. */
+  requestTimeOff(): Locator {
+    return this.main.getByRole("button", { name: "Request time off", exact: true });
+  }
+
   /** Every toast on screen, newest first. */
   toasts(): Locator {
     return this.page.locator(".toast");

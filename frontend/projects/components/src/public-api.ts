@@ -22,6 +22,7 @@ export * from './lib/auth-card/auth-card';
 export * from './lib/text-field/text-field';
 export * from './lib/select-field/select-field';
 export * from './lib/form-summary/form-summary';
+export * from './lib/well/well';
 
 // dialogs and lists
 export * from './lib/dialog/dialog';

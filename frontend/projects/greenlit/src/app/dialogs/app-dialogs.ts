@@ -20,15 +20,17 @@ export class AppDialogs {
 
   /**
    * Opens `component`; the result is what the dialog passes to `close`.
-   * `autoFocus` is a CSS selector for the control that takes focus first.
+   * `autoFocus` is a CSS selector for the control that takes focus first; `data` is what the
+   * dialog reads with `inject(DIALOG_DATA)`.
    */
-  open<R>(component: ComponentType<unknown>, autoFocus: string): DialogRef<R> {
+  open<R>(component: ComponentType<unknown>, autoFocus: string, data?: unknown): DialogRef<R> {
     const sheet = this.document.defaultView?.matchMedia(SHEET_QUERY).matches ?? false;
     const position = this.overlay.position().global().centerHorizontally();
     return this.dialog.open<R>(component, {
       ariaLabelledBy: 'dlg-title',
       ariaDescribedBy: 'dlg-title-desc',
       autoFocus,
+      data,
       restoreFocus: true,
       panelClass: 'gl-dialog-pane',
       backdropClass: 'gl-backdrop',

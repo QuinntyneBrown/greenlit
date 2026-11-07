@@ -75,5 +75,5 @@ the API refuses what ADR-003 forbids. Inviting a member is built (journey 5, `te
 "Invite a member" dialog adds a row and emails a link that works for seven days (the emails are written
 to the API log until a provider is chosen, ADR-006). Accepting an invitation is built (journey 6, `identity-and-access/accept-invitation`): the emailed
 link opens `/accept-invite/:token`, where the invitee sets a name and password and lands signed in on the
-calendar. The rest of the sheet lands feature by feature, each from a requirement in
+calendar. Requesting time off is built (journey 7, `requests/send-request`): a member opens "Request time off" on the calendar, picks a first and last day with an optional note, and the days turn yellow as a pending request for the manager (days left and over-allowance warnings arrive with allowances, journey 11). The rest of the sheet lands feature by feature, each from a requirement in
 `docs/specs/`, a detailed design and a mock, following the process in `AGENTS.md`.
