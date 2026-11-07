@@ -1,5 +1,5 @@
 import { Locator, Page } from "@playwright/test";
-import { BasePage } from "./base.page.js";
+import { BasePage, control } from "./base.page.js";
 import { PageSlug } from "../fixtures/routes.js";
 
 /**
@@ -101,5 +101,35 @@ export class PersonPage extends BasePage {
   /** A section of the lists, found by its heading. */
   section(title: string | RegExp): Locator {
     return this.main.locator("section", { has: this.page.getByRole("heading", { level: 2, name: title }) });
+  }
+
+  // ---- the states ----
+
+  /** The page's heading when it is not the person's name: "Time off", "Person not found", "Loading time off". */
+  pageHeading(): Locator {
+    return this.main.getByRole("heading", { level: 1 });
+  }
+
+  /** The placeholders shown while the person loads. */
+  placeholders(): Locator {
+    return this.main.locator(".skeleton");
+  }
+
+  /** The notice that replaces the page: forbidden, not found or error. */
+  notice(): Locator {
+    return this.main.locator(".empty");
+  }
+
+  noticeTitle(): Locator {
+    return this.notice().locator(".empty__title");
+  }
+
+  noticeText(): Locator {
+    return this.notice().locator(".empty__text");
+  }
+
+  /** A button or link of the notice, e.g. "Try again". */
+  noticeAction(name: string): Locator {
+    return control(this.notice().locator(".empty__actions"), name);
   }
 }
