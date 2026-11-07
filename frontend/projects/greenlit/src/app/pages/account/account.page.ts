@@ -21,10 +21,13 @@ import {
   TextField,
 } from 'components';
 
+import { AccountState } from '../../account/account-state';
 import { AppDialogs } from '../../dialogs/app-dialogs';
 import { SignOutDialog } from '../../dialogs/sign-out/sign-out.dialog';
 
 const MIN_PASSWORD = 10;
+const MAX_NAME = 100;
+const EMAIL = /^[^\s@]+@[^\s@.][^\s@]*\.[^\s@.]+$/;
 
 interface Status {
   readonly tone: 'success' | 'danger';
@@ -85,6 +88,8 @@ type Load =
                 inputId="acc-name"
                 autocomplete="name"
                 [(value)]="name"
+                [error]="profileSubmitted() ? nameError() : ''"
+                [readonly]="profileBusy()"
               />
               <gl-text-field
                 label="Email"
@@ -92,11 +97,26 @@ type Load =
                 type="email"
                 help="This is how you sign in."
                 [(value)]="email"
+                [error]="emailFieldError()"
+                [readonly]="profileBusy()"
+                (valueChange)="emailTaken.set(false)"
               />
             </div>
             <div class="settings-actions">
-              <gl-button variant="primary" size="sm" [disabled]="true">Save changes</gl-button>
-              <span aria-live="polite"></span>
+              <gl-button
+                variant="primary"
+                size="sm"
+                [busy]="profileBusy()"
+                [disabled]="!dirty() || profileBusy()"
+                (click)="saveProfile()"
+              >
+                {{ profileBusy() ? 'Saving…' : 'Save changes' }}
+              </gl-button>
+              <span aria-live="polite">
+                @if (profileStatus(); as status) {
+                  <gl-inline-message [tone]="status.tone">{{ status.text }}</gl-inline-message>
+                }
+              </span>
             </div>
           </section>
           <section class="settings-section" aria-labelledby="pw-title">
@@ -223,6 +243,7 @@ type Load =
 export class AccountPage {
   private readonly service = inject(ACCOUNT_SERVICE);
   private readonly dialogs = inject(AppDialogs);
+  private readonly accountState = inject(AccountState);
 
   protected readonly load = signal<Load>({ state: 'loading' });
 
@@ -233,6 +254,32 @@ export class AccountPage {
   protected readonly email = linkedSignal(() => {
     const load = this.load();
     return load.state === 'ready' ? load.account.email : '';
+  });
+  protected readonly profileBusy = signal(false);
+  protected readonly profileStatus = signal<Status | null>(null);
+  protected readonly profileSubmitted = signal(false);
+  /** True after the API said another account uses the email; clears when the person edits it. */
+  protected readonly emailTaken = signal(false);
+
+  protected readonly dirty = computed(() => {
+    const load = this.load();
+    return (
+      load.state === 'ready' &&
+      (this.name().trim() !== load.account.displayName ||
+        this.email().trim() !== load.account.email)
+    );
+  });
+  protected readonly nameError = computed(() => {
+    const name = this.name().trim();
+    if (!name) return 'Enter your name.';
+    return name.length > MAX_NAME ? 'Use 100 characters or fewer.' : '';
+  });
+  private readonly emailError = computed(() =>
+    EMAIL.test(this.email().trim()) ? '' : 'Enter a valid email address.',
+  );
+  protected readonly emailFieldError = computed(() => {
+    if (this.emailTaken()) return 'That email is already in use.';
+    return this.profileSubmitted() ? this.emailError() : '';
   });
   protected readonly current = signal('');
   protected readonly next = signal('');
@@ -278,6 +325,31 @@ export class AccountPage {
   private read(): void {
     this.service.get().subscribe((account) => {
       this.load.set(account ? { state: 'ready', account } : { state: 'error' });
+    });
+  }
+
+  /** Saves the name and email together; nothing is sent while either is invalid. */
+  protected saveProfile(): void {
+    if (this.profileBusy() || !this.dirty()) return;
+    this.profileSubmitted.set(true);
+    this.profileStatus.set(null);
+    if (this.nameError() || this.emailError()) return;
+    this.profileBusy.set(true);
+    this.service.updateProfile(this.name().trim(), this.email().trim()).subscribe((result) => {
+      this.profileBusy.set(false);
+      if (result.outcome === 'saved') {
+        this.load.set({ state: 'ready', account: result.account });
+        this.accountState.account.set(result.account);
+        this.profileSubmitted.set(false);
+        this.profileStatus.set({ tone: 'success', text: 'Saved' });
+      } else if (result.outcome === 'email-taken') {
+        this.emailTaken.set(true);
+      } else {
+        this.profileStatus.set({
+          tone: 'danger',
+          text: 'We couldn’t save your changes. Nothing was changed.',
+        });
+      }
     });
   }
 

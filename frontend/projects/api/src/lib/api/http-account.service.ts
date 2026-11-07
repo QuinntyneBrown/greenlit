@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 
 import { Account } from '../models/account';
-import { AccountService, ChangePasswordResult } from './account.service';
+import { AccountService, ChangePasswordResult, UpdateProfileResult } from './account.service';
 import { API_BASE_URL, apiUrl } from './api-base-url';
 import { problemCode } from './problem';
 
@@ -17,6 +17,23 @@ export class HttpAccountService implements AccountService {
     return this.http
       .get<Account>(apiUrl(this.baseUrl, 'api/account'))
       .pipe(catchError(() => of(null)));
+  }
+
+  updateProfile(displayName: string, email: string): Observable<UpdateProfileResult> {
+    return this.http
+      .put<Account>(apiUrl(this.baseUrl, 'api/account/profile'), { displayName, email })
+      .pipe(
+        map((account): UpdateProfileResult => ({ outcome: 'saved', account })),
+        catchError((error: unknown) =>
+          of<UpdateProfileResult>(
+            error instanceof HttpErrorResponse &&
+              error.status === 409 &&
+              problemCode(error) === 'email_taken'
+              ? { outcome: 'email-taken' }
+              : { outcome: 'failed' },
+          ),
+        ),
+      );
   }
 
   changePassword(current: string, next: string, confirm: string): Observable<ChangePasswordResult> {

@@ -3,6 +3,15 @@ import { Observable } from 'rxjs';
 
 import { Account } from '../models/account';
 
+/** What saving the profile came to. */
+export type UpdateProfileResult =
+  /** Saved; the account as the API now has it. */
+  | { readonly outcome: 'saved'; readonly account: Account }
+  /** Another account uses the email (409 `email_taken`); nothing changed. */
+  | { readonly outcome: 'email-taken' }
+  /** Nothing changed: the API failed, could not be reached or refused the request. */
+  | { readonly outcome: 'failed' };
+
 /** What changing the password came to. */
 export type ChangePasswordResult =
   | { readonly outcome: 'updated' }
@@ -18,6 +27,8 @@ export type ChangePasswordResult =
 export interface AccountService {
   /** The account; null when it could not be read. */
   get(): Observable<Account | null>;
+  /** Saves the display name and the sign-in email. */
+  updateProfile(displayName: string, email: string): Observable<UpdateProfileResult>;
   /** Changes the password; the current one must be right. */
   changePassword(current: string, next: string, confirm: string): Observable<ChangePasswordResult>;
 }
