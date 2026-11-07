@@ -157,30 +157,50 @@ public sealed class SeedCommandHandler
         var memberIds = team.Members.Select(m => m.Id).ToList();
         var existing = await _db.TimeOffDays.Where(d => memberIds.Contains(d.TeamMemberId)).ToListAsync(ct);
         foreach (var (memberName, day, status) in November)
-        {
-            var member = team.Members.Single(m => m.Name == memberName);
-            var date = new DateOnly(2026, 11, day);
-            if (existing.Any(d => d.TeamMemberId == member.Id && d.Date == date)) continue;
-            _db.TimeOffDays.Add(new TimeOffDay
-            {
-                Id = Guid.NewGuid(),
-                TeamMemberId = member.Id,
-                Date = date,
-                Status = status,
-                UpdatedUtc = now,
-                ConfirmedUtc = status == DayStatus.Confirmed ? now : null,
-            });
-        }
+            AddDay(team, memberName, new DateOnly(2026, 11, day), status, now, existing);
 
+        foreach (var (memberName, date) in WinterBreak) AddDay(team, memberName, date, DayStatus.Requested, now, existing);
         await SeedRequestsAsync(team, ct);
+        await SeedHistoryAsync(team, now, ct);
 
         var written = await _db.SaveChangesAsync(ct);
         _logger.LogInformation("Seed complete ({Rows} rows written).", written);
         return 0;
     }
 
-    /// <summary>The note on Ana's request, as pages/requests/member shows it.</summary>
-    private static readonly Dictionary<string, string> RequestNotes = new() { ["Ana Ruiz"] = "Visiting family in Seville" };
+    /// <summary>The notes on the pending requests, as pages/requests/default shows them.</summary>
+    private static readonly Dictionary<string, string> RequestNotes = new()
+    {
+        ["Ana Ruiz"] = "Visiting family in Seville",
+        ["Cleo Park"] = "Long weekend away",
+        ["Dev Patel"] = "Moving flat",
+        ["Elif Yılmaz"] = "Winter break",
+    };
+
+    /// <summary>Elif's winter break is the fourth pending request of pages/requests/default.</summary>
+    private static readonly (string Member, DateOnly Date)[] WinterBreak =
+    [
+        ("Elif Yılmaz", new(2026, 12, 29)), ("Elif Yılmaz", new(2026, 12, 30)), ("Elif Yılmaz", new(2026, 12, 31)),
+    ];
+
+    /// <summary>The requests already decided, as pages/requests/approved and declined show them.</summary>
+    private sealed record Decided(
+        string Member, DateOnly First, DateOnly Last, RequestStatus Status, string? Note,
+        DateOnly Sent, DateOnly Decision, string? Reason, DayStatus? Days);
+
+    private static readonly Decided[] History =
+    [
+        new("Finn Murphy", new(2026, 10, 19), new(2026, 10, 23), RequestStatus.Approved, "Half-term with my niece",
+            new(2026, 9, 28), new(2026, 9, 29), null, DayStatus.Confirmed),
+        new("Dev Patel", new(2026, 10, 12), new(2026, 10, 15), RequestStatus.Approved, null,
+            new(2026, 9, 14), new(2026, 9, 15), null, DayStatus.Confirmed),
+        new("Cleo Park", new(2026, 9, 7), new(2026, 9, 11), RequestStatus.Approved, "Wedding in Busan",
+            new(2026, 6, 2), new(2026, 6, 2), null, DayStatus.Confirmed),
+        new("Ben Okafor", new(2026, 12, 21), new(2026, 12, 24), RequestStatus.Declined, "Christmas",
+            new(2026, 10, 30), new(2026, 11, 2), "Three people are already out that week. Could you take the 29th onward instead?", DayStatus.Tentative),
+        new("Ana Ruiz", new(2026, 10, 5), new(2026, 10, 6), RequestStatus.Cancelled, "Short trip",
+            new(2026, 9, 20), new(2026, 9, 25), null, null),
+    ];
 
     /// <summary>
     /// The Requested days of November are each member's pending request, as the requests mocks show.
@@ -189,15 +209,14 @@ public sealed class SeedCommandHandler
     private async Task SeedRequestsAsync(Team team, CancellationToken ct)
     {
         var now = DateTimeOffset.UtcNow;
-        var memberIds = team.Members.Select(m => m.Id).ToList();
-        var stored = await _db.TimeOffRequests.Where(r => memberIds.Contains(r.TeamMemberId)).ToListAsync(ct);
         foreach (var member in team.Members)
         {
+            // One pending request per member for the Requested days that belong to none yet.
             var open = _db.TimeOffDays.Local
                 .Where(d => d.TeamMemberId == member.Id && d.Status == DayStatus.Requested && d.TimeOffRequestId is null)
                 .OrderBy(d => d.Date)
                 .ToList();
-            if (open.Count == 0 || stored.Any(r => r.TeamMemberId == member.Id)) continue;
+            if (open.Count == 0) continue;
             var request = new TimeOffRequest
             {
                 Id = Guid.NewGuid(),
@@ -210,6 +229,68 @@ public sealed class SeedCommandHandler
             };
             _db.TimeOffRequests.Add(request);
             foreach (var day in open) day.TimeOffRequestId = request.Id;
+        }
+    }
+
+    private void AddDay(Team team, string memberName, DateOnly date, DayStatus status, DateTimeOffset now, List<TimeOffDay> existing)
+    {
+        var member = team.Members.Single(m => m.Name == memberName);
+        if (existing.Any(d => d.TeamMemberId == member.Id && d.Date == date)) return;
+        var day = new TimeOffDay
+        {
+            Id = Guid.NewGuid(),
+            TeamMemberId = member.Id,
+            Date = date,
+            Status = status,
+            UpdatedUtc = now,
+            ConfirmedUtc = status == DayStatus.Confirmed ? now : null,
+        };
+        _db.TimeOffDays.Add(day);
+        existing.Add(day);
+    }
+
+    /// <summary>
+    /// The decided requests of the ledger. A request is looked up by member and first day, so a second seed
+    /// adds nothing; an approved one confirms its working days and a declined one leaves them tentative.
+    /// </summary>
+    private async Task SeedHistoryAsync(Team team, DateTimeOffset now, CancellationToken ct)
+    {
+        var memberIds = team.Members.Select(m => m.Id).ToList();
+        var stored = await _db.TimeOffRequests.Where(r => memberIds.Contains(r.TeamMemberId)).ToListAsync(ct);
+        var days = await _db.TimeOffDays.Where(d => memberIds.Contains(d.TeamMemberId)).ToListAsync(ct);
+        foreach (var h in History)
+        {
+            var member = team.Members.Single(m => m.Name == h.Member);
+            if (stored.Any(r => r.TeamMemberId == member.Id && r.FirstDay == h.First)) continue;
+            var request = new TimeOffRequest
+            {
+                Id = Guid.NewGuid(),
+                TeamMemberId = member.Id,
+                FirstDay = h.First,
+                LastDay = h.Last,
+                Note = h.Note,
+                Status = h.Status,
+                CreatedUtc = new DateTimeOffset(h.Sent.ToDateTime(new TimeOnly(9, 0)), TimeSpan.Zero),
+                DecidedUtc = new DateTimeOffset(h.Decision.ToDateTime(new TimeOnly(9, 0)), TimeSpan.Zero),
+                DeclineReason = h.Reason,
+            };
+            _db.TimeOffRequests.Add(request);
+            if (h.Days is not { } status) continue;
+            for (var date = h.First; date <= h.Last; date = date.AddDays(1))
+            {
+                if (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday) continue;
+                if (days.Any(d => d.TeamMemberId == member.Id && d.Date == date)) continue;
+                _db.TimeOffDays.Add(new TimeOffDay
+                {
+                    Id = Guid.NewGuid(),
+                    TeamMemberId = member.Id,
+                    Date = date,
+                    Status = status,
+                    TimeOffRequestId = request.Id,
+                    UpdatedUtc = now,
+                    ConfirmedUtc = status == DayStatus.Confirmed ? now : null,
+                });
+            }
         }
     }
 }

@@ -35,7 +35,7 @@ import { Avatar } from '../avatar/avatar';
         </button>
       </div>
       <div class="drawer__body"><ng-content /></div>
-      <div class="drawer__footer"><ng-content select="[slot=footer]" /></div>
+      <div class="drawer__footer" [hidden]="!footer()"><ng-content select="[slot=footer]" /></div>
     </div>
   `,
   styles: `
@@ -120,6 +120,9 @@ import { Avatar } from '../avatar/avatar';
       overflow: auto;
       flex: 1;
     }
+    .drawer__footer[hidden] {
+      display: none;
+    }
     .drawer__footer {
       display: flex;
       gap: var(--space-3);
@@ -138,5 +141,7 @@ export class Drawer {
   readonly descriptionId = input<string>('dlg-desc');
   /** A request is running: Close is off. */
   readonly busy = input<boolean>(false);
+  /** Draw the footer bar; off for a request that offers no decision. */
+  readonly footer = input<boolean>(true);
   readonly closed = output<void>();
 }

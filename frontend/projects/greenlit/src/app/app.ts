@@ -5,6 +5,7 @@ import {
   computed,
   effect,
   inject,
+  untracked,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
@@ -12,6 +13,7 @@ import { filter, map, startWith } from 'rxjs';
 
 import { AppNav, AppNavItem, SkipLink, TopBar } from 'components';
 
+import { RequestCountsState } from './requests/request-counts';
 import { ToastOutlet } from './toasts/toast-outlet';
 
 /**
@@ -66,7 +68,14 @@ export class App {
   );
 
   protected readonly shell = computed(() => this.shellData().shell);
-  protected readonly mainNav = MAIN_NAV;
+  private readonly requestCounts = inject(RequestCountsState);
+
+  /** The main navigation; Requests carries the manager's pending count (L2-022 AC8). */
+  protected readonly mainNav = computed<readonly AppNavItem[]>(() =>
+    MAIN_NAV.map((item) =>
+      item.link === '/requests' ? { ...item, badge: this.requestCounts.pending() } : item,
+    ),
+  );
 
   constructor() {
     effect(() => {
@@ -75,6 +84,10 @@ export class App {
       body.dataset['shell'] = data.shell;
       if (data.page) body.dataset['page'] = data.page;
       else delete body.dataset['page'];
+    });
+    // The pending count follows the person around: read again after every navigation inside the app.
+    effect(() => {
+      if (this.shellData().shell === 'app') untracked(() => this.requestCounts.refresh());
     });
   }
 

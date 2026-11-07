@@ -32,6 +32,22 @@ export function tokenTeamId(token: string | null): string | null {
 }
 
 /**
+ * True when the token's `role` claim says Manager (or Admin). Only for choosing what to show: the
+ * API alone decides what the person may do.
+ */
+export function tokenIsManager(token: string | null): boolean {
+  const payload = token?.split('.')[1];
+  if (!payload) return false;
+  try {
+    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const role = (JSON.parse(json) as { role?: unknown }).role;
+    return role === 'Manager' || role === 'Admin';
+  } catch {
+    return false;
+  }
+}
+
+/**
  * The app path to return to after signing in: only a path inside this app
  * (one leading `/`, not `//` or `/\`), so the parameter can never send
  * someone to another site. Anything else is the calendar.

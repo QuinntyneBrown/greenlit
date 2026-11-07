@@ -1,5 +1,5 @@
 // Acceptance Test
-// Traces to: L2-024 ("from the list"); the full ledger is journey 9
+// Traces to: L2-024 ("from the list"); the full ledger is review-requests.spec.ts
 // Description: The manager opens Requests and sees the pending requests of the team, each with an
 //              Approve button; a member has no business there and is sent to the calendar.
 // Data: the demo seed. Cleo Park (12-13 Nov), Ana Ruiz (16-20 Nov, "Visiting family in Seville") and

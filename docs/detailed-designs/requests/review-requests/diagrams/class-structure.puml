@@ -46,17 +46,22 @@ TimeOffRequest --> RequestStatus
 TeamMember "1" --> "*" TimeOffRequest : asks
 TimeOffRequest "1" o-- "*" TimeOffDay : covers working days
 
-class RequestLedgerDto <<new>> {
-  +RequestStatus Tab
-  +int PendingCount
-  +int ApprovedCount
-  +int DeclinedCount
-  +List<RequestSummaryDto> Items
+class RequestCountsDto <<new>> {
+  +int Pending
+  +int Approved
+  +int Declined
+}
+class RequestSummaryDto <<new>> {
+  +Guid Id
+  +string MemberName
+  +RequestStatus Status
+  +List<OverlapDto> Overlaps
+  +DateTime? DecidedUtc
+  +string DeclineReason
 }
 class RequestDetailDto <<new>> {
   +RequestSummaryDto Request
   +string MemberName
-  +int DaysLeftAfter
   +List<MemberRowDto> TeamWeeks
   +List<DayCoverage> Coverage
 }
@@ -65,8 +70,10 @@ class ApproveRequestsCommand <<new>> {
 }
 class ListRequestsQueryHandler <<new>>
 class GetRequestQueryHandler <<new>>
+class CountRequestsQueryHandler <<new>>
 class ApproveRequestsCommandHandler <<new>>
-ListRequestsQueryHandler ..> RequestLedgerDto : returns
+ListRequestsQueryHandler ..> RequestSummaryDto : returns
+CountRequestsQueryHandler ..> RequestCountsDto : returns
 GetRequestQueryHandler ..> RequestDetailDto : returns
 ApproveRequestsCommandHandler --> TimeOffRequest : Approve() each
 @enduml

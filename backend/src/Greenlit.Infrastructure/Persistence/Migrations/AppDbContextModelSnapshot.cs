@@ -209,6 +209,10 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DecidedUtc")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("DeclineReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<DateOnly>("FirstDay")
                         .HasColumnType("date");
 

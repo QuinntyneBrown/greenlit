@@ -1,12 +1,16 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { IsActiveMatchOptions, RouterLink, RouterLinkActive } from '@angular/router';
 
+import { CountPill } from '../badge/badge';
+
 /** One destination in the app navigation. */
 export interface AppNavItem {
   readonly label: string;
   readonly link: string;
   /** Match the link exactly when deciding the current item (needed for `/`). */
   readonly exact?: boolean;
+  /** A count shown after the label, read as "{n} pending"; nothing at zero or when unset. */
+  readonly badge?: number;
 }
 
 /**
@@ -16,7 +20,7 @@ export interface AppNavItem {
  */
 @Component({
   selector: 'gl-app-nav',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, CountPill],
   host: { style: 'display: contents' },
   template: `
     <nav class="app-nav" [attr.aria-label]="label()">
@@ -27,8 +31,11 @@ export interface AppNavItem {
           routerLinkActive
           ariaCurrentWhenActive="page"
           [routerLinkActiveOptions]="activeOptions(item)"
-          >{{ item.label }}</a
-        >
+          >{{ item.label }}
+          @if (item.badge) {
+            <gl-count-pill [count]="item.badge" />
+          }
+        </a>
       }
     </nav>
   `,

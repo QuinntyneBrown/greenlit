@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 
 import { Avatar } from '../avatar/avatar';
 import { Button } from '../button/button';
+import { RequestState, RequestStatus } from '../request-status/request-status';
 
 /** One request as the list shows it. */
 export interface RequestListItem {
@@ -10,23 +11,46 @@ export interface RequestListItem {
   /** "16–20 Nov · 5 days" */
   readonly summary: string;
   readonly note: string | null;
+  /** Where the request stands: a pending one offers Approve and a tick, the others show their status. */
+  readonly state: RequestState;
+  /** Lines under the note: who else is out, "No overlaps", "Sent 28 Sep · decided 29 Sep" or "Reason: ...". */
+  readonly meta: readonly string[];
+  /** Draw the people icon before each line of `meta` (who else is out). */
+  readonly metaIcon?: boolean;
+}
+
+/** A row's checkbox was ticked or cleared. */
+export interface RequestToggle {
+  readonly id: string;
+  readonly selected: boolean;
 }
 
 /**
  * The manager's requests (docs/design-system/components/request-row.html): one row per request with
- * who asked, for which days, the note, and an Approve button. The name opens the request's detail.
- * The row's `request-row` classes are the mock's. While a request is being approved its button
- * says "Approving…" (`aria-busy`) and stays off; the other rows stay usable. Selection, overlaps and
- * Decline arrive with journeys 9 and 10, so the check column is kept but empty.
+ * who asked, for which days, the note, the lines under it and either Approve (a pending request) or its
+ * status. The name opens the request's detail. The row's `request-row` classes are the mock's.
+ * With `selectable`, a pending row has the checkbox "Select {name}'s request" and a ticked row is
+ * highlighted (`data-selected`). While a request is being approved its button says "Approving…"
+ * (`aria-busy`) and stays off; the other rows stay usable. A long note keeps to one line and carries
+ * itself as its tooltip. Decline arrives with journey 10.
  */
 @Component({
   selector: 'gl-request-list',
-  imports: [Avatar, Button],
+  imports: [Avatar, Button, RequestStatus],
   template: `
     <ul class="request-list" [attr.aria-label]="label() || null">
       @for (item of items(); track item.id) {
-        <li class="request-row">
-          <span class="request-row__check"></span>
+        <li class="request-row" [attr.data-selected]="isSelected(item.id) ? '' : null">
+          <span class="request-row__check">
+            @if (selectable() && item.state === 'pending') {
+              <input
+                type="checkbox"
+                [attr.aria-label]="checkLabel(item.name)"
+                [checked]="isSelected(item.id)"
+                (change)="toggle(item.id, $event)"
+              />
+            }
+          </span>
           <button class="request-row__who" type="button" (click)="opened.emit(item.id)">
             <gl-avatar [name]="item.name" />
             <span class="request-row__text">
@@ -36,24 +60,41 @@ export interface RequestListItem {
           </button>
           <div class="request-text">
             @if (item.note) {
-              <p class="request-row__note">“{{ item.note }}”</p>
+              <p class="request-row__note" [attr.title]="item.note">“{{ item.note }}”</p>
             } @else {
               <p class="request-row__note request-row__note--none">No note</p>
             }
+            @for (line of item.meta; track $index) {
+              <p class="request-row__meta">
+                @if (item.metaIcon) {
+                  <svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24">
+                    <circle cx="9" cy="8" r="3.5" />
+                    <path
+                      d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"
+                    />
+                  </svg>
+                }
+                {{ line }}
+              </p>
+            }
           </div>
           <div class="request-row__actions">
-            <gl-button
-              variant="approve"
-              size="sm"
-              [busy]="isBusy(item.id)"
-              [disabled]="isBusy(item.id)"
-              (click)="approved.emit(item.id)"
-            >
-              <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
-                <path d="M4 12l6 6L20 6" />
-              </svg>
-              {{ isBusy(item.id) ? 'Approving…' : 'Approve' }}
-            </gl-button>
+            @if (item.state === 'pending') {
+              <gl-button
+                variant="approve"
+                size="sm"
+                [busy]="isBusy(item.id)"
+                [disabled]="isBusy(item.id)"
+                (click)="approved.emit(item.id)"
+              >
+                <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M4 12l6 6L20 6" />
+                </svg>
+                {{ isBusy(item.id) ? 'Approving…' : 'Approve' }}
+              </gl-button>
+            } @else {
+              <gl-request-status [state]="item.state" />
+            }
           </div>
         </li>
       }
@@ -78,8 +119,17 @@ export interface RequestListItem {
     .request-row:last-child {
       border-bottom: 0;
     }
+    .request-row[data-selected] {
+      background: var(--color-accent-subtle);
+    }
     .request-row__check {
       display: none;
+    }
+    .request-row__check input {
+      width: 1rem;
+      height: 1rem;
+      margin: 0;
+      accent-color: var(--color-brand-strong);
     }
     @media (min-width: 48rem) {
       .request-row {
@@ -145,6 +195,22 @@ export interface RequestListItem {
     .request-row__note--none {
       color: var(--color-fg-subtle);
     }
+    .request-row__meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      margin: 0;
+      font: var(--text-caption);
+      color: var(--color-fg-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .icon--sm {
+      width: 1rem;
+      height: 1rem;
+      flex: none;
+    }
     .request-row__actions {
       display: flex;
       flex-wrap: wrap;
@@ -160,13 +226,31 @@ export class RequestList {
   readonly label = input<string>('');
   /** Ids whose Approve is running. */
   readonly busy = input<readonly string[]>([]);
+  /** Pending rows carry a checkbox. */
+  readonly selectable = input<boolean>(false);
+  /** Ids of the ticked rows. */
+  readonly selected = input<readonly string[]>([]);
 
   /** The name was pressed: open this request's detail. */
   readonly opened = output<string>();
   /** Approve was pressed on this request. */
   readonly approved = output<string>();
+  /** A row's checkbox was ticked or cleared. */
+  readonly toggled = output<RequestToggle>();
 
   protected isBusy(id: string): boolean {
     return this.busy().includes(id);
+  }
+
+  protected isSelected(id: string): boolean {
+    return this.selected().includes(id);
+  }
+
+  protected checkLabel(name: string): string {
+    return `Select ${name}'s request`;
+  }
+
+  protected toggle(id: string, event: Event): void {
+    this.toggled.emit({ id, selected: (event.target as HTMLInputElement).checked });
   }
 }

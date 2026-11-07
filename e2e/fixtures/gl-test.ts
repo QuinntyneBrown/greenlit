@@ -134,6 +134,17 @@ interface RequestsApi {
   /** Undo (POST /api/requests/{id}/reopen) fails with a 500 until `recoverReopen()`. */
   failReopen(): Promise<void>;
   recoverReopen(): Promise<void>;
+  /** The ids of the last approve request (POST /api/requests/approve) the page made. */
+  lastApproved(): string[];
+  /** Pending requests (GET /api/requests) fail with a 500 until `recoverList()`. */
+  failList(): Promise<void>;
+  recoverList(): Promise<void>;
+  /** Holds list requests until the returned function is called. */
+  holdList(): Promise<() => void>;
+  /** The pending list is `entries` and the Pending count their number, whatever the database holds. */
+  stubPending(entries: object[]): Promise<void>;
+  /** Every request opened (GET /api/requests/{id}) comes back as its real detail changed by `change`. */
+  changeDetail(change: (detail: any) => void): Promise<void>;
 }
 
 interface GlFixtures {
@@ -197,12 +208,50 @@ export const test = base.extend<GlFixtures>({
     const reopen = "**/api/requests/*/reopen";
     let sends = 0;
     let approvals = 0;
+    let approved: string[] = [];
+    const list = (url: URL) => url.pathname === "/api/requests";
     page.on("request", (request) => {
       const path = new URL(request.url()).pathname;
       if (request.method() === "POST" && path === "/api/requests") sends++;
-      if (request.method() === "POST" && path === "/api/requests/approve") approvals++;
+      if (request.method() === "POST" && path === "/api/requests/approve") {
+        approvals++;
+        approved = (request.postDataJSON() as { ids: string[] }).ids;
+      }
     });
     await use({
+      lastApproved: () => approved,
+      failList: async () => {
+        await page.route(list, (route) => (route.request().method() === "GET" ? route.fulfill({ status: 500, body: "" }) : route.fallback()));
+      },
+      recoverList: () => page.unroute(list),
+      holdList: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(list, async (route) => {
+          if (route.request().method() !== "GET") return route.fallback();
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      stubPending: async (entries) => {
+        await page.route(list, (route) => {
+          const status = new URL(route.request().url()).searchParams.get("status") ?? "Pending";
+          return route.request().method() === "GET" && status === "Pending" ? route.fulfill({ json: entries }) : route.fallback();
+        });
+        await page.route("**/api/requests/counts", async (route) => {
+          const response = await route.fetch();
+          await route.fulfill({ response, json: { ...(await response.json()), pending: entries.length } });
+        });
+      },
+      changeDetail: async (change) => {
+        await page.route(/\/api\/requests\/[0-9a-f-]{36}$/, async (route) => {
+          const response = await route.fetch();
+          const detail = await response.json();
+          change(detail);
+          await route.fulfill({ response, json: detail });
+        });
+      },
       sends: () => sends,
       hold: async () => {
         let release!: () => void;

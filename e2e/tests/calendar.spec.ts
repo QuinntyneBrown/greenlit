@@ -18,7 +18,7 @@ test.describe("Calendar", () => {
 
   test("the header shows the logo and the Main navigation in order (L2-049 AC2)", async ({ pages }) => {
     await expect(pages.calendar.logo()).toBeVisible();
-    await expect(pages.calendar.mainNavLinks()).toHaveText(["Calendar", "Year", "Requests", "Settings"]);
+    await expect(pages.calendar.mainNavLinks()).toHaveText([/^Calendar\s*$/, /^Year\s*$/, /^Requests\s*(\d+ pending)?$/, /^Settings\s*$/]); // the manager's Requests link carries the pending count (L2-022 AC1)
   });
 
   test("Calendar is the only current navigation item (L2-049 AC3)", async ({ pages }) => {

@@ -73,6 +73,11 @@ export abstract class BasePage {
     return this.mainNav().getByRole("link", { name: new RegExp(`^${label}\\b`) });
   }
 
+  /** The count pill on the Requests link ("4 pending"); absent for a member and at zero. */
+  pendingPill(): Locator {
+    return this.mainNavLink("Requests").locator(".count-pill");
+  }
+
   async openFromMainNav(label: string): Promise<void> {
     await this.mainNavLink(label).click();
   }

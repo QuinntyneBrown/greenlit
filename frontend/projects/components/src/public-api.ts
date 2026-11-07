@@ -29,6 +29,7 @@ export * from './lib/dialog/dialog';
 export * from './lib/member-list/member-list';
 
 // requests
+export * from './lib/tabs/tabs';
 export * from './lib/request-list/request-list';
 export * from './lib/request-status/request-status';
 export * from './lib/drawer/drawer';

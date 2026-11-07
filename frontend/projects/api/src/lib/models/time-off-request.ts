@@ -1,3 +1,5 @@
+import { SheetCoverage, SheetMember } from './sheet-month';
+
 /** What the request dialog collects (requests/send-request, L2-019 AC1). */
 export interface NewRequest {
   /** `yyyy-MM-dd` */
@@ -22,8 +24,39 @@ export interface SentRequest {
   readonly sentUtc: string;
 }
 
-/** A request in the manager's list (GET /api/requests): the same shape as the one just sent. */
-export type RequestSummary = SentRequest;
+/** Another member who is out on some of a pending request's days. */
+export interface RequestOverlap {
+  readonly memberName: string;
+  /** The first of their days among the request's, `yyyy-MM-dd`. */
+  readonly firstDay: string;
+  readonly lastDay: string;
+}
+
+/** A request in the manager's ledger (GET /api/requests): the one just sent plus how it was decided. */
+export interface RequestSummary extends SentRequest {
+  /** When the manager decided it (ISO 8601); null while pending. */
+  readonly decidedUtc: string | null;
+  /** Why it was declined, when the manager said. */
+  readonly declineReason: string | null;
+  /** While pending, the other members who are out on its days; otherwise empty. */
+  readonly overlaps: readonly RequestOverlap[];
+}
+
+/** How many requests each tab of the ledger holds (GET /api/requests/counts). Declined includes Cancelled. */
+export interface RequestCounts {
+  readonly pending: number;
+  readonly approved: number;
+  readonly declined: number;
+}
+
+/** A request with the team for the weeks around it (GET /api/requests/{id}). */
+export interface RequestDetail {
+  readonly request: RequestSummary;
+  /** Every member, one cell per day from the Monday of the first week to the Sunday of the last. */
+  readonly members: readonly SheetMember[];
+  /** The Out row for the working days of those weeks. */
+  readonly coverage: readonly SheetCoverage[];
+}
 
 /** What approving one request did (POST /api/requests/approve), for the toast. */
 export interface ApprovalResult {

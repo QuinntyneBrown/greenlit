@@ -13,6 +13,8 @@ export interface SessionStore {
   isSignedIn(): boolean;
   /** The team the session names; null while the person is on no team (teams/create-team). */
   teamId(): string | null;
+  /** True when the session is a manager's: what to show, not what is allowed. */
+  isManager(): boolean;
   setToken(token: string): void;
   clear(): void;
 }

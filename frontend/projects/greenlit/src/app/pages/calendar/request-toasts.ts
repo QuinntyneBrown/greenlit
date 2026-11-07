@@ -102,3 +102,61 @@ export function undoFailedToast(
     action: { label: 'Try again', run: retry },
   };
 }
+
+/**
+ * Several requests approved together (notifications/request-toast/bulk, L2-026 AC3): one summary in
+ * place of one toast each. As with a single approval, a day left short is said in its place (L2-042 AC2).
+ */
+export function bulkApprovedToast(
+  results: readonly ApprovalResult[],
+  undo: () => void,
+): Pick<ToastRequest, 'tone' | 'title' | 'body' | 'action'> {
+  const action = { label: 'Undo', run: undo };
+  const count = results.length;
+  const short = results
+    .filter((r) => r.firstShortDate !== null && r.inOnShortDate !== null)
+    .sort((a, b) => (a.firstShortDate ?? '').localeCompare(b.firstShortDate ?? ''))[0];
+  if (short?.firstShortDate && short.inOnShortDate !== null) {
+    const people =
+      short.inOnShortDate === 1 ? '1 person will be' : `${short.inOnShortDate} people will be`;
+    return {
+      tone: 'warning',
+      title: `Approved ${count} requests, but only ${people} in on ${dayLabel(short.firstShortDate)}`,
+      body: `That’s below your minimum of ${short.coverageMinimum}.`,
+      action,
+    };
+  }
+  return {
+    tone: 'success',
+    title: `Approved ${count} requests`,
+    body: results.every((r) => r.emailed)
+      ? 'Their days are green on the calendar and everyone has been emailed.'
+      : 'Their days are green on the calendar.',
+    action,
+  };
+}
+
+/** None of the ticked requests was approved (all or nothing). */
+export function bulkApproveFailedToast(
+  count: number,
+  retry: () => void,
+): Pick<ToastRequest, 'tone' | 'title' | 'body' | 'action'> {
+  return {
+    tone: 'danger',
+    title: `We couldn’t approve ${count} requests`,
+    body: 'They’re still pending. Check your connection and try again.',
+    action: { label: 'Try again', run: retry },
+  };
+}
+
+/** Undo of a bulk approval stopped part-way; the ones not yet reopened stay approved. */
+export function bulkUndoFailedToast(
+  retry: () => void,
+): Pick<ToastRequest, 'tone' | 'title' | 'body' | 'action'> {
+  return {
+    tone: 'danger',
+    title: 'We couldn’t undo that',
+    body: 'Some of that time off is still approved. Check your connection and try again.',
+    action: { label: 'Try again', run: retry },
+  };
+}

@@ -95,6 +95,54 @@ public sealed class TestTeam
             UpdatedUtc = DateTimeOffset.UtcNow,
         }));
 
+    /// <summary>
+    /// Stores a request the way an earlier decision would have left it. Its days are the working days of
+    /// the range when <paramref name="dayStatus"/> is given, linked to the request; none when it is null.
+    /// </summary>
+    public async Task<Guid> AddRequestAsync(
+        string member,
+        DateOnly first,
+        DateOnly last,
+        RequestStatus status,
+        string? note = null,
+        DateTimeOffset? sent = null,
+        DateTimeOffset? decided = null,
+        string? declineReason = null,
+        DayStatus? dayStatus = null)
+    {
+        var request = new TimeOffRequest
+        {
+            Id = Guid.NewGuid(),
+            TeamMemberId = _rows[member].Id,
+            FirstDay = first,
+            LastDay = last,
+            Note = note,
+            Status = status,
+            CreatedUtc = sent ?? DateTimeOffset.UtcNow,
+            DecidedUtc = decided,
+            DeclineReason = declineReason,
+        };
+        await _factory.WriteAsync(db =>
+        {
+            db.TimeOffRequests.Add(request);
+            if (dayStatus is null) return;
+            for (var date = first; date <= last; date = date.AddDays(1))
+            {
+                if (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday) continue;
+                db.TimeOffDays.Add(new TimeOffDay
+                {
+                    Id = Guid.NewGuid(),
+                    TeamMemberId = request.TeamMemberId,
+                    Date = date,
+                    Status = dayStatus.Value,
+                    TimeOffRequestId = request.Id,
+                    UpdatedUtc = DateTimeOffset.UtcNow,
+                });
+            }
+        });
+        return request.Id;
+    }
+
     /// <summary>Sets the team's coverage minimum, which journey 17 lets the manager set in Settings.</summary>
     public Task SetCoverageMinimumAsync(int minimum) =>
         _factory.WriteAsync(db => db.Teams.Single(t => t.Id == Team.Id).CoverageMinimum = minimum);

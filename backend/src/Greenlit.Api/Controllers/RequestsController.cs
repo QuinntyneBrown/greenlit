@@ -18,10 +18,20 @@ public sealed class RequestsController : ControllerBase
     public async Task<ActionResult<QuoteDto>> Quote([FromQuery] string? first, [FromQuery] string? last, CancellationToken ct) =>
         Ok(await _sender.Send(new QuoteRequestQuery(first, last), ct));
 
-    /// <summary>The team's requests with one status (default Pending), oldest first; manager only.</summary>
+    /// <summary>The team's requests with one status (default Pending; Declined includes Cancelled), oldest first; manager only.</summary>
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<RequestDto>>> List([FromQuery] string? status, CancellationToken ct) =>
+    public async Task<ActionResult<IReadOnlyList<RequestSummaryDto>>> List([FromQuery] string? status, CancellationToken ct) =>
         Ok(await _sender.Send(new ListRequestsQuery(status), ct));
+
+    /// <summary>How many requests each ledger tab holds (Declined includes Cancelled); manager only.</summary>
+    [HttpGet("counts")]
+    public async Task<ActionResult<RequestCountsDto>> Counts(CancellationToken ct) =>
+        Ok(await _sender.Send(new CountRequestsQuery(), ct));
+
+    /// <summary>One request of the manager's team with every member's days for the weeks around it; manager only.</summary>
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<RequestDetailDto>> Get(Guid id, CancellationToken ct) =>
+        Ok(await _sender.Send(new GetRequestQuery(id), ct));
 
     /// <summary>Asks the manager for a run of days on the caller's own row and marks them Requested.</summary>
     [HttpPost]
