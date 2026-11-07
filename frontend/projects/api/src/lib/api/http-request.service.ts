@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import {
   ApprovalResult,
   DeclineResult,
+  MyRequests,
   NewRequest,
   RequestCounts,
   RequestDetail,
@@ -33,6 +34,10 @@ export class HttpRequestService implements RequestService {
   list(status: SentRequest['status']): Observable<readonly RequestSummary[]> {
     const params = new HttpParams().set('status', status);
     return this.http.get<RequestSummary[]>(apiUrl(this.baseUrl, 'api/requests'), { params });
+  }
+
+  mine(): Observable<MyRequests> {
+    return this.http.get<MyRequests>(apiUrl(this.baseUrl, 'api/requests/mine'));
   }
 
   counts(): Observable<RequestCounts> {

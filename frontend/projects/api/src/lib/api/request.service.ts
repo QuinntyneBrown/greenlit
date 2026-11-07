@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import {
   ApprovalResult,
   DeclineResult,
+  MyRequests,
   NewRequest,
   RequestCounts,
   RequestDetail,
@@ -20,6 +21,8 @@ export interface RequestService {
   send(request: NewRequest): Observable<SentRequest>;
   /** The team's requests with this status, oldest first; `Declined` also lists the cancelled ones. Manager only. */
   list(status: SentRequest['status']): Observable<readonly RequestSummary[]>;
+  /** The signed-in person's own requests, Upcoming and Past. */
+  mine(): Observable<MyRequests>;
   /** How many requests each ledger tab holds. Manager only. */
   counts(): Observable<RequestCounts>;
   /** One request with the team for the weeks around it. Manager only; an unknown id errors with 404. */

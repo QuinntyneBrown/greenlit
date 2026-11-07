@@ -42,6 +42,16 @@ export interface RequestSummary extends SentRequest {
   readonly overlaps: readonly RequestOverlap[];
 }
 
+/** A member's own requests (GET /api/requests/mine): pending ones, and decided or cancelled ones. */
+export interface MyRequests {
+  /** Who decides, for the New request and Cancel request dialogs. */
+  readonly managerName: string;
+  /** Pending requests, oldest first. */
+  readonly upcoming: readonly RequestSummary[];
+  /** Decided and cancelled requests, most recently sent first. */
+  readonly past: readonly RequestSummary[];
+}
+
 /** How many requests each tab of the ledger holds (GET /api/requests/counts). Declined includes Cancelled. */
 export interface RequestCounts {
   readonly pending: number;

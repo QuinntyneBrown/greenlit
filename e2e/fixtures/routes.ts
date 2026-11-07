@@ -32,6 +32,8 @@ export const ROUTES = {
   calendar: { app: "/", mock: "/pages/calendar/default.html", guard: "auth", page: "calendar" },
   createTeam: { app: "/create-team", mock: "/pages/create-team/default.html", guard: "auth", page: "create-team" },
   notFound: { app: "/no-such-page", mock: "/pages/not-found/default.html", page: "not-found" },
+  /** Requests as a member sees it: My requests (docs/detailed-designs/requests/my-requests). */
+  myRequests: { app: "/requests", mock: "/pages/requests/member.html", guard: "auth", page: "requests" },
   requests: { app: "/requests", mock: "/pages/requests/default.html", guard: "manager", page: "requests" },
   settings: { app: "/settings", mock: "/pages/settings/default.html", guard: "auth", page: "settings" },
   signIn: { app: "/sign-in", mock: "/pages/sign-in/default.html", page: "sign-in" },

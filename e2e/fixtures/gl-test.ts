@@ -145,6 +145,10 @@ interface RequestsApi {
   /** Undo (POST /api/requests/{id}/reopen) fails with a 500 until `recoverReopen()`. */
   failReopen(): Promise<void>;
   recoverReopen(): Promise<void>;
+  /** The member's own requests (GET /api/requests/mine) come back as `body`, whatever the database holds. */
+  stubMine(body: object): Promise<void>;
+  /** The member's own requests fail with a 500. */
+  failMine(): Promise<void>;
   /** The ids of the last approve request (POST /api/requests/approve) the page made. */
   lastApproved(): string[];
   /** Pending requests (GET /api/requests) fail with a 500 until `recoverList()`. */
@@ -234,6 +238,12 @@ export const test = base.extend<GlFixtures>({
     });
     await use({
       lastApproved: () => approved,
+      stubMine: async (body) => {
+        await page.route("**/api/requests/mine", (route) => route.fulfill({ json: body }));
+      },
+      failMine: async () => {
+        await page.route("**/api/requests/mine", (route) => route.fulfill({ status: 500, body: "" }));
+      },
       failList: async () => {
         await page.route(list, (route) => (route.request().method() === "GET" ? route.fulfill({ status: 500, body: "" }) : route.fallback()));
       },

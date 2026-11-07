@@ -49,3 +49,12 @@ export function requestRow(request: RequestSummary): RequestListItem {
   const decided = request.decidedUtc ? ` · decided ${instantDay(request.decidedUtc)}` : '';
   return { ...base, meta: [`Sent ${instantDay(request.sentUtc)}${decided}`] };
 }
+
+/**
+ * What My requests shows for one of the member's own requests (pages/requests/member): the range and days
+ * as the title, "Sent 3 Nov" under it, and below the note who else is out while it is pending, the reason
+ * when it was declined, else "Sent … · decided …".
+ */
+export function myRequestRow(request: RequestSummary): RequestListItem {
+  return { ...requestRow(request), sent: `Sent ${instantDay(request.sentUtc)}` };
+}
