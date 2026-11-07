@@ -10,6 +10,7 @@ import { Avatar, Button, EmptyState, Legend, MonthMini, RunList, Skeleton, Stat 
 
 import { AppDialogs } from '../../dialogs/app-dialogs';
 import { AdjustAllowanceDialog } from '../../dialogs/adjust-allowance/adjust-allowance.dialog';
+import { RemoveMemberDialog } from '../../dialogs/remove-member/remove-member.dialog';
 import { EditWorkingDaysDialog } from '../../dialogs/edit-working-days/edit-working-days.dialog';
 import { NewRequestData, NewRequestDialog } from '../../dialogs/new-request/new-request.dialog';
 import { ToastService } from '../../toasts/toast.service';
@@ -156,6 +157,19 @@ function stateOf(error: unknown): 'forbidden' | 'notfound' | 'error' {
                 <gl-button size="sm" (click)="editWorkingDays(p)">Edit working days</gl-button>
               </div>
             </section>
+            @if (!p.isYou) {
+              <section aria-labelledby="remove-title">
+                <h2 id="remove-title" class="section-title">Remove from team</h2>
+                <p class="text-muted text-sm hint">
+                  Their history is kept, but they won't appear on the calendar.
+                </p>
+                <div class="action">
+                  <gl-button size="sm" class="remove" (click)="removeMember(p)">
+                    Remove {{ firstName(p) }}
+                  </gl-button>
+                </div>
+              </section>
+            }
           </div>
         }
       </div>
@@ -325,6 +339,9 @@ function stateOf(error: unknown): 'forbidden' | 'notfound' | 'error' {
     .action {
       margin-top: var(--space-3);
     }
+    .remove {
+      --gl-btn-fg: var(--color-danger-fg);
+    }
     .person-columns__main {
       max-width: 48rem;
     }
@@ -453,6 +470,18 @@ export class PersonPage {
       .closed.subscribe((saved) => {
         if (saved) this.reload();
       });
+  }
+
+  /** "Remove {first name}": asks first, then leaves the page of someone who is no longer on the team (L2-011). */
+  protected removeMember(person: Person): void {
+    this.dialogs.open<boolean>(RemoveMemberDialog, '#rm-cancel', {
+      memberId: person.id,
+      firstName: this.firstName(person),
+    });
+  }
+
+  protected firstName(person: Person): string {
+    return person.name.split(' ')[0];
   }
 
   protected reload(): void {

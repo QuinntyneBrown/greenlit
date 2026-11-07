@@ -45,6 +45,8 @@ public sealed class SeedCommandHandler
     /// Noor only opens the page; Priya, Sam and Tomás each create a team, one per e2e viewport.
     /// Uma, Vic and Wren each create a team for the invite-a-member spec (teams/invite-member), one per viewport,
     /// because a person invited to the demo team cannot be taken off it again.
+    /// Xavi, Yara and Zoe each create a team for the remove-a-member spec (teams/remove-member), one per viewport,
+    /// because removing someone from the demo team would change every other spec's sheet.
     /// </summary>
     private static readonly (string Name, string Email, Guid UserId)[] Newcomers =
     [
@@ -55,6 +57,9 @@ public sealed class SeedCommandHandler
         ("Uma Singh", "uma@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000105")),
         ("Vic Alvarez", "vic@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000106")),
         ("Wren Fox", "wren@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000107")),
+        ("Xavi Moreno", "xavi@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000108")),
+        ("Yara Khan", "yara@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000109")),
+        ("Zoe Lind", "zoe@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000110")),
     ];
 
     /// <summary>The mocks' job titles and join dates (docs/mocks/README.md); the person page shows them.</summary>

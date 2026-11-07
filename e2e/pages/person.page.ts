@@ -133,6 +133,16 @@ export class PersonPage extends BasePage {
     return control(this.workingDaysSection(), "Edit working days");
   }
 
+  /** The manager's "Remove from team" section: heading, hint and "Remove {first name}". */
+  removeSection(): Locator {
+    return this.main.locator("section", { has: this.page.getByRole("heading", { level: 2, name: "Remove from team" }) });
+  }
+
+  /** "Remove Ben": opens the confirmation dialog. */
+  remove(firstName: string): Locator {
+    return control(this.removeSection(), `Remove ${firstName}`);
+  }
+
   /** True when the page is wider than the screen. */
   async scrollsSideways(): Promise<boolean> {
     return this.page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
