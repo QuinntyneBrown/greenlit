@@ -66,6 +66,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/settings/settings.page').then((m) => m.SettingsPage),
   },
   {
+    path: 'account',
+    data: { page: 'account' },
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/account/account.page').then((m) => m.AccountPage),
+  },
+  {
     path: 'create-team',
     data: { shell: 'bare', page: 'create-team' },
     canActivate: [authGuard, noTeamGuard],

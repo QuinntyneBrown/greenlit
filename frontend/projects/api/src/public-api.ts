@@ -37,6 +37,7 @@ export * from './lib/models/person';
 
 // Service contracts (interface + InjectionToken)
 export * from './lib/api/session-store';
+export * from './lib/api/account.service';
 export * from './lib/api/auth.service';
 export * from './lib/api/sheet.service';
 export * from './lib/api/team.service';
@@ -59,6 +60,7 @@ export * from './lib/api/session-expired.interceptor';
 export * from './lib/api/local-storage-session-store';
 export * from './lib/api/http-sheet.service';
 export * from './lib/api/browser-connectivity.service';
+export * from './lib/api/http-account.service';
 export * from './lib/api/http-auth.service';
 export * from './lib/api/http-team.service';
 export * from './lib/api/http-invitation.service';

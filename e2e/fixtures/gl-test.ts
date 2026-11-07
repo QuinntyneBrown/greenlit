@@ -17,6 +17,7 @@ import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { personIdOf } from "./people.js";
 import { Person, SESSION_KEY, expiredToken, signIn } from "./session.js";
 import { AccountMenu } from "../pages/account-menu.js";
+import { AccountPage } from "../pages/account.page.js";
 import { ConnectionBanner } from "../pages/connection-banner.js";
 import { SessionExpiredPage } from "../pages/session-expired.page.js";
 import { SignOutDialog } from "../pages/sign-out.dialog.js";
@@ -44,6 +45,7 @@ import { SignInPage } from "../pages/sign-in.page.js";
 import { YearPage } from "../pages/year.page.js";
 
 interface Pages {
+  account: AccountPage;
   connection: ConnectionBanner;
   sessionExpired: SessionExpiredPage;
   signOutDialog: SignOutDialog;
@@ -91,6 +93,8 @@ interface GotoOptions {
   personId?: string;
   /** The invitation token of an `acceptInvite` route (the one in the emailed link). */
   token?: string;
+  /** Start signed in with this bearer token (a fresh account's, from fixtures/account.ts) instead of a seeded person's. */
+  session?: string;
 }
 
 /**
@@ -193,6 +197,30 @@ interface PasswordResetApi {
   /** The check of an opened link fails with a 500 until `recoverCheck()`. */
   failCheck(): Promise<void>;
   recoverCheck(): Promise<void>;
+}
+
+/**
+ * Watches and steers the account requests: reading it (GET /api/account), saving the profile
+ * (PUT /api/account/profile) and changing the password (PUT /api/account/password).
+ */
+interface AccountApi {
+  /** Reading the account fails with a 500 until `recoverGet()`. */
+  failGet(): Promise<void>;
+  recoverGet(): Promise<void>;
+  /** Holds the read until the returned function is called. */
+  holdGet(): Promise<() => void>;
+  /** How many profile saves the page has sent so far. */
+  profileSaves(): number;
+  holdProfile(): Promise<() => void>;
+  /** Profile saves fail with a 500 until `recoverProfile()`. */
+  failProfile(): Promise<void>;
+  recoverProfile(): Promise<void>;
+  /** How many password changes the page has sent so far. */
+  passwordChanges(): number;
+  holdPassword(): Promise<() => void>;
+  /** Password changes fail with a 500 until `recoverPassword()`. */
+  failPassword(): Promise<void>;
+  recoverPassword(): Promise<void>;
 }
 
 /** Watches and steers the create-team request (POST /api/teams). */
@@ -421,6 +449,7 @@ interface GlFixtures {
   requestsApi: RequestsApi;
   invitationsApi: InvitationsApi;
   passwordResetApi: PasswordResetApi;
+  accountApi: AccountApi;
   authApi: AuthApi;
   membersApi: MembersApi;
   teamApi: TeamApi;
@@ -445,8 +474,8 @@ export const test = base.extend<GlFixtures>({
   goto: async ({ page }, use) => {
     await use(async (key, options = {}) => {
       // Guarded routes start signed in, with a token from POST /api/auth/sign-in (fixtures/session.ts).
-      if ((guardFor(key) || options.as) && !isBaseline && !options.signedOut) {
-        const token = await signIn(page.request, options.as ?? "manager");
+      if ((guardFor(key) || options.as || options.session) && !isBaseline && !options.signedOut) {
+        const token = options.session ?? (await signIn(page.request, options.as ?? "manager"));
         await page.addInitScript(
           ([k, t]) => window.localStorage.setItem(k, t),
           [SESSION_KEY, token],
@@ -938,6 +967,47 @@ export const test = base.extend<GlFixtures>({
       recoverList: () => page.unroute(list),
     });
   },
+  accountApi: async ({ page }, use) => {
+    const get = "**/api/account";
+    const profile = "**/api/account/profile";
+    const password = "**/api/account/password";
+    let profiles = 0;
+    let passwords = 0;
+    page.on("request", (r) => {
+      if (r.method() !== "PUT") return;
+      const path = new URL(r.url()).pathname;
+      if (path === "/api/account/profile") profiles++;
+      if (path === "/api/account/password") passwords++;
+    });
+    const hold = async (pattern: string, method: string) => {
+      let release!: () => void;
+      const released = new Promise<void>((resolve) => (release = resolve));
+      await page.route(pattern, async (route) => {
+        if (route.request().method() !== method) return route.fallback();
+        await released;
+        await route.continue();
+      });
+      return release;
+    };
+    const fail = async (pattern: string, method: string) => {
+      await page.route(pattern, (route) =>
+        route.request().method() === method ? route.fulfill({ status: 500, body: "" }) : route.fallback(),
+      );
+    };
+    await use({
+      failGet: () => fail(get, "GET"),
+      recoverGet: () => page.unroute(get),
+      holdGet: () => hold(get, "GET"),
+      profileSaves: () => profiles,
+      holdProfile: () => hold(profile, "PUT"),
+      failProfile: () => fail(profile, "PUT"),
+      recoverProfile: () => page.unroute(profile),
+      passwordChanges: () => passwords,
+      holdPassword: () => hold(password, "PUT"),
+      failPassword: () => fail(password, "PUT"),
+      recoverPassword: () => page.unroute(password),
+    });
+  },
   passwordResetApi: async ({ page }, use) => {
     const request = (r: { url(): string; method(): string }) =>
       r.method() === "POST" && new URL(r.url()).pathname === "/api/auth/password-reset";
@@ -1265,6 +1335,7 @@ export const test = base.extend<GlFixtures>({
   },
   pages: async ({ page }, use) => {
     await use({
+      account: new AccountPage(page),
       accountMenu: new AccountMenu(page),
       connection: new ConnectionBanner(page),
       acceptInvite: new AcceptInvitePage(page),
