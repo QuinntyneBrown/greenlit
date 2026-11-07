@@ -7,9 +7,11 @@ import {
   AUTH_SERVICE,
   HttpAuthService,
   HttpSheetService,
+  HttpTeamService,
   LocalStorageSessionStore,
   SESSION_STORE,
   SHEET_SERVICE,
+  TEAM_SERVICE,
   authInterceptor,
 } from 'api';
 
@@ -32,5 +34,6 @@ export const appConfig: ApplicationConfig = {
     { provide: SESSION_STORE, useExisting: LocalStorageSessionStore },
     { provide: SHEET_SERVICE, useExisting: HttpSheetService },
     { provide: AUTH_SERVICE, useExisting: HttpAuthService },
+    { provide: TEAM_SERVICE, useExisting: HttpTeamService },
   ],
 };

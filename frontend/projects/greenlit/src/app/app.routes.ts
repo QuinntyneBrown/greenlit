@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { authGuard, signedOutGuard } from './guards/auth.guard';
+import { authGuard, noTeamGuard, signedOutGuard, teamGuard } from './guards/auth.guard';
 
 /**
  * Greenlit application routes.
@@ -10,7 +10,8 @@ import { authGuard, signedOutGuard } from './guards/auth.guard';
  * objects anchor on. Children inherit their parent's data.
  *
  * `/` is the calendar (L2-049); `authGuard` sends a visitor without a
- * session to `/sign-in` and back (identity-and-access/sign-in). Screens join this table with their journeys;
+ * session to `/sign-in` and back (identity-and-access/sign-in), and `teamGuard`
+ * sends a session on no team to `/create-team` (teams/create-team). Screens join this table with their journeys;
  * until then their addresses, and any unknown one, show not found (L2-046).
  */
 export const routes: Routes = [
@@ -18,8 +19,15 @@ export const routes: Routes = [
     path: '',
     pathMatch: 'full',
     data: { page: 'calendar' },
-    canActivate: [authGuard],
+    canActivate: [authGuard, teamGuard],
     loadComponent: () => import('./pages/calendar/calendar.page').then((m) => m.CalendarPage),
+  },
+  {
+    path: 'create-team',
+    data: { shell: 'bare', page: 'create-team' },
+    canActivate: [authGuard, noTeamGuard],
+    loadComponent: () =>
+      import('./pages/create-team/create-team.page').then((m) => m.CreateTeamPage),
   },
   {
     path: 'sign-in',

@@ -16,11 +16,13 @@ import { test as base, expect, TestInfo } from "@playwright/test";
 import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { Person, SESSION_KEY, signIn } from "./session.js";
 import { CalendarPage } from "../pages/calendar.page.js";
+import { CreateTeamPage } from "../pages/create-team.page.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
 
 interface Pages {
   calendar: CalendarPage;
+  createTeam: CreateTeamPage;
   notFound: NotFoundPage;
   signIn: SignInPage;
 }
@@ -61,8 +63,19 @@ interface AuthApi {
   fail(): Promise<void>;
 }
 
+/** Watches and steers the create-team request (POST /api/teams). */
+interface TeamApi {
+  /** How many create-team requests the page has sent so far. */
+  requests(): number;
+  /** Holds create-team requests; none reaches the API. */
+  hold(): Promise<void>;
+  /** Every create-team request fails with a 500. */
+  fail(): Promise<void>;
+}
+
 interface GlFixtures {
   authApi: AuthApi;
+  teamApi: TeamApi;
   sheetApi: SheetApi;
   goto: (key: RouteKey, options?: GotoOptions) => Promise<void>;
   pages: Pages;
@@ -112,6 +125,22 @@ export const test = base.extend<GlFixtures>({
       },
     });
   },
+  teamApi: async ({ page }, use) => {
+    const pattern = "**/api/teams";
+    let count = 0;
+    page.on("request", (request) => {
+      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/teams") count++;
+    });
+    await use({
+      requests: () => count,
+      hold: async () => {
+        await page.route(pattern, () => new Promise<void>(() => {}));
+      },
+      fail: async () => {
+        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+    });
+  },
   sheetApi: async ({ page }, use) => {
     const pattern = "**/api/sheet**";
     await use({
@@ -139,7 +168,12 @@ export const test = base.extend<GlFixtures>({
     });
   },
   pages: async ({ page }, use) => {
-    await use({ calendar: new CalendarPage(page), notFound: new NotFoundPage(page), signIn: new SignInPage(page) });
+    await use({
+      calendar: new CalendarPage(page),
+      createTeam: new CreateTeamPage(page),
+      notFound: new NotFoundPage(page),
+      signIn: new SignInPage(page),
+    });
   },
   settle: async ({ page }, use) => {
     await use(async () => {

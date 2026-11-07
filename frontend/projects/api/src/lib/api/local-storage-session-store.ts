@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { SESSION_KEY, SessionStore } from './session-store';
-import { isLiveToken } from './session-token';
+import { isLiveToken, tokenTeamId } from './session-token';
 
 /** Keeps the token in localStorage so a reload stays signed in. Storage can be unavailable; then there is no session. */
 @Injectable({ providedIn: 'root' })
@@ -16,6 +16,10 @@ export class LocalStorageSessionStore implements SessionStore {
 
   isSignedIn(): boolean {
     return isLiveToken(this.token());
+  }
+
+  teamId(): string | null {
+    return tokenTeamId(this.token());
   }
 
   setToken(token: string): void {

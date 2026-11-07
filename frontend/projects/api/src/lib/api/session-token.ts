@@ -16,6 +16,22 @@ export function isLiveToken(token: string | null, now: Date = new Date()): boole
 }
 
 /**
+ * The team the token names (its `team_id` claim, ADR-004), or null for a
+ * token without one: an account that is not on a team yet.
+ */
+export function tokenTeamId(token: string | null): string | null {
+  const payload = token?.split('.')[1];
+  if (!payload) return null;
+  try {
+    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const teamId = (JSON.parse(json) as { team_id?: unknown }).team_id;
+    return typeof teamId === 'string' && teamId ? teamId : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * The app path to return to after signing in: only a path inside this app
  * (one leading `/`, not `//` or `/\`), so the parameter can never send
  * someone to another site. Anything else is the calendar.

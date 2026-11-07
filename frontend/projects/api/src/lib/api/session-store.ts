@@ -11,6 +11,8 @@ export interface SessionStore {
   token(): string | null;
   /** True while the stored token has not expired (ADR-004). */
   isSignedIn(): boolean;
+  /** The team the session names; null while the person is on no team (teams/create-team). */
+  teamId(): string | null;
   setToken(token: string): void;
   clear(): void;
 }

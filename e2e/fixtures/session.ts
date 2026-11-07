@@ -23,9 +23,25 @@ export const DEMO_PASSWORD = "greenlit-demo";
 export const PEOPLE = {
   manager: { name: "Maya Chen", email: "maya@northwind.studio" },
   member: { name: "Ana Ruiz", email: "ana@northwind.studio" },
+  /** On no team: opens create-team and never creates one. */
+  newcomer: { name: "Noor Haddad", email: "noor@northwind.studio" },
+  /** On no team until the create-team spec creates one, one per viewport (see `creatorFor`). */
+  "creator-mobile": { name: "Priya Shah", email: "priya@northwind.studio" },
+  "creator-tablet": { name: "Sam Lee", email: "sam@northwind.studio" },
+  "creator-desktop": { name: "Tomás Silva", email: "tomas@northwind.studio" },
 } as const;
 
 export type Person = keyof typeof PEOPLE;
+
+/**
+ * The newcomer who creates a team in this viewport's project. Each creates one
+ * team per e2e database, so a second run needs a fresh one (eng/Start-E2eApi.ps1).
+ */
+export function creatorFor(project: string): Person {
+  const person = `creator-${project}`;
+  if (!(person in PEOPLE)) throw new Error(`No seeded creator for the '${project}' project.`);
+  return person as Person;
+}
 
 /** Tokens last eight hours (ADR-004), so one sign-in per person serves the whole run. */
 const tokens = new Map<Person, string>();

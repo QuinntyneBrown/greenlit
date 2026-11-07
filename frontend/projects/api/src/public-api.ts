@@ -23,14 +23,17 @@ export * from './lib/api/session-token';
 export * from './lib/models/day-status';
 export * from './lib/models/sheet-month';
 export * from './lib/models/session';
+export * from './lib/models/new-team';
 
 // Service contracts (interface + InjectionToken)
 export * from './lib/api/session-store';
 export * from './lib/api/auth.service';
 export * from './lib/api/sheet.service';
+export * from './lib/api/team.service';
 export * from './lib/api/auth.interceptor';
 
 // Concrete implementations (imported only by composition roots)
 export * from './lib/api/local-storage-session-store';
 export * from './lib/api/http-sheet.service';
 export * from './lib/api/http-auth.service';
+export * from './lib/api/http-team.service';
