@@ -139,7 +139,7 @@ test.describe("Accepting an invitation", () => {
     expect(me?.cells.find((c) => c.date === day)?.kind).toBe("Tentative");
   });
 
-  test("Open the calendar goes straight there, and pressing Enter in the last field joins (keyboard)", async ({
+  test("pressing Enter in the last field joins, and the calendar opens by itself (keyboard)", async ({
     goto,
     page,
     pages,
@@ -153,7 +153,7 @@ test.describe("Accepting an invitation", () => {
     await pages.acceptInvite.confirm().press("Enter");
 
     await expect(pages.acceptInvite.heading()).toHaveText("Welcome, Finn");
-    await pages.acceptInvite.openCalendar().click();
+    await expect(pages.acceptInvite.openCalendar()).toHaveAttribute("href", "/");
     await pages.calendar.waitForReady();
     expect(new URL(page.url()).pathname).toBe("/");
     await expect(pages.calendar.youRow()).toContainText("Finn M");
