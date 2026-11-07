@@ -21,6 +21,11 @@ public sealed class AuthController : ControllerBase
     public async Task<ActionResult<SessionDto>> SignIn([FromBody] SignInRequest request, CancellationToken ct) =>
         Ok(await _sender.Send(new SignInCommand(request.Email, request.Password), ct));
 
+    /// <summary>Who the caller is, for the account menu. Authenticated by the fallback policy.</summary>
+    [HttpGet("me")]
+    public async Task<ActionResult<AccountDto>> Me(CancellationToken ct) =>
+        Ok(await _sender.Send(new GetAccountQuery(), ct));
+
     /// <summary>Emails a reset link when the address has an account. Anonymous by design, and 204 either way so it reveals nothing.</summary>
     [HttpPost("password-reset")]
     [AllowAnonymous]

@@ -16,15 +16,17 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Frontend**
 
-- **`UserMenu`** — `gl-user-menu` component built on the CDK Overlay. Escape closes it and returns focus to the avatar; arrow keys move between items.
-- **`SignOutDialog`** — CDK Dialog in `app/dialogs/sign-out`. It shows "Signing out…" while busy.
-- **`SessionStore`** — Clears the token on sign-out. The HTTP interceptor turns a `401` with code `session_expired` into navigation to the session-expired page, remembering the current URL.
-- **`SessionExpiredPage`** — Bare-shell page (`page: 'session-expired'`) whose "Sign in" returns to the remembered URL after signing in.
+- **`UserMenu`** — `gl-user-menu` in `frontend/projects/components`: the avatar button (`aria-haspopup="menu"`, `aria-expanded`, `aria-label="Account menu for {name}"`) and the `.menu` panel on the CDK Overlay. Enter, Space or ArrowDown on the button opens it and focuses the first item; arrow keys, Home and End move between items; Escape and Tab close it, and Escape returns focus to the avatar. The panel names the person ("Maya Chen", "Manager · maya@northwind.studio") and lists "My time off", "Account", "Brand guide" and "Sign out". The shell reads who is signed in from `AUTH_SERVICE.account()` and places the menu in the top bar's `[slot=end]`.
+- **`SignOutDialog`** — CDK Dialog in `app/dialogs/sign-out`. "Stay signed in" closes it. "Sign out" shows "Signing out…" (`aria-busy`, every way out off) while `AUTH_SERVICE.signOut()` runs, then the session is cleared and the app navigates to sign-in.
+- **`HttpAuthService`** — `signOut()` calls `POST /api/auth/sign-out` and clears the stored token whether or not the call succeeds: the person asked to leave, so a failed call never keeps them signed in.
+- **Session expiry** — Two paths lead to the session-expired page. `authGuard` finds a stored token that is no longer live; the `sessionExpiredInterceptor` in `api` sees a `401` with code `session_expired` on a call to the Greenlit API. Both clear the token and navigate to `/session-expired?returnUrl={current url}`.
+- **`SessionExpiredPage`** — Bare-shell page (`page: 'session-expired'`). Its "Sign in" link goes to `/sign-in?returnUrl={returnUrl}`; sign-in already returns the person to `returnUrl` (sign-in design), so no separate store keeps the URL.
 
 **Backend**
 
-- **`AuthController`** — `POST /api/auth/sign-out` records the sign-out. Server-side token revocation is `<TO SUPPLY>`; without it the client discards the token.
-- **`JwtBearer middleware`** — Existing ASP.NET Core authentication. An expired token fails validation and the API returns `401`.
+- **`AuthController`** — `GET /api/auth/me` returns `{ displayName, email, role }` of the caller (authenticated, fallback policy); `POST /api/auth/sign-out` returns `204` for an authenticated caller. Both are authenticated by the fallback policy; neither is `[AllowAnonymous]`, and neither reveals anything about any person but the caller.
+- **Sign-out and revocation** — Decided: sign-out does **not** revoke the token. ADR-004 keeps no server-side session store and no refresh token, and a stateless bearer cannot be revoked without one. The endpoint logs the sign-out (user id only) and the client discards the token; a copy of the token taken earlier stays valid until its eight hours end, the risk ADR-004 already accepts.
+- **`JwtBearer events`** — `OnChallenge` answers an expired token with a ProblemDetails `401` and `code: session_expired`. A missing, malformed or wrongly signed token keeps the plain `401`, so the code reveals nothing but that this token was once valid and has lapsed.
 
 **Shared plumbing (exists today)**
 
@@ -63,7 +65,7 @@ The menu opens the sign-out dialog; an expired token reaches `SessionStore` as a
 
 ### Class structure
 
-The slice is mostly frontend: `SessionStore` owns the token and the return URL used by the session-expired page.
+The slice is mostly frontend: `SessionStore` owns the token; the return URL travels as the `returnUrl` query parameter of the session-expired and sign-in pages (the diagram shows it on the store).
 
 ![Class diagram for use the account menu and sign out](diagrams/class-structure.png)
 
