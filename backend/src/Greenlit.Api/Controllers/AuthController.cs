@@ -29,7 +29,27 @@ public sealed class AuthController : ControllerBase
         await _sender.Send(new RequestPasswordResetCommand(request.Email), ct);
         return NoContent();
     }
+
+    /// <summary>Whether a reset link still works: 204, or 410 <c>reset_link_expired</c>. Changes nothing.</summary>
+    [HttpGet("password-reset/{token}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> CheckPasswordResetLink(string token, CancellationToken ct)
+    {
+        await _sender.Send(new CheckPasswordResetLinkQuery(token), ct);
+        return NoContent();
+    }
+
+    /// <summary>Chooses a new password with the emailed token. Anonymous by design: the unguessable single-use token is the credential.</summary>
+    [HttpPost("password-reset/confirm")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request, CancellationToken ct)
+    {
+        await _sender.Send(new ResetPasswordCommand(request.Token, request.Password, request.ConfirmPassword), ct);
+        return NoContent();
+    }
 }
+
+public sealed record ResetPasswordRequest(string? Token, string? Password, string? ConfirmPassword);
 
 public sealed record RequestPasswordResetRequest(string? Email);
 

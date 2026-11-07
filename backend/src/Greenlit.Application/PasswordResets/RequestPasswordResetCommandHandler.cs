@@ -35,6 +35,8 @@ public sealed class RequestPasswordResetCommandHandler : IRequestHandler<Request
 
         var token = PasswordResetTokens.NewToken();
         var now = _time.GetUtcNow();
+        await _db.PasswordResetTokens.Where(t => t.UserId == user.Id && t.UsedUtc == null)
+            .ExecuteUpdateAsync(s => s.SetProperty(t => t.UsedUtc, now), ct);
         var issued = new PasswordResetToken
         {
             Id = Guid.NewGuid(),
