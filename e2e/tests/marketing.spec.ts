@@ -98,4 +98,22 @@ test.describe("Marketing page", () => {
       "Weekend",
     ]);
   });
+
+  test("the video plays the pitch with captions off by default (L2-050 AC5)", async ({
+    pages,
+  }) => {
+    const m = pages.marketing;
+    await expect(m.watchTitle()).toHaveText("Greenlit in twenty seconds.");
+    await expect(m.video()).toHaveAttribute("controls", "");
+    await expect(m.video()).toHaveAttribute("poster", /meet-greenlit\.jpg$/);
+    await expect(m.video()).toHaveAttribute(
+      "aria-label",
+      "Meet Greenlit, a twenty-second tour",
+    );
+    await expect(m.captionTracks()).toHaveCount(1);
+    await expect(m.captionTracks()).toHaveAttribute("srclang", "en");
+    await expect(m.captionTracks()).toHaveAttribute("label", "English");
+    await expect(m.captionTracks()).not.toHaveAttribute("default", /.*/);
+    expect(await m.captionMode()).toBe("disabled");
+  });
 });

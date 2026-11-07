@@ -111,4 +111,29 @@ export class MarketingPage extends BasePage {
   sheetLegendItems(): Locator {
     return this.sheet().locator(".mk-sheet__legend > span");
   }
+
+  // Video
+
+  watch(): Locator {
+    return this.page.locator("section#watch");
+  }
+
+  watchTitle(): Locator {
+    return this.watch().getByRole("heading", { level: 2 });
+  }
+
+  video(): Locator {
+    return this.watch().locator("video");
+  }
+
+  captionTracks(): Locator {
+    return this.video().locator("track[kind='captions']");
+  }
+
+  /** The mode of the first text track: "disabled" until the viewer turns captions on. */
+  async captionMode(): Promise<string | undefined> {
+    return this.video().evaluate(
+      (v: HTMLVideoElement) => v.textTracks[0]?.mode,
+    );
+  }
 }
