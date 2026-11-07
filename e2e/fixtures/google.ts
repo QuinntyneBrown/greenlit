@@ -31,7 +31,7 @@ export const GIS_SCRIPT = "https://accounts.google.com/gsi/client";
 /** The stub served in place of the GIS script: the one API surface the app uses. */
 const STUB = `
 (() => {
-  const encode = (text) => btoa(unescape(encodeURIComponent(text))).replace(/\\+/g, "-").replace(/\\//g, "_").replace(/=+$/, "");
+  const encode = (text) => btoa(unescape(encodeURIComponent(text))).split("+").join("-").split("/").join("_").replace(/=+$/, "");
   const next = () => window.__glGoogle || { kind: "dismissed" };
   window.google = { accounts: { oauth2: { initTokenClient(config) {
     return { requestAccessToken() {
