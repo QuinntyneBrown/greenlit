@@ -160,7 +160,6 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(64)");
 
                     b.Property<int>("WorkingDays")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(31);
 
@@ -386,8 +385,7 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
 
                     b.HasOne("Greenlit.Domain.Entities.TimeOffRequest", "TimeOffRequest")
                         .WithMany("Days")
-                        .HasForeignKey("TimeOffRequestId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("TimeOffRequestId");
 
                     b.Navigation("TeamMember");
 

@@ -17,6 +17,9 @@ public sealed class TimeOffRequestConfiguration : IEntityTypeConfiguration<TimeO
         b.HasIndex(x => new { x.TeamMemberId, x.Status });
         b.HasOne(x => x.TeamMember).WithMany(m => m.Requests).HasForeignKey(x => x.TeamMemberId).OnDelete(DeleteBehavior.Cascade);
         // A day leaves its request when the request goes; the day row itself stays until it is cleared.
-        b.HasMany(x => x.Days).WithOne(d => d.TimeOffRequest).HasForeignKey(d => d.TimeOffRequestId).OnDelete(DeleteBehavior.SetNull);
+        // ClientSetNull, not SetNull: SQL Server refuses a second cascade path into TimeOffDays
+        // (TeamMember already cascades to both). RequestLedger clears the days itself before
+        // removing a request, so the database never needs to.
+        b.HasMany(x => x.Days).WithOne(d => d.TimeOffRequest).HasForeignKey(d => d.TimeOffRequestId).OnDelete(DeleteBehavior.ClientSetNull);
     }
 }
