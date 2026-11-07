@@ -1,8 +1,8 @@
 name: CI
 
 # Runs the same gates on every pull request and on pushes to non-main
-# branches, so a merge to main never meets a red suite. The deploy workflow
-# (when hosting lands) reruns these before anything reaches an environment.
+# branches, so a merge to main never meets a red suite. deploy.yml reruns the
+# frontend gates on main before anything reaches Azure (ADR-010).
 on:
   pull_request:
   push:

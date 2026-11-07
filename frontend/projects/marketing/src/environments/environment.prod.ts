@@ -1,3 +1,3 @@
 export const environment = {
-  appUrl: 'REPLACE_WITH_PRODUCTION_APP_ORIGIN',
+  appUrl: 'https://gentle-wave-0f947aa0f.4.azurestaticapps.net',
 };

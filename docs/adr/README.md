@@ -15,6 +15,7 @@ or infrastructure choice is made or revisited.
 | [ADR-007](ADR-007-allowances.md)                  | Allowances are computed from day rows, never stored as a balance                   |
 | [ADR-008](ADR-008-team-holidays.md) | A removed holiday is kept, a team remembers its calendar, and adding a day off clears booked days |
 | [ADR-009](ADR-009-working-days.md) | Working days are weekday sets, and days that turn red are kept, not deleted |
+| [ADR-010](ADR-010-static-web-apps-hosting.md) | Host both Angular applications on Azure Static Web Apps, deployed from main |
 
 ## Template
 
