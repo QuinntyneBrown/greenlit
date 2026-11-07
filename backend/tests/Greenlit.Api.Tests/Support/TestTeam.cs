@@ -6,6 +6,7 @@ using Greenlit.Domain.Entities;
 using Greenlit.Domain.Enums;
 using Greenlit.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
@@ -97,6 +98,28 @@ public sealed class TestTeam
     public Task AddHolidayAsync(DateOnly date, string name) =>
         _factory.WriteAsync(db => db.Holidays.Add(new Holiday { Id = Guid.NewGuid(), TeamId = Team.Id, Date = date, Name = name }));
 
+    /// <summary>The time-off requests stored for the named person, oldest first.</summary>
+    public async Task<IReadOnlyList<RequestRow>> RequestsOfAsync(string member)
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var id = _rows[member].Id;
+        var requests = await db.TimeOffRequests.AsNoTracking().Include(r => r.Days)
+            .Where(r => r.TeamMemberId == id).ToListAsync();
+        return requests.OrderBy(r => r.CreatedUtc).ThenBy(r => r.FirstDay)
+            .Select(r => new RequestRow(
+                r.FirstDay.ToString("yyyy-MM-dd"), r.LastDay.ToString("yyyy-MM-dd"), r.Note, r.Status.ToString(), r.Days.Count))
+            .ToList();
+    }
+
+    /// <summary>A user who belongs to no team.</summary>
+    public static async Task<User> LoneUserAsync(GreenlitApiFactory factory)
+    {
+        var user = NewUser("Lone Ranger", UserRole.Member);
+        await factory.WriteAsync(db => db.Users.Add(user));
+        return user;
+    }
+
     /// <summary>The id of the named person's row.</summary>
     public Guid MemberIdOf(string name) => _rows[name].Id;
 
@@ -124,6 +147,9 @@ public sealed class TestTeam
         CreatedUtc = DateTimeOffset.UtcNow,
     };
 }
+
+/// <summary>A stored request as the tests compare it: dates, note, status and how many days point at it.</summary>
+public sealed record RequestRow(string FirstDay, string LastDay, string? Note, string Status, int Days);
 
 public static class GreenlitApiFactoryExtensions
 {
