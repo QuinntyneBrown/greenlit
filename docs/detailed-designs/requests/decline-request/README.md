@@ -12,7 +12,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Frontend**
 
-- **`DeclineRequestDialog`** — CDK Dialog in `app/dialogs/decline-request` with Reason (optional), "Keep pending" and "Decline request". A failure keeps the reason (`L2-025` AC4).
+- **`DeclineRequestDialog`** — CDK Dialog in `app/dialogs/decline-request`, opened from a pending row's Decline or the Decline in the request detail's footer (the drawer closes and the Requests page opens the dialog). It has Reason (optional, a `gl-textarea-field`, 500 characters at most), "Keep pending" and "Decline request"; the button reads "Declining…" and everything else is off while it runs. A failure keeps the reason (`L2-025` AC4).
 - **`ToastService`** — Shows "Declined Ben’s request" and "Ben has been emailed your reason." with Undo.
 - **`RequestService / REQUEST_SERVICE`** — Contract and injection token in the `api` project: `mine()`, `list(status)`, `get(id)`, `send(request)`, `cancel(id)`, `approve(ids)`, `decline(id, reason)` and `reopen(id)`.
 

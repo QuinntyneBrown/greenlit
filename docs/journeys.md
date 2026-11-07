@@ -25,7 +25,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 7 | Send a time-off request | Member asks for days with a note; sees days left. | 0 (built) |
 | 8 | Approve a request | Manager confirms requested days, member is emailed, coverage warned, undo. | 0 (built) |
 | 9 | Review requests | Manager sees pending requests with overlaps, opens detail, approves in bulk. | 0 (built) |
-| 10 | Decline a request | Manager declines with optional reason; days return to tentative. | 2 |
+| 10 | Decline a request | Manager declines with optional reason; days return to tentative. | 0 (built) |
 | 11 | Compute allowances | Yearly days, used, booked, requested and left; over-allowance warnings. | 4 |
 | 12 | Select days and use the keyboard | Select ranges by drag or arrow keys; act from selection bar. | 5 |
 | 13 | Follow and cancel own requests | Member sees upcoming and past requests and cancels pending ones. | 2.5 |
@@ -44,9 +44,22 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total remaining** | | **50.5** |
+| | **Total remaining** | | **48.5** |
 
 ## Notes
+
+- Journey 10 is built. `POST /api/requests/{id}/decline` with `{ reason }` (manager only, own team only: an id that is
+  unknown or on another team is the same `404 request_not_found`, a member `403 forbidden`, a request that is not
+  Pending `409 request_not_pending`, a reason over 500 characters `400`) records the reason (blank is none), moves the
+  request to Declined and its days to Tentative, still linked to it, then emails the member through `IEmailSender`
+  (subject "Your time off request was declined", the reason quoted when given); it answers a `DeclineResult` whose
+  `emailed` is false when the member has no address or the mail failed, and the toast then drops "has been emailed".
+  Undo is `POST /api/requests/{id}/reopen`, which now accepts a Declined request as well as an Approved one: it is
+  Pending again without its reason and the days still Tentative and linked to it are Requested again (the 409 code
+  is now `request_not_decided`). Without a reason the toast says "Ben has been emailed." New: `gl-textarea-field`,
+  the dialog's `tone` icon, the request list's `declined` output; the frontend `RequestService` gains `decline`. The
+  request detail's footer has Decline (it closes the drawer and the page opens the dialog). Deferred: editing a
+  decision after the undo window.
 
 - Journey 9 is built, except what later journeys own. `GET /api/requests?status=` now returns, per request, `overlaps`
   (the other members out, Requested or Confirmed, on its days, each with their first and last overlapping day),
