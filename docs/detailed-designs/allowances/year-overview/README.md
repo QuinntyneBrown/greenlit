@@ -6,7 +6,15 @@ The year page shows the whole team's year in one view. A grid has one row per me
 
 Below the grid, a table gives each person's allowance for the year: Allowance, Used, Booked, Requested, Left and a usage bar. Sorting by days left, most first, shows who has not had a break.
 
-`<TO SUPPLY>`: the mocks show this table to members as well as the manager, while the person page tells members that only managers see everyone's allowance (`L2-035` AC1). This design follows the year mocks.
+## Decisions
+
+- **Everyone sees the allowance table.** The mocks show it to members as well as the manager, while the person page tells members that only managers see everyone's allowance (`L2-035` AC1). The year page follows the year mocks: every member of the team sees every row of the table, because the calendar already shows each person's days left (`L2-014` AC1) and the same figures. What a member does not get is the link from a name to that person's page, which is for the manager (`pages/year/member`). The endpoint returns only the caller's own team (`ADR-007`).
+- **The year is a calendar year.** `GET /api/year?year=2026` groups days from 1 January to 31 December and takes the allowance for the leave year that starts in that year, at the team's leave-year start month (`ADR-007`). Used and Booked still split at today in the team's time zone, so a past year is all Used and a future year all Booked.
+- **A sliver per day.** The grid draws one sliver per calendar day (mock `pages/year/default`), so each month carries its days' statuses as well as the confirmed count the cell is named by. Weekends, holidays and days a member does not work are `off`; a day with no row is `empty`.
+- **Names are not links yet.** The manager mock links each name to the person page; that page arrives with the person-page design, and the names become links to it then (member mocks never link). Until then a name is text.
+- **Sorting is the client's.** The endpoint returns the rows with the caller first, then in team order; "Most days left first" reorders them in the browser and toggles back (`aria-pressed`).
+- **Empty means no one but the manager.** As on the calendar (`L2-012` AC6), a team of one shows "No one on the team yet".
+- **Errors.** A year that is not a four-digit year from 2000 to 2100 answers 400 with the validation `code`; a caller on no team is 404 `not_found`; no session is 401. Nothing in an error names another team.
 
 ## Description
 
@@ -15,13 +23,13 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 **Frontend**
 
 - **`YearPage`** — App-shell page (`page: 'year'`) with "Previous year" and "Next year", the legend, the `gl-year-grid` "Time off by month" and the allowance `gl-table` with the sort control "Most days left first".
-- **`YearGrid`** — Cells named "{member}, {Month}: {n} confirmed days off"; activating one navigates to the calendar for that month.
-- **`YearService / YEAR_SERVICE`** — `year(yyyy)`.
+- **`YearGrid`** (`gl-year-grid`) and **`AllowanceTable`** (`gl-allowance-table`, with the sort toggle `aria-pressed` and `aria-sort` on Left) — Cells named "{member}, {Month}: {n} confirmed days off"; activating one navigates to the calendar for that month.
+- **`YearService / YEAR_SERVICE`** — `year(yyyy)`; `HttpYearService` calls `GET /api/year`.
 
 **Backend**
 
 - **`YearController`** — `GET /api/year?year=2026`.
-- **`GetYearQueryHandler`** — Groups the team's confirmed days by member and month in one query and computes each member's `Allowance` for the leave year. The signed-in member's row comes first.
+- **`GetYearQueryHandler`** — Reads the team's days and holidays for the calendar year in one query each, builds each member's twelve months (day statuses and the confirmed count) and takes each member's `AllowanceFigures` from `AllowanceCalculator`. The signed-in person's row comes first.
 
 **Shared plumbing (exists today)**
 
@@ -60,7 +68,7 @@ The year page loads one `YearDto` from the Greenlit API.
 
 ### Class structure
 
-Each `YearRowDto` has twelve monthly counts and an `Allowance`; sorting happens on the client.
+Each `YearMemberDto` has twelve `YearMonthDto` (a confirmed count and a status per day) and its `AllowanceFigures`; sorting happens on the client.
 
 ![Class diagram for view the team's year](diagrams/class-structure.png)
 

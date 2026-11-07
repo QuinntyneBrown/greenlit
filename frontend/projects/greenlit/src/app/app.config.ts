@@ -24,6 +24,8 @@ import {
   SESSION_STORE,
   SHEET_SERVICE,
   TEAM_SERVICE,
+  YEAR_SERVICE,
+  HttpYearService,
   authInterceptor,
   sessionExpiredInterceptor,
 } from 'api';
@@ -54,5 +56,6 @@ export const appConfig: ApplicationConfig = {
     { provide: COVERAGE_SERVICE, useExisting: HttpCoverageService },
     { provide: INVITATION_SERVICE, useExisting: HttpInvitationService },
     { provide: REQUEST_SERVICE, useExisting: HttpRequestService },
+    { provide: YEAR_SERVICE, useExisting: HttpYearService },
   ],
 };

@@ -29,7 +29,8 @@ export type PageSlug =
   | "reset-password"
   | "session-expired"
   | "settings"
-  | "sign-in";
+  | "sign-in"
+  | "year";
 
 interface RouteEntry {
   readonly app: string;
@@ -112,6 +113,20 @@ export const ROUTES = {
     app: "/sign-in",
     mock: "/pages/sign-in/default.html",
     page: "sign-in",
+  },
+  /** The team's year as the manager sees it: names link to person pages (docs/detailed-designs/allowances/year-overview). */
+  year: {
+    app: "/year",
+    mock: "/pages/year/default.html",
+    guard: "auth",
+    page: "year",
+  },
+  /** The team's year as a member sees it: the member's row first, names not linked. */
+  memberYear: {
+    app: "/year",
+    mock: "/pages/year/member.html",
+    guard: "auth",
+    page: "year",
   },
 } as const satisfies Record<string, RouteEntry>;
 

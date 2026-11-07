@@ -36,6 +36,7 @@ import { RequestDetailDialog } from "../pages/request-detail.dialog.js";
 import { RequestsPage } from "../pages/requests.page.js";
 import { SettingsPage } from "../pages/settings.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
+import { YearPage } from "../pages/year.page.js";
 
 interface Pages {
   sessionExpired: SessionExpiredPage;
@@ -59,6 +60,7 @@ interface Pages {
   requests: RequestsPage;
   settings: SettingsPage;
   signIn: SignInPage;
+  year: YearPage;
 }
 
 interface GotoOptions {
@@ -66,6 +68,8 @@ interface GotoOptions {
   as?: Person;
   /** `yyyy-MM`: open the calendar on this month instead of the current one. */
   month?: string;
+  /** `yyyy`: open the year page on this year instead of the current one. */
+  year?: string;
   /** Open a guarded route with no session, to see where it sends a visitor. */
   signedOut?: boolean;
   /** Open the route with a session the browser kept but whose time has run out. */
@@ -94,6 +98,21 @@ interface SheetApi {
   recoverSaves(): Promise<void>;
   /** Holds saves (PUT /api/sheet/days) until the returned function is called. */
   holdSaves(): Promise<() => void>;
+}
+
+/**
+ * Puts the year request (GET /api/year) into states the seeded data cannot produce: a failing API, a slow
+ * one, or a team of one.
+ */
+interface YearApi {
+  /** Every year request fails with a 500 until `recover()`. */
+  fail(): Promise<void>;
+  /** Lets year requests through again. */
+  recover(): Promise<void>;
+  /** Holds year requests until the returned function is called. */
+  hold(): Promise<() => void>;
+  /** Answers with the real year, keeping only the signed-in person's row. */
+  onlyMe(): Promise<void>;
 }
 
 /** Watches and steers the sign-in request (POST /api/auth/sign-in). */
@@ -322,6 +341,7 @@ interface GlFixtures {
   membersApi: MembersApi;
   teamApi: TeamApi;
   sheetApi: SheetApi;
+  yearApi: YearApi;
   goto: (key: RouteKey, options?: GotoOptions) => Promise<void>;
   pages: Pages;
   /** Pause until web fonts have loaded and the network is idle so visual diffs are stable. */
@@ -359,6 +379,7 @@ export const test = base.extend<GlFixtures>({
       );
       const query = new URLSearchParams();
       if (options.month && !isBaseline) query.set("month", options.month);
+      if (options.year && !isBaseline) query.set("year", options.year);
       if (options.returnUrl && !isBaseline)
         query.set("returnUrl", options.returnUrl);
       await page.goto(query.size ? `${path}?${query}` : path);
@@ -936,6 +957,34 @@ export const test = base.extend<GlFixtures>({
       },
     });
   },
+  yearApi: async ({ page }, use) => {
+    const pattern = "**/api/year**";
+    await use({
+      fail: async () => {
+        await page.route(pattern, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
+      },
+      recover: () => page.unroute(pattern),
+      hold: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      onlyMe: async () => {
+        await page.route(pattern, async (route) => {
+          const response = await route.fetch();
+          const year = await response.json();
+          year.members = year.members.filter((m: { isYou: boolean }) => m.isYou);
+          await route.fulfill({ response, json: year });
+        });
+      },
+    });
+  },
   sheetApi: async ({ page }, use) => {
     const pattern = "**/api/sheet**";
     await use({
@@ -1007,6 +1056,7 @@ export const test = base.extend<GlFixtures>({
       sessionExpired: new SessionExpiredPage(page),
       signIn: new SignInPage(page),
       signOutDialog: new SignOutDialog(page),
+      year: new YearPage(page),
     });
   },
   settle: async ({ page }, use) => {

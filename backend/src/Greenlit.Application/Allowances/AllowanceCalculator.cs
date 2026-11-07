@@ -57,12 +57,18 @@ public sealed class AllowanceCalculator
         return (first, first.AddYears(1).AddDays(-1));
     }
 
-    /// <summary>The figures of every member of <paramref name="team"/> in <paramref name="members"/>, for the leave year containing today.</summary>
+    /// <summary>
+    /// The figures of every member of <paramref name="team"/> in <paramref name="members"/>, for the leave year containing today,
+    /// or, with <paramref name="leaveYear"/>, the leave year that starts in that calendar year (the year page).
+    /// Used and Booked always split at today.
+    /// </summary>
     public async Task<IReadOnlyDictionary<Guid, AllowanceFigures>> ComputeAsync(
-        Team team, IReadOnlyCollection<TeamMember> members, CancellationToken ct)
+        Team team, IReadOnlyCollection<TeamMember> members, CancellationToken ct, int? leaveYear = null)
     {
         var today = Today(team);
-        var (first, last) = LeaveYear(team, today);
+        var (first, last) = leaveYear is { } year
+            ? LeaveYear(team, new DateOnly(year, team.LeaveYearStartMonth, 1))
+            : LeaveYear(team, today);
         var ids = members.Select(m => m.Id).ToList();
 
         var holidays = (await _db.Holidays.AsNoTracking()
