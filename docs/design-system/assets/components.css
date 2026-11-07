@@ -375,6 +375,7 @@ legend { font: var(--text-label); padding: 0; margin-bottom: var(--space-2); }
 .auth-layout { min-height: 100dvh; display: grid; place-items: center; padding: var(--space-6) var(--layout-margin); }
 .auth-card { width: 100%; max-width: 26rem; }
 .auth-card .logo { display: flex; justify-content: center; margin-bottom: var(--space-6); }
+.auth-card .logo .logo-lockup { font-size: var(--font-size-3xl); }
 
 /* ---------- Animations ----------------------------------------------------- */
 @keyframes spin { to { rotate: 360deg; } }
@@ -401,7 +402,7 @@ legend { font: var(--text-label); padding: 0; margin-bottom: var(--space-2); }
 
 /* ---------- Brand ----------------------------------------------------------- */
 .avatar { background: var(--color-bg-subtle); color: var(--color-fg-muted); }
-.logo-lockup { display: inline-flex; align-items: center; gap: 0.28em; font-size: var(--font-size-xl); color: var(--color-fg-default); text-decoration: none; }
+.logo-lockup { display: inline-flex; align-items: center; gap: 0.28em; font-size: var(--font-size-2xl); color: var(--color-fg-default); text-decoration: none; }
 .logo-lockup:hover { color: var(--color-fg-default); text-decoration: none; }
 .logo-lockup--lg { font-size: var(--font-size-5xl); }
 .logo-lockup__mark { height: 0.72em; width: 0.984em; flex: none; }

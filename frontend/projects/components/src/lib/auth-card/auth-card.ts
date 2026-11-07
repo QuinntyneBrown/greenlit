@@ -51,6 +51,7 @@ import { LogoLockup } from '../logo-lockup/logo-lockup';
       display: flex;
       justify-content: center;
       margin-bottom: var(--space-6);
+      --gl-logo-lockup-size: var(--font-size-3xl);
     }
     .card {
       background: var(--color-bg-surface);

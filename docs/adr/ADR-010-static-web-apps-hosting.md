@@ -19,8 +19,8 @@ the app (`frontend/projects/greenlit`). Both are static builds. The domain `gree
   using that site's deployment token (`AZURE_SWA_TOKEN_WWW`, `AZURE_SWA_TOKEN_APP` repository secrets).
 - Each app ships a `staticwebapp.config.json` from its `public/` folder: the SPA fallback to `index.html`,
   security headers and cache rules.
-- The marketing site's production `appUrl` is the app site's address; it changes to `https://app.greenlit.rocks`
-  when the custom domains are attached (`az staticwebapp hostname set`).
+- The marketing site's production `appUrl` is the app site's custom domain, `https://app.greenlit.rocks`
+  (attached with `az staticwebapp hostname set`).
 
 ## Consequences
 
