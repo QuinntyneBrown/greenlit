@@ -1,12 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { REQUEST_SERVICE, SESSION_STORE } from 'api';
 import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        { provide: SESSION_STORE, useValue: { isManager: () => false } },
+        { provide: REQUEST_SERVICE, useValue: {} },
+      ],
     }).compileComponents();
   });
 

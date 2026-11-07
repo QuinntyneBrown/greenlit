@@ -82,7 +82,8 @@ export interface TeamGridStroke {
   template: `
     <div class="grid-card">
       <div
-        class="team-grid team-grid--left"
+        class="team-grid"
+        [class.team-grid--left]="showLeft()"
         role="grid"
         [attr.aria-label]="label()"
         [attr.aria-busy]="loading() ? 'true' : null"
@@ -110,7 +111,9 @@ export interface TeamGridStroke {
               }}</span>
             </div>
           }
-          <div role="columnheader" class="grid-colhead grid-colhead--tail">Left</div>
+          @if (showLeft()) {
+            <div role="columnheader" class="grid-colhead grid-colhead--tail">Left</div>
+          }
         </div>
 
         @if (loading()) {
@@ -154,15 +157,17 @@ export interface TeamGridStroke {
                   (keydown.space)="press($event, r, c)"
                 ></div>
               }
-              <div
-                role="gridcell"
-                class="grid-left"
-                [attr.data-over]="row.over ? '' : null"
-                [attr.aria-label]="row.leftLabel"
-                [attr.title]="row.leftLabel"
-              >
-                {{ row.left }}
-              </div>
+              @if (showLeft()) {
+                <div
+                  role="gridcell"
+                  class="grid-left"
+                  [attr.data-over]="row.over ? '' : null"
+                  [attr.aria-label]="row.leftLabel"
+                  [attr.title]="row.leftLabel"
+                >
+                  {{ row.left }}
+                </div>
+              }
             </div>
           }
           <div role="row">
@@ -182,7 +187,9 @@ export interface TeamGridStroke {
                 }
               </div>
             }
-            <div role="gridcell"></div>
+            @if (showLeft()) {
+              <div role="gridcell"></div>
+            }
           </div>
         }
       </div>
@@ -208,6 +215,10 @@ export interface TeamGridStroke {
       .team-grid {
         padding: var(--space-4);
       }
+    }
+    .team-grid {
+      grid-template-columns: minmax(8.25rem, 11rem) repeat(var(--days, 30), minmax(1.5rem, 1fr));
+      min-width: calc(11rem + var(--days, 30) * 1.7rem + 1.5rem);
     }
     .team-grid--left {
       grid-template-columns:
@@ -432,6 +443,8 @@ export class TeamGrid {
   /** The Out row, aligned with `columns`. */
   readonly cover = input<readonly (TeamGridCover | null)[]>([]);
   readonly loading = input<boolean>(false);
+  /** The Left column with each person's days left; off where it has no meaning, such as a request's weeks. */
+  readonly showLeft = input<boolean>(true);
   /** The colour a stroke previews; `empty` for Clear. Null: painting is off. */
   readonly paint = input<TeamGridCellStatus | null>(null);
   /** A stroke ended on an editable row. */

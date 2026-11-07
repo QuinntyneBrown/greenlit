@@ -1,7 +1,7 @@
 <gl-skip-link />
 @if (shell() === 'app') {
   <gl-top-bar>
-    <gl-app-nav [items]="mainNav" />
+    <gl-app-nav [items]="mainNav()" />
   </gl-top-bar>
 }
 <!--

@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-export type RequestState = 'pending' | 'approved' | 'declined';
+export type RequestState = 'pending' | 'approved' | 'declined' | 'cancelled';
 
 const LABELS: Record<RequestState, string> = {
   pending: 'Pending',
   approved: 'Approved',
   declined: 'Declined',
+  cancelled: 'Cancelled',
 };
 
 /**
