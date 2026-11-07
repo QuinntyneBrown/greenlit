@@ -1,9 +1,11 @@
 import { Routes } from '@angular/router';
 
+import { OfflinePage } from './pages/offline/offline.page';
 import {
   authGuard,
   managerMatch,
   noTeamGuard,
+  onlineGuard,
   signedOutGuard,
   teamGuard,
 } from './guards/auth.guard';
@@ -23,53 +25,60 @@ import {
 export const routes: Routes = [
   {
     path: '',
-    pathMatch: 'full',
-    data: { page: 'calendar' },
-    canActivate: [authGuard, teamGuard],
-    loadComponent: () => import('./pages/calendar/calendar.page').then((m) => m.CalendarPage),
-  },
-  {
-    path: 'year',
-    data: { page: 'year' },
-    canActivate: [authGuard, teamGuard],
-    loadComponent: () => import('./pages/year/year.page').then((m) => m.YearPage),
-  },
-  {
-    path: 'people/:id',
-    data: { page: 'person' },
-    canActivate: [authGuard, teamGuard],
-    loadComponent: () => import('./pages/person/person.page').then((m) => m.PersonPage),
-  },
-  {
-    path: 'person',
-    data: { page: 'person' },
-    canActivate: [authGuard, teamGuard],
-    loadComponent: () => import('./pages/person/person.page').then((m) => m.PersonPage),
-  },
-  {
-    path: 'requests',
-    data: { page: 'requests' },
-    canMatch: [managerMatch],
-    canActivate: [authGuard, teamGuard],
-    loadComponent: () => import('./pages/requests/requests.page').then((m) => m.RequestsPage),
-  },
-  {
-    path: 'requests',
-    data: { page: 'requests' },
-    canActivate: [authGuard, teamGuard],
-    loadComponent: () => import('./pages/requests/my-requests.page').then((m) => m.MyRequestsPage),
-  },
-  {
-    path: 'settings',
-    data: { page: 'settings' },
-    canActivate: [authGuard, teamGuard],
-    loadComponent: () => import('./pages/settings/settings.page').then((m) => m.SettingsPage),
-  },
-  {
-    path: 'account',
-    data: { page: 'account' },
-    canActivate: [authGuard],
-    loadComponent: () => import('./pages/account/account.page').then((m) => m.AccountPage),
+    canActivateChild: [onlineGuard],
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        data: { page: 'calendar' },
+        canActivate: [authGuard, teamGuard],
+        loadComponent: () => import('./pages/calendar/calendar.page').then((m) => m.CalendarPage),
+      },
+      {
+        path: 'year',
+        data: { page: 'year' },
+        canActivate: [authGuard, teamGuard],
+        loadComponent: () => import('./pages/year/year.page').then((m) => m.YearPage),
+      },
+      {
+        path: 'people/:id',
+        data: { page: 'person' },
+        canActivate: [authGuard, teamGuard],
+        loadComponent: () => import('./pages/person/person.page').then((m) => m.PersonPage),
+      },
+      {
+        path: 'person',
+        data: { page: 'person' },
+        canActivate: [authGuard, teamGuard],
+        loadComponent: () => import('./pages/person/person.page').then((m) => m.PersonPage),
+      },
+      {
+        path: 'requests',
+        data: { page: 'requests' },
+        canMatch: [managerMatch],
+        canActivate: [authGuard, teamGuard],
+        loadComponent: () => import('./pages/requests/requests.page').then((m) => m.RequestsPage),
+      },
+      {
+        path: 'requests',
+        data: { page: 'requests' },
+        canActivate: [authGuard, teamGuard],
+        loadComponent: () =>
+          import('./pages/requests/my-requests.page').then((m) => m.MyRequestsPage),
+      },
+      {
+        path: 'settings',
+        data: { page: 'settings' },
+        canActivate: [authGuard, teamGuard],
+        loadComponent: () => import('./pages/settings/settings.page').then((m) => m.SettingsPage),
+      },
+      {
+        path: 'account',
+        data: { page: 'account' },
+        canActivate: [authGuard],
+        loadComponent: () => import('./pages/account/account.page').then((m) => m.AccountPage),
+      },
+    ],
   },
   {
     path: 'create-team',
@@ -107,6 +116,19 @@ export const routes: Routes = [
     data: { shell: 'bare', page: 'reset-password' },
     loadComponent: () =>
       import('./pages/reset-password/reset-password.page').then((m) => m.ResetPasswordPage),
+  },
+  { path: 'offline', data: { page: 'offline' }, component: OfflinePage },
+  {
+    path: 'forbidden',
+    data: { page: 'forbidden' },
+    canActivate: [authGuard, teamGuard],
+    loadComponent: () => import('./pages/forbidden/forbidden.page').then((m) => m.ForbiddenPage),
+  },
+  {
+    path: 'server-error',
+    data: { page: 'server-error' },
+    loadComponent: () =>
+      import('./pages/server-error/server-error.page').then((m) => m.ServerErrorPage),
   },
   {
     path: '**',

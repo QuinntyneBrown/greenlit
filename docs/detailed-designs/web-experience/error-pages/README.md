@@ -15,14 +15,16 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 **Frontend**
 
 - **`NotFoundPage`** — Route `**` (`page: 'not-found'`): "This page doesn’t exist". It replaces the former `**` redirect to `/sheet`; `/sheet` itself now shows this page (`L2-049` AC5).
-- **`ForbiddenPage`** — `page: 'forbidden'`: "You don’t have access to this". A route guard sends members here from manager-only routes.
+- **`ForbiddenPage`** — `page: 'forbidden'`: "You don’t have access to this" and "Ask {manager} if you need it.", the manager's name read from the team's month. The Requests page opens it when the API answers its ledger with `403`. No route is manager-only by guard today: screens a member may open show a member's view (Requests becomes My requests), so the API's `403` is the source of truth.
 - **`ServerErrorPage`** — `page: 'server-error'`: "Something went wrong on our side" with "Error reference {ref}.", "Try again" and "Back to calendar".
-- **`OfflinePage`** — `page: 'offline'`: "You’re offline" with "Try again".
-- **`ErrorInterceptor`** — Routes a `500` ProblemDetails to the server-error page, carrying its `reference`, when the page has no in-place error state.
+- **`OfflinePage`** — `page: 'offline'`: "You’re offline" with "Try again". It is part of the main bundle, so it renders with no network. `onlineGuard` (`canActivateChild` over the app screens) opens `/offline?returnUrl=…` when a screen is opened while the connection is down (offline or reconnecting); nothing is cached, so every screen opened then has nothing loaded. A screen already open stays, read-only (`L2-045`). "Try again" asks the connectivity service to check; when it answers, the wanted screen opens.
+- **`serverErrorInterceptor`** — For a `GET` to the API that fails with a `500` ProblemDetails carrying a `reference`, opens `/server-error?reference=…&returnUrl=…`; "Try again" opens `returnUrl` again. A `500` without a reference, and any failed change, stay with the page that made the call (in-place error states and toasts).
+
+Decision: the not-found page keeps the app shell for everyone (a signed-out visitor sees the top bar without an account menu). The account menu's `/brand` link has no screen behind it and shows not found.
 
 **Backend**
 
-- **`ExceptionHandlingMiddleware`** — Existing middleware. For an unhandled exception it adds a `reference` extension to the ProblemDetails, derived from the request's trace identifier, and logs it with the exception. The exact format is `<TO SUPPLY>`; the mocks show `7F3A-91C2`.
+- **`ExceptionHandlingMiddleware`** — Existing middleware. For an unhandled exception it adds a `reference` extension to the ProblemDetails, a random eight-hex-digit code written `XXXX-XXXX` (the mocks show `7F3A-91C2`), and logs it with the exception.
 - **`Manager policy`** — Existing authorization policy; a member's call to a manager endpoint returns `403`.
 
 ## Requirements

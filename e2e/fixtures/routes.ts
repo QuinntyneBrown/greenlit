@@ -23,11 +23,14 @@ export type PageSlug =
   | "accept-invite"
   | "calendar"
   | "create-team"
+  | "forbidden"
   | "forgot-password"
   | "marketing"
   | "not-found"
+  | "offline"
   | "person"
   | "requests"
+  | "server-error"
   | "reset-password"
   | "session-expired"
   | "settings"
@@ -70,6 +73,13 @@ export const ROUTES = {
     mock: "/pages/marketing/default.html",
     page: "marketing",
   },
+  /** Where a member lands who opens a manager-only page. */
+  forbidden: {
+    app: "/forbidden",
+    mock: "/pages/forbidden/default.html",
+    guard: "auth",
+    page: "forbidden",
+  },
   forgotPassword: {
     app: "/forgot-password",
     mock: "/pages/forgot-password/default.html",
@@ -79,6 +89,13 @@ export const ROUTES = {
     app: "/no-such-page",
     mock: "/pages/not-found/default.html",
     page: "not-found",
+  },
+  /** Where a page that needs the network lands while Greenlit is offline. */
+  offline: {
+    app: "/offline",
+    mock: "/pages/offline/default.html",
+    guard: "auth",
+    page: "offline",
   },
   /** A person's page as the manager sees it: `:id` is a member's id (docs/detailed-designs/allowances/person-page). */
   person: {
@@ -126,6 +143,12 @@ export const ROUTES = {
     app: "/reset-password/:token",
     mock: "/pages/reset-password/default.html",
     page: "reset-password",
+  },
+  /** Where a page that failed on the server lands, with the error reference in the address. */
+  serverError: {
+    app: "/server-error",
+    mock: "/pages/server-error/default.html",
+    page: "server-error",
   },
   /** Where an expired session lands (docs/detailed-designs/identity-and-access/sign-out). */
   sessionExpired: {

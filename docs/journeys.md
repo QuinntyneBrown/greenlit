@@ -31,19 +31,19 @@ account menu, and the pending count arrive with the journeys that need them.
 | 13 | Follow and cancel own requests | Member sees upcoming and past requests and cancels pending ones. | 0 (built) |
 | 14 | Manage team holidays | Manager adds and removes team holidays, shown red for everyone. | 0 (built) |
 | 15 | Set working days | Team work week and part-time days per member, never booked. | 0 (built) |
-| 16 | Get feedback on actions | Toasts confirm every change, with undo and retry where possible. | 2 |
+| 16 | Get feedback on actions | Toasts confirm every change, with undo and retry where possible. | 0 (built) |
 | 17 | Set the coverage minimum | Manager sets fewest people in; short days flagged on sheet. | 0 (built) |
-| 18 | Edit team settings | Manager edits name, time zone, roles, yearly days; members read-only. | 3 |
-| 19 | Reset a forgotten password | Emailed one-hour, single-use link to choose a new password. | 2.5 |
+| 18 | Edit team settings | Manager edits name, time zone, roles, yearly days; members read-only. | 0 (built) |
+| 19 | Reset a forgotten password | Emailed one-hour, single-use link to choose a new password. | 0 (built) |
 | 20 | Use the account menu and sign out | Account menu, confirmed sign-out, and a clear expired-session page. | 0 (built) |
 | 21 | View the team's year | Twelve months per member plus a sortable allowance usage table. | 0 (built) |
 | 22 | View a person's page | Allowance, year at a glance and time off for one member. | 0 (built) |
-| 23 | Adjust a member's allowance | Manager adds or removes days with a required reason. | 2 |
-| 24 | Remove a member | Manager removes someone, keeping history and blocking their sign-in. | 2 |
+| 23 | Adjust a member's allowance | Manager adds or removes days with a required reason. | 0 (built) |
+| 24 | Remove a member | Manager removes someone, keeping history and blocking their sign-in. | 0 (built) |
 | 25 | Send email notifications | Switches for new-request emails to manager and decision emails to members. | 0 (built) |
-| 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
-| 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
-| 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
+| 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 0 (built) |
+| 27 | Manage the account | Change display name, email and password from the Account page. | 0 (built) |
+| 28 | See clear error pages | Not found, forbidden, server error with a reference, and offline pages, each with a way back. | 0 (built) |
 | 29 | Visit the marketing page | The public page that explains Greenlit and sends a manager to create a team or sign in. | 0 (built) |
 | | **Total remaining** | | **29** |
 
@@ -217,3 +217,8 @@ account menu, and the pending count arrive with the journeys that need them.
   in that year, the caller's row first. `AllowanceCalculator.ComputeAsync` gained an optional `leaveYear`. The year page
   (`gl-year-grid`, `gl-allowance-table`) shows the table to members as well as the manager, as the year mocks do. Names
   are not yet links to the person page (journey 22). `gl-button` gained `pressed` for the sort toggle.
+- Journey 28 is built (L2-046): `ExceptionHandlingMiddleware` adds a `reference` (`7F3A-91C2`) to the 500 ProblemDetails and logs it;
+  `serverErrorInterceptor` (in `api`) opens `/server-error?reference=...&returnUrl=...` when a read fails with a 500 that carries
+  one; the Requests page opens `/forbidden` when the API answers its ledger with 403; `onlineGuard` opens `/offline` for a screen
+  opened while offline. Left alone: the `/brand` link in the account menu still shows not found (no Brand guide screen is in any
+  requirement), and a signed-out visitor sees the not-found page in the app shell without an account menu.

@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, CanMatchFn, Router } from '@angular/router';
+import { CanActivateChildFn, CanActivateFn, CanMatchFn, Router } from '@angular/router';
 
-import { SESSION_STORE } from 'api';
+import { CONNECTIVITY_SERVICE, SESSION_STORE } from 'api';
 
 /**
  * Guarded screens need a session (identity-and-access/sign-in). A visitor
@@ -36,3 +36,12 @@ export const noTeamGuard: CanActivateFn = () =>
  * (Requests is the manager's ledger, and a member's My requests). What the API allows is up to the API.
  */
 export const managerMatch: CanMatchFn = () => inject(SESSION_STORE).isManager();
+
+/**
+ * A screen opened while Greenlit is offline has nothing cached to show, so the offline page opens instead and
+ * remembers where the person was going (L2-046 AC4). A screen already open stays, read-only (L2-045).
+ */
+export const onlineGuard: CanActivateChildFn = (_route, state) =>
+  inject(CONNECTIVITY_SERVICE).readOnly()
+    ? inject(Router).createUrlTree(['/offline'], { queryParams: { returnUrl: state.url } })
+    : true;

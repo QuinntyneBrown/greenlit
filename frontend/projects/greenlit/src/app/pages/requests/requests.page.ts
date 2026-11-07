@@ -232,9 +232,9 @@ export class RequestsPage {
         const list = this.requests.list(STATUS[tab]).pipe(
           map((requests): Load => ({ state: 'ready', requests })),
           catchError((error: unknown) => {
-            // A member has nothing to decide here (journey 13 gives them My requests).
+            // The ledger is the manager's: the API refusing it opens the forbidden page (L2-046 AC2).
             if (error instanceof HttpErrorResponse && error.status === 403) {
-              void this.router.navigateByUrl('/', { replaceUrl: true });
+              void this.router.navigateByUrl('/forbidden', { replaceUrl: true });
             }
             return of<Load>({ state: 'error' });
           }),
