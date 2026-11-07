@@ -37,6 +37,7 @@ import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
 import { NewRequestDialog } from "../pages/new-request.dialog.js";
 import { MarketingPage } from "../pages/marketing.page.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
+import { OfflinePage } from "../pages/offline.page.js";
 import { ForbiddenPage } from "../pages/forbidden.page.js";
 import { ServerErrorPage } from "../pages/server-error.page.js";
 import { PersonPage } from "../pages/person.page.js";
@@ -68,6 +69,7 @@ interface Pages {
   notFound: NotFoundPage;
   serverError: ServerErrorPage;
   forbidden: ForbiddenPage;
+  offline: OfflinePage;
   requestDetail: RequestDetailDialog;
   declineRequest: DeclineRequestDialog;
   cancelRequest: CancelRequestDialog;
@@ -1410,6 +1412,7 @@ export const test = base.extend<GlFixtures>({
       notFound: new NotFoundPage(page),
       serverError: new ServerErrorPage(page),
       forbidden: new ForbiddenPage(page),
+      offline: new OfflinePage(page),
       requestDetail: new RequestDetailDialog(page),
       declineRequest: new DeclineRequestDialog(page),
       cancelRequest: new CancelRequestDialog(page),

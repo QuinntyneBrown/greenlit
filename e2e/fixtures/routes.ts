@@ -27,6 +27,7 @@ export type PageSlug =
   | "forgot-password"
   | "marketing"
   | "not-found"
+  | "offline"
   | "person"
   | "requests"
   | "server-error"
@@ -88,6 +89,13 @@ export const ROUTES = {
     app: "/no-such-page",
     mock: "/pages/not-found/default.html",
     page: "not-found",
+  },
+  /** Where a page that needs the network lands while Greenlit is offline. */
+  offline: {
+    app: "/offline",
+    mock: "/pages/offline/default.html",
+    guard: "auth",
+    page: "offline",
   },
   /** A person's page as the manager sees it: `:id` is a member's id (docs/detailed-designs/allowances/person-page). */
   person: {
