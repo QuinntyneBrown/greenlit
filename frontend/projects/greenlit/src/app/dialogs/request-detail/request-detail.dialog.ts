@@ -43,8 +43,8 @@ type Weeks =
  * keeps the drawer open until the decision is recorded (Esc and Close are off meanwhile); a failure says
  * the request is still pending and offers "Try approving again". It closes with the approval so the page can
  * confirm it. If the weeks cannot be loaded the rest still shows, with a way to try again. Decline in the
- * footer closes the drawer with a wish to decline, and the page asks for the reason. "Days left after" waits for
- * allowances (journey 11).
+ * footer closes the drawer with a wish to decline, and the page asks for the reason. "Days left after" is the
+ * member's days left once their requests are approved (L2-023 AC1), shown when the detail has loaded.
  */
 @Component({
   selector: 'app-request-detail-dialog',
@@ -71,6 +71,12 @@ type Weeks =
           <dt>Sent</dt>
           <dd>{{ sent }}</dd>
         </div>
+        @if (daysLeftAfter() !== null) {
+          <div>
+            <dt>Days left after</dt>
+            <dd>{{ daysLeftAfter() }}</dd>
+          </div>
+        }
       </dl>
       @if (shown().note; as note) {
         <p class="quote">“{{ note }}”</p>
@@ -185,10 +191,17 @@ export class RequestDetailDialog {
     const weeks = this.weeks();
     return weeks.state === 'ready' ? weeks.detail.request : this.request;
   });
+  /** The requester's days left once their requests are approved (L2-023 AC1); unknown until the detail loads. */
+  protected readonly daysLeftAfter = computed(() => {
+    const weeks = this.weeks();
+    return weeks.state === 'ready' ? weeks.detail.daysLeftAfter : null;
+  });
   protected readonly view = computed(() => {
     const weeks = this.weeks();
     return requestWeeks(
-      weeks.state === 'ready' ? weeks.detail : { request: this.request, members: [], coverage: [] },
+      weeks.state === 'ready'
+        ? weeks.detail
+        : { request: this.request, members: [], coverage: [], daysLeftAfter: 0 },
     );
   });
 

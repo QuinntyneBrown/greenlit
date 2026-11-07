@@ -1,3 +1,5 @@
+import { AllowanceFigures } from './allowance-figures';
+
 /** What a day cell is (mirrors `Greenlit.Application.Sheet.CellKind`). Red days are separate from time off. */
 export type CellKind =
   'Working' | 'NotWorking' | 'Holiday' | 'Tentative' | 'Requested' | 'Confirmed';
@@ -16,8 +18,10 @@ export interface SheetMember {
   readonly initials: string;
   /** The signed-in person's row. */
   readonly isYou: boolean;
-  /** Days left for the year; null until allowances are set up (allowances/allowance-figures). */
+  /** Days left in the leave year: allowance minus used and booked days (allowances/allowance-figures). */
   readonly daysLeft: number | null;
+  /** Every figure behind `daysLeft`; null where the API does not compute them (a request's weeks). */
+  readonly allowance: AllowanceFigures | null;
   /** One cell per day of the month, in date order. */
   readonly cells: readonly SheetCell[];
 }

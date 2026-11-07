@@ -21,6 +21,8 @@ export interface ChangeSet {
   readonly memberName: string;
   readonly status: DayStatus | null;
   readonly changes: readonly DayChange[];
+  /** How many days the member's requested days exceed their days left once saved; 0 when not over (L2-030). */
+  readonly daysOver: number;
 }
 
 /** The `code` a refused change answers with (docs/detailed-designs/sheet/mark-days). */

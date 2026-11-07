@@ -303,7 +303,11 @@ export class CalendarPage {
   /** Opens the request dialog (L2-019 AC1); a sent request turns its days yellow and is announced. */
   protected requestTimeOff(): void {
     const managerName = this.current()?.managerName ?? '';
-    const data: NewRequestData = { managerName };
+    const own = this.current()?.members.find((m) => m.isYou)?.allowance;
+    const data: NewRequestData = {
+      managerName,
+      daysToRequest: own ? Math.max(0, own.left - own.requested) : null,
+    };
     this.dialogs
       .open<SentRequest>(NewRequestDialog, '#nr-start', data)
       .closed.subscribe((request) => {

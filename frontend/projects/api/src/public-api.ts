@@ -21,6 +21,7 @@ export * from './lib/api/session-token';
 
 // Models
 export * from './lib/models/day-status';
+export * from './lib/models/allowance-figures';
 export * from './lib/models/sheet-month';
 export * from './lib/models/change-set';
 export * from './lib/models/session';
