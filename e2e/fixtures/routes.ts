@@ -28,6 +28,7 @@ export type PageSlug =
   | "not-found"
   | "person"
   | "requests"
+  | "server-error"
   | "reset-password"
   | "session-expired"
   | "settings"
@@ -126,6 +127,12 @@ export const ROUTES = {
     app: "/reset-password/:token",
     mock: "/pages/reset-password/default.html",
     page: "reset-password",
+  },
+  /** Where a page that failed on the server lands, with the error reference in the address. */
+  serverError: {
+    app: "/server-error",
+    mock: "/pages/server-error/default.html",
+    page: "server-error",
   },
   /** Where an expired session lands (docs/detailed-designs/identity-and-access/sign-out). */
   sessionExpired: {

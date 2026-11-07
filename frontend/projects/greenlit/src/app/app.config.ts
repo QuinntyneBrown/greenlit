@@ -36,6 +36,7 @@ import {
   HttpYearService,
   authInterceptor,
   connectivityInterceptor,
+  serverErrorInterceptor,
   sessionExpiredInterceptor,
 } from 'api';
 
@@ -51,7 +52,12 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(
       withFetch(),
-      withInterceptors([authInterceptor, sessionExpiredInterceptor, connectivityInterceptor]),
+      withInterceptors([
+        authInterceptor,
+        sessionExpiredInterceptor,
+        serverErrorInterceptor,
+        connectivityInterceptor,
+      ]),
     ),
     { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
 

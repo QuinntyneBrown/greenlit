@@ -109,6 +109,12 @@ export const routes: Routes = [
       import('./pages/reset-password/reset-password.page').then((m) => m.ResetPasswordPage),
   },
   {
+    path: 'server-error',
+    data: { page: 'server-error' },
+    loadComponent: () =>
+      import('./pages/server-error/server-error.page').then((m) => m.ServerErrorPage),
+  },
+  {
     path: '**',
     data: { page: 'not-found' },
     loadComponent: () => import('./pages/not-found/not-found.page').then((m) => m.NotFoundPage),

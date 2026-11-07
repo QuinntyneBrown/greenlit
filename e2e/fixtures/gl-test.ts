@@ -37,6 +37,7 @@ import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
 import { NewRequestDialog } from "../pages/new-request.dialog.js";
 import { MarketingPage } from "../pages/marketing.page.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
+import { ServerErrorPage } from "../pages/server-error.page.js";
 import { PersonPage } from "../pages/person.page.js";
 import { RequestDetailDialog } from "../pages/request-detail.dialog.js";
 import { RequestsPage } from "../pages/requests.page.js";
@@ -64,6 +65,7 @@ interface Pages {
   newRequest: NewRequestDialog;
   marketing: MarketingPage;
   notFound: NotFoundPage;
+  serverError: ServerErrorPage;
   requestDetail: RequestDetailDialog;
   declineRequest: DeclineRequestDialog;
   cancelRequest: CancelRequestDialog;
@@ -436,7 +438,15 @@ interface ConnectionApi {
   recoverMonth(): Promise<void>;
 }
 
+/** Makes a page fail on the server the way an unhandled error does: a 500 ProblemDetails with an error reference. */
+interface ServerErrorApi {
+  /** Month requests (GET /api/sheet) fail with a 500 carrying `reference` until `recover()`. */
+  failMonth(reference: string): Promise<void>;
+  recover(): Promise<void>;
+}
+
 interface GlFixtures {
+  serverErrorApi: ServerErrorApi;
   connectionApi: ConnectionApi;
   removeMemberApi: RemoveMemberApi;
   adjustmentsApi: AdjustmentsApi;
@@ -1255,6 +1265,24 @@ export const test = base.extend<GlFixtures>({
       },
     });
   },
+  serverErrorApi: async ({ page }, use) => {
+    const month = "**/api/sheet**";
+    await use({
+      failMonth: async (reference) => {
+        await page.route(month, (route) =>
+          route.request().method() !== "GET"
+            ? route.fallback()
+            : route.fulfill({
+                status: 500,
+                headers: { "access-control-allow-origin": "*" },
+                contentType: "application/problem+json",
+                body: JSON.stringify({ title: "Server error", status: 500, reference }),
+              }),
+        );
+      },
+      recover: () => page.unroute(month),
+    });
+  },
   connectionApi: async ({ page }, use) => {
     const pattern = "**/api/_ping";
     const month = /\/api\/sheet\?/;
@@ -1352,6 +1380,7 @@ export const test = base.extend<GlFixtures>({
       newRequest: new NewRequestDialog(page),
       marketing: new MarketingPage(page),
       notFound: new NotFoundPage(page),
+      serverError: new ServerErrorPage(page),
       requestDetail: new RequestDetailDialog(page),
       declineRequest: new DeclineRequestDialog(page),
       cancelRequest: new CancelRequestDialog(page),

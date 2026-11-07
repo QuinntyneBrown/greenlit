@@ -55,6 +55,7 @@ export * from './lib/api/connectivity.service';
 export * from './lib/api/connectivity.interceptor';
 export * from './lib/api/auth.interceptor';
 export * from './lib/api/session-expired.interceptor';
+export * from './lib/api/server-error.interceptor';
 
 // Concrete implementations (imported only by composition roots)
 export * from './lib/api/local-storage-session-store';
