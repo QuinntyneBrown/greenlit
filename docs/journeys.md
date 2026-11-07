@@ -26,7 +26,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 8 | Approve a request | Manager confirms requested days, member is emailed, coverage warned, undo. | 0 (built) |
 | 9 | Review requests | Manager sees pending requests with overlaps, opens detail, approves in bulk. | 0 (built) |
 | 10 | Decline a request | Manager declines with optional reason; days return to tentative. | 0 (built) |
-| 11 | Compute allowances | Yearly days, used, booked, requested and left; over-allowance warnings. | 4 |
+| 11 | Compute allowances | Yearly days, used, booked, requested and left; over-allowance warnings. | 0 (built) |
 | 12 | Select days and use the keyboard | Select ranges by drag or arrow keys; act from selection bar. | 5 |
 | 13 | Follow and cancel own requests | Member sees upcoming and past requests and cancels pending ones. | 2.5 |
 | 14 | Manage team holidays | Manager adds and removes team holidays, shown red for everyone. | 3 |
@@ -44,9 +44,28 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total remaining** | | **48.5** |
+| | **Total remaining** | | **44.5** |
 
 ## Notes
+
+- Journey 11 is built, except the Settings page (journey 18). Allowances are computed on read by `AllowanceCalculator`
+  (ADR-007, which supersedes ADR-003's "no balances"; the ADR the prompt called ADR-004 is ADR-007 because ADR-004 was
+  taken): `Team.DefaultYearlyDays` (25), `LeaveYearStartMonth` (1), `MaxCarryOver` (5), `TeamMember.YearlyDays` (null: the
+  default) and `AllowanceAdjustment` rows (journey 23 adds them from the UI; the seed has Ana +3, Ben +2, Finn +1) with
+  migration `AddAllowances`. `GET /api/sheet` rows carry `daysLeft` (Left) and `allowance` (yearlyDays, adjustments,
+  allowance, used, booked, requested, tentative, left); the Left column shows `daysLeft`, negative with a minus sign.
+  `GET /api/requests/quote` also answers `daysAvailable` and `daysOver`: the dialog says "You have 6 days left to
+  request.", then "2 days from your allowance. 4 days left after this." or "10 days from your allowance. That's 4 days
+  over." and still sends. `PUT /api/sheet/days` answers `daysOver` and a Requested stroke over the allowance toasts
+  "That's 1 day over your allowance." (new mock `notifications/toast/over-allowance`, L2-030 AC5). `GET
+  /api/requests/{id}` answers `daysLeftAfter` (Left minus Requested) for "Days left after". `GET /api/team/settings` and
+  `PUT /api/team/settings/allowances` (manager only; negative days `400`, "Enter 0 or more days.") exist with
+  `membersWithoutAllowance`, but the Allowances section and the "Two members have no allowance set" banner on Settings
+  are journey 18. "Today" is the existing `TimeProvider`, not a new `IClock`. Carry-over is manual (an adjustment), with
+  no year-end step. The over test counts pending requested days: over = requested + new days - left. The selection
+  bar's "n days over allowance" (L2-016 AC5) arrives with journey 12; the person page and year table (21, 22) read the
+  same figures. The seed gives Ana the person-page mock's year (17 used, 5 requested, 3 tentative = 11 left of 28); the
+  other members' used days are the seeded approved requests, so their Left differs from the year mock.
 
 - Journey 10 is built. `POST /api/requests/{id}/decline` with `{ reason }` (manager only, own team only: an id that is
   unknown or on another team is the same `404 request_not_found`, a member `403 forbidden`, a request that is not
