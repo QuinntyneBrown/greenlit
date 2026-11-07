@@ -17,6 +17,13 @@ export * from './lib/top-bar/top-bar';
 // actions
 export * from './lib/button/button';
 
+// identity and status
+export * from './lib/avatar/avatar';
+export * from './lib/badge/badge';
+
 // feedback
+export * from './lib/alert/alert';
+export * from './lib/inline-message/inline-message';
+export * from './lib/skeleton/skeleton';
 export * from './lib/empty-state/empty-state';
 export * from './lib/error-page/error-page';
