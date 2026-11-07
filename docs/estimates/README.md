@@ -1,7 +1,7 @@
 # Estimates
 
 - Overall effort: 92 days
-- Complete: 78%
+- Complete: 82%
 
 | Subsystem | Effort | Complete |
 |---|---|---|
@@ -10,7 +10,7 @@
 | [teams](teams.md) | 21 days | 80% |
 | [requests](requests.md) | 16 days | 90% |
 | [web-experience](web-experience.md) | 11 days | 64% |
-| [allowances](allowances.md) | 14 days | 57% |
+| [allowances](allowances.md) | 14 days | 84% |
 
 ## Roadmap
 
@@ -18,4 +18,4 @@
 2. identity-and-access and teams: the account journeys (manage account) and notification settings (invite, accept, reset password, sign out, holidays, working days, the coverage minimum and team settings are built)
 3. requests: the member's request detail (send, approve, review, decline, my requests and cancel are built; days left is built with allowances; the Decisions switch arrives with notifications)
 4. web-experience: connectivity and the remaining error pages (toasts are built)
-5. allowances: person page and adjustments (figures, the year page and the Settings Allowances section are built under ADR-007)
+5. allowances: adjustments (journey 23) and the person page's Adjust allowance and Remove sections (figures, the year page, the Settings Allowances section and the person page are built under ADR-007)

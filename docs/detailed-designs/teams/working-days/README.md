@@ -17,7 +17,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 **Frontend**
 
 - **`WorkWeekSection`** — Shows the team's Working days as toggles Mon to Sun and saves them with the section's own "Save changes" (disabled until an edit; "Saving…", then "Saved"; a failure keeps the chips and offers Try again in a toast).
-- **`EditWorkingDaysDialog`** — CDK Dialog in `app/dialogs/edit-working-days`, opened from a member's "Edit working days" button (the person page arrives with journey 22). It requires at least one day ("Pick at least one working day.").
+- **`EditWorkingDaysDialog`** — CDK Dialog in `app/dialogs/edit-working-days`, opened from a member's "Edit working days" button (also offered on the person page, `allowances/person-page`). It requires at least one day ("Pick at least one working day.").
 
 **Backend**
 
@@ -37,7 +37,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **API shapes.** Days are spelled `"Mon"` to `"Sun"`. `GET /api/team/settings` returns `workingDays`; `PUT /api/team/settings/work-week` takes `{ days }`; `PUT /api/team/members/{id}/working-days` takes `{ days }` and returns the member's effective `workingDays`; each sheet row carries its effective `workingDays`. An empty set answers 400 with `errors.Days = ["Pick at least one working day."]`; a member outside the caller's team answers 404; a non-manager answers 403.
 
-**Entry point.** The person page arrives in journey 22. Until then "Edit working days" is a button on each member row of Settings > Team, opening the same dialog.
+**Entry points.** "Edit working days" is a button on each member row of Settings > Team and on the manager's view of a person's page (`allowances/person-page`), opening the same dialog.
 
 ## Requirements
 

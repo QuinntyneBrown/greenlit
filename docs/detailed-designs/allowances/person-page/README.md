@@ -17,8 +17,8 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 **Frontend**
 
 - **`PersonPage`** — App-shell page (`page: 'person'`) at `/people/{id}`, and at `/person` for the signed-in person's own page (the account menu's "My time off", `L2-006` AC5). It shows the header (name, job title, "Joined {Mon yyyy}", non-standard working days), "{n} days left in {year}" with the over-allowance text, the `gl-stat` figures, the `gl-month-mini` year, Upcoming and Taken lists (`gl-run-list`), and the manager sections. It handles the loading, forbidden, not-found and error states. The member's own page offers "Request time off", which opens the request dialog of `requests/send-request`. The manager's "Edit working days" opens the dialog of `teams/working-days`.
-- **`PersonService / PERSON_SERVICE`** — `get(id)`, where the id is a member's id or `me`. The actions of `allowances/adjust-allowance` and `teams/remove-member` join the service with their journeys (23 and 24).
-- **Names link to the page.** For the manager, a name in the year grid and in the allowance table links to `/people/{id}`; a member's names stay text (`allowances/year-overview`).
+- **`PersonService / PERSON_SERVICE`** — `get(id)` (the person also names the manager, for the request dialog), where the id is a member's id or `me`. The actions of `allowances/adjust-allowance` and `teams/remove-member` join the service with their journeys (23 and 24).
+- **Names link to the page.** For the manager, a name in the allowance table of the year page links to `/people/{id}`; a member's names stay text (`allowances/year-overview`).
 
 **Backend**
 
