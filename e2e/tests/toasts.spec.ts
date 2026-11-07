@@ -87,3 +87,35 @@ test.describe("Toast lifetime", () => {
     await expect(pages.calendar.toast(SAVED)).toHaveCount(0);
   });
 });
+
+test.describe("Toast announcements", () => {
+  test.beforeEach(async ({ request }) => {
+    await clearDays(request, "Ana Ruiz", ANA_PAINTED);
+  });
+  test.afterEach(async ({ request }) => {
+    await clearDays(request, "Ana Ruiz", ANA_PAINTED);
+  });
+
+  test("info and success toasts are announced politely, warning and error toasts assertively (design: ToastOutlet)", async ({
+    goto,
+    pages,
+    sheetApi,
+  }) => {
+    await goto("calendar", { as: "member", month: "2026-11" });
+    await pages.calendar.waitForReady();
+    await pages.calendar.choosePaint("Tentative");
+
+    await pages.calendar.paint("Ana Ruiz", "Mon 23 Nov");
+    await expect(pages.calendar.toastAnnouncedAs(SAVED)).toHaveAttribute("aria-live", "polite");
+
+    await pages.calendar.paint("Ana Ruiz", "Wed 4 Nov");
+    const warning = "Confirmed days can only be changed by Maya";
+    await expect(pages.calendar.toast(warning)).toBeVisible();
+    await expect(pages.calendar.toastAnnouncedAs(warning)).toHaveAttribute("aria-live", "assertive");
+
+    await sheetApi.failSaves();
+    await pages.calendar.paint("Ana Ruiz", "Tue 24 Nov");
+    const error = "We couldn’t save those days";
+    await expect(pages.calendar.toastAnnouncedAs(error)).toHaveAttribute("aria-live", "assertive");
+  });
+});
