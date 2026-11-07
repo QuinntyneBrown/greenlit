@@ -1,4 +1,4 @@
 export const environment = {
-  apiBaseUrl: 'REPLACE_WITH_PRODUCTION_API_ORIGIN',
+  apiBaseUrl: 'https://app-greenlit-api-prod.azurewebsites.net',
   galleryRoutes: false,
 };
