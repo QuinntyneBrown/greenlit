@@ -1,5 +1,6 @@
 using System.Globalization;
 using Greenlit.Application.Abstractions;
+using Greenlit.Application.Allowances;
 using Greenlit.Application.Exceptions;
 using Greenlit.Application.Requests;
 using Greenlit.Domain.Entities;
@@ -20,6 +21,7 @@ internal sealed class DayChanger
     private readonly ICurrentUser _currentUser;
     private readonly TimeProvider _time;
     private readonly RequestLedger _ledger;
+    private readonly AllowanceCalculator _allowances;
 
     public DayChanger(IAppDbContext db, ICurrentUser currentUser, TimeProvider time)
     {
@@ -27,6 +29,7 @@ internal sealed class DayChanger
         _currentUser = currentUser;
         _time = time;
         _ledger = new RequestLedger(db, time);
+        _allowances = new AllowanceCalculator(db, time);
     }
 
     /// <param name="targets">Date and the status it should end up with (null: a working day).</param>
@@ -128,6 +131,7 @@ internal sealed class DayChanger
 
         await _ledger.ReconcileAsync(team.Id, member.Id, joining, leaving, ct);
         await _db.SaveChangesAsync(ct);
-        return new ChangeSetDto(member.Id, member.Name, status, changes);
+        var figures = (await _allowances.ComputeAsync(team, [member], ct))[member.Id];
+        return new ChangeSetDto(member.Id, member.Name, status, changes, figures.DaysOver());
     }
 }

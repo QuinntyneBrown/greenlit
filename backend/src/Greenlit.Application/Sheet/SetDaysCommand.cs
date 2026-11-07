@@ -15,6 +15,7 @@ public sealed record RestoreDaysCommand(Guid MemberId, IReadOnlyList<RestoreDay>
 public sealed record RestoreDay(string? Date, string? Status);
 
 /// <summary>What a stroke changed: each day's status before and after, which Undo writes back.</summary>
-public sealed record ChangeSetDto(Guid MemberId, string MemberName, DayStatus? Status, IReadOnlyList<DayChangeDto> Changes);
+/// <remarks><c>DaysOver</c> is how many days the member's requested days exceed their days left once the change is saved (L2-030); 0 when they do not.</remarks>
+public sealed record ChangeSetDto(Guid MemberId, string MemberName, DayStatus? Status, IReadOnlyList<DayChangeDto> Changes, int DaysOver);
 
 public sealed record DayChangeDto(string Date, DayStatus? Previous, DayStatus? Current);
