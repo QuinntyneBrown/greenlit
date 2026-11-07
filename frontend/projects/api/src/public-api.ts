@@ -22,6 +22,7 @@ export * from './lib/api/session-token';
 // Models
 export * from './lib/models/day-status';
 export * from './lib/models/sheet-month';
+export * from './lib/models/change-set';
 export * from './lib/models/session';
 export * from './lib/models/new-team';
 
@@ -37,3 +38,4 @@ export * from './lib/api/local-storage-session-store';
 export * from './lib/api/http-sheet.service';
 export * from './lib/api/http-auth.service';
 export * from './lib/api/http-team.service';
+export * from './lib/api/problem';
