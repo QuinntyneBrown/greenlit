@@ -83,7 +83,7 @@ The token is usable once within one hour (`L2-003` AC4); the password rules matc
 
 ## Decisions and open questions resolved
 
-- **Email provider** — none yet; `LoggingEmailSender` (ADR-006, ADR-010). The link is `{Greenlit:App:Origin}/reset-password/{token}`.
+- **Email provider** — none yet; `LoggingEmailSender` (ADR-006, ADR-011). The link is `{Greenlit:App:Origin}/reset-password/{token}`.
 - **Token** — 32 random bytes, base64url; only the SHA-256 hash is stored (`PasswordResetToken.TokenHash`). A new request retires the person's earlier unused tokens, so only the newest link works.
 - **Unknown or used token** — both answer `reset_link_expired` (410). Nothing tells a never-issued token from a used one.
 - **Delivery failure** — `POST /api/auth/password-reset` answers 503 with code `email_failed` and the token just made is removed (`L2-002` AC3). Delivery can only fail for an address with an account, so an outage lets a caller infer existence; this is accepted because `L2-002` AC3 requires the failure to be shown.

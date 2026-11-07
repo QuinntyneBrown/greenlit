@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Greenlit.Application.PasswordResets;
 
 /// <summary>
-/// Sets the new password for the account the link was issued to and uses the link up (L2-003, ADR-010).
+/// Sets the new password for the account the link was issued to and uses the link up (L2-003, ADR-011).
 /// The token is claimed with one conditional update first, so of two simultaneous submits only one can
 /// succeed; if the password cannot be saved, the claim is given back.
 /// </summary>

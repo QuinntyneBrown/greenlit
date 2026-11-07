@@ -69,7 +69,7 @@ public class RequestPasswordResetTests : IClassFixture<FrozenClockApiFactory>
     [Fact]
     public async Task The_token_is_stored_only_as_a_hash_and_works_for_one_hour()
     {
-        // L2-002 AC2 ("It works for one hour"), ADR-010.
+        // L2-002 AC2 ("It works for one hour"), ADR-011.
         var team = await TestTeam.CreateAsync(_factory, "Maya Chen");
         var email = team.EmailOf("Maya Chen");
 

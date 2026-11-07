@@ -2,7 +2,7 @@ namespace Greenlit.Domain.Entities;
 
 /// <summary>
 /// A single-use link that lets the person behind a <see cref="User"/> choose a new password
-/// (docs/detailed-designs/identity-and-access/reset-password, ADR-010). Only the hash of the token
+/// (docs/detailed-designs/identity-and-access/reset-password, ADR-011). Only the hash of the token
 /// is stored; the token itself exists in the email alone.
 /// </summary>
 public class PasswordResetToken

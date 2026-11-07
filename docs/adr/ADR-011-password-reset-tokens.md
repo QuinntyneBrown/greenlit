@@ -1,4 +1,4 @@
-# ADR-010: Password reset tokens are single-use, hashed and expire in an hour
+# ADR-011: Password reset tokens are single-use, hashed and expire in an hour
 
 **Status:** Accepted
 **Date:** 2026-11-07

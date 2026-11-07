@@ -109,7 +109,7 @@ public class ResetPasswordTests : IClassFixture<FrozenClockApiFactory>
     [Fact]
     public async Task Asking_again_makes_the_earlier_link_stop_working()
     {
-        // ADR-010: only the newest link works.
+        // ADR-011: only the newest link works.
         var (email, first) = await RequestLinkAsync();
         await _factory.CreateClient().PostAsJsonAsync("/api/auth/password-reset", new { email });
         var second = RecordingEmailSender.ResetTokenIn(_factory.Emails.To(email).Last());

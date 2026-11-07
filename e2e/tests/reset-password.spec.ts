@@ -2,7 +2,7 @@
 // Traces to: L2-003
 // Description: A person follows the emailed link, chooses a new password once, and signs in with it.
 // Data: every test makes a fresh account through the real API (fixtures/password-reset.ts) so no seeded password changes,
-//       and reads the link from the e2e API's log (ADR-010).
+//       and reads the link from the e2e API's log (ADR-011).
 
 import { test, expect } from "../fixtures/gl-test.js";
 import { inviterFor } from "../fixtures/session.js";

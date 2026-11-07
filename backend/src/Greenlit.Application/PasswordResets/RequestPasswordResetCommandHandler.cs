@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Greenlit.Application.PasswordResets;
 
 /// <summary>
-/// Issues a reset token for the account behind the address and emails the link (L2-002, ADR-010).
+/// Issues a reset token for the account behind the address and emails the link (L2-002, ADR-011).
 /// An address with no account completes the same way, so the answer never says which exist.
 /// </summary>
 public sealed class RequestPasswordResetCommandHandler : IRequestHandler<RequestPasswordResetCommand>
