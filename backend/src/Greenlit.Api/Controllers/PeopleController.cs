@@ -13,6 +13,11 @@ public sealed class PeopleController : ControllerBase
 
     public PeopleController(ISender sender) => _sender = sender;
 
+    /// <summary>The caller's own page ("My time off").</summary>
+    [HttpGet("me")]
+    public async Task<ActionResult<PersonDto>> GetMe(CancellationToken ct) =>
+        Ok(await _sender.Send(new GetPersonQuery(null), ct));
+
     /// <summary>The person with <paramref name="id"/> on the caller's team.</summary>
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<PersonDto>> Get(Guid id, CancellationToken ct) =>

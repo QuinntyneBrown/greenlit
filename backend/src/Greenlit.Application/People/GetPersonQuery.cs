@@ -11,4 +11,6 @@ public sealed record PersonDto(
     Guid Id,
     string Name,
     int Year,
+    bool IsYou,
+    bool CanManage,
     AllowanceFigures Allowance);
