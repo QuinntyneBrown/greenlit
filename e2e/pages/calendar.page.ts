@@ -321,4 +321,24 @@ export class CalendarPage extends BasePage {
   toastAnnouncedAs(title: string): Locator {
     return this.page.locator("[aria-live]").filter({ has: this.toast(title) });
   }
+
+  /** Scrolls the cell to the foot of the viewport and gives it keyboard focus, where a toast would sit. */
+  async focusCellAtViewportFoot(member: string, day: string): Promise<void> {
+    const cell = this.cell(member, day);
+    await cell.evaluate((el) => el.scrollIntoView({ block: "end" }));
+    await cell.focus();
+  }
+
+  /** Whether the focused element lies under any toast on screen. */
+  async focusIsCoveredByToast(): Promise<boolean> {
+    return this.page.evaluate(() => {
+      const focused = document.activeElement;
+      if (!focused) return false;
+      const f = focused.getBoundingClientRect();
+      return [...document.querySelectorAll(".toast")].some((t) => {
+        const r = t.getBoundingClientRect();
+        return f.left < r.right && f.right > r.left && f.top < r.bottom && f.bottom > r.top;
+      });
+    });
+  }
 }

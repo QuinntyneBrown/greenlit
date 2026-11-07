@@ -15,7 +15,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 **Frontend**
 
 - **`ToastService`** — Angular service in the `greenlit` app. `show(toast)` returns a handle; the service owns the stack, the 8 s timers and their pause and resume. Danger toasts have no timer.
-- **`ToastOutlet`** — Region rendered once by the app shell. It hosts the `gl-toast` stack in an `aria-live` region: `polite` for info and success, `assertive` for warning and danger.
+- **`ToastOutlet`** — Region rendered once by the app shell. It hosts the `gl-toast` stack in two `aria-live` regions that share one visual stack (`display: contents`, newest first by `order`): `polite` for info and success, `assertive` for warning and danger. A toast never covers the element that has focus: when focus lands under the stack the page gains room below its content and scrolls just far enough to bring the element clear.
 - **`Toast`** — `gl-toast` component with tone, title, body, optional action ("Undo", "Try again") and "Dismiss".
 - **`ToastRequest`** — Value passed by a feature: `tone`, `title`, `body`, `action?: { label, run() }`.
 

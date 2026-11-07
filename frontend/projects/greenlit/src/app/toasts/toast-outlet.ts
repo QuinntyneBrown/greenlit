@@ -1,5 +1,5 @@
-import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { DOCUMENT, NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 
 import { Toast } from 'components';
 
@@ -73,6 +73,7 @@ import { ActiveToast, ToastService } from './toast.service';
       }
     }
   `,
+  host: { '(document:focusin)': 'keepClear($event)' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ToastOutlet {
@@ -89,5 +90,38 @@ export class ToastOutlet {
   protected act(toast: ActiveToast): void {
     this.toasts.dismiss(toast.id);
     toast.action?.run();
+  }
+
+  private readonly root = inject(DOCUMENT).documentElement;
+
+  constructor() {
+    // With no toast left there is nothing to keep clear of.
+    effect(() => {
+      if (this.toasts.toasts().length === 0) {
+        this.root.style.paddingBottom = '';
+        this.root.style.scrollPaddingBottom = '';
+      }
+    });
+  }
+
+  /**
+   * A toast never covers the element that has focus: when focus lands under the stack, the
+   * page gains room below its content and scrolls just far enough to bring the element clear.
+   */
+  protected keepClear(event: FocusEvent): void {
+    const target = event.target;
+    if (!(target instanceof HTMLElement) || target.closest('app-toast-outlet')) return;
+    const shown = Array.from(this.root.querySelectorAll('app-toast-outlet .toast')).map((t) =>
+      t.getBoundingClientRect(),
+    );
+    const at = target.getBoundingClientRect();
+    const covered = shown.some(
+      (r) => at.left < r.right && at.right > r.left && at.top < r.bottom && at.bottom > r.top,
+    );
+    if (!covered) return;
+    const clearance = `${window.innerHeight - Math.min(...shown.map((r) => r.top)) + 16}px`;
+    this.root.style.paddingBottom = clearance;
+    this.root.style.scrollPaddingBottom = clearance;
+    target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
 }

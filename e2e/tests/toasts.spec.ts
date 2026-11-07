@@ -119,3 +119,27 @@ test.describe("Toast announcements", () => {
     await expect(pages.calendar.toastAnnouncedAs(error)).toHaveAttribute("aria-live", "assertive");
   });
 });
+
+test.describe("Toast placement", () => {
+  test.beforeEach(async ({ request }) => {
+    await clearDays(request, "Ana Ruiz", ANA_PAINTED);
+  });
+  test.afterEach(async ({ request }) => {
+    await clearDays(request, "Ana Ruiz", ANA_PAINTED);
+  });
+
+  test("a toast never covers the element that has focus", async ({ goto, pages }) => {
+    await goto("calendar", { as: "member", month: "2026-11" });
+    await pages.calendar.waitForReady();
+    await pages.calendar.choosePaint("Tentative");
+    await pages.calendar.paint("Ana Ruiz", "Mon 23 Nov");
+    await pages.calendar.paint("Ana Ruiz", "Tue 24 Nov");
+    await pages.calendar.paint("Ana Ruiz", "Wed 25 Nov");
+    await expect(pages.calendar.toasts()).toHaveCount(3);
+
+    const last = (await pages.calendar.memberNames().last().innerText()).trim();
+    await pages.calendar.focusCellAtViewportFoot(last, "Fri 27 Nov");
+
+    await expect.poll(() => pages.calendar.focusIsCoveredByToast()).toBe(false);
+  });
+});
