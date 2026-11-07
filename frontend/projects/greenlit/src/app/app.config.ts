@@ -3,8 +3,10 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 
 import {
+  ACCOUNT_SERVICE,
   API_BASE_URL,
   AUTH_SERVICE,
+  HttpAccountService,
   HttpAuthService,
   HttpHolidayService,
   HttpInvitationService,
@@ -59,6 +61,7 @@ export const appConfig: ApplicationConfig = {
     { provide: SESSION_STORE, useExisting: LocalStorageSessionStore },
     { provide: SHEET_SERVICE, useExisting: HttpSheetService },
     { provide: AUTH_SERVICE, useExisting: HttpAuthService },
+    { provide: ACCOUNT_SERVICE, useExisting: HttpAccountService },
     { provide: TEAM_SERVICE, useExisting: HttpTeamService },
     { provide: HOLIDAY_SERVICE, useExisting: HttpHolidayService },
     { provide: WORKING_DAYS_SERVICE, useExisting: HttpWorkingDaysService },

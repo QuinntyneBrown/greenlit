@@ -19,6 +19,7 @@ export type RouteGuard = "auth" | "manager";
 
 /** `body[data-page]` value every screen stamps (route data in the app). */
 export type PageSlug =
+  | "account"
   | "accept-invite"
   | "calendar"
   | "create-team"
@@ -112,6 +113,13 @@ export const ROUTES = {
     mock: "/pages/requests/default.html",
     guard: "manager",
     page: "requests",
+  },
+  /** Account, from the account menu (docs/detailed-designs/identity-and-access/manage-account). */
+  account: {
+    app: "/account",
+    mock: "/pages/account/default.html",
+    guard: "auth",
+    page: "account",
   },
   /** The page the emailed reset link opens; `token` is the one in the link. */
   resetPassword: {
