@@ -37,6 +37,7 @@ import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
 import { NewRequestDialog } from "../pages/new-request.dialog.js";
 import { MarketingPage } from "../pages/marketing.page.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
+import { ForbiddenPage } from "../pages/forbidden.page.js";
 import { ServerErrorPage } from "../pages/server-error.page.js";
 import { PersonPage } from "../pages/person.page.js";
 import { RequestDetailDialog } from "../pages/request-detail.dialog.js";
@@ -66,6 +67,7 @@ interface Pages {
   marketing: MarketingPage;
   notFound: NotFoundPage;
   serverError: ServerErrorPage;
+  forbidden: ForbiddenPage;
   requestDetail: RequestDetailDialog;
   declineRequest: DeclineRequestDialog;
   cancelRequest: CancelRequestDialog;
@@ -445,7 +447,15 @@ interface ServerErrorApi {
   recover(): Promise<void>;
 }
 
+/** Makes the API refuse the signed-in person a manager-only read, as it does a member (403). */
+interface ForbiddenApi {
+  /** The requests ledger (GET /api/requests) answers 403 until `recover()`. */
+  denyRequests(): Promise<void>;
+  recover(): Promise<void>;
+}
+
 interface GlFixtures {
+  forbiddenApi: ForbiddenApi;
   serverErrorApi: ServerErrorApi;
   connectionApi: ConnectionApi;
   removeMemberApi: RemoveMemberApi;
@@ -1265,6 +1275,24 @@ export const test = base.extend<GlFixtures>({
       },
     });
   },
+  forbiddenApi: async ({ page }, use) => {
+    const ledger = /\/api\/requests(\?|$)/;
+    await use({
+      denyRequests: async () => {
+        await page.route(ledger, (route) =>
+          route.request().method() !== "GET"
+            ? route.fallback()
+            : route.fulfill({
+                status: 403,
+                headers: { "access-control-allow-origin": "*" },
+                contentType: "application/problem+json",
+                body: JSON.stringify({ title: "Forbidden", status: 403 }),
+              }),
+        );
+      },
+      recover: () => page.unroute(ledger),
+    });
+  },
   serverErrorApi: async ({ page }, use) => {
     const month = "**/api/sheet**";
     await use({
@@ -1381,6 +1409,7 @@ export const test = base.extend<GlFixtures>({
       marketing: new MarketingPage(page),
       notFound: new NotFoundPage(page),
       serverError: new ServerErrorPage(page),
+      forbidden: new ForbiddenPage(page),
       requestDetail: new RequestDetailDialog(page),
       declineRequest: new DeclineRequestDialog(page),
       cancelRequest: new CancelRequestDialog(page),

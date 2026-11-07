@@ -23,6 +23,7 @@ export type PageSlug =
   | "accept-invite"
   | "calendar"
   | "create-team"
+  | "forbidden"
   | "forgot-password"
   | "marketing"
   | "not-found"
@@ -70,6 +71,13 @@ export const ROUTES = {
     origin: MARKETING_ORIGIN,
     mock: "/pages/marketing/default.html",
     page: "marketing",
+  },
+  /** Where a member lands who opens a manager-only page. */
+  forbidden: {
+    app: "/forbidden",
+    mock: "/pages/forbidden/default.html",
+    guard: "auth",
+    page: "forbidden",
   },
   forgotPassword: {
     app: "/forgot-password",

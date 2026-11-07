@@ -109,6 +109,12 @@ export const routes: Routes = [
       import('./pages/reset-password/reset-password.page').then((m) => m.ResetPasswordPage),
   },
   {
+    path: 'forbidden',
+    data: { page: 'forbidden' },
+    canActivate: [authGuard, teamGuard],
+    loadComponent: () => import('./pages/forbidden/forbidden.page').then((m) => m.ForbiddenPage),
+  },
+  {
     path: 'server-error',
     data: { page: 'server-error' },
     loadComponent: () =>
