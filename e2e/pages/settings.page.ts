@@ -284,7 +284,7 @@ export class SettingsPage extends BasePage {
 
   /** The banner that says next year's public holidays are ready: "2027 UK bank holidays are ready". */
   reviewBanner(): Locator {
-    return this.main.locator(".banner");
+    return this.main.locator(".alert--info.banner");
   }
 
   reviewBannerTitle(): Locator {
