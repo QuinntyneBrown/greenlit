@@ -55,8 +55,9 @@ export class RequestsPage extends BasePage {
   }
 
   /** The name button that opens the request's detail. */
-  open(member: string): Locator {
-    return this.row(member).locator(".request-row__who");
+  open(member: string, summary?: string): Locator {
+    const row = summary ? this.row(member).filter({ hasText: summary }) : this.row(member);
+    return row.locator(".request-row__who");
   }
 
   /** The empty state shown when the list cannot be loaded. */
