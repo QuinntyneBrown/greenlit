@@ -159,7 +159,9 @@ test.describe("Joining with Google", () => {
     pages,
     request,
   }, testInfo) => {
-    const invitation = await invite(request, inviterFor(testInfo.project.name), "Ana Ruiz", PEOPLE.member.email);
+    // Ana already has an account on the demo team; the inviter's own team can still invite her address (as "Ana R.", so the
+    // working-days spec, which keeps an "Ana Ruiz" row on that team, never meets two of her).
+    const invitation = await invite(request, inviterFor(testInfo.project.name), "Ana R.", PEOPLE.member.email);
     await goto("acceptInvite", { token: invitation.token });
     await pages.acceptInvite.waitForReady();
     const accept = pages.acceptInvite;
