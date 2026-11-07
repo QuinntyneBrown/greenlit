@@ -7,10 +7,14 @@
       <a href="#screens">Inside the app</a>
       <a href="#managers">For managers</a>
     </nav>
-    <gl-button variant="primary" size="sm" [href]="signInUrl">
-      Open the app
-      <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" /></svg>
-    </gl-button>
+    <span class="mk-header__cta">
+      <gl-button variant="primary" size="sm" [href]="signInUrl">
+        Open the app
+        <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M7 17 17 7M8 7h9v9" />
+        </svg>
+      </gl-button>
+    </span>
   </div>
 </header>
 
@@ -217,3 +221,79 @@
     </div>
   </div>
 </section>
+
+<section class="mk-section" id="managers" aria-labelledby="managers-h">
+  <div class="mk-shell mk-split">
+    <div class="mk-heading mk-heading--tight" data-reveal>
+      <h2 id="managers-h">Made for the person who <em>keeps the sheet.</em></h2>
+      <p class="mk-lead">
+        You know who is out, who is waiting on you and where the team runs thin. Greenlit just says
+        it out loud.
+      </p>
+    </div>
+    <ul class="mk-list" data-reveal>
+      <li>
+        <span class="cell" data-status="off" aria-hidden="true"></span>
+        <div>
+          <strong>Weekends and holidays are red</strong>
+          <span>Set once, never booked, never counted.</span>
+        </div>
+      </li>
+      <li>
+        <span class="cell" data-status="confirmed" aria-hidden="true"></span>
+        <div>
+          <strong>Invite by email</strong>
+          <span>Members join your team from a link. No public sign-up.</span>
+        </div>
+      </li>
+      <li>
+        <span class="cell" data-status="requested" aria-hidden="true"></span>
+        <div>
+          <strong>Know before you say yes</strong>
+          <span>Set the fewest people who should be in, and see the days that fall short.</span>
+        </div>
+      </li>
+      <li>
+        <span class="cell" data-status="tentative" aria-hidden="true"></span>
+        <div>
+          <strong>Easy on a phone</strong>
+          <span>Every colour also has a mark, so nothing depends on colour alone.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="mk-section mk-final" id="start" aria-labelledby="start-h">
+  <div class="mk-shell">
+    <div class="mk-heading mk-heading--center" data-reveal>
+      <h2 id="start-h">Get your team <em>greenlit.</em></h2>
+      <p>Set up your team, invite the people you work with, and share the same month.</p>
+    </div>
+    <div class="mk-cta-row" data-reveal>
+      <gl-button variant="primary" size="lg" [href]="createTeamUrl">
+        Create your team
+        <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M7 17 17 7M8 7h9v9" />
+        </svg>
+      </gl-button>
+      <gl-button variant="ghost" size="lg" [href]="signInUrl">Sign in</gl-button>
+    </div>
+  </div>
+</section>
+
+<footer class="mk-footer">
+  <div class="mk-shell mk-footer__inner">
+    <div>
+      <gl-logo-lockup href="#top" label="Greenlit, back to the top" />
+      <p class="mk-footer__tagline text-muted">Every day off, greenlit.</p>
+    </div>
+    <nav aria-label="Footer">
+      <strong>Product</strong>
+      <a href="#how">How it works</a>
+      <a href="#screens">Inside the app</a>
+      <a [href]="signInUrl">Open the app</a>
+    </nav>
+    <small>© 2026 Greenlit · Made for small teams who share one month.</small>
+  </div>
+</footer>

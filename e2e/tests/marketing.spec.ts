@@ -158,4 +158,58 @@ test.describe("Marketing page", () => {
       await expect(m.screenshotImages().nth(i)).toHaveAttribute("alt", /\S+/);
     }
   });
+
+  test("what the manager gets (L2-050 AC9)", async ({ pages }) => {
+    const m = pages.marketing;
+    await expect(m.sectionTitle("managers")).toHaveText(
+      "Made for the person who keeps the sheet.",
+    );
+    await expect(m.managerItems()).toHaveText([
+      "Weekends and holidays are red",
+      "Invite by email",
+      "Know before you say yes",
+      "Easy on a phone",
+    ]);
+  });
+
+  test("the closing call to action and the footer (L2-050 AC10)", async ({
+    pages,
+  }) => {
+    const m = pages.marketing;
+    await expect(m.sectionTitle("start")).toHaveText("Get your team greenlit.");
+    await expect(m.startCreateTeam()).toHaveAttribute(
+      "href",
+      appLink("/create-team", "create-team"),
+    );
+    await expect(m.startSignIn()).toHaveAttribute(
+      "href",
+      appLink("/sign-in", "sign-in"),
+    );
+    await expect(m.footerNavLinks()).toHaveText([
+      "How it works",
+      "Inside the app",
+      "Open the app",
+    ]);
+  });
+
+  test("nothing scrolls sideways on a phone (L2-050 AC12)", async ({
+    pages,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile", "the phone viewport");
+    expect(await pages.marketing.scrollsHorizontally()).toBe(false);
+  });
+});
+
+test.describe("Marketing site addresses", () => {
+  test("any other address shows the page (L2-050 AC11)", async ({
+    page,
+    pages,
+  }) => {
+    test.skip(isBaseline, "the mocks have no router");
+    await page.goto(`${MARKETING_ORIGIN}/no-such-page`);
+    await pages.marketing.waitForReady();
+    await expect(pages.marketing.heroTitle()).toHaveText(
+      "Every day off, greenlit.",
+    );
+  });
 });

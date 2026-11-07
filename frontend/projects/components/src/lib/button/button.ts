@@ -41,11 +41,12 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
     }
   `,
   styles: `
+    /* --gl-btn-fg and --gl-btn-bg-hover: knobs a host sets to draw a ghost or link button on an inverse surface. */
     .btn {
       --btn-bg: var(--color-bg-surface);
-      --btn-fg: var(--color-fg-default);
+      --btn-fg: var(--gl-btn-fg, var(--color-fg-default));
       --btn-border: var(--color-border-strong);
-      --btn-bg-hover: var(--color-bg-subtle);
+      --btn-bg-hover: var(--gl-btn-bg-hover, var(--color-bg-subtle));
       --btn-bg-active: var(--color-bg-subtle-hover);
       display: inline-flex;
       align-items: center;

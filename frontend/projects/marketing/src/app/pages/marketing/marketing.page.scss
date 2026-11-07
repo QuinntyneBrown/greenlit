@@ -134,14 +134,14 @@
 .mk-nav a:hover {
   color: var(--color-fg-default);
 }
-.mk-header .btn {
+.mk-header__cta {
   margin-left: auto;
 }
 @media (min-width: 56rem) {
   .mk-nav {
     display: flex;
   }
-  .mk-header .btn {
+  .mk-header__cta {
     margin-left: 0;
   }
 }
@@ -433,9 +433,9 @@
 .mk-final .mk-cta-row {
   justify-content: center;
 }
-.mk-final .btn--ghost {
-  --btn-fg: var(--color-fg-inverse);
-  --btn-bg-hover: color-mix(in srgb, var(--color-fg-inverse) 12%, transparent);
+.mk-final gl-button {
+  --gl-btn-fg: var(--color-fg-inverse);
+  --gl-btn-bg-hover: color-mix(in srgb, var(--color-fg-inverse) 12%, transparent);
 }
 
 /* Footer */
@@ -487,4 +487,11 @@
   .mk-hero {
     padding-block: var(--space-8) var(--space-12);
   }
+}
+
+.mk-heading--tight {
+  margin-bottom: 0;
+}
+.mk-footer__tagline {
+  margin-top: var(--space-2);
 }

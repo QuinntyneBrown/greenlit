@@ -169,4 +169,37 @@ export class MarketingPage extends BasePage {
   screenshotImages(): Locator {
     return this.section("screens").locator(".mk-shot img");
   }
+
+  // Managers, start, footer
+
+  managerItems(): Locator {
+    return this.section("managers").locator(".mk-list li strong");
+  }
+
+  startCreateTeam(): Locator {
+    return this.section("start").getByRole("link", {
+      name: "Create your team",
+      exact: true,
+    });
+  }
+
+  startSignIn(): Locator {
+    return this.section("start").getByRole("link", {
+      name: "Sign in",
+      exact: true,
+    });
+  }
+
+  footerNavLinks(): Locator {
+    return this.page
+      .getByRole("navigation", { name: "Footer", exact: true })
+      .getByRole("link");
+  }
+
+  /** Whether the document is wider than the viewport (a phone must not scroll sideways). */
+  async scrollsHorizontally(): Promise<boolean> {
+    return this.page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    );
+  }
 }
