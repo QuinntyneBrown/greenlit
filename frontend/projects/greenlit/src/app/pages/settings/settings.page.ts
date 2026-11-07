@@ -15,6 +15,7 @@ import {
   SHEET_SERVICE,
   SheetMonth,
   TeamHolidays,
+  COVERAGE_SERVICE,
   WORKING_DAYS_SERVICE,
   holidayDateLabel,
   weekDayNames,
@@ -23,6 +24,7 @@ import {
 import {
   Alert,
   Button,
+  Counter,
   DayChips,
   EmptyState,
   HolidayList,
@@ -59,7 +61,7 @@ type HolidaysLoad =
  */
 @Component({
   selector: 'app-settings-page',
-  imports: [Alert, Button, DayChips, EmptyState, HolidayList, MemberList, Skeleton],
+  imports: [Alert, Button, Counter, DayChips, EmptyState, HolidayList, MemberList, Skeleton],
   template: `
     @if (review(); as review) {
       <gl-alert
@@ -210,6 +212,42 @@ type HolidaysLoad =
         </div>
       </section>
     }
+    @if (isManager()) {
+      <section id="coverage" class="settings-section" aria-labelledby="coverage-title">
+        <h2 id="coverage-title" class="section-title">Coverage</h2>
+        <p>
+          The fewest people who should be in on any working day. Days below this are flagged on the
+          calendar’s “Out” row.
+        </p>
+        @if (coverageSettings(); as coverage) {
+          <fieldset>
+            <gl-counter
+              [value]="minimum()"
+              [max]="coverage.teamSize"
+              decrementLabel="Fewer people"
+              incrementLabel="More people"
+              [suffix]="'of ' + coverage.teamSize + ' people in'"
+              [disabled]="coverageBusy()"
+              (valueChange)="stepCoverage($event)"
+            />
+          </fieldset>
+        } @else {
+          <gl-skeleton />
+        }
+        <div class="settings-actions">
+          <gl-button
+            variant="primary"
+            size="sm"
+            [busy]="coverageBusy()"
+            [disabled]="!canSaveCoverage()"
+            (click)="saveCoverage()"
+          >
+            {{ coverageBusy() ? 'Saving…' : 'Save changes' }}
+          </gl-button>
+          <span aria-live="polite">{{ coverageStatus() }}</span>
+        </div>
+      </section>
+    }
   `,
   styles: `
     :host {
@@ -284,6 +322,7 @@ export class SettingsPage {
   private readonly sheet = inject(SHEET_SERVICE);
   private readonly holidayService = inject(HOLIDAY_SERVICE);
   private readonly workingDaysService = inject(WORKING_DAYS_SERVICE);
+  private readonly coverageService = inject(COVERAGE_SERVICE);
   private readonly dialogs = inject(AppDialogs);
   private readonly toasts = inject(ToastService);
   private readonly document = inject(DOCUMENT);
@@ -360,6 +399,62 @@ export class SettingsPage {
     if (draft === null || saved === null || this.weekBusy() || draft.length === 0) return false;
     return draft.join() !== saved.join();
   });
+
+  /** The coverage minimum and team size as saved; null until they have loaded (the stepper waits). */
+  private readonly loadedCoverage = toSignal(
+    toObservable(this.isManager).pipe(
+      switchMap((manager) =>
+        manager ? this.coverageService.settings().pipe(catchError(() => of(null))) : of(null),
+      ),
+    ),
+    { initialValue: null },
+  );
+  private readonly savedCoverage = signal<number | null>(null);
+  protected readonly coverageSettings = computed(() => {
+    const loaded = this.loadedCoverage();
+    return loaded === null
+      ? null
+      : { teamSize: loaded.teamSize, saved: this.savedCoverage() ?? loaded.minimum };
+  });
+  /** What the stepper shows while the manager edits; null while it matches what is saved. */
+  private readonly draftCoverage = signal<number | null>(null);
+  protected readonly minimum = computed(
+    () => this.draftCoverage() ?? this.coverageSettings()?.saved ?? 0,
+  );
+  protected readonly coverageBusy = signal(false);
+  protected readonly coverageStatus = signal('');
+  protected readonly canSaveCoverage = computed(() => {
+    const draft = this.draftCoverage();
+    const saved = this.coverageSettings()?.saved;
+    return draft !== null && saved !== undefined && !this.coverageBusy() && draft !== saved;
+  });
+
+  protected stepCoverage(value: number): void {
+    this.draftCoverage.set(value);
+    this.coverageStatus.set('');
+  }
+
+  /** "Save changes" of Coverage; a failure keeps the value as entered and offers Try again. */
+  protected saveCoverage(): void {
+    const draft = this.draftCoverage();
+    if (draft === null || this.coverageBusy()) return;
+    this.coverageBusy.set(true);
+    this.coverageService.save(draft).subscribe((result) => {
+      this.coverageBusy.set(false);
+      if (result.ok) {
+        this.savedCoverage.set(draft);
+        this.draftCoverage.set(null);
+        this.coverageStatus.set('Saved');
+        return;
+      }
+      this.toasts.show({
+        tone: 'danger',
+        title: 'We couldn’t save your changes',
+        body: 'Nothing was changed. Check your connection and try again.',
+        action: { label: 'Try again', run: () => this.saveCoverage() },
+      });
+    });
+  }
 
   private readonly loadedHolidays = computed(() => {
     const load = this.holidaysLoad();
