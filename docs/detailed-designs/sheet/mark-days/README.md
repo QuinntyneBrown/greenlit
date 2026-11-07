@@ -46,6 +46,8 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **Requests deferred.** `RequestLedger` and the pending request of `L2-015` AC5 belong to journey 7 (`requests/send-request`); there is no `TimeOffRequest` entity yet, so Requested days are plain day rows until then. The toast still says "{manager} will be notified."
 - **Manager name.** `GetMonth` gains `managerName` so the client can word "Confirmed days can only be changed by Maya" and "Maya Chen will be notified."
 - **Client.** The sheet page keeps the month in a signal, patches the stroke's cells at once, and puts them back if the save fails. After a save it refetches the month quietly, so the Out row stays true. Cells of editable rows are focusable and Enter or Space paints the focused cell; roving focus and arrow keys are journey 12.
+- **Select mode and the default.** The paint picker offers Select first and starts on it, as the mocks do; Select does nothing until journey 12, so nothing is painted until a colour is chosen.
+- **Touch.** While a paint colour is chosen the sheet takes `touch-action: none`, so a finger dragging along a row paints instead of scrolling; choose Select to scroll the sheet by touch.
 - **Toast.** The minimum `ToastService` and `gl-toast` of `web-experience/feedback-toasts` are built here (8 s timer paused on hover and focus; danger stays; newest first) for journey 16 to extend.
 
 ## Requirements

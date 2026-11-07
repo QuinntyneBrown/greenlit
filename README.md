@@ -69,5 +69,7 @@ and the loading, empty and error states. Sign-in is built (journey 2, `identity-
 validation, busy, failed and success states, and every app screen sends a visitor without a session
 there first. Creating a team is built (journey 3, `teams/create-team`): `POST /api/teams` makes the
 caller the manager with the first rows and the GB, IE or US public holidays (ADR-005), and a
-signed-in person on no team is sent to `/create-team` (sign in as `noor@northwind.studio`). The rest of the sheet lands feature by feature, each from a requirement in
+signed-in person on no team is sent to `/create-team` (sign in as `noor@northwind.studio`). Marking days is built (journey 4, `sheet/mark-days`): choose a
+paint colour, press or drag across your own row (the manager's: any row), and a toast offers Undo;
+the API refuses what ADR-003 forbids. The rest of the sheet lands feature by feature, each from a requirement in
 `docs/specs/`, a detailed design and a mock, following the process in `AGENTS.md`.

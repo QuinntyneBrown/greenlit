@@ -19,7 +19,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 1 | View the team's month | Everyone sees the month sheet: coloured cells, days left, who's out. | 0 (built) |
 | 2 | Sign in | Email and password sign-in that opens the team's calendar. | 0 (built) |
 | 3 | Create a team | Manager sets name, time zone, public holidays and first members. | 0 (built) |
-| 4 | Mark days on the calendar | Members paint their days tentative, requested or clear; managers confirm; undo. | 6 |
+| 4 | Mark days on the calendar | Members paint their days tentative, requested or clear; managers confirm; undo. | 0 (built) |
 | 5 | Invite a member | Manager adds a row and emails a seven-day invitation. | 3 |
 | 6 | Accept an invitation | Invitee sets name and password, then lands on the sheet. | 2.5 |
 | 7 | Send a time-off request | Member asks for days with a note; sees days left. | 3 |
@@ -44,9 +44,17 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total remaining** | | **73** |
+| | **Total remaining** | | **67** |
 
 ## Notes
+
+- Journey 4 is built: `PUT /api/sheet/days` and `POST /api/sheet/days/restore` apply ADR-003's
+  rules in `DayChanger` and `DayChangePolicy`, and the calendar has the paint picker, press and
+  drag painting (mouse, finger, Enter or Space on a focused cell), the Undo toast and the
+  rolled-back failed save. The minimum `gl-toast` and `ToastService` are built for journey 16 to
+  extend. Left for later journeys: Select mode (journey 12; the picker offers it, and it does
+  nothing yet) and the pending request a member's Requested days join (journey 7), so the
+  "will be notified" toast promises an email journey 25 sends.
 
 - Journey 3 is built: `POST /api/teams`, the `/create-team` page with all its states, and
   `teamGuard`, which sends a signed-in person on no team there. Holidays come from offline rules
