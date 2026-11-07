@@ -16,6 +16,7 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<Holiday> Holidays => Set<Holiday>();
     public DbSet<AllowanceAdjustment> AllowanceAdjustments => Set<AllowanceAdjustment>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
+    public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
     public void DiscardChanges() => ChangeTracker.Clear();
 

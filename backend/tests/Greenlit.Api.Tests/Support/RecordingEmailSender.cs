@@ -34,4 +34,12 @@ public sealed class RecordingEmailSender : IEmailSender
         if (!match.Success) throw new InvalidOperationException("No invitation link in: " + message.Body);
         return match.Groups[1].Value;
     }
+
+    /// <summary>The password reset token in the link of <paramref name="message"/>.</summary>
+    public static string ResetTokenIn(EmailMessage message)
+    {
+        var match = System.Text.RegularExpressions.Regex.Match(message.Body, @"https://app\.example\.com/reset-password/([A-Za-z0-9_-]+)");
+        if (!match.Success) throw new InvalidOperationException("No reset link in: " + message.Body);
+        return match.Groups[1].Value;
+    }
 }
