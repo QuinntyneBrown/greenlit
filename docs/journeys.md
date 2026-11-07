@@ -16,7 +16,7 @@ account menu, and the pending count arrive with the journeys that need them.
 
 | # | Journey | Description | Effort (days) |
 |---|---|---|---|
-| 1 | View the team's month | Everyone sees the month sheet: coloured cells, days left, who's out. | 7 |
+| 1 | View the team's month | Everyone sees the month sheet: coloured cells, days left, who's out. | 0 (built) |
 | 2 | Sign in | Email and password sign-in that opens the team's calendar. | 3 |
 | 3 | Create a team | Manager sets name, time zone, public holidays and first members. | 3 |
 | 4 | Mark days on the calendar | Members paint their days tentative, requested or clear; managers confirm; undo. | 6 |
@@ -44,9 +44,13 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total** | | **86** |
+| | **Total remaining** | | **79** |
 
 ## Notes
+
+- Journey 1 is built. Three of its criteria arrive with the journeys that own their data: the
+  Left figures (L2-014 AC1) with journey 11, part-time working days (L2-013 AC2, L2-014 AC3) with
+  journey 15, and coverage flags (L2-042 AC1) with journey 17. The grid already renders all three.
 
 - Journeys 11, 21, 22 and 23 depend on allowances, which ADR-003 currently puts out of scope. A
   superseding ADR is needed before they start (see `docs/detailed-designs/README.md`).

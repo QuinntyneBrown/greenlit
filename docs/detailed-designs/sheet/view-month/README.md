@@ -27,10 +27,10 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 **Backend**
 
 - **`SheetController`** — `GET /api/sheet?month=2026-11`.
-- **`GetMonthQueryHandler`** — Loads the caller's team, its active members, their `TimeOffDay` rows in the month and the team's holidays in one round trip (ADR-003). It resolves each cell through `WeekendRule`, the Left figures through `AllowanceCalculator` (`allowances/allowance-figures`), and the Out row through `CoverageCalculator` (`teams/coverage-minimum`).
+- **`GetMonthQueryHandler`** — Loads the caller's team, its active members, their `TimeOffDay` rows in the month and the team's holidays in one round trip (ADR-003). It resolves each cell through `WorkingDayRule`, the Left figures through `AllowanceCalculator` (`allowances/allowance-figures`), and the Out row through `CoverageCalculator` (`teams/coverage-minimum`).
 - **`MonthDto`** — Response: `Month`, `Today`, `IsManager`, `CoverageMinimum`, `Members` (each with `Id`, `Name`, `Initials`, `IsYou`, `DaysLeft`, `Cells`), `Coverage` (per date `Out`, `In`, `BelowMinimum`).
-- **`ICurrentUser`** — Greenlit.Application abstraction introduced by this design. It exposes the caller's `UserId`, `TeamId`, `TeamMemberId` and `IsManager` from the JWT claims, so every handler scopes data to the caller's team.
-- **`IClock`** — Greenlit.Application abstraction introduced by this design. It returns the current instant and the team's local date, so tests fix "today".
+- **`ICurrentUser`** — Greenlit.Application abstraction introduced by this design. It exposes the caller's `UserId` from the token's `sub` claim; `GetMonthQueryHandler` resolves the caller's team, member row and manager flag from it, so every query is scoped to the caller's team.
+- **`TimeProvider`** — .NET's built-in clock, registered as `TimeProvider.System`. The handler turns its instant into the team's local date, and tests can replace it to fix "today".
 
 **Shared plumbing (exists today)**
 
@@ -90,7 +90,7 @@ Journey 1 builds this design before sign-in, allowances, coverage settings and p
 |---|---|
 | Month in the address | The calendar reads `?month=yyyy-MM`; without it the page shows the current month in the team's time zone. Previous, Next and Today change the parameter, so a month can be bookmarked and reloaded. |
 | Session before sign-in | The endpoint keeps the authenticated fallback policy. The `api` project gets a `SESSION_STORE` contract that holds the bearer token and an interceptor that sends it. Sign-in (`identity-and-access/sign-in`) will write the token; until then the Playwright fixture writes one minted with the development signing key for a seeded user. No anonymous endpoint is added. |
-| Caller identity | `ICurrentUser` reads the `sub` claim (user id) and resolves the caller's team member row and team; the caller is the manager when `Team.ManagerUserId` is their id. A caller with no team gets 404 `team_not_found`. |
+| Caller identity | `ICurrentUser` reads the `sub` claim (user id) and resolves the caller's team member row and team; the caller is the manager when `Team.ManagerUserId` is their id. A caller with no team gets 404. |
 | Left column | `DaysLeft` is `null` until `allowances/allowance-figures` lands (ADR-003 keeps balances out of scope until it is superseded). The cell shows "–" with the accessible name "Days left not set up yet". L2-014 AC1 is delivered with journey 11. |
 | Coverage minimum | `Team` has no minimum yet, so `CoverageMinimum` is `null` and no day is flagged. The Out cell already renders the flag when `BelowMinimum` is true; `teams/coverage-minimum` (journey 17) adds the value. L2-042 AC1 is delivered there. |
 | Member working days | Only weekends and holidays are non-working until `teams/working-days` (journey 15); L2-013 AC2's part-time case and L2-014 AC3 are delivered there. The query resolves non-working days in one place (`WorkingDayRule`) so that journey only extends it. |
