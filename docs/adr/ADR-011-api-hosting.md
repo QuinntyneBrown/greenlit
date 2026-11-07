@@ -22,7 +22,7 @@ matters more than headroom, and `Program.cs` refuses SQLite in Production: the A
   (the app site's address, later `https://app.greenlit.rocks`), `ASPNETCORE_ENVIRONMENT=Production`.
 - `deploy.yml` publishes the API framework-dependent, opens the SQL firewall to the runner for the length of
   the job, runs `greenlit migrate --provider SqlServer` (the API never migrates on startup), closes the
-  firewall, zip-deploys, and smoke-tests `/swagger`.
+  firewall, zip-deploys, and smoke-tests the anonymous `POST /api/_ping` (`{"mode":"ok"}` → 200) (Swagger is not mounted in Production).
 - The runner signs in as the service principal `sp-greenlit-github-deploy`, Contributor on `rg-greenlit-prod`
   only (`AZURE_CREDENTIALS`).
 

@@ -137,7 +137,7 @@ jobs:
     timeout-minutes: 20
     environment:
       name: production-api
-      url: https://app-greenlit-api-prod.azurewebsites.net/swagger
+      url: https://app-greenlit-api-prod.azurewebsites.net/api/_ping
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -172,8 +172,8 @@ jobs:
       - name: Smoke test
         run: |
           for i in $(seq 1 20); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' "https://$API_APP.azurewebsites.net/swagger/index.html")
+            code=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{"mode":"ok"}' "https://$API_APP.azurewebsites.net/api/_ping")
             [ "$code" = "200" ] && echo "API is up" && exit 0
             sleep 15
           done
-          echo "::error::The API did not answer on /swagger within five minutes"; exit 1
+          echo "::error::The API did not answer on /api/_ping within five minutes"; exit 1
