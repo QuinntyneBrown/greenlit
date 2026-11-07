@@ -38,6 +38,7 @@ export * from './lib/drawer/drawer';
 // the sheet
 export * from './lib/segmented-control/segmented-control';
 export * from './lib/team-grid/team-grid';
+export * from './lib/selection-bar/selection-bar';
 export * from './lib/period-nav/period-nav';
 export * from './lib/legend/legend';
 

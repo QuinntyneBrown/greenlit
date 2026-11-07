@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, combineLatest, map, of, startWith, switchMap, tap } from 'rxjs';
@@ -20,8 +27,11 @@ import {
   PeriodNav,
   SegmentedControl,
   SegmentedOption,
+  SelectionAction,
+  SelectionBar,
   TeamGrid,
   TeamGridCellStatus,
+  TeamGridSelection,
   TeamGridStroke,
 } from 'components';
 
@@ -29,6 +39,7 @@ import { AppDialogs } from '../../dialogs/app-dialogs';
 import { NewRequestData, NewRequestDialog } from '../../dialogs/new-request/new-request.dialog';
 import { ToastService } from '../../toasts/toast.service';
 import { addMonths, calendarView, columnsFor, monthTitle } from './calendar-view';
+import { selectionBarView } from './selection-view';
 import { FAILED_SAVE, PaintContext, refusedToast, savedToast } from './paint-toasts';
 import { requestSentToast } from './request-toasts';
 
@@ -43,6 +54,13 @@ const MONTH_PARAM = /^\d{4}-(0[1-9]|1[0-2])$/;
 type PaintChoice = 'select' | 'confirmed' | 'requested' | 'tentative' | 'clear';
 
 const PAINT_STATUS: Record<Exclude<PaintChoice, 'select'>, DayStatus | null> = {
+  confirmed: 'Confirmed',
+  requested: 'Requested',
+  tentative: 'Tentative',
+  clear: null,
+};
+
+const ACTION_STATUS: Record<SelectionAction, DayStatus | null> = {
   confirmed: 'Confirmed',
   requested: 'Requested',
   tentative: 'Tentative',
@@ -75,7 +93,7 @@ function localMonth(): string {
  */
 @Component({
   selector: 'app-calendar-page',
-  imports: [PeriodNav, Legend, TeamGrid, EmptyState, Button, SegmentedControl],
+  imports: [PeriodNav, Legend, TeamGrid, SelectionBar, EmptyState, Button, SegmentedControl],
   template: `
     <div class="page-title-row">
       <gl-period-nav
@@ -150,10 +168,26 @@ function localMonth(): string {
             [cover]="view().cover"
             [loading]="load().state === 'loading'"
             [paint]="gridPaint()"
+            [selectable]="choice() === 'select'"
+            (selectionChange)="selection.set($event)"
+            (cleared)="selectionCleared()"
             (stroke)="paintStroke($event)"
+            (monthStep)="go($event)"
           />
         }
       }
+    }
+    <p class="visually-hidden" role="status">{{ announcement() }}</p>
+    @if (bar(); as bar) {
+      <gl-selection-bar
+        [title]="bar.title"
+        [workingDays]="bar.workingDays"
+        [over]="bar.over"
+        [canConfirm]="isManager()"
+        [busy]="saving()"
+        (chosen)="actOnSelection($event)"
+        (dismissed)="dismissSelection()"
+      />
     }
   `,
   styles: `
@@ -168,6 +202,8 @@ function localMonth(): string {
       gap: var(--space-4);
     }
     .toolbar-end {
+      min-width: 0;
+      max-width: 100%;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -267,8 +303,8 @@ export class CalendarPage {
   // ---- painting days (docs/detailed-designs/sheet/mark-days) ----
 
   protected readonly showPicker = computed(() => this.loaded() !== null && !this.isEmpty());
-  private readonly isManager = computed(() => this.loaded()?.isManager ?? false);
-  private readonly choice = signal<PaintChoice>('select');
+  protected readonly isManager = computed(() => this.loaded()?.isManager ?? false);
+  protected readonly choice = signal<PaintChoice>('select');
   protected readonly paintChoice = this.choice.asReadonly();
 
   /** L2-015 AC1-2: the manager also offers Confirmed. */
@@ -281,6 +317,61 @@ export class CalendarPage {
     { value: 'tentative', label: 'Tentative', swatch: 'tentative' },
     { value: 'clear', label: 'Clear', swatch: 'empty' },
   ]);
+
+  // ---- selecting days (docs/detailed-designs/sheet/select-days) ----
+
+  /** The range the sheet reports in Select mode; null when nothing is selected. */
+  protected readonly selection = signal<TeamGridSelection | null>(null);
+
+  /** What the selection bar shows; null hides the bar. */
+  protected readonly bar = computed(() => {
+    const sheet = this.loaded();
+    const selection = this.selection();
+    return sheet && selection ? selectionBarView(sheet, this.view().rows, selection) : null;
+  });
+
+  /** The polite status: how many days are selected, nothing once it is cleared. */
+  protected readonly announcement = computed(() => {
+    const n = this.selection()?.dates.length ?? 0;
+    return n === 0 ? '' : `${n} ${n === 1 ? 'day' : 'days'} selected`;
+  });
+
+  /** L2-016 AC4: "Clear selection" on the bar. */
+  protected dismissSelection(): void {
+    this.grid()?.clearSelection();
+    this.grid()?.focusActive();
+    this.selectionCleared();
+  }
+
+  /** L2-016 AC4: Escape or "Clear selection" cleared the range. */
+  protected selectionCleared(): void {
+    this.toasts.show({
+      tone: 'info',
+      title: 'Selection cleared',
+      body: 'Pick days to start again.',
+    });
+  }
+
+  /** An action from the bar is being saved. */
+  protected readonly saving = signal(false);
+  private readonly grid = viewChild(TeamGrid);
+
+  /** L2-016 AC3: the same change a paint stroke makes, over the selected days. */
+  protected actOnSelection(action: SelectionAction): void {
+    const selection = this.selection();
+    if (!selection || this.saving()) return;
+    this.saving.set(true);
+    this.save(
+      { memberId: selection.memberId, dates: selection.dates, status: ACTION_STATUS[action] },
+      (saved) => {
+        this.saving.set(false);
+        if (!saved) return;
+        // The change is made: the range is spent, and focus goes back to the sheet to carry on.
+        this.grid()?.clearSelection();
+        this.grid()?.focusActive();
+      },
+    );
+  }
 
   protected readonly hint = computed(() =>
     this.isManager()
@@ -329,15 +420,25 @@ export class CalendarPage {
   }
 
   /** Shows the stroke at once, saves it, and puts the cells back if the save fails (L2-018 AC2). */
-  private save(stroke: DayStroke): void {
+  private save(stroke: DayStroke, settled?: (saved: boolean) => void): void {
     const before = this.applyKinds(stroke.memberId, stroke.dates, stroke.status);
     this.sheetApi.setDays(stroke).subscribe({
-      next: (set) => this.saved(set),
+      next: (set) => {
+        this.saved(set);
+        settled?.(true);
+      },
       error: (error: unknown) => {
         this.restoreKinds(stroke.memberId, before);
-        this.refused(error, () => this.save(stroke));
+        settled?.(false);
+        this.refused(error, () => this.actOnRetry(stroke, settled));
       },
     });
+  }
+
+  /** "Try again" on the failed-save toast repeats the same stroke, with the same follow-up. */
+  private actOnRetry(stroke: DayStroke, settled?: (saved: boolean) => void): void {
+    if (settled) this.saving.set(true);
+    this.save(stroke, settled);
   }
 
   private saved(set: ChangeSet): void {

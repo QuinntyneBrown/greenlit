@@ -70,6 +70,8 @@ interface SheetApi {
   /** Saving days (PUT /api/sheet/days) fails with a 500 until `recoverSaves()`. */
   failSaves(): Promise<void>;
   recoverSaves(): Promise<void>;
+  /** Holds saves (PUT /api/sheet/days) until the returned function is called. */
+  holdSaves(): Promise<() => void>;
 }
 
 /** Watches and steers the sign-in request (POST /api/auth/sign-in). */
@@ -407,6 +409,16 @@ export const test = base.extend<GlFixtures>({
         );
       },
       recoverSaves: () => page.unroute("**/api/sheet/days"),
+      holdSaves: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route("**/api/sheet/days", async (route) => {
+          if (route.request().method() !== "PUT") return route.fallback();
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
       onlyMe: async () => {
         await page.route(pattern, async (route) => {
           const response = await route.fetch();

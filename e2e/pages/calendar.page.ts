@@ -192,6 +192,90 @@ export class CalendarPage extends BasePage {
     }
   }
 
+  // ---- the keyboard on the sheet (docs/detailed-designs/sheet/select-days) ----
+
+  /** The cells that are a tab stop: the sheet has exactly one (roving focus). */
+  tabStops(): Locator {
+    return this.grid().locator('.cell[tabindex="0"]');
+  }
+
+  /** The cell that has keyboard focus. */
+  focusedCell(): Locator {
+    return this.grid().locator(".cell:focus");
+  }
+
+  /** Puts keyboard focus on a cell, as Tab would land there. */
+  async focusCell(member: string, day: string): Promise<void> {
+    await this.cell(member, day).focus();
+  }
+
+  /** Presses a key (or chord such as "Shift+ArrowRight") with focus where it is. */
+  async press(key: string): Promise<void> {
+    await this.page.keyboard.press(key);
+  }
+
+  // ---- selecting days (docs/detailed-designs/sheet/select-days) ----
+
+  /**
+   * Selects `member`'s cells from day `from` to day `to` in Select mode: a click when they are
+   * the same, otherwise a drag with the mouse or a finger.
+   */
+  async select(member: string, from: string, to: string = from): Promise<void> {
+    await this.paint(member, from, to);
+  }
+
+  /** The cells that are selected (`aria-pressed="true"`). */
+  selectedCells(): Locator {
+    return this.grid().locator('.cell[aria-pressed="true"]');
+  }
+
+  /** The selection bar: a toolbar labelled "Selected days". */
+  selectionBar(): Locator {
+    return this.page.getByRole("toolbar", { name: "Selected days", exact: true });
+  }
+
+  /** "{member} · {range}", e.g. "Ana Ruiz · 23–25 Nov". */
+  selectionTitle(): Locator {
+    return this.selectionBar().locator(".selection-bar__title");
+  }
+
+  /** The line under the title: "3 days working" and, over the allowance, "2 days over allowance". */
+  selectionMeta(): Locator {
+    return this.selectionBar().locator(".selection-bar__meta");
+  }
+
+  /** The bar's buttons in order: Confirm (manager only), Request, Tentative, Clear, Clear selection. */
+  selectionActions(): Locator {
+    return this.selectionBar().getByRole("button");
+  }
+
+  selectionAction(name: string): Locator {
+    return this.selectionBar().getByRole("button", { name, exact: true });
+  }
+
+  /** The selection bar's button that has keyboard focus. */
+  focusedAction(): Locator {
+    return this.selectionBar().locator("button:focus");
+  }
+
+  /**
+   * Gets keyboard focus onto the cell for `member` and `day` using only keys: Tab from the top of the page
+   * into the sheet, then the arrow keys and Home.
+   */
+  async keyboardTo(member: string, day: string): Promise<void> {
+    await this.page.locator("body").press("Tab");
+    for (let i = 0; i < 40 && (await this.focusedCell().count()) === 0; i++) await this.press("Tab");
+    const nameOfFocused = async (): Promise<string> => (await this.focusedCell().getAttribute("aria-label")) ?? "";
+    for (let i = 0; i < 12 && !(await nameOfFocused()).startsWith(`${member}, `); i++) await this.press("ArrowDown");
+    await this.press("Home");
+    for (let i = 0; i < 40 && !(await nameOfFocused()).startsWith(`${member}, ${day}: `); i++) await this.press("ArrowRight");
+  }
+
+  /** The polite status that says how many days are selected ("3 days selected"). */
+  selectionAnnouncement(): Locator {
+    return this.main.getByRole("status");
+  }
+
   // ---- requesting time off (docs/detailed-designs/requests/send-request) ----
 
   /** The member's "Request time off" button beside the paint picker; the manager does not get one. */

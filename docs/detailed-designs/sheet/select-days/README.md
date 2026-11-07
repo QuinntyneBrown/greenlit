@@ -72,3 +72,19 @@ The frontend `SelectionState` computes the working-day count and the overage tha
 Enter and the arrow keys build the selection (`L2-047` AC1), and Escape clears it (`L2-016` AC4, `L2-047` AC2). A member's bar has no "Confirm" (`L2-016` AC2).
 
 ![Sequence diagram: select days from the keyboard](diagrams/sequence-keyboard-select.png)
+
+## Decisions
+
+Settled while building journey 12; the mocks and L2 are unchanged by them.
+
+- **No separate directive.** The `SelectionController` of the component view is part of `gl-team-grid` (it already owns the pointer and focus handling for paint strokes); `gl-selection-bar` and the page's `selection-view` helper do the rest.
+- **One owner of the range.** `gl-team-grid` owns the selection (`row`, anchor column, head column) and emits `selectionChange` with `{ memberId, dates } | null`; the page owns what the bar says and does. The grid clears it when the mode leaves Select, when the month changes, and on request (`clearSelection()`); Escape clears it and emits `cleared` so the page can say "Selection cleared".
+- **Select is the default mode.** A stray tap never changes data; the picker's other choices stay Paint mode (`sheet/mark-days`), and Paint mode wins for the pointer.
+- **Single-row range.** A selection is contiguous on one row. Only the caller's editable rows can be selected, so a member cannot select another member's cells (`L2-017` AC1); the manager can select on any row. Weekends and holidays inside the range are selected but not counted; a range of only red days still goes to the API, which answers "Those are all non-working days".
+- **Pointer.** A press selects the cell, a drag extends within the row, and a press on the only selected cell toggles it off. Touch uses the same pointer events as Paint mode (editable cells take `touch-action: pan-y` in Select mode, so a horizontal drag selects and a vertical pan still scrolls the page).
+- **Roving focus (APG grid).** The grid is one tab stop: the active cell has `tabindex=0`, every other cell `-1`. Weekend and holiday cells are skipped by every key. Arrows move; Home/End go to the row's first/last working day; Ctrl+Home/End to the sheet's first/last; PageUp/PageDown go to the previous/next month (the page navigates and focus returns to the same row and day). Read-only cells take focus too, so a member can read the whole sheet from the keyboard; Enter on them does nothing.
+- **Keyboard selection.** In Select mode Enter anchors a selection on the focused cell and enters "extending": Left/Right move the head (the range follows, skipping nothing but focus skipping red days) and Up/Down are ignored; Enter again ends extending and keeps the range. Shift+Left/Right extend from the anchor without Enter. Escape clears and keeps focus on the cell. In Paint mode Enter or Space still paints the cell.
+- **The bar.** `gl-selection-bar` follows the grid in the DOM, so Tab from the grid reaches it. It is `role="toolbar"` with a roving tab stop (arrows, Home, End). It appears fixed at the bottom of the viewport. Confirm is offered only to the manager; the actions emit `action` (`Confirmed | Requested | Tentative | null`) and `clear`.
+- **Overage.** `over = max(0, requested + extra - left)` from the member's `AllowanceFigures`, where `extra` is the selection's working days that are not already requested, the same rule as the server's `DaysOver` (`L2-030` AC2). It warns and never blocks (`L2-030` AC4).
+- **After an action.** The page sends the same `SetDaysCommand` as a paint stroke (`mark-days`), clears the range, and returns focus to the grid's active cell; the toast and Undo are those of `mark-days`. A failed save keeps the selection (the toast says so, `L2-018`).
+- **Announcements.** A visually hidden polite status says "{n} days selected" when the range changes; "Selection cleared" is a toast with "Pick days to start again."

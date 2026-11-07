@@ -27,7 +27,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 9 | Review requests | Manager sees pending requests with overlaps, opens detail, approves in bulk. | 0 (built) |
 | 10 | Decline a request | Manager declines with optional reason; days return to tentative. | 0 (built) |
 | 11 | Compute allowances | Yearly days, used, booked, requested and left; over-allowance warnings. | 0 (built) |
-| 12 | Select days and use the keyboard | Select ranges by drag or arrow keys; act from selection bar. | 5 |
+| 12 | Select days and use the keyboard | Select ranges by drag or arrow keys; act from selection bar. | 0 (built) |
 | 13 | Follow and cancel own requests | Member sees upcoming and past requests and cancels pending ones. | 2.5 |
 | 14 | Manage team holidays | Manager adds and removes team holidays, shown red for everyone. | 3 |
 | 15 | Set working days | Team work week and part-time days per member, never booked. | 3 |
@@ -47,6 +47,16 @@ account menu, and the pending count arrive with the journeys that need them.
 | | **Total remaining** | | **44.5** |
 
 ## Notes
+
+- Journey 12 is built. Select is the default mode: a click, a drag (mouse or finger) or Enter then the arrow
+  keys (or Shift+arrows) selects a range on one row, and `gl-selection-bar` ("Selected days", a toolbar
+  after the sheet) offers Confirm (manager only), Request, Tentative, Clear and Clear selection, with
+  "n days over allowance" computed on the client from the member's allowance figures. An action is the same
+  `PUT /api/sheet/days` a paint stroke makes, so no backend changed. The grid is one roving tab stop with
+  arrows, Home, End, Ctrl+Home/End and PageUp/PageDown for months; Escape clears ("Selection cleared"). The
+  paint picker was also stopped from widening a phone's screen for the manager. Dragging across a whole
+  month on a phone needs the sheet scrolled so both ends are on screen; the keyboard and Shift+click reach
+  further.
 
 - Journey 11 is built, except the Settings page (journey 18). Allowances are computed on read by `AllowanceCalculator`
   (ADR-007, which supersedes ADR-003's "no balances"; the ADR the prompt called ADR-004 is ADR-007 because ADR-004 was
