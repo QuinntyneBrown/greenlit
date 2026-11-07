@@ -45,6 +45,8 @@ export interface Person {
   readonly workingDays: readonly WeekDay[];
   /** The year the leave year starts in; the year at a glance is this calendar year. */
   readonly year: number;
+  /** Whom a request goes to. */
+  readonly managerName: string;
   /** The signed-in person's own page. */
   readonly isYou: boolean;
   /** The signed-in person is the manager. */

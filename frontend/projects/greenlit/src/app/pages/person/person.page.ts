@@ -5,9 +5,13 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BehaviorSubject, catchError, combineLatest, map, of, startWith, switchMap } from 'rxjs';
 
-import { PERSON_SERVICE, Person } from 'api';
+import { PERSON_SERVICE, Person, SentRequest } from 'api';
 import { Avatar, Button, EmptyState, Legend, MonthMini, RunList, Skeleton, Stat } from 'components';
 
+import { AppDialogs } from '../../dialogs/app-dialogs';
+import { NewRequestData, NewRequestDialog } from '../../dialogs/new-request/new-request.dialog';
+import { ToastService } from '../../toasts/toast.service';
+import { requestSentToast } from '../calendar/request-toasts';
 import { adjustmentItems, facts, miniMonths, runItems, subtitle } from './person-view';
 
 type Load =
@@ -68,7 +72,16 @@ function stateOf(error: unknown): 'forbidden' | 'notfound' | 'error' {
           <p class="text-muted text-sm caption">days left in {{ p.year }}</p>
         </div>
       </header>
-      <gl-stat class="person-facts" [facts]="facts()" />
+      <gl-stat class="person-facts" [facts]="facts()">
+        @if (p.isYou && !p.canManage) {
+          <gl-button slot="action" variant="primary" (click)="requestTimeOff(p)">
+            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Request time off
+          </gl-button>
+        }
+      </gl-stat>
       <section class="year" aria-labelledby="year-title">
         <div class="toolbar-row">
           <h2 id="year-title" class="section-title">{{ p.year }} at a glance</h2>
@@ -333,6 +346,8 @@ function stateOf(error: unknown): 'forbidden' | 'notfound' | 'error' {
 export class PersonPage {
   private readonly api = inject(PERSON_SERVICE);
   private readonly route = inject(ActivatedRoute);
+  private readonly dialogs = inject(AppDialogs);
+  private readonly toasts = inject(ToastService);
 
   private readonly attempt = new BehaviorSubject(0);
 
@@ -351,6 +366,22 @@ export class PersonPage {
     ),
     { initialValue: { state: 'loading' } as Load },
   );
+
+  /** Opens the request dialog (L2-019); a sent request turns its days yellow and is announced. */
+  protected requestTimeOff(person: Person): void {
+    const own = person.allowance;
+    const data: NewRequestData = {
+      managerName: person.managerName,
+      daysToRequest: Math.max(0, own.left - own.requested),
+    };
+    this.dialogs
+      .open<SentRequest>(NewRequestDialog, '#nr-start', data)
+      .closed.subscribe((request) => {
+        if (!request) return;
+        this.reload();
+        this.toasts.show(requestSentToast(request, person.managerName));
+      });
+  }
 
   protected reload(): void {
     this.attempt.next(this.attempt.value + 1);
