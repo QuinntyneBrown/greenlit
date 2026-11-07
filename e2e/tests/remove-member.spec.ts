@@ -6,6 +6,7 @@
 //       the API; every test adds the members it removes, by names no other test uses, so the demo team is never touched.
 
 import { test, expect } from "../fixtures/gl-test.js";
+import { freshEmail, invite, join, trySignIn, tryWithSession } from "../fixtures/invitation.js";
 import { removerFor } from "../fixtures/session.js";
 import { ensureMember, ensureOwnTeam } from "../fixtures/team.js";
 
@@ -60,6 +61,54 @@ test.describe("Removing a member", () => {
     await expect(pages.removeMember.dialog()).toBeHidden();
     expect(removeMemberApi.removes()).toBe(0);
     await expect(pages.person.name()).toHaveText("Cara Webb");
+  });
+});
+
+test.describe("Confirming a removal", () => {
+  test.beforeEach(async ({ request }, testInfo) => {
+    await ensureOwnTeam(request, removerFor(testInfo.project.name), "Removal team");
+  });
+
+  test("Yes, remove Finn shows Removing…, takes his row off the calendar and the year, and Finn cannot sign in (L2-011 AC2, AC4)", async ({
+    goto,
+    pages,
+    removeMemberApi,
+    request,
+  }, testInfo) => {
+    const manager = removerFor(testInfo.project.name);
+    const email = freshEmail("finn");
+    const invitation = await invite(request, manager, "Finn Murphy", email);
+    const finnsSession = await join(request, invitation, "finn-secret-1234");
+    await goto("person", { as: manager, person: "Finn Murphy" });
+    await pages.person.waitForReady();
+    const release = await removeMemberApi.hold();
+    await pages.person.remove("Finn").click();
+
+    await pages.removeMember.confirm().click();
+
+    await expect(pages.removeMember.confirm()).toHaveText("Removing…");
+    await expect(pages.removeMember.confirm()).toHaveAttribute("aria-busy", "true");
+    await expect(pages.removeMember.cancel()).toBeDisabled();
+    await expect(pages.removeMember.close()).toBeDisabled();
+    release();
+    await expect(pages.removeMember.dialog()).toBeHidden();
+    expect(removeMemberApi.removes()).toBe(1);
+
+    await pages.calendar.waitForReady();
+    await expect(pages.calendar.memberNames()).not.toContainText(["Finn Murphy"]);
+    await goto("year", { as: manager });
+    await pages.year.waitForReady();
+    await expect(pages.year.memberNames()).not.toContainText(["Finn Murphy"]);
+
+    await goto("person", { as: manager, personId: invitation.memberId });
+    await pages.person.waitForReady();
+    await expect(pages.person.pageHeading()).toHaveText("Person not found");
+    await expect(pages.person.noticeTitle()).toHaveText("This person isn't on the team");
+    await expect(pages.person.noticeText()).toHaveText("They may have been removed.");
+    await expect(pages.person.noticeAction("Back to calendar")).toBeVisible();
+
+    expect(await trySignIn(request, email, "finn-secret-1234")).toEqual({ status: 401, code: "member_removed" });
+    expect(await tryWithSession(request, finnsSession)).toEqual({ status: 401, code: "member_removed" });
   });
 });
 

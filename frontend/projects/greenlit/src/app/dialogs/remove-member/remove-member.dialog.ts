@@ -1,5 +1,7 @@
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+
+import { TEAM_SERVICE } from 'api';
 
 import { Button, Dialog } from 'components';
 
@@ -19,6 +21,7 @@ export interface RemoveMemberData {
       [title]="'Remove ' + data.firstName + ' from the team?'"
       description="Their history is kept, but they won’t appear on the calendar."
       tone="danger"
+      [busy]="busy()"
       (closed)="close()"
     >
       <svg slot="icon" class="icon" aria-hidden="true" viewBox="0 0 24 24">
@@ -30,8 +33,10 @@ export interface RemoveMemberData {
         <li>You can invite {{ data.firstName }} back from Settings at any time.</li>
       </ul>
       <div slot="footer" class="actions">
-        <gl-button id="rm-cancel" (click)="close()">Cancel</gl-button>
-        <gl-button variant="danger">Yes, remove {{ data.firstName }}</gl-button>
+        <gl-button id="rm-cancel" [disabled]="busy()" (click)="close()">Cancel</gl-button>
+        <gl-button variant="danger" [busy]="busy()" [disabled]="busy()" (click)="remove()">
+          {{ busy() ? 'Removing…' : 'Yes, remove ' + data.firstName }}
+        </gl-button>
       </div>
     </gl-dialog>
   `,
@@ -53,8 +58,26 @@ export interface RemoveMemberData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RemoveMemberDialog {
+  private readonly team = inject(TEAM_SERVICE);
   private readonly ref = inject<DialogRef<boolean>>(DialogRef);
   protected readonly data = inject<RemoveMemberData>(DIALOG_DATA);
+
+  protected readonly busy = signal(false);
+
+  constructor() {
+    // Esc and the backdrop do nothing while the member is being removed.
+    effect(() => {
+      this.ref.disableClose = this.busy();
+    });
+  }
+
+  protected remove(): void {
+    if (this.busy()) return;
+    this.busy.set(true);
+    this.team.remove(this.data.memberId).subscribe((result) => {
+      if (result.ok) this.ref.close(true);
+    });
+  }
 
   protected close(): void {
     this.ref.close(false);

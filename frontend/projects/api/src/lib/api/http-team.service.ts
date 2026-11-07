@@ -7,9 +7,9 @@ import { CreatedTeam, NewTeam } from '../models/new-team';
 import { API_BASE_URL, apiUrl } from './api-base-url';
 import { problemCode } from './problem';
 import { SESSION_STORE } from './session-store';
-import { CreateTeamResult, InviteResult, TeamService } from './team.service';
+import { CreateTeamResult, InviteResult, RemoveMemberResult, TeamService } from './team.service';
 
-/** POST /api/teams and POST /api/team/members; creating a team keeps the new manager's session in the session store. */
+/** POST /api/teams, POST /api/team/members and DELETE /api/team/members/{id}; creating a team keeps the new manager's session in the session store. */
 @Injectable({ providedIn: 'root' })
 export class HttpTeamService implements TeamService {
   private readonly http = inject(HttpClient);
@@ -31,5 +31,14 @@ export class HttpTeamService implements TeamService {
         of<InviteResult>({ outcome: problemCode(error) === 'member_exists' ? 'exists' : 'failed' }),
       ),
     );
+  }
+
+  remove(memberId: string): Observable<RemoveMemberResult> {
+    return this.http
+      .delete(apiUrl(this.baseUrl, `api/team/members/${encodeURIComponent(memberId)}`))
+      .pipe(
+        map((): RemoveMemberResult => ({ ok: true })),
+        catchError(() => of<RemoveMemberResult>({ ok: false })),
+      );
   }
 }

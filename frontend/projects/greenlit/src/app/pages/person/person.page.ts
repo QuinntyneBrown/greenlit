@@ -2,7 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BehaviorSubject, catchError, combineLatest, map, of, startWith, switchMap } from 'rxjs';
 
 import { PERSON_SERVICE, Person, SentRequest } from 'api';
@@ -412,6 +412,7 @@ export class PersonPage {
   private readonly route = inject(ActivatedRoute);
   private readonly dialogs = inject(AppDialogs);
   private readonly toasts = inject(ToastService);
+  private readonly router = inject(Router);
 
   private readonly attempt = new BehaviorSubject(0);
 
@@ -474,10 +475,14 @@ export class PersonPage {
 
   /** "Remove {first name}": asks first, then leaves the page of someone who is no longer on the team (L2-011). */
   protected removeMember(person: Person): void {
-    this.dialogs.open<boolean>(RemoveMemberDialog, '#rm-cancel', {
-      memberId: person.id,
-      firstName: this.firstName(person),
-    });
+    this.dialogs
+      .open<boolean>(RemoveMemberDialog, '#rm-cancel', {
+        memberId: person.id,
+        firstName: this.firstName(person),
+      })
+      .closed.subscribe((removed) => {
+        if (removed) void this.router.navigateByUrl('/');
+      });
   }
 
   protected firstName(person: Person): string {
