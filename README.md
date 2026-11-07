@@ -43,7 +43,7 @@ npm ci
 npm start                    # http://localhost:4200, expects the API on :5100
 
 # API on a fresh SQLite file with the demo team, for Playwright or local hacking
-pwsh eng/Start-E2eApi.ps1 -Build
+pwsh eng/Start-E2eApi.ps1 -Build   # sign in as maya@northwind.studio / greenlit-demo
 
 # Playwright
 cd e2e
@@ -64,5 +64,8 @@ design tokens and foundations load from the `components` library, which also hol
 reusable `gl-*` components (button, empty state, error page, avatar, badge, count pill, alert,
 inline message, skeleton). The calendar shows the team's month (journey 1, `sheet/view-month`):
 `GET /api/sheet` and the `gl-team-grid` sheet with every day cell, the Out row, month navigation
-and the loading, empty and error states. The rest of the sheet lands feature by feature, each from a requirement in
+and the loading, empty and error states. Sign-in is built (journey 2, `identity-and-access/sign-in`):
+`POST /api/auth/sign-in` issues an eight-hour session (ADR-004), `/sign-in` shows the form with its
+validation, busy, failed and success states, and every app screen sends a visitor without a session
+there first. The rest of the sheet lands feature by feature, each from a requirement in
 `docs/specs/`, a detailed design and a mock, following the process in `AGENTS.md`.

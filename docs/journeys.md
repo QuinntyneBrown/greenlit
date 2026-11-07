@@ -17,7 +17,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | # | Journey | Description | Effort (days) |
 |---|---|---|---|
 | 1 | View the team's month | Everyone sees the month sheet: coloured cells, days left, who's out. | 0 (built) |
-| 2 | Sign in | Email and password sign-in that opens the team's calendar. | 3 |
+| 2 | Sign in | Email and password sign-in that opens the team's calendar. | 0 (built) |
 | 3 | Create a team | Manager sets name, time zone, public holidays and first members. | 3 |
 | 4 | Mark days on the calendar | Members paint their days tentative, requested or clear; managers confirm; undo. | 6 |
 | 5 | Invite a member | Manager adds a row and emails a seven-day invitation. | 3 |
@@ -44,9 +44,13 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total remaining** | | **79** |
+| | **Total remaining** | | **76** |
 
 ## Notes
+
+- Journey 2 is built: `POST /api/auth/sign-in`, the `/sign-in` page with all its states, and
+  `authGuard`, which sends a visitor without a session to sign-in and back. Every demo account
+  signs in with the password `greenlit-demo`. Rate limiting is left open (see the sign-in design).
 
 - Journey 1 is built. Three of its criteria arrive with the journeys that own their data: the
   Left figures (L2-014 AC1) with journey 11, part-time working days (L2-013 AC2, L2-014 AC3) with
