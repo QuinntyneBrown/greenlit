@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, switchMap } from 'rxjs';
 
 import { TeamYear, YEAR_SERVICE } from 'api';
-import { Legend, PeriodNav, YearGrid } from 'components';
+import { AllowanceTable, Legend, PeriodNav, YearGrid } from 'components';
 
-import { yearColumns, yearRows } from './year-view';
+import { allowanceRows, yearColumns, yearRows } from './year-view';
 
 const YEAR_PARAM = /^\d{4}$/;
 
@@ -17,7 +17,7 @@ const YEAR_PARAM = /^\d{4}$/;
  */
 @Component({
   selector: 'app-year-page',
-  imports: [PeriodNav, Legend, YearGrid],
+  imports: [PeriodNav, Legend, YearGrid, AllowanceTable],
   template: `
     <div class="page-title-row">
       <gl-period-nav unit="year" [title]="'' + year()" (previous)="go(-1)" (next)="go(1)" />
@@ -26,6 +26,12 @@ const YEAR_PARAM = /^\d{4}$/;
     <p class="text-muted intro">The whole team's year in one view. Select a month to open it.</p>
     @if (loaded(); as loaded) {
       <gl-year-grid class="region" [columns]="columns()" [rows]="rows()" />
+      <gl-allowance-table
+        class="summary"
+        [title]="'Allowance in ' + loaded.year"
+        [rows]="summary()"
+        [(sorted)]="sorted"
+      />
     }
   `,
   styles: `
@@ -44,6 +50,9 @@ const YEAR_PARAM = /^\d{4}$/;
     }
     .region {
       margin-top: var(--space-5);
+    }
+    .summary {
+      margin-top: var(--space-12);
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,6 +82,13 @@ export class YearPage {
   protected readonly rows = computed(() => {
     const year = this.loaded();
     return year ? yearRows(year) : [];
+  });
+
+  /** L2-032 AC3: rows ordered by days left, most first; a client-side reorder of the same data. */
+  protected readonly sorted = signal(false);
+  protected readonly summary = computed(() => {
+    const year = this.loaded();
+    return year ? allowanceRows(year, this.sorted()) : [];
   });
 
   protected go(step: number): void {

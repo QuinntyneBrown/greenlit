@@ -34,6 +34,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
         [type]="type()"
         [disabled]="disabled()"
         [attr.aria-busy]="busy() || null"
+        [attr.aria-pressed]="pressed()"
         [attr.aria-label]="ariaLabel() || null"
       >
         <ng-container [ngTemplateOutlet]="content" />
@@ -84,6 +85,11 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
       opacity: 0.5;
       cursor: not-allowed;
       transform: none;
+    }
+    .btn[aria-pressed='true'] {
+      --btn-bg: var(--color-accent-subtle);
+      --btn-fg: var(--color-fg-accent);
+      --btn-border: var(--color-accent);
     }
     .btn--primary {
       --btn-bg: var(--color-accent);
@@ -190,6 +196,8 @@ export class Button {
   readonly block = input<boolean>(false);
   /** Square icon-only button (`btn--icon`); give it an `ariaLabel`. */
   readonly icon = input<boolean>(false);
+  /** A toggle button: true or false sets aria-pressed; null (the default) is a plain button. */
+  readonly pressed = input<boolean | null>(null);
   /** Accessible name for an icon-only button. */
   readonly ariaLabel = input<string>('');
 

@@ -43,6 +43,7 @@ export * from './lib/drawer/drawer';
 export * from './lib/segmented-control/segmented-control';
 export * from './lib/team-grid/team-grid';
 export * from './lib/year-grid/year-grid';
+export * from './lib/allowance-table/allowance-table';
 export * from './lib/selection-bar/selection-bar';
 export * from './lib/period-nav/period-nav';
 export * from './lib/legend/legend';

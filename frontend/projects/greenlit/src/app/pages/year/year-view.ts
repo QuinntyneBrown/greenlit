@@ -1,5 +1,5 @@
 import { TeamYear, YearMember } from 'api';
-import { YearGridColumn, YearGridRow } from 'components';
+import { AllowanceTableRow, YearGridColumn, YearGridRow } from 'components';
 
 /**
  * Turns the API's year into what the grid shows: month headings that link to the calendar and cell
@@ -49,4 +49,30 @@ function row(year: number, member: YearMember): YearGridRow {
 
 export function yearRows(year: TeamYear): YearGridRow[] {
   return year.members.map((member) => row(year.year, member));
+}
+
+function percent(days: number, allowance: number): number {
+  return allowance > 0 ? Math.min(100, Math.max(0, (days / allowance) * 100)) : 0;
+}
+
+/** One row per person: the figures of L2-029 and the usage bar's name (L2-032 AC2). */
+export function allowanceRows(year: TeamYear, sortedByDaysLeft: boolean): AllowanceTableRow[] {
+  const rows = year.members.map((member): AllowanceTableRow => {
+    const a = member.allowance;
+    const taken = a.used + a.booked;
+    return {
+      memberId: member.id,
+      name: member.name,
+      allowance: a.allowance,
+      used: a.used,
+      booked: a.booked,
+      requested: a.requested,
+      left: a.left,
+      takenPercent: percent(taken, a.allowance),
+      requestedPercent: percent(a.requested, a.allowance),
+      usageLabel: `${taken} of ${a.allowance} days taken or booked, ${a.requested} requested`,
+    };
+  });
+  // Array.prototype.sort is stable, so people with the same days left keep the team's order.
+  return sortedByDaysLeft ? rows.sort((a, b) => b.left - a.left) : rows;
 }

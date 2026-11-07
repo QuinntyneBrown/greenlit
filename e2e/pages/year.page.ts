@@ -78,6 +78,57 @@ export class YearPage extends BasePage {
       .evaluateAll((els) => els.map((el) => el.getAttribute("data-status")));
   }
 
+  /** The placeholder cells shown while the year loads. */
+  placeholderCells(): Locator {
+    return this.grid().locator("[role='gridcell'] .skeleton");
+  }
+
+  // ---- the allowance table ----
+
+  /** The section heading, e.g. "Allowance in 2026". */
+  summaryHeading(): Locator {
+    return this.main.getByRole("heading", { level: 2, name: /^Allowance in \d{4}$/ });
+  }
+
+  summaryHint(): Locator {
+    return this.main.getByText("Sort by days left to see who hasn't had a break yet.", { exact: true });
+  }
+
+  /** The table named by its caption, "Allowance in 2026". */
+  table(): Locator {
+    return this.main.getByRole("table", { name: /^Allowance in \d{4}$/ });
+  }
+
+  /** The column headings in order: Person to Usage. */
+  tableHeaders(): Locator {
+    return this.table().getByRole("columnheader");
+  }
+
+  /** The sort control; it reads pressed once the rows are ordered by days left. */
+  sortByDaysLeft(): Locator {
+    return this.main.getByRole("button", { name: "Most days left first", exact: true });
+  }
+
+  /** Each row's person, in row order. */
+  tablePeople(): Locator {
+    return this.table().locator("tbody tr td:first-child .cluster > :not(.avatar)");
+  }
+
+  /** A person's row. */
+  tableRow(person: string): Locator {
+    return this.table().locator("tbody tr", { has: this.page.locator("td:first-child", { hasText: person }) });
+  }
+
+  /** The figures of a person's row after their name: Allowance, Used, Booked, Requested, Left. */
+  figures(person: string): Locator {
+    return this.tableRow(person).locator("td.num");
+  }
+
+  /** The usage bar of a person's row; its name says the numbers. */
+  usageBar(person: string): Locator {
+    return this.tableRow(person).getByRole("img");
+  }
+
   // ---- the states ----
 
   /** The empty state or the error state card. */
