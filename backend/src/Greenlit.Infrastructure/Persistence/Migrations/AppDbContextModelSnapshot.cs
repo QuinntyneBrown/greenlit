@@ -175,15 +175,54 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("TeamMemberId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("TimeOffRequestId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTimeOffset>("UpdatedUtc")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TimeOffRequestId");
+
                     b.HasIndex("TeamMemberId", "Date")
                         .IsUnique();
 
                     b.ToTable("TimeOffDays");
+                });
+
+            modelBuilder.Entity("Greenlit.Domain.Entities.TimeOffRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateOnly>("FirstDay")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("LastDay")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<Guid>("TeamMemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamMemberId", "Status");
+
+                    b.ToTable("TimeOffRequests");
                 });
 
             modelBuilder.Entity("Greenlit.Domain.Entities.User", b =>
@@ -264,6 +303,24 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Greenlit.Domain.Entities.TimeOffRequest", "TimeOffRequest")
+                        .WithMany("Days")
+                        .HasForeignKey("TimeOffRequestId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("TeamMember");
+
+                    b.Navigation("TimeOffRequest");
+                });
+
+            modelBuilder.Entity("Greenlit.Domain.Entities.TimeOffRequest", b =>
+                {
+                    b.HasOne("Greenlit.Domain.Entities.TeamMember", "TeamMember")
+                        .WithMany("Requests")
+                        .HasForeignKey("TeamMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("TeamMember");
                 });
 
@@ -278,7 +335,14 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                 {
                     b.Navigation("Invitations");
 
+                    b.Navigation("Requests");
+
                     b.Navigation("TimeOffDays");
+                });
+
+            modelBuilder.Entity("Greenlit.Domain.Entities.TimeOffRequest", b =>
+                {
+                    b.Navigation("Days");
                 });
 #pragma warning restore 612, 618
         }
