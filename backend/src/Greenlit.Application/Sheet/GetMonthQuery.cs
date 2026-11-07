@@ -9,6 +9,7 @@ public sealed record MonthDto(
     string Month,
     string Today,
     bool IsManager,
+    string ManagerName,
     int? CoverageMinimum,
     IReadOnlyList<MemberRowDto> Members,
     IReadOnlyList<CoverageDto> Coverage);

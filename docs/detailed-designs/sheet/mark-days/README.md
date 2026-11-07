@@ -36,6 +36,20 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **`ValidationBehavior`** — MediatR pipeline behaviour in Greenlit.Application. It runs each request's FluentValidation validator before the handler and raises `ValidationException` on failure.
 - **`IAppDbContext`** — Greenlit.Application abstraction over the EF Core context, implemented by `AppDbContext` in Greenlit.Infrastructure. Handlers read and write through it in one unit of work.
 
+## Decisions for the first build (journey 4)
+
+- **Endpoints.** `PUT /api/sheet/days` takes `{ memberId, dates[], status }` (`status` is `Tentative`, `Requested`, `Confirmed` or `null` for Clear) and returns the `ChangeSet`: `{ memberId, memberName, status, changes: [{ date, previous, current }] }`. `POST /api/sheet/days/restore` takes `{ memberId, days: [{ date, status }] }` (`status` null clears) and applies the same policy.
+- **Scoping.** A member id outside the caller's team answers 404, the same as an unknown id, so it never reveals other teams. A member on another member's row answers 403 `not_your_row`.
+- **Non-working dates.** The handler drops weekends and holidays from a stroke and changes the rest (`L2-017` AC4). A stroke with nothing left answers 400 `all_non_working`, or `day_is_holiday` when every date in it is a holiday (ADR-003); nothing changes.
+- **Confirmed days.** A member's stroke leaves their own Confirmed days alone; when that leaves nothing to change the answer is 403 `confirmed_locked` (`L2-017` AC2). A member asking for Confirmed is 403 `confirmed_locked` too. The manager sets any status on any row.
+- **No-op days.** A date already at the target status is not a change and is left out of `changes`; a stroke that changes nothing returns an empty `changes` list and shows no toast.
+- **Requests deferred.** `RequestLedger` and the pending request of `L2-015` AC5 belong to journey 7 (`requests/send-request`); there is no `TimeOffRequest` entity yet, so Requested days are plain day rows until then. The toast still says "{manager} will be notified."
+- **Manager name.** `GetMonth` gains `managerName` so the client can word "Confirmed days can only be changed by Maya" and "Maya Chen will be notified."
+- **Client.** The sheet page keeps the month in a signal, patches the stroke's cells at once, and puts them back if the save fails. After a save it refetches the month quietly, so the Out row stays true. Cells of editable rows are focusable and Enter or Space paints the focused cell; roving focus and arrow keys are journey 12.
+- **Select mode and the default.** The paint picker offers Select first and starts on it, as the mocks do; Select does nothing until journey 12, so nothing is painted until a colour is chosen.
+- **Touch.** While a paint colour is chosen the sheet takes `touch-action: none`, so a finger dragging along a row paints instead of scrolling; choose Select to scroll the sheet by touch.
+- **Toast.** The minimum `ToastService` and `gl-toast` of `web-experience/feedback-toasts` are built here (8 s timer paused on hover and focus; danger stays; newest first) for journey 16 to extend.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier; the acceptance criteria for each are in `docs/specs/L2.md`.

@@ -97,6 +97,9 @@ public sealed class TestTeam
     public Task AddHolidayAsync(DateOnly date, string name) =>
         _factory.WriteAsync(db => db.Holidays.Add(new Holiday { Id = Guid.NewGuid(), TeamId = Team.Id, Date = date, Name = name }));
 
+    /// <summary>The id of the named person's row.</summary>
+    public Guid MemberIdOf(string name) => _rows[name].Id;
+
     /// <summary>The named person's account email.</summary>
     public string EmailOf(string name) => _users[name].Email;
 

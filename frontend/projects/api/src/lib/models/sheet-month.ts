@@ -37,6 +37,8 @@ export interface SheetMonth {
   /** Today in the team's time zone, `yyyy-MM-dd`. */
   readonly today: string;
   readonly isManager: boolean;
+  /** The manager's name, for "Confirmed days can only be changed by …". */
+  readonly managerName: string;
   /** Fewest people who should be in; null until the team sets one (teams/coverage-minimum). */
   readonly coverageMinimum: number | null;
   /** In display order: a member's own row first. */

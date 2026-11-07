@@ -40,6 +40,8 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
             : DateOnly.ParseExact(request.Month + "-01", "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
         var isManager = team.ManagerUserId == userId;
+        var managerName = team.Members.FirstOrDefault(m => m.UserId == team.ManagerUserId)?.Name
+            ?? await _db.Users.AsNoTracking().Where(u => u.Id == team.ManagerUserId).Select(u => u.DisplayName).FirstAsync(ct);
         var ordered = team.Members.OrderBy(m => m.SortOrder).ThenBy(m => m.Name).ToList();
         if (!isManager)
         {
@@ -87,6 +89,7 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
             month.ToString("yyyy-MM", CultureInfo.InvariantCulture),
             Iso(today),
             isManager,
+            managerName,
             CoverageMinimum: null,
             members,
             coverage);

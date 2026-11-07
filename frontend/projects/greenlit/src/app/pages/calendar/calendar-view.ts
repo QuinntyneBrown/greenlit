@@ -103,10 +103,14 @@ export function calendarView(sheet: SheetMonth): CalendarView {
   const rows: TeamGridRow[] = sheet.members.map((member) => {
     const left = member.daysLeft;
     return {
+      memberId: member.id,
       name: member.name,
+      // L2-017: the manager paints any row, a member only their own.
+      editable: sheet.isManager || member.isYou,
       // L2-012 AC2: a member's own row is marked "You"; the manager's view marks no row.
       you: member.isYou && !sheet.isManager,
       cells: member.cells.map((cell) => ({
+        date: cell.date,
         status: STATUS[cell.kind],
         label: `${member.name}, ${dayLabel(cell.date)}: ${
           cell.kind === 'Holiday' ? (cell.holidayName ?? 'Holiday') : STATE_WORDS[cell.kind]
