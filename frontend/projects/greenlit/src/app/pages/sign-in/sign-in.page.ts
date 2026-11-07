@@ -55,6 +55,14 @@ export const SIGNED_IN_PAUSE_MS = 1500;
         <form class="stack" novalidate (submit)="submit($event)">
           @if (submitted() && summaryItems().length) {
             <gl-form-summary [items]="summaryItems()" />
+          } @else if (failure() === 'invalid-credentials') {
+            <gl-alert tone="danger" title="Email or password doesn’t match">
+              Check them and try again. If you’ve forgotten your password, you can reset it.
+            </gl-alert>
+          } @else if (failure() === 'failed') {
+            <gl-alert tone="danger" title="We couldn’t sign you in">
+              Something went wrong on our side. Try again in a moment.
+            </gl-alert>
           }
           <gl-text-field
             label="Email"
@@ -63,6 +71,7 @@ export const SIGNED_IN_PAUSE_MS = 1500;
             autocomplete="username"
             [(value)]="email"
             [error]="shown('email') ? emailError() : ''"
+            [readonly]="busy()"
             (blurred)="touch('email')"
           />
           <gl-text-field
@@ -72,9 +81,18 @@ export const SIGNED_IN_PAUSE_MS = 1500;
             autocomplete="current-password"
             [(value)]="password"
             [error]="shown('password') ? passwordError() : ''"
+            [readonly]="busy()"
             (blurred)="touch('password')"
           />
-          <gl-button type="submit" variant="primary" [block]="true">Sign in</gl-button>
+          <gl-button
+            type="submit"
+            variant="primary"
+            [block]="true"
+            [busy]="busy()"
+            [disabled]="busy()"
+          >
+            Sign in
+          </gl-button>
           <div class="auth-links"><a routerLink="/forgot-password">Forgot your password?</a></div>
         </form>
         <p slot="note" class="text-caption note">
@@ -123,6 +141,10 @@ export class SignInPage {
   protected readonly email = signal('');
   protected readonly password = signal('');
   protected readonly submitted = signal(false);
+  /** True while the sign-in request runs (pages/sign-in/submitting). */
+  protected readonly busy = signal(false);
+  /** Why the last attempt failed (pages/sign-in/error); null before one has. */
+  protected readonly failure = signal<'invalid-credentials' | 'failed' | null>(null);
   /** The first name to welcome once signed in. */
   protected readonly welcomeName = signal<string | null>(null);
   /** Where to go after signing in, as a URL tree so its query survives. */
@@ -159,13 +181,20 @@ export class SignInPage {
 
   protected submit(event: Event): void {
     event.preventDefault();
+    if (this.busy()) return;
     this.submitted.set(true);
     if (this.summaryItems().length) {
       afterNextRender(() => this.summary()?.focus(), { injector: this.injector });
       return;
     }
+    this.failure.set(null);
+    this.busy.set(true);
     this.auth.signIn(this.email().trim(), this.password()).subscribe((result) => {
-      if (result.outcome !== 'signed-in') return;
+      this.busy.set(false);
+      if (result.outcome !== 'signed-in') {
+        this.failure.set(result.outcome);
+        return;
+      }
       this.welcomeName.set(result.session.displayName.split(' ')[0]);
       const timer = setTimeout(
         () => this.router.navigateByUrl(this.destination()),

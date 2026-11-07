@@ -79,3 +79,58 @@ test.describe("Signing in", () => {
     expect(new URL(page.url()).pathname).toBe("/");
   });
 });
+
+test.describe("Signing in, busy and failed", () => {
+  test.beforeEach(async ({ goto, pages }) => {
+    await goto("signIn");
+    await pages.signIn.waitForReady();
+  });
+
+  test("the button is busy and the fields read-only while signing in (L2-001 AC4)", async ({ authApi, pages }) => {
+    const release = await authApi.hold();
+    await pages.signIn.signIn(PEOPLE.manager.email, DEMO_PASSWORD);
+
+    await expect(pages.signIn.submit()).toHaveAttribute("aria-busy", "true");
+    await expect(pages.signIn.submit()).toBeDisabled();
+    await expect(pages.signIn.email()).toHaveAttribute("readonly", "");
+    await expect(pages.signIn.password()).toHaveAttribute("readonly", "");
+
+    release();
+    await expect(pages.signIn.heading()).toHaveText("Signed in");
+  });
+
+  test("a wrong password says the email or password doesn't match, keeping both (L2-001 AC3)", async ({
+    page,
+    pages,
+  }) => {
+    await pages.signIn.signIn(PEOPLE.manager.email, "not-the-password");
+
+    await expect(pages.signIn.failureTitle()).toHaveText("Email or password doesn’t match");
+    await expect(pages.signIn.failureText()).toHaveText(
+      "Check them and try again. If you’ve forgotten your password, you can reset it.",
+    );
+    await expect(pages.signIn.email()).toHaveValue(PEOPLE.manager.email);
+    await expect(pages.signIn.password()).toHaveValue("not-the-password");
+    await expect(pages.signIn.submit()).toBeEnabled();
+    await expect(pages.signIn.email()).not.toHaveAttribute("readonly", /.*/);
+    expect(new URL(page.url()).pathname).toBe("/sign-in");
+  });
+
+  test("an unknown email gets the same message (L2-001 AC3)", async ({ pages }) => {
+    await pages.signIn.signIn("nobody@northwind.studio", DEMO_PASSWORD);
+
+    await expect(pages.signIn.failureTitle()).toHaveText("Email or password doesn’t match");
+  });
+
+  test("a failing server says so, and trying again signs in", async ({ authApi, page, pages }) => {
+    await authApi.fail();
+    await pages.signIn.signIn(PEOPLE.manager.email, DEMO_PASSWORD);
+
+    await expect(pages.signIn.failureTitle()).toHaveText("We couldn’t sign you in");
+    await expect(pages.signIn.failureText()).toHaveText("Something went wrong on our side. Try again in a moment.");
+
+    await page.unrouteAll();
+    await pages.signIn.submit().click();
+    await expect(pages.signIn.heading()).toHaveText("Signed in");
+  });
+});
