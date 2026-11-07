@@ -4,9 +4,9 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map, startWith, switchMap } from 'rxjs';
 
 import { PERSON_SERVICE, Person } from 'api';
-import { Avatar, Legend, MonthMini, Skeleton, Stat } from 'components';
+import { Avatar, Legend, MonthMini, RunList, Skeleton, Stat } from 'components';
 
-import { facts, miniMonths, subtitle } from './person-view';
+import { adjustmentItems, facts, miniMonths, runItems, subtitle } from './person-view';
 
 type Load = { readonly state: 'loading' } | { readonly state: 'ready'; readonly person: Person };
 
@@ -17,7 +17,7 @@ type Load = { readonly state: 'loading' } | { readonly state: 'ready'; readonly 
  */
 @Component({
   selector: 'app-person-page',
-  imports: [RouterLink, Avatar, Stat, Skeleton, Legend, MonthMini],
+  imports: [RouterLink, Avatar, Stat, Skeleton, Legend, MonthMini, RunList],
   template: `
     @if (person(); as p) {
       <a class="back-link" routerLink="/">
@@ -57,6 +57,36 @@ type Load = { readonly state: 'loading' } | { readonly state: 'ready'; readonly 
           </div>
         </div>
       </section>
+      <div class="person-columns">
+        <div class="person-columns__main">
+          <div class="stack">
+            <section aria-labelledby="up-title">
+              <h2 id="up-title" class="section-title">Upcoming</h2>
+              @if (p.upcoming.length) {
+                <gl-run-list [items]="upcoming()" />
+              } @else {
+                <p class="text-muted text-sm none">Nothing planned for the rest of the year.</p>
+              }
+            </section>
+            <section aria-labelledby="past-title">
+              <h2 id="past-title" class="section-title">Taken in {{ p.year }}</h2>
+              @if (p.taken.length) {
+                <gl-run-list [items]="taken()" />
+              } @else {
+                <p class="text-muted text-sm none">No time off taken yet this year.</p>
+              }
+            </section>
+            <section aria-labelledby="adj-title">
+              <h2 id="adj-title" class="section-title">Allowance adjustments</h2>
+              @if (p.adjustments.length) {
+                <gl-run-list [items]="adjustments()" />
+              } @else {
+                <p class="text-muted text-sm none">No adjustments.</p>
+              }
+            </section>
+          </div>
+        </div>
+      </div>
     } @else {
       <gl-skeleton shape="rect" width="100%" height="var(--space-24)" />
     }
@@ -119,6 +149,22 @@ type Load = { readonly state: 'loading' } | { readonly state: 'ready'; readonly 
     }
     .year {
       margin-top: var(--space-10);
+    }
+    .person-columns {
+      display: grid;
+      gap: var(--space-12);
+      margin-top: var(--space-12);
+    }
+    .person-columns__main {
+      max-width: 48rem;
+    }
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-8);
+    }
+    .none {
+      padding-block: var(--space-4);
     }
     .toolbar-row {
       display: flex;
@@ -185,6 +231,11 @@ export class PersonPage {
     const p = this.person();
     return p ? miniMonths(p) : [];
   });
+  protected readonly upcoming = computed(() => runItems(this.person()?.upcoming ?? []));
+  protected readonly taken = computed(() => runItems(this.person()?.taken ?? []));
+  protected readonly adjustments = computed(() =>
+    adjustmentItems(this.person()?.adjustments ?? []),
+  );
   protected readonly facts = computed(() => {
     const p = this.person();
     return p ? facts(p) : [];

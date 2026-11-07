@@ -85,4 +85,21 @@ export class PersonPage extends BasePage {
       .locator(".month-mini-grid > div", { has: this.page.locator(".month-mini__title", { hasText: month }) })
       .locator(`.mini-day[aria-label^="${day} ${month}:"]`);
   }
+
+  // ---- time off and adjustments ----
+
+  /** The rows of the section titled `title`: "Upcoming", "Taken in 2026" or "Allowance adjustments". */
+  rows(title: string | RegExp): Locator {
+    return this.section(title).locator(".run-list li");
+  }
+
+  /** The words of a section that has no rows, e.g. "No adjustments.". */
+  emptyNote(title: string | RegExp): Locator {
+    return this.section(title).locator("p");
+  }
+
+  /** A section of the lists, found by its heading. */
+  section(title: string | RegExp): Locator {
+    return this.main.locator("section", { has: this.page.getByRole("heading", { level: 2, name: title }) });
+  }
 }

@@ -122,6 +122,23 @@ interface YearApi {
   onlyMe(): Promise<void>;
 }
 
+/**
+ * Puts a person's page (GET /api/people/{id}) into states the seeded data cannot produce: a failing API, a slow
+ * one, or a person the seed does not hold.
+ */
+interface PersonApi {
+  /** Every person request fails with a 500 until `recover()`. */
+  fail(): Promise<void>;
+  /** Lets person requests through again. */
+  recover(): Promise<void>;
+  /** Holds person requests until the returned function is called. */
+  hold(): Promise<() => void>;
+  /** Every person comes back as the real person changed by `change`. */
+  change(change: (person: any) => void): Promise<void>;
+  /** How many person requests the page has sent so far. */
+  requests(): number;
+}
+
 /** Watches and steers the sign-in request (POST /api/auth/sign-in). */
 interface AuthApi {
   /** How many sign-in requests the page has sent so far. */
@@ -349,6 +366,7 @@ interface GlFixtures {
   teamApi: TeamApi;
   sheetApi: SheetApi;
   yearApi: YearApi;
+  personApi: PersonApi;
   goto: (key: RouteKey, options?: GotoOptions) => Promise<void>;
   pages: Pages;
   /** Pause until web fonts have loaded and the network is idle so visual diffs are stable. */
@@ -966,6 +984,37 @@ export const test = base.extend<GlFixtures>({
           route.fulfill({ status: 500, body: "" }),
         );
       },
+    });
+  },
+  personApi: async ({ page }, use) => {
+    const pattern = "**/api/people/**";
+    let count = 0;
+    page.on("request", (request) => {
+      if (request.method() === "GET" && new URL(request.url()).pathname.startsWith("/api/people/")) count++;
+    });
+    await use({
+      fail: async () => {
+        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recover: () => page.unroute(pattern),
+      hold: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      change: async (change) => {
+        await page.route(pattern, async (route) => {
+          const response = await route.fetch();
+          const person = await response.json();
+          change(person);
+          await route.fulfill({ response, json: person });
+        });
+      },
+      requests: () => count,
     });
   },
   yearApi: async ({ page }, use) => {
