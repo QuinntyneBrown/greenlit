@@ -15,14 +15,14 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                 table: "Teams",
                 type: "bit",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: true);
 
             migrationBuilder.AddColumn<bool>(
                 name: "NotifyNewRequests",
                 table: "Teams",
                 type: "bit",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: true);
         }
 
         /// <inheritdoc />

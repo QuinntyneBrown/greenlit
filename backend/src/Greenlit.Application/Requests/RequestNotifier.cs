@@ -24,6 +24,27 @@ public sealed class RequestNotifier
         _logger = logger;
     }
 
+    /// <summary>
+    /// Emails the team's manager that <paramref name="member"/> sent <paramref name="request"/>, when the team's
+    /// New requests switch is on. Never throws: the request is already saved (L2-043 AC2).
+    /// </summary>
+    public async Task NewRequestAsync(Team team, TeamMember member, TimeOffRequest request, int days, CancellationToken ct)
+    {
+        if (!team.NotifyNewRequests) return;
+        try
+        {
+            var manager = await _db.Users.AsNoTracking().Where(u => u.Id == team.ManagerUserId)
+                .Select(u => new { u.Email, u.DisplayName }).FirstOrDefaultAsync(ct);
+            if (manager is null || string.IsNullOrWhiteSpace(manager.Email)) return;
+            await _email.SendAsync(
+                NewRequestEmail.Compose(manager.Email, manager.DisplayName, member.Name, request.FirstDay, request.LastDay, days, request.Note), ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "The new-request email for request {RequestId} could not be sent.", request.Id);
+        }
+    }
+
     /// <summary>True when the approval email was sent; false when the member has no address or sending failed.</summary>
     public Task<bool> ApprovedAsync(Team team, string managerName, TimeOffRequest request, CancellationToken ct) =>
         SendAsync(request, "approval", address =>
