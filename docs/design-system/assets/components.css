@@ -125,7 +125,7 @@ hr, .divider { border: 0; border-top: 1px solid var(--color-border-default); mar
 .field__label .optional { color: var(--color-fg-subtle); font-weight: var(--font-weight-regular); }
 .field__help { font: var(--text-body-sm); color: var(--color-fg-muted); }
 .field__error { font: var(--text-body-sm); color: var(--color-danger-fg); display: flex; gap: var(--space-1); align-items: flex-start; }
-.field__error::before { content: "⚠"; flex: none; }
+.field__error::before { content: "⚠" / ""; flex: none; }
 .field__counter { font: var(--text-caption); color: var(--color-fg-subtle); text-align: right; }
 .input, .select, .textarea {
   width: 100%; min-height: var(--control-height-md); padding: var(--space-2) var(--space-3);

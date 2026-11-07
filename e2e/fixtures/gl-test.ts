@@ -17,10 +17,12 @@ import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { Person, SESSION_KEY, tokenFor } from "./session.js";
 import { CalendarPage } from "../pages/calendar.page.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
+import { SignInPage } from "../pages/sign-in.page.js";
 
 interface Pages {
   calendar: CalendarPage;
   notFound: NotFoundPage;
+  signIn: SignInPage;
 }
 
 interface GotoOptions {
@@ -45,7 +47,18 @@ interface SheetApi {
   onlyMe(): Promise<void>;
 }
 
+/** Watches and steers the sign-in request (POST /api/auth/sign-in). */
+interface AuthApi {
+  /** How many sign-in requests the page has sent so far. */
+  requests(): number;
+  /** Holds sign-in requests until the returned function is called. */
+  hold(): Promise<() => void>;
+  /** Every sign-in request fails with a 500. */
+  fail(): Promise<void>;
+}
+
 interface GlFixtures {
+  authApi: AuthApi;
   sheetApi: SheetApi;
   goto: (key: RouteKey, options?: GotoOptions) => Promise<void>;
   pages: Pages;
@@ -68,6 +81,28 @@ export const test = base.extend<GlFixtures>({
       }
       const path = pathFor(key);
       await page.goto(options.month && !isBaseline ? `${path}?month=${options.month}` : path);
+    });
+  },
+  authApi: async ({ page }, use) => {
+    const pattern = "**/api/auth/sign-in";
+    let count = 0;
+    page.on("request", (request) => {
+      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/auth/sign-in") count++;
+    });
+    await use({
+      requests: () => count,
+      hold: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      fail: async () => {
+        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+      },
     });
   },
   sheetApi: async ({ page }, use) => {
@@ -97,7 +132,7 @@ export const test = base.extend<GlFixtures>({
     });
   },
   pages: async ({ page }, use) => {
-    await use({ calendar: new CalendarPage(page), notFound: new NotFoundPage(page) });
+    await use({ calendar: new CalendarPage(page), notFound: new NotFoundPage(page), signIn: new SignInPage(page) });
   },
   settle: async ({ page }, use) => {
     await use(async () => {

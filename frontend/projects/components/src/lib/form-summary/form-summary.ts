@@ -24,7 +24,6 @@ export interface FormSummaryItem {
 @Component({
   selector: 'gl-form-summary',
   imports: [Alert],
-  host: { tabindex: '-1' },
   template: `
     <gl-alert tone="danger" [summary]="true" [title]="title()">
       <ul class="form-summary__list">
@@ -39,14 +38,6 @@ export interface FormSummaryItem {
   styles: `
     :host {
       display: block;
-    }
-    :host(:focus) {
-      outline: none;
-    }
-    :host(:focus-visible) {
-      outline: var(--focus-ring-width) solid var(--color-focus-ring);
-      outline-offset: var(--focus-ring-offset);
-      border-radius: var(--radius-md);
     }
     .form-summary__list {
       margin: var(--space-1) 0 0;
@@ -69,7 +60,7 @@ export class FormSummary {
   });
 
   focus(): void {
-    this.host.nativeElement.focus();
+    this.host.nativeElement.querySelector<HTMLElement>('.form-summary')?.focus();
   }
 
   protected goTo(event: Event, field: string): void {

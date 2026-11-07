@@ -18,6 +18,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/calendar/calendar.page').then((m) => m.CalendarPage),
   },
   {
+    path: 'sign-in',
+    data: { shell: 'bare', page: 'sign-in' },
+    loadComponent: () => import('./pages/sign-in/sign-in.page').then((m) => m.SignInPage),
+  },
+  {
     path: '**',
     data: { page: 'not-found' },
     loadComponent: () => import('./pages/not-found/not-found.page').then((m) => m.NotFoundPage),

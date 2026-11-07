@@ -19,6 +19,7 @@ export type AlertTone = 'info' | 'success' | 'warning' | 'danger';
       [class]="'alert alert--' + tone()"
       [class.banner]="banner()"
       [class.form-summary]="summary()"
+      [attr.tabindex]="summary() ? -1 : null"
       [attr.role]="tone() === 'danger' ? 'alert' : 'status'"
     >
       @switch (tone()) {
@@ -102,6 +103,9 @@ export type AlertTone = 'info' | 'success' | 'warning' | 'danger';
     .form-summary {
       border-left: 4px solid var(--color-danger-solid);
     }
+    .form-summary:focus:not(:focus-visible) {
+      outline: none;
+    }
     .alert > .icon {
       width: 1.25rem;
       height: 1.25rem;
@@ -163,7 +167,7 @@ export class Alert {
   readonly title = input<string>('');
   /** Full-width page-level form. */
   readonly banner = input<boolean>(false);
-  /** The error summary of a form (`form-summary`); see `gl-form-summary`. */
+  /** The error summary of a form (`form-summary`), focusable from script; see `gl-form-summary`. */
   readonly summary = input<boolean>(false);
   /** Shows a Dismiss button that emits `dismissed`. */
   readonly dismissible = input<boolean>(false);

@@ -74,7 +74,7 @@ export type TextFieldType = 'text' | 'email' | 'password' | 'number' | 'search';
       align-items: flex-start;
     }
     .field__error::before {
-      content: '⚠';
+      content: '⚠' / '';
       flex: none;
     }
     .input {

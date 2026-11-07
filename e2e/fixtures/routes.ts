@@ -18,7 +18,7 @@
 export type RouteGuard = "auth" | "manager";
 
 /** `body[data-page]` value every screen stamps (route data in the app). */
-export type PageSlug = "calendar" | "not-found";
+export type PageSlug = "calendar" | "not-found" | "sign-in";
 
 interface RouteEntry {
   readonly app: string;
@@ -30,6 +30,7 @@ interface RouteEntry {
 export const ROUTES = {
   calendar: { app: "/", mock: "/pages/calendar/default.html", guard: "auth", page: "calendar" },
   notFound: { app: "/no-such-page", mock: "/pages/not-found/default.html", page: "not-found" },
+  signIn: { app: "/sign-in", mock: "/pages/sign-in/default.html", page: "sign-in" },
 } as const satisfies Record<string, RouteEntry>;
 
 export type RouteKey = keyof typeof ROUTES;
