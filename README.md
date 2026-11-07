@@ -5,75 +5,164 @@
 <h1 align="center">Greenlit</h1>
 
 <p align="center">
-  <strong>Team time off, one month at a time.</strong><br>
-  The vacation sheet small teams keep in Google Sheets, as a product: members down
-  the side, days across the top, a colour in every cell, and the manager's
-  green light where it counts.
+  <strong>Team time off, one month at a time.</strong>
 </p>
 
-Managers of small teams still track vacation in a Google Sheet: one table per month, names down
-the side, weekday initials and day numbers across the top, and a colour in every cell. Red for
-weekends and holidays, blue for tentative, yellow for requested, green for confirmed.
+<p align="center">
+  <a href="https://github.com/QuinntyneBrown/greenlit/actions/workflows/ci.yml"><img src="https://github.com/QuinntyneBrown/greenlit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/QuinntyneBrown/greenlit/actions/workflows/deploy.yml"><img src="https://github.com/QuinntyneBrown/greenlit/actions/workflows/deploy.yml/badge.svg" alt="Deploy"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License: MIT"></a>
+</p>
 
-Greenlit is that sheet as a product. A responsive web app where a team member colours their own
-days, the manager confirms them, and everyone sees the same month. Nothing more.
+Greenlit replaces the vacation spreadsheet that managers of small teams keep by hand. It is a
+responsive web app with one table per month: team members down the side, days across the top,
+and a colour in every cell. A member colours their own days, the manager confirms them, and
+everyone sees the same month.
 
-## Stack
+| Colour | Meaning                                       |
+| ------ | --------------------------------------------- |
+| Red    | Weekend or team holiday                       |
+| Blue   | Tentative: pencilled in, not yet requested    |
+| Yellow | Requested: waiting on the manager             |
+| Green  | Confirmed: the manager gave it the green light |
 
-| Path        | What                                                                                                                           |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `backend/`  | .NET 10 Clean Architecture API, EF Core (SQL Server; SQLite for tests and e2e), MediatR, JWT, `greenlit` CLI                   |
-| `frontend/` | Angular 21 workspace: `greenlit` app, `api` library (contracts + implementations), `components` library (`gl-*` design system) |
-| `e2e/`      | Playwright (Chromium only), Page Object Model, visual parity against `docs/mocks`                                              |
-| `docs/`     | Requirements (`specs/`), detailed designs, mocks, ADRs                                                                         |
-| `eng/`      | PowerShell scripts for local runs and CI                                                                                       |
+## Table of contents
 
-`AGENTS.md` is the single source of guidance for anyone (or any agent) working in this repository.
+- [Features](#features)
+- [Project structure](#project-structure)
+- [Getting started](#getting-started)
+- [Running the tests](#running-the-tests)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Security](#security)
+- [Support](#support)
+- [License](#license)
 
-## Quick start
+## Features
+
+- **Month sheet.** The team's month at a glance, with an Out row and month navigation.
+- **Mark days.** Pick a colour and press or drag across your row, on a phone or with a keyboard.
+- **Requests.** Send a request with a note; the manager approves or declines, singly or in bulk,
+  with Undo.
+- **Allowances.** Yearly days per member, adjustments, and a Left column that never blocks.
+- **Holidays.** Public holidays for GB, IE and US on team creation, plus the team's own.
+- **Teams and invitations.** Create a team, invite members by email, accept with a link.
+- **Sign-in and password reset.** Eight-hour sessions with email-based password recovery.
+
+Greenlit is under active development. See [docs/estimates](docs/estimates/README.md) for the
+current percentage complete and the roadmap.
+
+## Project structure
+
+| Path                     | Description                                                                                           |
+| ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `backend/`               | .NET 10 API (Clean Architecture, EF Core, MediatR, JWT) and the `greenlit` CLI                        |
+| `frontend/`              | Angular 21 workspace: `greenlit` (app), `marketing` (site), `api` (contracts), `components` (`gl-*`) |
+| `e2e/`                   | Playwright suite (Chromium only) with page objects and visual parity against the mocks               |
+| `docs/specs/`            | Requirements: `L1.md` (high level) and `L2.md` (detailed, with acceptance criteria)                   |
+| `docs/detailed-designs/` | Per-feature designs with C4, class and sequence diagrams                                             |
+| `docs/mocks/`            | Static HTML design reference, the source of truth for the UI                                         |
+| `docs/adr/`              | Architecture decision records                                                                        |
+| `eng/`                   | PowerShell scripts for local runs and CI                                                             |
+
+`AGENTS.md` is the single source of engineering guidance for this repository, for people and
+agents alike.
+
+## Getting started
+
+### Prerequisites
+
+- [.NET SDK 10.0](https://dotnet.microsoft.com/download) (see `backend/global.json`)
+- [Node.js 22](https://nodejs.org/) and npm
+- [PowerShell 7](https://github.com/PowerShell/PowerShell) for the scripts in `eng/`
+- SQL Server LocalDB is optional; tests and the e2e API use SQLite
+
+### Build
 
 ```powershell
-# Backend: build and test (no database server needed)
 dotnet build backend/Greenlit.sln
-dotnet test backend/Greenlit.sln
 
-# Frontend
 cd frontend
 npm ci
-npm start                    # http://localhost:4200, expects the API on :5100
+npm run build
+```
 
-# API on a fresh SQLite file with the demo team, for Playwright or local hacking
-pwsh eng/Start-E2eApi.ps1 -Build   # sign in as maya@northwind.studio / greenlit-demo
+### Run
 
-# Playwright
+The quickest way to see the product is the seeded demo team on SQLite:
+
+```powershell
+pwsh eng/Start-E2eApi.ps1 -Build      # API on http://localhost:5100
+
+cd frontend
+npm start                             # app on http://localhost:4200
+npm run start:marketing               # marketing site on http://localhost:4300
+```
+
+Sign in as `maya@northwind.studio` with the password `greenlit-demo` to act as the manager, or as
+`noor@northwind.studio` to walk through creating a team.
+
+To run against SQL Server LocalDB instead, `pwsh eng/Start-FreshStack.ps1` resets and seeds the
+database and then starts both the API and the dev server. Pass `-Sqlite` to use SQLite.
+
+The API does not apply migrations on startup. Use the CLI:
+
+```powershell
+dotnet run --project backend/src/Greenlit.Cli -- migrate
+dotnet run --project backend/src/Greenlit.Cli -- seed
+dotnet run --project backend/src/Greenlit.Cli -- reset --yes
+```
+
+## Running the tests
+
+No database server is required. Backend tests run on in-memory SQLite; Playwright runs against
+the API started by `eng/Start-E2eApi.ps1`.
+
+```powershell
+# Backend, as CI runs it
+pwsh eng/Test-Backend.ps1
+
+# Frontend: format, lint, unit tests
+cd frontend
+npm run format:check
+npm run lint
+npm test
+
+# End to end
 cd e2e
 npm ci
 npx playwright install chromium
-npm run test:behavior
+npm run test:behavior                 # behaviour
+npm run test:visual                   # visual parity with docs/mocks
 ```
 
-`pwsh eng/Start-FreshStack.ps1` resets and seeds the database (SQL Server LocalDB, or `-Sqlite`),
-then starts both the API and the dev server.
+## Documentation
 
-## Status
+- [User journeys](docs/journeys.md): the scenarios the product serves, in priority order
+- [Requirements](docs/specs/): L1 and L2 with acceptance criteria
+- [Detailed designs](docs/detailed-designs/): one per feature, derived from the requirements
+- [Design system](docs/design-system/): tokens, foundations and components extracted from the mocks
+- [Architecture decisions](docs/adr/): the ADRs behind the backend, auth, holidays and deployment
+- [Estimates](docs/estimates/README.md): effort, percentage complete and roadmap
+- [Business plan](docs/business-plan.md)
 
-Scaffold. The request pipeline, persistence, CLI, lint/format gates and the e2e harness are in
-place and green. The app shell is built (L2-049): the calendar at `/` inside the top bar with the
-logo and the Main navigation, the skip link, and the not-found page for any unknown address. The
-design tokens and foundations load from the `components` library, which also holds the first
-reusable `gl-*` components (button, empty state, error page, avatar, badge, count pill, alert,
-inline message, skeleton). The calendar shows the team's month (journey 1, `sheet/view-month`):
-`GET /api/sheet` and the `gl-team-grid` sheet with every day cell, the Out row, month navigation
-and the loading, empty and error states. Sign-in is built (journey 2, `identity-and-access/sign-in`):
-`POST /api/auth/sign-in` issues an eight-hour session (ADR-004), `/sign-in` shows the form with its
-validation, busy, failed and success states, and every app screen sends a visitor without a session
-there first. Creating a team is built (journey 3, `teams/create-team`): `POST /api/teams` makes the
-caller the manager with the first rows and the GB, IE or US public holidays (ADR-005), and a
-signed-in person on no team is sent to `/create-team` (sign in as `noor@northwind.studio`). Marking days is built (journey 4, `sheet/mark-days`): choose a
-paint colour, press or drag across your own row (the manager's: any row), and a toast offers Undo;
-the API refuses what ADR-003 forbids. Inviting a member is built (journey 5, `teams/invite-member`): Settings has a Team section whose
-"Invite a member" dialog adds a row and emails a link that works for seven days (the emails are written
-to the API log until a provider is chosen, ADR-006). Accepting an invitation is built (journey 6, `identity-and-access/accept-invitation`): the emailed
-link opens `/accept-invite/:token`, where the invitee sets a name and password and lands signed in on the
-calendar. Requesting time off is built (journey 7, `requests/send-request`): a member opens "Request time off" on the calendar, picks a first and last day with an optional note, and the days turn yellow as a pending request for the manager (days left and over-allowance warnings come with allowances, journey 11). Approving a request is built (journey 8, `requests/approve-request`): the manager opens Requests (`/requests`), presses Approve on a row or in the request's detail drawer, and its days turn green, the member is emailed (to the API log until a provider is chosen) and a toast offers Undo; when the approval leaves fewer people in than the team's coverage minimum the toast says so. Reviewing requests is built (journey 9, `requests/review-requests`): Requests has Pending, Approved and Declined tabs with their counts (the Requests link shows how many are pending), each pending row says who else is out on its days, a request's detail drawer shows the team for its weeks with the Out row, and the manager can tick several pending requests and approve them together with one Undo. Declining is built (journey 10, `requests/decline-request`): a pending row and its detail drawer have Decline, which opens a dialog for an optional reason; the request becomes Declined, its days go back to tentative (blue), the member is emailed with the reason (to the API log until a provider is chosen) and a toast offers Undo. Allowances are built (journey 11, `allowances/allowance-figures`, ADR-007): each member has yearly days (the team default of 25 unless set) plus adjustments, the calendar's Left column shows allowance minus used and booked days, the request dialog says how many days are left to request and warns, without blocking, when a request goes over, and the request detail shows "Days left after". The rest of the sheet lands feature by feature, each from a requirement in
-`docs/specs/`, a detailed design and a mock, following the process in `AGENTS.md`.
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and `AGENTS.md` before you
+start: every production change begins with a requirement, a detailed design and a mock, and
+lands in small, test-first slices. Changes to `main` go through a pull request.
+
+This project follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Security
+
+To report a vulnerability, follow the process in [SECURITY.md](SECURITY.md). Please do not open
+a public issue for security problems.
+
+## Support
+
+See [SUPPORT.md](SUPPORT.md) for how to ask questions and file bugs.
+
+## License
+
+Greenlit is licensed under the [MIT License](LICENSE).
