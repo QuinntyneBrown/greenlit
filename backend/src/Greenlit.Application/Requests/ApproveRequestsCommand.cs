@@ -13,6 +13,7 @@ public sealed record ApprovalResult(
     string FirstDay,
     string LastDay,
     int Days,
+    bool Emailed,
     int CoverageMinimum,
     string? FirstShortDate,
     int? InOnShortDate);

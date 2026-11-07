@@ -42,6 +42,12 @@ internal static class RequestCaller
         return team;
     }
 
+    /// <summary>The manager's name as the team shows it: their row, else their account.</summary>
+    public static async Task<string> ManagerNameAsync(IAppDbContext db, Team team, CancellationToken ct) =>
+        await db.TeamMembers.AsNoTracking().Where(m => m.TeamId == team.Id && m.UserId == team.ManagerUserId)
+            .Select(m => m.Name).FirstOrDefaultAsync(ct)
+        ?? await db.Users.AsNoTracking().Where(u => u.Id == team.ManagerUserId).Select(u => u.DisplayName).FirstAsync(ct);
+
     /// <summary>The dates from <paramref name="first"/> to <paramref name="last"/> that are neither weekends nor the team's holidays.</summary>
     public static async Task<(List<DateOnly> Working, bool AllHolidays)> WorkingDaysAsync(
         IAppDbContext db, Guid teamId, DateOnly first, DateOnly last, CancellationToken ct)

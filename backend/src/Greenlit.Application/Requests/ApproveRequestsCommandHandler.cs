@@ -17,9 +17,11 @@ public sealed class ApproveRequestsCommandHandler : IRequestHandler<ApproveReque
     private readonly IAppDbContext _db;
     private readonly ICurrentUser _currentUser;
     private readonly TimeProvider _time;
+    private readonly RequestNotifier _notifier;
 
-    public ApproveRequestsCommandHandler(IAppDbContext db, ICurrentUser currentUser, TimeProvider time)
+    public ApproveRequestsCommandHandler(IAppDbContext db, ICurrentUser currentUser, TimeProvider time, RequestNotifier notifier)
     {
+        _notifier = notifier;
         _db = db;
         _currentUser = currentUser;
         _time = time;
@@ -50,17 +52,19 @@ public sealed class ApproveRequestsCommandHandler : IRequestHandler<ApproveReque
             ? new Dictionary<DateOnly, int>()
             : await CoverageCalculator.InOnAsync(_db, team, allDates, ct);
 
-        return ids
-            .Select(id => requests.Single(r => r.Id == id))
-            .Select(r =>
-            {
-                var shortDay = CoverageCalculator.FirstShort(team, r.Days.Select(d => d.Date), inOn);
-                return new ApprovalResult(
+        var managerName = await RequestCaller.ManagerNameAsync(_db, team, ct);
+        var results = new List<ApprovalResult>();
+        foreach (var r in ids.Select(id => requests.Single(r => r.Id == id)))
+        {
+            var emailed = await _notifier.ApprovedAsync(team, managerName, r, ct);
+            var shortDay = CoverageCalculator.FirstShort(team, r.Days.Select(d => d.Date), inOn);
+            results.Add(new ApprovalResult(
                     r.Id, r.TeamMember.Name, RequestInput.Iso(r.FirstDay), RequestInput.Iso(r.LastDay), r.Days.Count,
-                    team.CoverageMinimum,
-                    shortDay is { } s ? RequestInput.Iso(s.Date) : null,
-                    shortDay?.In);
-            })
-            .ToList();
+                emailed,
+                team.CoverageMinimum,
+                shortDay is { } s ? RequestInput.Iso(s.Date) : null,
+                shortDay?.In));
+        }
+        return results;
     }
 }
