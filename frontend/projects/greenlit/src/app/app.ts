@@ -12,6 +12,8 @@ import { filter, map, startWith } from 'rxjs';
 
 import { AppNav, AppNavItem, SkipLink, TopBar } from 'components';
 
+import { ToastOutlet } from './toasts/toast-outlet';
+
 /**
  * Application shell.
  *
@@ -45,7 +47,7 @@ export const MAIN_NAV: readonly AppNavItem[] = [
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SkipLink, TopBar, AppNav],
+  imports: [RouterOutlet, SkipLink, TopBar, AppNav, ToastOutlet],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
