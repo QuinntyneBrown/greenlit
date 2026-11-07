@@ -21,7 +21,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 3 | Create a team | Manager sets name, time zone, public holidays and first members. | 0 (built) |
 | 4 | Mark days on the calendar | Members paint their days tentative, requested or clear; managers confirm; undo. | 0 (built) |
 | 5 | Invite a member | Manager adds a row and emails a seven-day invitation. | 0 (built) |
-| 6 | Accept an invitation | Invitee sets name and password, then lands on the sheet. | 2.5 |
+| 6 | Accept an invitation | Invitee sets name and password, then lands on the sheet. | 0 (built) |
 | 7 | Send a time-off request | Member asks for days with a note; sees days left. | 3 |
 | 8 | Approve a request | Manager confirms requested days, member is emailed, coverage warned, undo. | 3 |
 | 9 | Review requests | Manager sees pending requests with overlaps, opens detail, approves in bulk. | 5 |
@@ -44,9 +44,18 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total remaining** | | **64** |
+| | **Total remaining** | | **61.5** |
 
 ## Notes
+
+- Journey 6 is built: `GET /api/invitations/{token}` and `POST /api/invitations/{token}/accept` are
+  anonymous (the token is the credential). An unknown token is `404 invitation_not_found` and names no
+  one; a used, replaced or expired one is `410 invitation_expired` with the manager's name. Accepting
+  creates the user with the invitation's email and the chosen role, links the row (days kept), signs the
+  person in and shows "You're in" before opening the calendar. An email that already has an account is
+  `409 account_exists`. The `/accept-invite/:token` page has loading, form, expired, unavailable, failed
+  and joined states (two mocks, `failed` and `unavailable`, were added). The e2e suite reads the link
+  from the API log (ADR-006).
 
 - Journey 5 is built: `POST /api/team/members` (manager only) adds the row and emails a link that
   works for seven days; only the token's hash is stored (ADR-006). Inviting an address that has not
