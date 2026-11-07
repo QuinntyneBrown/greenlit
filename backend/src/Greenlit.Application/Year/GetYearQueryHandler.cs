@@ -1,5 +1,6 @@
 using System.Globalization;
 using Greenlit.Application.Abstractions;
+using Greenlit.Application.Allowances;
 using Greenlit.Application.Exceptions;
 using Greenlit.Application.Sheet;
 using Greenlit.Domain.Enums;
@@ -16,11 +17,13 @@ public sealed class GetYearQueryHandler : IRequestHandler<GetYearQuery, YearDto>
 {
     private readonly IAppDbContext _db;
     private readonly ICurrentUser _currentUser;
+    private readonly AllowanceCalculator _allowances;
 
-    public GetYearQueryHandler(IAppDbContext db, ICurrentUser currentUser)
+    public GetYearQueryHandler(IAppDbContext db, ICurrentUser currentUser, AllowanceCalculator allowances)
     {
         _db = db;
         _currentUser = currentUser;
+        _allowances = allowances;
     }
 
     public async Task<YearDto> Handle(GetYearQuery request, CancellationToken ct)
@@ -57,13 +60,16 @@ public sealed class GetYearQueryHandler : IRequestHandler<GetYearQuery, YearDto>
                 .ToListAsync(ct))
             .ToHashSet();
 
+        var figures = await _allowances.ComputeAsync(team, ordered, ct, leaveYear: year);
+
         var members = ordered
             .Select(m => new YearMemberDto(
                 m.Id,
                 m.Name,
                 GetMonthQueryHandler.Initials(m.Name),
                 m.UserId == userId,
-                Enumerable.Range(1, 12).Select(month => MonthOf(year, month, m.Id, WorkingDayRule.For(team, m), holidays, statusOf)).ToList()))
+                Enumerable.Range(1, 12).Select(month => MonthOf(year, month, m.Id, WorkingDayRule.For(team, m), holidays, statusOf)).ToList(),
+                figures[m.Id]))
             .ToList();
 
         return new YearDto(year, team.ManagerUserId == userId, members);
