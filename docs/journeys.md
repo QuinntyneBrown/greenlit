@@ -44,7 +44,8 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| | **Total remaining** | | **40** |
+| 29 | Visit the marketing page | The public page that explains Greenlit and sends a manager to create a team or sign in. | 2 |
+| | **Total remaining** | | **42** |
 
 ## Notes
 

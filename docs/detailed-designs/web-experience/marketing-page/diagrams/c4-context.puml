@@ -1,0 +1,12 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Show the marketing page
+
+Person(visitor, "Visitor", "A manager who keeps the vacation spreadsheet")
+System(site, "Greenlit marketing site", "One public page that explains Greenlit")
+System_Ext(app, "Greenlit app", "Shared team time-off sheet")
+
+Rel(visitor, site, "Reads")
+Rel(site, app, "Links to create-team and sign-in")
+@enduml

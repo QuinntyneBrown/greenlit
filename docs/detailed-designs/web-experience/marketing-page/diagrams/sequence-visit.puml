@@ -1,0 +1,26 @@
+@startuml
+title UML sequence behaviour — Visit the marketing page and go to the app
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Visitor" as actor
+box "Frontend — Marketing site (Angular)" #E0F2FE
+  participant "Angular router" as router
+  participant "App" as app
+  participant "MarketingPage" as page
+end box
+box "Frontend — Greenlit app" #DCFCE7
+  participant "Create team" as create
+end box
+actor -> router : Open /
+router -> app : NavigationEnd, data { page: marketing }
+app -> app : Stamp body data-page="marketing"
+router -> page : MarketingPage in main#main
+page --> actor : "Every day off, greenlit." (L2-050 AC1)
+actor -> page : Click "How it works"
+page --> actor : Scrolls to #how (L2-050 AC2)
+actor -> page : Click "Create your team"
+page -> create : appUrl + /create-team (L2-050 AC3)
+@enduml

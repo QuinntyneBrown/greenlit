@@ -1,0 +1,30 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Show the marketing page
+
+Person(visitor, "Visitor", "A manager who keeps the vacation spreadsheet")
+Container_Boundary(site_b, "Marketing site") {
+  Component(app, "App", "Angular shell component", "Stamps body data-page, skip link, main")
+  Component(router, "Route table", "app.routes.ts", "Marketing page at /, ** redirects to /")
+  Component(page, "MarketingPage", "mk-marketing-page", "Hero, video, why, how, screens, managers, start")
+  Component(reveal, "RevealDirective", "mkReveal", "Scroll-in animation")
+  Component(env, "environment", "environment.ts", "appUrl")
+}
+Container_Boundary(lib_b, "components library") {
+  Component(logo, "LogoLockup", "gl-logo-lockup", "href: #top")
+  Component(btn, "Button", "gl-button", "href: app links and anchors")
+  Component(skip, "SkipLink", "gl-skip-link", "Skip to content")
+}
+System_Ext(spa, "Greenlit app", "create-team, sign-in")
+
+Rel(visitor, page, "Reads, scrolls")
+Rel(router, app, "Route data")
+Rel(app, skip, "Renders")
+Rel(router, page, "Loads")
+Rel(page, env, "Reads appUrl")
+Rel(page, logo, "Header")
+Rel(page, btn, "Calls to action")
+Rel(page, reveal, "Decorates sections")
+Rel(btn, spa, "Leads to")
+@enduml

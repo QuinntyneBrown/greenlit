@@ -1,0 +1,16 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Show the marketing page
+
+Person(visitor, "Visitor", "A manager who keeps the vacation spreadsheet")
+System_Boundary(greenlit, "Greenlit") {
+  Container(site, "Marketing site", "Angular (frontend/projects/marketing)", "Static page, video and screenshots")
+  Container(spa, "Greenlit web application", "Angular (frontend/projects/greenlit)", "Pages, dialogs and the gl-* components")
+  Container(api, "Greenlit API", "ASP.NET Core (Greenlit.Api)", "Controllers, MediatR handlers, domain rules")
+}
+
+Rel(visitor, site, "Reads", "HTTPS")
+Rel(site, spa, "Links to by environment.appUrl", "HTTPS")
+Rel(spa, api, "Calls", "JSON/HTTPS")
+@enduml

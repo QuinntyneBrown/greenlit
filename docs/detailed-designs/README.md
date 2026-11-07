@@ -74,3 +74,4 @@ Toasts, connection banners and error pages shared by every screen.
 | [Report outcomes with toasts](web-experience/feedback-toasts/README.md) | Toast lifetime, pause, undo and dismiss rules shared by every feature. | L2-044, L2-018 |
 | [Handle connection changes](web-experience/connectivity/README.md) | Offline, reconnecting, unstable, back-online and sync-failure banners; read-only while offline. | L2-045 |
 | [Show error pages](web-experience/error-pages/README.md) | Not found, forbidden, server error with reference, and offline pages. | L2-046 |
+| [Show the marketing page](web-experience/marketing-page/README.md) | The public single page: hero sheet, video, three colours, screens, and links into the app; its own Angular application. | L2-050 |

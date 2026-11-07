@@ -1,0 +1,58 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Show the marketing page
+
+class App <<new>> {
+  -readPage(): string
+}
+class MarketingPage <<new>> {
+  +appUrl: string
+  +signInUrl: string
+  +createTeamUrl: string
+  +sheet: HeroSheet
+}
+class HeroSheet <<new>> {
+  +days: HeroDay[]
+  +rows: HeroRow[]
+}
+class HeroDay <<new>> {
+  +date: number
+  +weekday: string
+  +off: boolean
+}
+class HeroRow <<new>> {
+  +name: string
+  +cells: HeroCell[]
+}
+class HeroCell <<new>> {
+  +status: 'confirmed' | 'requested' | 'tentative' | 'off' | 'empty'
+  +label: string
+}
+class RevealDirective <<new>>
+class Button <<exists>> {
+  +link?: string | UrlTree
+  +href?: string
+}
+class LogoLockup <<exists>> {
+  +link: string
+  +href?: string
+  +label: string
+}
+App ..> MarketingPage : routes
+MarketingPage --> HeroSheet
+HeroSheet *-- "14" HeroDay
+HeroSheet *-- "4" HeroRow
+HeroRow *-- "14" HeroCell
+MarketingPage ..> Button
+MarketingPage ..> LogoLockup
+MarketingPage ..> RevealDirective
+@enduml
