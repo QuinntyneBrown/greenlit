@@ -66,6 +66,9 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("nvarchar(120)");
 
+                    b.Property<DateTimeOffset?>("RemovedUtc")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<Guid>("TeamId")
                         .HasColumnType("uniqueidentifier");
 

@@ -12,7 +12,8 @@ namespace Greenlit.Application.Holidays;
 /// <summary>
 /// Adds a day off to the caller's own team; only its manager may (L2-037). A date that is already a holiday is
 /// refused naming it (<see cref="HolidayExists"/>), even on a weekend; any other weekend adds nothing
-/// (<see cref="DayIsWeekend"/>). Days members already hold on the date are deleted in the same unit
+/// (<see cref="DayIsWeekend"/>). A date whose holiday was removed is revived under the new name, so the
+/// team has one row per date. Days members already hold on the date are deleted in the same unit
 /// of work, because a holiday never holds time off (ADR-003, ADR-008).
 /// </summary>
 public sealed class AddHolidayCommandHandler : IRequestHandler<AddHolidayCommand, HolidayDto>
@@ -35,27 +36,21 @@ public sealed class AddHolidayCommandHandler : IRequestHandler<AddHolidayCommand
         var date = DateOnly.ParseExact(request.Date!, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         var name = request.Name!.Trim();
 
-        var existing = await _db.Holidays.SingleOrDefaultAsync(h => h.TeamId == team.Id && h.Date == date, ct);
-        if (existing is not null)
-            throw new ConflictException(HolidayExists, $"{HolidayLabels.Date(date)} is already a holiday ({existing.Name}).");
-
+        var holiday = await _db.Holidays.IgnoreQueryFilters().SingleOrDefaultAsync(h => h.TeamId == team.Id && h.Date == date, ct);
+        if (holiday is { RemovedUtc: null })
+            throw new ConflictException(HolidayExists, $"{HolidayCalendar.Date(date)} is already a holiday ({holiday.Name}).");
         if (WorkingDayRule.IsWeekend(date))
             throw new BadRequestException(DayIsWeekend, "That day is already a weekend.");
 
-        var holiday = new Holiday { Id = Guid.NewGuid(), TeamId = team.Id, Date = date, Name = name };
-        _db.Holidays.Add(holiday);
-        _db.TimeOffDays.RemoveRange(await _db.TimeOffDays
-            .Where(d => d.Date == date && d.TeamMember.TeamId == team.Id)
-            .ToListAsync(ct));
+        if (holiday is null)
+        {
+            holiday = new Holiday { Id = Guid.NewGuid(), TeamId = team.Id, Date = date };
+            _db.Holidays.Add(holiday);
+        }
+        holiday.Name = name;
+        holiday.RemovedUtc = null;
+        await HolidayCalendar.ClearDaysAsync(_db, team.Id, date, ct);
         await _db.SaveChangesAsync(ct);
-        return HolidayLabels.ToDto(holiday);
+        return HolidayCalendar.ToDto(holiday);
     }
-}
-
-internal static class HolidayLabels
-{
-    /// <summary>"Mon 25 May", as the Settings list and dialogs write a date.</summary>
-    public static string Date(DateOnly date) => date.ToString("ddd d MMM", CultureInfo.InvariantCulture);
-
-    public static HolidayDto ToDto(Holiday holiday) => new(holiday.Id, holiday.Date.ToString("yyyy-MM-dd"), holiday.Name);
 }

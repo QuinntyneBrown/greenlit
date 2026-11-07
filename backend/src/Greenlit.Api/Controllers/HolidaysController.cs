@@ -22,4 +22,15 @@ public sealed class HolidaysController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<HolidayDto>> Add([FromBody] AddHolidayCommand command, CancellationToken ct) =>
         StatusCode(StatusCodes.Status201Created, await _sender.Send(command, ct));
+
+    /// <summary>Removes a holiday; its date is a working day again. Undo restores it.</summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Remove(Guid id, CancellationToken ct)
+    {
+        await _sender.Send(new RemoveHolidayCommand(id), ct);
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/restore")]
+    public Task<HolidayDto> Restore(Guid id, CancellationToken ct) => _sender.Send(new RestoreHolidayCommand(id), ct);
 }

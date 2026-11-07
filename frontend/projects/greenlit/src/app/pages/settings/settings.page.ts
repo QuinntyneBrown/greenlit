@@ -2,7 +2,14 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 
-import { HOLIDAY_SERVICE, SHEET_SERVICE, SheetMonth, TeamHolidays, holidayDateLabel } from 'api';
+import {
+  HOLIDAY_SERVICE,
+  Holiday,
+  SHEET_SERVICE,
+  SheetMonth,
+  TeamHolidays,
+  holidayDateLabel,
+} from 'api';
 import {
   Button,
   DayChips,
@@ -17,6 +24,7 @@ import {
 import { AppDialogs } from '../../dialogs/app-dialogs';
 import { InviteMemberDialog } from '../../dialogs/invite-member/invite-member.dialog';
 import { AddHolidayDialog, AddHolidayOutcome } from '../../dialogs/add-holiday/add-holiday.dialog';
+import { RemoveHolidayDialog } from '../../dialogs/remove-holiday/remove-holiday.dialog';
 import { ToastService } from '../../toasts/toast.service';
 
 type Load =
@@ -123,7 +131,12 @@ const WORKING_DAYS = [1, 2, 3, 4, 5];
               }
             </div>
             @if (holidays().length) {
-              <gl-holiday-list class="holidays" label="Holidays" [holidays]="holidays()" />
+              <gl-holiday-list
+                class="holidays"
+                label="Holidays"
+                [holidays]="holidays()"
+                (removed)="removeHoliday($event)"
+              />
             } @else {
               <div class="card-plain holidays">
                 <gl-empty-state
@@ -299,6 +312,39 @@ export class SettingsPage {
             body: 'Nothing changes on the calendar, so we didn’t add it.',
           });
       });
+  }
+
+  protected removeHoliday(id: string): void {
+    const holiday = this.loadedHolidays()?.holidays.find((h) => h.id === id);
+    if (!holiday) return;
+    this.dialogs
+      .open<boolean>(RemoveHolidayDialog, '.dialog__footer .btn', { holiday })
+      .closed.subscribe((removed) => {
+        if (!removed) return;
+        this.retryHolidays();
+        this.toasts.show({
+          tone: 'success',
+          title: `Removed ${holiday.name}`,
+          body: `${holidayDateLabel(holiday.date)} is a working day again.`,
+          action: { label: 'Undo', run: () => this.restoreHoliday(holiday) },
+        });
+      });
+  }
+
+  /** Undo of a removal; when it fails the toast offers to try again. */
+  private restoreHoliday(holiday: Holiday): void {
+    this.holidayService.restore(holiday.id).subscribe((result) => {
+      if (result.ok) {
+        this.retryHolidays();
+        return;
+      }
+      this.toasts.show({
+        tone: 'danger',
+        title: 'We couldn’t undo that',
+        body: `${holiday.name} is still removed. Check your connection and try again.`,
+        action: { label: 'Try again', run: () => this.restoreHoliday(holiday) },
+      });
+    });
   }
 
   protected invite(): void {

@@ -44,6 +44,12 @@ export function weekendFor(project: string): Day {
   return onOrAfter(thisYear(), month, 1, 6);
 }
 
+/** A Wednesday in the project's own month (June, July, August), one per `slot` (0 to 3) so specs never meet on a date. */
+export function wednesdayFor(project: string, slot: number): Day {
+  const month = { mobile: 6, tablet: 7, desktop: 8 }[project as "mobile"] ?? 6;
+  return onOrAfter(thisYear(), month, 1 + 7 * slot, 3);
+}
+
 /** Christmas Day of this year: a holiday every United Kingdom team made through the API holds. */
 export function christmas(): Day {
   return onOrAfter(thisYear(), 12, 25, new Date(Date.UTC(thisYear(), 11, 25)).getUTCDay());

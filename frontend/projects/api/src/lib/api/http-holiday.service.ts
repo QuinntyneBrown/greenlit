@@ -4,10 +4,10 @@ import { Observable, catchError, map, of } from 'rxjs';
 
 import { Holiday, TeamHolidays } from '../models/team-holidays';
 import { API_BASE_URL, apiUrl } from './api-base-url';
-import { AddHolidayResult, HolidayService } from './holiday.service';
+import { AddHolidayResult, HolidayChangeResult, HolidayService } from './holiday.service';
 import { problemCode } from './problem';
 
-/** GET and POST /api/team/holidays. */
+/** GET and POST /api/team/holidays, DELETE /api/team/holidays/{id} and POST .../restore. */
 @Injectable({ providedIn: 'root' })
 export class HttpHolidayService implements HolidayService {
   private readonly http = inject(HttpClient);
@@ -32,6 +32,20 @@ export class HttpHolidayService implements HolidayService {
         }
         return of<AddHolidayResult>({ outcome: 'failed' });
       }),
+    );
+  }
+
+  remove(id: string): Observable<HolidayChangeResult> {
+    return this.http.delete(apiUrl(this.baseUrl, `api/team/holidays/${id}`)).pipe(
+      map((): HolidayChangeResult => ({ ok: true })),
+      catchError(() => of<HolidayChangeResult>({ ok: false })),
+    );
+  }
+
+  restore(id: string): Observable<HolidayChangeResult> {
+    return this.http.post(apiUrl(this.baseUrl, `api/team/holidays/${id}/restore`), null).pipe(
+      map((): HolidayChangeResult => ({ ok: true })),
+      catchError(() => of<HolidayChangeResult>({ ok: false })),
     );
   }
 }
