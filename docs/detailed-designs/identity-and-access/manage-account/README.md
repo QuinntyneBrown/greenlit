@@ -13,7 +13,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 **Frontend**
 
 - **`AccountPage`** — App-shell page (`page: 'account'`) with the sections Profile, Password and Sign out, following `docs/mocks/pages/account/*`.
-- **`AccountService / ACCOUNT_SERVICE`** — `get()`, `updateProfile(displayName, email)` and `changePassword(current, next)`.
+- **`AccountService / ACCOUNT_SERVICE`** — `get()`, `updateProfile(displayName, email)` and `changePassword(current, next, confirm)`.
 
 **Backend**
 
