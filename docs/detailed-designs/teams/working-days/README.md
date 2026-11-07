@@ -33,7 +33,11 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **`ValidationBehavior`** — MediatR pipeline behaviour in Greenlit.Application. It runs each request's FluentValidation validator before the handler and raises `ValidationException` on failure.
 - **`IAppDbContext`** — Greenlit.Application abstraction over the EF Core context, implemented by `AppDbContext` in Greenlit.Infrastructure. Handlers read and write through it in one unit of work.
 
-`<TO SUPPLY>`: what happens to existing `TimeOffDay` rows on days that become non-working. ADR-003 rejects new days on holidays but says nothing about working-day changes.
+**Existing days when the work week changes** (ADR-009): stored `TimeOffDay` rows are kept. On a non-working weekday a stored day reads "Not working" (red), counts in no figure and is not "in" or "out" on the Out row; it comes back unchanged if the weekday is switched on again. New days on a non-working weekday are dropped like weekends.
+
+**API shapes.** Days are spelled `"Mon"` to `"Sun"`. `GET /api/team/settings` returns `workingDays`; `PUT /api/team/settings/work-week` takes `{ days }`; `PUT /api/team/members/{id}/working-days` takes `{ days }` and returns the member's effective `workingDays`; each sheet row carries its effective `workingDays`. An empty set answers 400 with `errors.Days = ["Pick at least one working day."]`; a member outside the caller's team answers 404; a non-manager answers 403.
+
+**Entry point.** The person page arrives in journey 22. Until then "Edit working days" is a button on each member row of Settings > Team, opening the same dialog.
 
 ## Requirements
 

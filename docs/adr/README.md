@@ -14,6 +14,7 @@ or infrastructure choice is made or revisited.
 | [ADR-006](ADR-006-invitation-emails-logged-tokens-hashed.md) | Invitation emails are logged, and invitation tokens are stored hashed           |
 | [ADR-007](ADR-007-allowances.md)                  | Allowances are computed from day rows, never stored as a balance                   |
 | [ADR-008](ADR-008-team-holidays.md) | A removed holiday is kept, a team remembers its calendar, and adding a day off clears booked days |
+| [ADR-009](ADR-009-working-days.md) | Working days are weekday sets, and days that turn red are kept, not deleted |
 
 ## Template
 
