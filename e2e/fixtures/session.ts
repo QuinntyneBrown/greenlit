@@ -33,6 +33,10 @@ export const PEOPLE = {
   "inviter-mobile": { name: "Uma Singh", email: "uma@northwind.studio" },
   "inviter-tablet": { name: "Vic Alvarez", email: "vic@northwind.studio" },
   "inviter-desktop": { name: "Wren Fox", email: "wren@northwind.studio" },
+  /** Manage a team of their own for the remove-a-member spec, one per viewport (see `removerFor`). */
+  "remover-mobile": { name: "Xavi Moreno", email: "xavi@northwind.studio" },
+  "remover-tablet": { name: "Yara Khan", email: "yara@northwind.studio" },
+  "remover-desktop": { name: "Zoe Lind", email: "zoe@northwind.studio" },
 } as const;
 
 export type Person = keyof typeof PEOPLE;
@@ -54,6 +58,16 @@ export function creatorFor(project: string): Person {
 export function inviterFor(project: string): Person {
   const person = `inviter-${project}`;
   if (!(person in PEOPLE)) throw new Error(`No seeded inviter for the '${project}' project.`);
+  return person as Person;
+}
+
+/**
+ * The manager of the team this viewport's project removes people from. Removal is destructive, so the
+ * remove-a-member spec never touches the demo team: each viewport has a team of its own.
+ */
+export function removerFor(project: string): Person {
+  const person = `remover-${project}`;
+  if (!(person in PEOPLE)) throw new Error(`No seeded remover for the '${project}' project.`);
   return person as Person;
 }
 

@@ -18,11 +18,18 @@ export type InviteResult =
   /** Nothing was added: the API failed, could not be reached, or refused the request. */
   | { readonly outcome: 'failed' };
 
+/** Whether a removal went through; any failure is `{ ok: false }` (the dialog says only that nothing was changed). */
+export interface RemoveMemberResult {
+  readonly ok: boolean;
+}
+
 /** The team: creating one (teams/create-team) and inviting people to it (teams/invite-member). */
 export interface TeamService {
   create(team: NewTeam): Observable<CreateTeamResult>;
   /** Adds a row for the person and emails them a link; inviting a pending address again sends a new link. */
   invite(member: NewMember): Observable<InviteResult>;
+  /** Removes the member from the team, keeping their history (teams/remove-member, L2-011). Manager only. */
+  remove(memberId: string): Observable<RemoveMemberResult>;
 }
 
 export const TEAM_SERVICE = new InjectionToken<TeamService>('TEAM_SERVICE');

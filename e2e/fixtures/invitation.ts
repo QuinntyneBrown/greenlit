@@ -69,3 +69,30 @@ export async function paintDays(request: APIRequestContext, manager: Person, mem
   });
   if (!response.ok()) throw new Error(`Painting ${dates.join(", ")} failed with ${response.status()}.`);
 }
+
+/** The invitee sets a password through the real API and gets the session the accept page would store. */
+export async function join(request: APIRequestContext, invitation: Invitation, password: string): Promise<string> {
+  const response = await request.post(`${API_BASE_URL}/api/invitations/${invitation.token}/accept`, {
+    data: { name: invitation.name, password },
+  });
+  if (!response.ok()) throw new Error(`Accepting the invitation for ${invitation.email} failed with ${response.status()}.`);
+  return ((await response.json()) as { accessToken: string }).accessToken;
+}
+
+/** What the API answers to a sign-in: the status and, for a failure, its ProblemDetails `code`. */
+export async function trySignIn(
+  request: APIRequestContext,
+  email: string,
+  password: string,
+): Promise<{ status: number; code: string | null }> {
+  const response = await request.post(`${API_BASE_URL}/api/auth/sign-in`, { data: { email, password } });
+  const body = response.ok() ? null : ((await response.json()) as { code?: string });
+  return { status: response.status(), code: body?.code ?? null };
+}
+
+/** What the API answers to a request made with an earlier session token: the status and the failure's `code`. */
+export async function tryWithSession(request: APIRequestContext, token: string): Promise<{ status: number; code: string | null }> {
+  const response = await request.get(`${API_BASE_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+  const body = response.ok() ? null : ((await response.json()) as { code?: string });
+  return { status: response.status(), code: body?.code ?? null };
+}

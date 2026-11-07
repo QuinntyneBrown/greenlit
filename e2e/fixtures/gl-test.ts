@@ -12,7 +12,7 @@
  * `@playwright/test` directly, so the routing/POM wiring is consistent.
  */
 
-import { test as base, expect, TestInfo } from "@playwright/test";
+import { test as base, expect, Route, TestInfo } from "@playwright/test";
 import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { personIdOf } from "./people.js";
 import { Person, SESSION_KEY, expiredToken, signIn } from "./session.js";
@@ -21,6 +21,7 @@ import { SessionExpiredPage } from "../pages/session-expired.page.js";
 import { SignOutDialog } from "../pages/sign-out.dialog.js";
 import { RemoveHolidayDialog } from "../pages/remove-holiday.dialog.js";
 import { AdjustAllowanceDialog } from "../pages/adjust-allowance.dialog.js";
+import { RemoveMemberDialog } from "../pages/remove-member.dialog.js";
 import { EditWorkingDaysDialog } from "../pages/edit-working-days.dialog.js";
 import { AddHolidayDialog } from "../pages/add-holiday.dialog.js";
 import { AcceptInvitePage } from "../pages/accept-invite.page.js";
@@ -46,6 +47,7 @@ interface Pages {
   signOutDialog: SignOutDialog;
   accountMenu: AccountMenu;
   adjustAllowance: AdjustAllowanceDialog;
+  removeMember: RemoveMemberDialog;
   editWorkingDays: EditWorkingDaysDialog;
   removeHoliday: RemoveHolidayDialog;
   addHoliday: AddHolidayDialog;
@@ -365,7 +367,19 @@ interface AdjustmentsApi {
   recover(): Promise<void>;
 }
 
+/** Watches and steers removing a member (DELETE /api/team/members/{id}). */
+interface RemoveMemberApi {
+  /** How many removals the page has sent so far. */
+  removes(): number;
+  /** Holds removals until the returned function is called. */
+  hold(): Promise<() => void>;
+  /** Removals fail with a 500 until `recover()`. */
+  fail(): Promise<void>;
+  recover(): Promise<void>;
+}
+
 interface GlFixtures {
+  removeMemberApi: RemoveMemberApi;
   adjustmentsApi: AdjustmentsApi;
   coverageApi: CoverageApi;
   workingDaysApi: WorkingDaysApi;
@@ -1000,6 +1014,34 @@ export const test = base.extend<GlFixtures>({
       },
     });
   },
+  removeMemberApi: async ({ page }, use) => {
+    const pattern = "**/api/team/members/*";
+    let removes = 0;
+    page.on("request", (request) => {
+      if (request.method() === "DELETE" && /^\/api\/team\/members\/[^/]+$/.test(new URL(request.url()).pathname)) removes++;
+    });
+    const deletesOnly = (handler: (route: Route) => Promise<void> | void) => (route: Route) =>
+      route.request().method() === "DELETE" ? handler(route) : route.fallback();
+    await use({
+      removes: () => removes,
+      hold: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(
+          pattern,
+          deletesOnly(async (route) => {
+            await released;
+            await route.continue();
+          }),
+        );
+        return release;
+      },
+      fail: async () => {
+        await page.route(pattern, deletesOnly((route) => route.fulfill({ status: 500, body: "" })));
+      },
+      recover: () => page.unroute(pattern),
+    });
+  },
   adjustmentsApi: async ({ page }, use) => {
     const pattern = "**/api/people/*/adjustments";
     let adds = 0;
@@ -1137,6 +1179,7 @@ export const test = base.extend<GlFixtures>({
       forgotPassword: new ForgotPasswordPage(page),
       resetPassword: new ResetPasswordPage(page),
       adjustAllowance: new AdjustAllowanceDialog(page),
+      removeMember: new RemoveMemberDialog(page),
       editWorkingDays: new EditWorkingDaysDialog(page),
       addHoliday: new AddHolidayDialog(page),
       removeHoliday: new RemoveHolidayDialog(page),

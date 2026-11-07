@@ -29,5 +29,13 @@ public sealed class MembersController : ControllerBase
     public Task<MemberWorkingDaysDto> SetWorkingDays(Guid id, [FromBody] WorkingDaysBody body, CancellationToken ct) =>
         _sender.Send(new SetMemberWorkingDaysCommand(id, body.Days), ct);
 
+    /// <summary>Removes a member from the team, keeping their history (docs/detailed-designs/teams/remove-member).</summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Remove(Guid id, CancellationToken ct)
+    {
+        await _sender.Send(new RemoveMemberCommand(id), ct);
+        return NoContent();
+    }
+
     public sealed record WorkingDaysBody(IReadOnlyList<string>? Days);
 }

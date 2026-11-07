@@ -200,9 +200,19 @@ file sealed class JwtBearerPostConfigure : IPostConfigureOptions<JwtBearerOption
         // failure keeps the plain 401 and reveals nothing.
         options.Events = new JwtBearerEvents
         {
+            // A session held by someone the manager has since removed stops working at once (L2-011).
+            OnTokenValidated = async context =>
+            {
+                var sub = context.Principal?.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (!Guid.TryParse(sub, out var userId)) return;
+                var db = context.HttpContext.RequestServices.GetRequiredService<IAppDbContext>();
+                if (await Greenlit.Application.Auth.RemovedMembers.IsRemovedAsync(db, userId, context.HttpContext.RequestAborted))
+                    context.Fail(new RemovedMemberException());
+            },
             OnChallenge = async context =>
             {
-                if (context.AuthenticateFailure is not SecurityTokenExpiredException) return;
+                var removed = context.AuthenticateFailure is RemovedMemberException;
+                if (!removed && context.AuthenticateFailure is not SecurityTokenExpiredException) return;
                 context.HandleResponse();
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 await context.Response.WriteAsJsonAsync(
@@ -210,8 +220,8 @@ file sealed class JwtBearerPostConfigure : IPostConfigureOptions<JwtBearerOption
                     {
                         Status = StatusCodes.Status401Unauthorized,
                         Title = "Unauthorized",
-                        Detail = "Your session has expired.",
-                        Extensions = { ["code"] = "session_expired" },
+                        Detail = removed ? Greenlit.Application.Auth.RemovedMembers.Detail : "Your session has expired.",
+                        Extensions = { ["code"] = removed ? Greenlit.Application.Auth.RemovedMembers.Code : "session_expired" },
                     },
                     options: null,
                     contentType: "application/problem+json");
@@ -230,3 +240,5 @@ file sealed class JwtBearerPostConfigure : IPostConfigureOptions<JwtBearerOption
         };
     }
 }
+
+file sealed class RemovedMemberException : Exception;

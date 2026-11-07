@@ -18,8 +18,9 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 **Backend**
 
 - **`MembersController`** — `DELETE /api/team/members/{id}` behind the `Manager` policy.
-- **`RemoveMemberCommandHandler`** — Stamps `RemovedUtc`. A global EF Core query filter hides removed members from sheet, year and request queries; history queries opt out of it. Removing the last manager raises code `last_manager` `<TO SUPPLY: confirm rule>`.
-- **`ITokenService`** — Refuses to issue a session for a removed member. Existing tokens stop working because the handler that resolves `ICurrentUser` rejects a removed member with `401`.
+- **`RemoveMemberCommandHandler`** — Stamps `RemovedUtc`. A global EF Core query filter hides removed members from sheet, year and request queries; history queries opt out of it. The manager cannot remove themselves: code `cannot_remove_self` (409), which also keeps the team from losing its last manager, since only the team's manager may remove anyone. A member of another team or one already removed is `404 person_not_found`, so nothing about other teams leaks.
+- **`SignInCommandHandler`** — Refuses to sign in an account whose team rows are all removed: `401` with code `member_removed`, only after the password matched, so a wrong password still reveals nothing. A person invited back has a live row again and signs in.
+- **Bearer `OnTokenValidated` event** — Existing tokens stop working: a token whose account is a removed member is refused with `401` and code `member_removed` on its next request.
 
 **Shared plumbing (exists today)**
 
