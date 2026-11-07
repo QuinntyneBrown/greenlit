@@ -8,7 +8,7 @@ Signing out asks for confirmation in a dialog. Greenlit also ends a session that
 
 **account menu** — menu attached to the header avatar, following the WAI-ARIA menu button pattern
 
-**session expiry** — point at which the session token stops being accepted; its duration is `<TO SUPPLY>`
+**session expiry** — point at which the session token stops being accepted; its duration is eight hours from sign-in (ADR-004)
 
 ## Description
 
