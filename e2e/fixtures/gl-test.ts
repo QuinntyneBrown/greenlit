@@ -13,7 +13,8 @@
  */
 
 import { test as base, expect, TestInfo } from "@playwright/test";
-import { pathFor, RouteKey } from "./routes.js";
+import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
+import { Person, SESSION_KEY, tokenFor } from "./session.js";
 import { CalendarPage } from "../pages/calendar.page.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
 
@@ -22,8 +23,15 @@ interface Pages {
   notFound: NotFoundPage;
 }
 
+interface GotoOptions {
+  /** Who is signed in on a guarded route; the manager by default. */
+  as?: Person;
+  /** `yyyy-MM`: open the calendar on this month instead of the current one. */
+  month?: string;
+}
+
 interface GlFixtures {
-  goto: (key: RouteKey) => Promise<void>;
+  goto: (key: RouteKey, options?: GotoOptions) => Promise<void>;
   pages: Pages;
   /** Pause until web fonts have loaded and the network is idle so visual diffs are stable. */
   settle: () => Promise<void>;
@@ -36,8 +44,14 @@ export function isPhone(testInfo: TestInfo): boolean {
 
 export const test = base.extend<GlFixtures>({
   goto: async ({ page }, use) => {
-    await use(async (key) => {
-      await page.goto(pathFor(key));
+    await use(async (key, options = {}) => {
+      // Until sign-in lands, guarded routes get a session the e2e API accepts (fixtures/session.ts).
+      if (guardFor(key) && !isBaseline) {
+        const token = tokenFor(options.as ?? "manager");
+        await page.addInitScript(([k, t]) => window.localStorage.setItem(k, t), [SESSION_KEY, token]);
+      }
+      const path = pathFor(key);
+      await page.goto(options.month && !isBaseline ? `${path}?month=${options.month}` : path);
     });
   },
   pages: async ({ page }, use) => {

@@ -28,7 +28,7 @@ interface RouteEntry {
 }
 
 export const ROUTES = {
-  calendar: { app: "/", mock: "/pages/calendar/default.html", page: "calendar" },
+  calendar: { app: "/", mock: "/pages/calendar/default.html", guard: "auth", page: "calendar" },
   notFound: { app: "/no-such-page", mock: "/pages/not-found/default.html", page: "not-found" },
 } as const satisfies Record<string, RouteEntry>;
 

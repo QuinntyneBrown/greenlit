@@ -20,7 +20,13 @@ export * from './lib/api/api-base-url';
 
 // Models
 export * from './lib/models/day-status';
+export * from './lib/models/sheet-month';
 
 // Service contracts (interface + InjectionToken)
+export * from './lib/api/session-store';
+export * from './lib/api/sheet.service';
+export * from './lib/api/auth.interceptor';
 
 // Concrete implementations (imported only by composition roots)
+export * from './lib/api/local-storage-session-store';
+export * from './lib/api/http-sheet.service';

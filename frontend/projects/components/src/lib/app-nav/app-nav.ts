@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { IsActiveMatchOptions, RouterLink, RouterLinkActive } from '@angular/router';
 
 /** One destination in the app navigation. */
 export interface AppNavItem {
@@ -26,7 +26,7 @@ export interface AppNavItem {
           [routerLink]="item.link"
           routerLinkActive
           ariaCurrentWhenActive="page"
-          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          [routerLinkActiveOptions]="activeOptions(item)"
           >{{ item.label }}</a
         >
       }
@@ -91,4 +91,17 @@ export class AppNav {
   readonly items = input.required<readonly AppNavItem[]>();
   /** Accessible name of the navigation landmark. */
   readonly label = input<string>('Main');
+
+  /**
+   * A destination stays current whatever its query string says: the calendar
+   * on `/?month=2026-10` is still the calendar (L2-049 AC3).
+   */
+  protected activeOptions(item: AppNavItem): IsActiveMatchOptions {
+    return {
+      paths: item.exact ? 'exact' : 'subset',
+      queryParams: 'ignored',
+      matrixParams: 'ignored',
+      fragment: 'ignored',
+    };
+  }
 }

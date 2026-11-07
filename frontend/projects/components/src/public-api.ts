@@ -17,6 +17,11 @@ export * from './lib/top-bar/top-bar';
 // actions
 export * from './lib/button/button';
 
+// the sheet
+export * from './lib/team-grid/team-grid';
+export * from './lib/period-nav/period-nav';
+export * from './lib/legend/legend';
+
 // identity and status
 export * from './lib/avatar/avatar';
 export * from './lib/badge/badge';

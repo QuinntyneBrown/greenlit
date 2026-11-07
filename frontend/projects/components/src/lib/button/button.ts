@@ -109,6 +109,13 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
       text-decoration: underline;
       text-underline-offset: 0.15em;
     }
+    .btn--icon {
+      padding: 0;
+      width: var(--control-height-md);
+    }
+    .btn--icon.btn--sm {
+      width: var(--control-height-sm);
+    }
     .btn--sm {
       min-height: var(--control-height-sm);
       padding-inline: var(--space-3);
@@ -167,6 +174,8 @@ export class Button {
   /** Shows the spinner and sets `aria-busy`. */
   readonly busy = input<boolean>(false);
   readonly block = input<boolean>(false);
+  /** Square icon-only button (`btn--icon`); give it an `ariaLabel`. */
+  readonly icon = input<boolean>(false);
   /** Accessible name for an icon-only button. */
   readonly ariaLabel = input<string>('');
 
@@ -175,6 +184,7 @@ export class Button {
     if (this.variant() !== 'default') list.push(`btn--${this.variant()}`);
     if (this.size() !== 'md') list.push(`btn--${this.size()}`);
     if (this.block()) list.push('btn--block');
+    if (this.icon()) list.push('btn--icon');
     return list.join(' ');
   }
 }
