@@ -14,6 +14,7 @@ public sealed record PersonDto(
     DateOnly? JoinedOn,
     IReadOnlyList<string> WorkingDays,
     int Year,
+    string ManagerName,
     bool IsYou,
     bool CanManage,
     AllowanceFigures Allowance,

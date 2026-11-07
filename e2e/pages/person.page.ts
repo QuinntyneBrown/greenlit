@@ -103,6 +103,13 @@ export class PersonPage extends BasePage {
     return this.main.locator("section", { has: this.page.getByRole("heading", { level: 2, name: title }) });
   }
 
+  // ---- the actions ----
+
+  /** The "Request time off" button of the facts bar: on a member's own page only. */
+  requestTimeOff(): Locator {
+    return control(this.main.locator(".facts-bar"), "Request time off");
+  }
+
   // ---- the states ----
 
   /** The page's heading when it is not the person's name: "Time off", "Person not found", "Loading time off". */

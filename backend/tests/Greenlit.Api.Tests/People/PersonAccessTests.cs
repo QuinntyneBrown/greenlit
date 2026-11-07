@@ -97,4 +97,16 @@ public class PersonAccessTests : IClassFixture<FrozenClockApiFactory>
         maya.GetProperty("name").GetString().Should().Be("Maya Chen");
         maya.GetProperty("canManage").GetBoolean().Should().BeTrue();
     }
+
+    [Fact]
+    public async Task The_page_names_the_manager_so_a_member_can_request_time_off_from_it()
+    {
+        // L2-033 AC4: "Request time off" (L2-019) says whom the request goes to.
+        var team = await TestTeam.CreateAsync(_factory);
+        await team.AddMemberAsync("Ana Ruiz");
+
+        var person = await PersonFiguresTests.PersonAsync(team.ClientFor("Ana Ruiz"), team.MemberIdOf("Ana Ruiz"));
+
+        person.GetProperty("managerName").GetString().Should().Be("Maya Chen");
+    }
 }

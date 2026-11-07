@@ -2,6 +2,7 @@ using System.Globalization;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Allowances;
 using Greenlit.Application.Exceptions;
+using Greenlit.Application.Requests;
 using Greenlit.Application.Sheet;
 using Greenlit.Application.Teams;
 using Greenlit.Domain.Enums;
@@ -81,6 +82,7 @@ public sealed class GetPersonQueryHandler : IRequestHandler<GetPersonQuery, Pers
         var taken = RunBuilder.Build(days.Where(d => d.Date < today).Select(d => (d.Date, d.Status == "confirmed" ? Name(d.Status) : null)))
             .Reverse().ToList();
 
+        var managerName = await RequestCaller.ManagerNameAsync(_db, team, ct);
         var adjustments = (await _db.AllowanceAdjustments.AsNoTracking()
                 .Where(a => a.TeamMemberId == member.Id && a.EffectiveDate >= first && a.EffectiveDate <= last)
                 .ToListAsync(ct))
@@ -88,7 +90,7 @@ public sealed class GetPersonQueryHandler : IRequestHandler<GetPersonQuery, Pers
             .Select(a => new AdjustmentDto(a.Id, a.Days, a.Reason, a.EffectiveDate))
             .ToList();
 
-        return new PersonDto(member.Id, member.Name, member.JobTitle, member.JoinedOn, WorkingDaysNames.ToNames(WorkingDayRule.For(team, member)), year, isYou, isManager, figures, figures.DaysOver(), months, upcoming, taken, adjustments);
+        return new PersonDto(member.Id, member.Name, member.JobTitle, member.JoinedOn, WorkingDaysNames.ToNames(WorkingDayRule.For(team, member)), year, managerName, isYou, isManager, figures, figures.DaysOver(), months, upcoming, taken, adjustments);
     }
 
     /// <summary>The status as the API spells a <see cref="DayStatus"/>: "Confirmed", not "confirmed".</summary>
