@@ -27,7 +27,7 @@ public class SeedCommandHandlerTests
         team.TimeZone.Should().Be("Europe/London");
         team.Members.OrderBy(m => m.SortOrder).Select(m => m.Name).Should().Equal(
             "Maya Chen", "Ana Ruiz", "Ben Okafor", "Cleo Park", "Dev Patel", "Elif Yılmaz", "Finn Murphy");
-        (await read.Users.CountAsync()).Should().Be(14);
+        (await read.Users.CountAsync()).Should().Be(17);
         (await read.Holidays.CountAsync()).Should().Be(8);
     }
 
@@ -70,7 +70,7 @@ public class SeedCommandHandlerTests
     }
 
     [Fact]
-    public async Task Seven_newcomers_have_accounts_on_no_team_to_create_one_with()
+    public async Task Ten_newcomers_have_accounts_on_no_team_to_create_one_with()
     {
         // Journey 3: create-team needs signed-in people who are not on a team yet; journey 5: so does the invite spec.
         var options = await SeedTwiceAsync();
@@ -83,7 +83,8 @@ public class SeedCommandHandlerTests
             .ToListAsync();
         newcomers.Should().Equal(
             "noor@northwind.studio", "priya@northwind.studio", "sam@northwind.studio", "tomas@northwind.studio",
-            "uma@northwind.studio", "vic@northwind.studio", "wren@northwind.studio");
+            "uma@northwind.studio", "vic@northwind.studio", "wren@northwind.studio",
+            "xavi@northwind.studio", "yara@northwind.studio", "zoe@northwind.studio");
     }
 
     [Fact]
@@ -95,7 +96,7 @@ public class SeedCommandHandlerTests
         await using var read = new AppDbContext(options);
         var hasher = new IdentityPasswordHasher();
         var users = await read.Users.ToListAsync();
-        users.Should().HaveCount(14).And.OnlyContain(u => hasher.Verify(u, u.PasswordHash, SeedCommandHandler.DemoPassword));
+        users.Should().HaveCount(17).And.OnlyContain(u => hasher.Verify(u, u.PasswordHash, SeedCommandHandler.DemoPassword));
         users.Select(u => u.PasswordHash).Should().OnlyHaveUniqueItems("each hash has its own salt");
     }
 
