@@ -1,6 +1,8 @@
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Allowances;
 using Greenlit.Application.Exceptions;
+using Greenlit.Application.Sheet;
+using Greenlit.Application.Teams;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,6 +46,6 @@ public sealed class GetPersonQueryHandler : IRequestHandler<GetPersonQuery, Pers
         var figures = (await _allowances.ComputeAsync(team, [member], ct))[member.Id];
         var (first, _) = AllowanceCalculator.LeaveYear(team, _allowances.Today(team));
 
-        return new PersonDto(member.Id, member.Name, first.Year, isYou, isManager, figures);
+        return new PersonDto(member.Id, member.Name, member.JobTitle, member.JoinedOn, WorkingDaysNames.ToNames(WorkingDayRule.For(team, member)), first.Year, isYou, isManager, figures);
     }
 }

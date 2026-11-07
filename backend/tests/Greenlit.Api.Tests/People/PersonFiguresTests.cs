@@ -4,6 +4,7 @@ using System.Text.Json;
 using FluentAssertions;
 using Greenlit.Api.Tests.Support;
 using Greenlit.Domain.Enums;
+using Days = Greenlit.Domain.Enums.WorkingDays;
 
 namespace Greenlit.Api.Tests.People;
 
@@ -50,6 +51,33 @@ public class PersonFiguresTests : IClassFixture<FrozenClockApiFactory>
         figures.GetProperty("requested").GetInt32().Should().Be(1);
         figures.GetProperty("tentative").GetInt32().Should().Be(1);
         figures.GetProperty("left").GetInt32().Should().Be(23);
+    }
+
+    [Fact]
+    public async Task The_head_has_the_job_title_when_they_joined_and_the_working_days()
+    {
+        // L2-033 AC1: job title, "Joined {Mon yyyy}", working days.
+        var team = await TestTeam.CreateAsync(_factory);
+        await team.AddMemberAsync("Ana Ruiz");
+        await team.AddMemberAsync("Dev Patel");
+        await _factory.WriteAsync(db =>
+        {
+            var ana = db.TeamMembers.Single(m => m.Id == team.MemberIdOf("Ana Ruiz"));
+            ana.JobTitle = "Product Designer";
+            ana.JoinedOn = new DateOnly(2022, 3, 14);
+            db.TeamMembers.Single(m => m.Id == team.MemberIdOf("Dev Patel")).WorkingDays = Days.Mon | Days.Tue | Days.Wed | Days.Thu;
+        });
+        var client = team.ClientFor("Maya Chen");
+
+        var ana = await PersonAsync(client, team.MemberIdOf("Ana Ruiz"));
+        var dev = await PersonAsync(client, team.MemberIdOf("Dev Patel"));
+
+        ana.GetProperty("jobTitle").GetString().Should().Be("Product Designer");
+        ana.GetProperty("joinedOn").GetString().Should().Be("2022-03-14");
+        ana.GetProperty("workingDays").EnumerateArray().Select(d => d.GetString()).Should().Equal("Mon", "Tue", "Wed", "Thu", "Fri");
+        dev.GetProperty("jobTitle").ValueKind.Should().Be(JsonValueKind.Null);
+        dev.GetProperty("joinedOn").ValueKind.Should().Be(JsonValueKind.Null);
+        dev.GetProperty("workingDays").EnumerateArray().Select(d => d.GetString()).Should().Equal("Mon", "Tue", "Wed", "Thu");
     }
 
     internal static async Task<JsonElement> PersonAsync(HttpClient client, Guid id)

@@ -10,6 +10,9 @@ public sealed record GetPersonQuery(Guid? Id) : IRequest<PersonDto>;
 public sealed record PersonDto(
     Guid Id,
     string Name,
+    string? JobTitle,
+    DateOnly? JoinedOn,
+    IReadOnlyList<string> WorkingDays,
     int Year,
     bool IsYou,
     bool CanManage,

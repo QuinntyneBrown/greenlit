@@ -27,6 +27,12 @@ public class TeamMember
     /// <summary>The weekdays this member works, for a part-timer; null means the team's work week applies (teams/working-days).</summary>
     public WorkingDays? WorkingDays { get; set; }
 
+    /// <summary>What the person does, shown on their page; null when nobody has said (docs/detailed-designs/allowances/person-page).</summary>
+    public string? JobTitle { get; set; }
+
+    /// <summary>The day they joined the team, shown on their page as "Joined Mar 2022"; null when unknown.</summary>
+    public DateOnly? JoinedOn { get; set; }
+
     public ICollection<AllowanceAdjustment> Adjustments { get; set; } = new List<AllowanceAdjustment>();
     public ICollection<Invitation> Invitations { get; set; } = new List<Invitation>();
     public ICollection<TimeOffRequest> Requests { get; set; } = new List<TimeOffRequest>();

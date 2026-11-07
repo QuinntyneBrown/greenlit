@@ -10,6 +10,7 @@ public sealed class TeamMemberConfiguration : IEntityTypeConfiguration<TeamMembe
     {
         b.HasKey(x => x.Id);
         b.Property(x => x.Name).HasMaxLength(120).IsRequired();
+        b.Property(x => x.JobTitle).HasMaxLength(120);
         b.Property(x => x.Email).HasMaxLength(256);
         b.HasIndex(x => new { x.TeamId, x.SortOrder });
         b.Property(x => x.Role).HasConversion<string>().HasMaxLength(32);
