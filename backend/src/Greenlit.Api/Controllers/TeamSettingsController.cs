@@ -27,4 +27,9 @@ public sealed class TeamSettingsController : ControllerBase
     [HttpPut("work-week")]
     public Task<TeamSettingsDto> SaveWorkWeek([FromBody] SaveWorkWeekCommand command, CancellationToken ct) =>
         _sender.Send(command, ct);
+
+    /// <summary>The team's coverage minimum (docs/detailed-designs/teams/coverage-minimum).</summary>
+    [HttpPut("coverage")]
+    public Task<TeamSettingsDto> SaveCoverage([FromBody] SaveCoverageCommand command, CancellationToken ct) =>
+        _sender.Send(command, ct);
 }
