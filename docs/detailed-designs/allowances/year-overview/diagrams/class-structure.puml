@@ -13,17 +13,24 @@ title Class structure — View the team's year
 
 class YearDto <<new>> {
   +int Year
-  +List<YearRowDto> Rows
+  +bool IsManager
+  +List<YearMemberDto> Members
 }
-class YearRowDto <<new>> {
-  +Guid MemberId
+class YearMemberDto <<new>> {
+  +Guid Id
   +string Name
+  +string Initials
   +bool IsYou
-  +int[] ConfirmedByMonth
-  +Allowance Allowance
+  +List<YearMonthDto> Months
+  +AllowanceFigures Allowance
 }
-class Allowance <<new>> {
-  +int Total
+class YearMonthDto <<new>> {
+  +int Month
+  +int Confirmed
+  +List<string> Days
+}
+class AllowanceFigures {
+  +int Allowance
   +int Used
   +int Booked
   +int Requested
@@ -32,7 +39,8 @@ class Allowance <<new>> {
 class GetYearQueryHandler <<new>> {
   +Handle(query: GetYearQuery): Task<YearDto>
 }
-YearDto *-- "*" YearRowDto
-YearRowDto --> Allowance
+YearDto *-- "*" YearMemberDto
+YearMemberDto *-- "12" YearMonthDto
+YearMemberDto --> AllowanceFigures
 GetYearQueryHandler ..> YearDto : builds
 @enduml
