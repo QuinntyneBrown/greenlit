@@ -53,6 +53,14 @@ public sealed class RequestsController : ControllerBase
     public async Task<ActionResult<DeclineResult>> Decline(Guid id, [FromBody] DeclineBody? body, CancellationToken ct) =>
         Ok(await _sender.Send(new DeclineRequestCommand(id, body?.Reason), ct));
 
+    /// <summary>The caller withdraws their own pending request: it becomes Cancelled and its days Tentative.</summary>
+    [HttpPost("{id:guid}/cancel")]
+    public async Task<IActionResult> Cancel(Guid id, CancellationToken ct)
+    {
+        await _sender.Send(new CancelRequestCommand(id), ct);
+        return NoContent();
+    }
+
     /// <summary>Undo of an approval: the request is Pending again and its days Requested.</summary>
     [HttpPost("{id:guid}/reopen")]
     public async Task<IActionResult> Reopen(Guid id, CancellationToken ct)
