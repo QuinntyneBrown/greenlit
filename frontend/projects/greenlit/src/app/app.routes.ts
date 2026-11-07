@@ -29,6 +29,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/calendar/calendar.page').then((m) => m.CalendarPage),
   },
   {
+    path: 'year',
+    data: { page: 'year' },
+    canActivate: [authGuard, teamGuard],
+    loadComponent: () => import('./pages/year/year.page').then((m) => m.YearPage),
+  },
+  {
     path: 'requests',
     data: { page: 'requests' },
     canMatch: [managerMatch],
