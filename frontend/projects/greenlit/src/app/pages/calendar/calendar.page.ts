@@ -9,6 +9,7 @@ import {
   DayStatus,
   DayStroke,
   SHEET_SERVICE,
+  SentRequest,
   SheetMonth,
   problemCode,
 } from 'api';
@@ -24,9 +25,12 @@ import {
   TeamGridStroke,
 } from 'components';
 
+import { AppDialogs } from '../../dialogs/app-dialogs';
+import { NewRequestData, NewRequestDialog } from '../../dialogs/new-request/new-request.dialog';
 import { ToastService } from '../../toasts/toast.service';
 import { addMonths, calendarView, columnsFor, monthTitle } from './calendar-view';
 import { FAILED_SAVE, PaintContext, refusedToast, savedToast } from './paint-toasts';
+import { requestSentToast } from './request-toasts';
 
 type Load =
   | { readonly state: 'loading' }
@@ -82,12 +86,22 @@ function localMonth(): string {
         (today)="goToday()"
       />
       @if (showPicker()) {
-        <gl-segmented-control
-          label="Paint"
-          [options]="paintOptions()"
-          [value]="paintChoice()"
-          (valueChange)="choosePaint($event)"
-        />
+        <div class="toolbar-end">
+          <gl-segmented-control
+            label="Paint"
+            [options]="paintOptions()"
+            [value]="paintChoice()"
+            (valueChange)="choosePaint($event)"
+          />
+          @if (canRequest()) {
+            <gl-button variant="primary" (click)="requestTimeOff()">
+              <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Request time off
+            </gl-button>
+          }
+        </div>
       }
     </div>
     <div class="toolbar-row">
@@ -153,6 +167,12 @@ function localMonth(): string {
       justify-content: space-between;
       gap: var(--space-4);
     }
+    .toolbar-end {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+    }
     .toolbar-row {
       display: flex;
       flex-wrap: wrap;
@@ -181,6 +201,7 @@ function localMonth(): string {
 export class CalendarPage {
   private readonly sheetApi = inject(SHEET_SERVICE);
   private readonly toasts = inject(ToastService);
+  private readonly dialogs = inject(AppDialogs);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly attempt = signal(0);
@@ -272,6 +293,25 @@ export class CalendarPage {
     const choice = this.choice();
     return choice === 'select' ? null : choice === 'clear' ? 'empty' : choice;
   });
+
+  /** L2-019: a member asks the manager; the manager has nobody to ask. */
+  protected readonly canRequest = computed(() => {
+    const sheet = this.loaded();
+    return sheet !== null && !sheet.isManager && sheet.members.some((m) => m.isYou);
+  });
+
+  /** Opens the request dialog (L2-019 AC1); a sent request turns its days yellow and is announced. */
+  protected requestTimeOff(): void {
+    const managerName = this.current()?.managerName ?? '';
+    const data: NewRequestData = { managerName };
+    this.dialogs
+      .open<SentRequest>(NewRequestDialog, '#nr-start', data)
+      .closed.subscribe((request) => {
+        if (!request) return;
+        this.refresh();
+        this.toasts.show(requestSentToast(request, managerName));
+      });
+  }
 
   protected choosePaint(value: string): void {
     this.choice.set(value as PaintChoice);
