@@ -9,6 +9,8 @@ export const SESSION_KEY = 'greenlit.session';
  */
 export interface SessionStore {
   token(): string | null;
+  /** True while the stored token has not expired (ADR-004). */
+  isSignedIn(): boolean;
   setToken(token: string): void;
   clear(): void;
 }

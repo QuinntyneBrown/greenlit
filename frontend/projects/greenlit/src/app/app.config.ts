@@ -4,6 +4,8 @@ import { provideRouter, withInMemoryScrolling } from '@angular/router';
 
 import {
   API_BASE_URL,
+  AUTH_SERVICE,
+  HttpAuthService,
   HttpSheetService,
   LocalStorageSessionStore,
   SESSION_STORE,
@@ -29,5 +31,6 @@ export const appConfig: ApplicationConfig = {
     // Swap any of them for a mock at test time without touching page code.
     { provide: SESSION_STORE, useExisting: LocalStorageSessionStore },
     { provide: SHEET_SERVICE, useExisting: HttpSheetService },
+    { provide: AUTH_SERVICE, useExisting: HttpAuthService },
   ],
 };

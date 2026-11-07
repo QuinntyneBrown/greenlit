@@ -26,10 +26,14 @@ interface Pages {
 }
 
 interface GotoOptions {
-  /** Who is signed in on a guarded route; the manager by default. */
+  /** Who is signed in: on a guarded route the manager by default; on any other route only when given. */
   as?: Person;
   /** `yyyy-MM`: open the calendar on this month instead of the current one. */
   month?: string;
+  /** Open a guarded route with no session, to see where it sends a visitor. */
+  signedOut?: boolean;
+  /** Open sign-in with this `returnUrl`, as the guard does. */
+  returnUrl?: string;
 }
 
 /**
@@ -75,12 +79,15 @@ export const test = base.extend<GlFixtures>({
   goto: async ({ page }, use) => {
     await use(async (key, options = {}) => {
       // Until sign-in lands, guarded routes get a session the e2e API accepts (fixtures/session.ts).
-      if (guardFor(key) && !isBaseline) {
+      if ((guardFor(key) || options.as) && !isBaseline && !options.signedOut) {
         const token = tokenFor(options.as ?? "manager");
         await page.addInitScript(([k, t]) => window.localStorage.setItem(k, t), [SESSION_KEY, token]);
       }
       const path = pathFor(key);
-      await page.goto(options.month && !isBaseline ? `${path}?month=${options.month}` : path);
+      const query = new URLSearchParams();
+      if (options.month && !isBaseline) query.set("month", options.month);
+      if (options.returnUrl && !isBaseline) query.set("returnUrl", options.returnUrl);
+      await page.goto(query.size ? `${path}?${query}` : path);
     });
   },
   authApi: async ({ page }, use) => {

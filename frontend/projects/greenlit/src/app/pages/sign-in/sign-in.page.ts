@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   Injector,
   afterNextRender,
   computed,
@@ -8,55 +9,79 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { AuthCard, Button, FormSummary, FormSummaryItem, TextField } from 'components';
+import { AUTH_SERVICE, safeReturnUrl } from 'api';
+import {
+  Alert,
+  AuthCard,
+  Button,
+  FormSummary,
+  FormSummaryItem,
+  ProgressBar,
+  TextField,
+} from 'components';
 
 type Field = 'email' | 'password';
 
 const EMAIL_ID = 'si-email';
 const PASSWORD_ID = 'si-pw';
 
+/** How long "Signed in" shows before the calendar opens (design decision, journey 2). */
+export const SIGNED_IN_PAUSE_MS = 1500;
+
 /**
  * Sign in (docs/detailed-designs/identity-and-access/sign-in, L2-001): email
  * and password on the bare-shell auth card. Fields validate on blur once,
  * then on every change; a submit attempt with errors shows the summary,
- * moves focus to it and sends nothing.
+ * moves focus to it and sends nothing. A successful sign-in shows "Signed
+ * in" and then opens the page the visitor was going to (`returnUrl`), or the
+ * calendar.
  */
 @Component({
   selector: 'app-sign-in-page',
-  imports: [AuthCard, TextField, FormSummary, Button, RouterLink],
+  imports: [AuthCard, TextField, FormSummary, Button, RouterLink, Alert, ProgressBar],
   template: `
-    <gl-auth-card title="Sign in" lead="Welcome back. Your team’s time off is waiting.">
-      <form class="stack" novalidate (submit)="submit($event)">
-        @if (submitted() && summaryItems().length) {
-          <gl-form-summary [items]="summaryItems()" />
-        }
-        <gl-text-field
-          label="Email"
-          [inputId]="emailId"
-          type="email"
-          autocomplete="username"
-          [(value)]="email"
-          [error]="shown('email') ? emailError() : ''"
-          (blurred)="touch('email')"
-        />
-        <gl-text-field
-          label="Password"
-          [inputId]="passwordId"
-          type="password"
-          autocomplete="current-password"
-          [(value)]="password"
-          [error]="shown('password') ? passwordError() : ''"
-          (blurred)="touch('password')"
-        />
-        <gl-button type="submit" variant="primary" [block]="true">Sign in</gl-button>
-        <div class="auth-links"><a routerLink="/forgot-password">Forgot your password?</a></div>
-      </form>
-      <p slot="note" class="text-caption note">
-        New here? Greenlit is invite-only. Ask your manager to send you an invitation.
-      </p>
-    </gl-auth-card>
+    @if (welcomeName(); as name) {
+      <gl-auth-card title="Signed in" lead="You’re all set.">
+        <gl-alert tone="success" [title]="'Welcome back, ' + name"
+          >Taking you to your calendar…</gl-alert
+        >
+        <gl-progress-bar label="Signing you in" />
+        <gl-button [link]="destination()" [block]="true">Go to the calendar now</gl-button>
+      </gl-auth-card>
+    } @else {
+      <gl-auth-card title="Sign in" lead="Welcome back. Your team’s time off is waiting.">
+        <form class="stack" novalidate (submit)="submit($event)">
+          @if (submitted() && summaryItems().length) {
+            <gl-form-summary [items]="summaryItems()" />
+          }
+          <gl-text-field
+            label="Email"
+            [inputId]="emailId"
+            type="email"
+            autocomplete="username"
+            [(value)]="email"
+            [error]="shown('email') ? emailError() : ''"
+            (blurred)="touch('email')"
+          />
+          <gl-text-field
+            label="Password"
+            [inputId]="passwordId"
+            type="password"
+            autocomplete="current-password"
+            [(value)]="password"
+            [error]="shown('password') ? passwordError() : ''"
+            (blurred)="touch('password')"
+          />
+          <gl-button type="submit" variant="primary" [block]="true">Sign in</gl-button>
+          <div class="auth-links"><a routerLink="/forgot-password">Forgot your password?</a></div>
+        </form>
+        <p slot="note" class="text-caption note">
+          New here? Greenlit is invite-only. Ask your manager to send you an invitation.
+        </p>
+      </gl-auth-card>
+    }
   `,
   styles: `
     :host {
@@ -86,7 +111,10 @@ const PASSWORD_ID = 'si-pw';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignInPage {
+  private readonly auth = inject(AUTH_SERVICE);
+  private readonly router = inject(Router);
   private readonly injector = inject(Injector);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly summary = viewChild(FormSummary);
 
   protected readonly emailId = EMAIL_ID;
@@ -95,6 +123,14 @@ export class SignInPage {
   protected readonly email = signal('');
   protected readonly password = signal('');
   protected readonly submitted = signal(false);
+  /** The first name to welcome once signed in. */
+  protected readonly welcomeName = signal<string | null>(null);
+  /** Where to go after signing in, as a URL tree so its query survives. */
+  protected readonly destination = signal(
+    this.router.parseUrl(
+      safeReturnUrl(inject(ActivatedRoute).snapshot.queryParamMap.get('returnUrl')),
+    ),
+  );
   private readonly touched = signal<ReadonlySet<Field>>(new Set());
 
   protected readonly emailError = computed(() =>
@@ -128,5 +164,14 @@ export class SignInPage {
       afterNextRender(() => this.summary()?.focus(), { injector: this.injector });
       return;
     }
+    this.auth.signIn(this.email().trim(), this.password()).subscribe((result) => {
+      if (result.outcome !== 'signed-in') return;
+      this.welcomeName.set(result.session.displayName.split(' ')[0]);
+      const timer = setTimeout(
+        () => this.router.navigateByUrl(this.destination()),
+        SIGNED_IN_PAUSE_MS,
+      );
+      this.destroyRef.onDestroy(() => clearTimeout(timer));
+    });
   }
 }

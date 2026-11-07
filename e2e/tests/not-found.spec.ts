@@ -20,7 +20,7 @@ test.describe("Not found", () => {
   });
 
   test("Back to calendar opens the calendar (L2-046 AC1)", async ({ page, goto, pages }) => {
-    await goto("notFound");
+    await goto("notFound", { as: "manager" });
     await pages.notFound.waitForReady();
     await pages.notFound.goBackToCalendar();
     await pages.calendar.waitForReady();

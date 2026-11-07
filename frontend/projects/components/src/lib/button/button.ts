@@ -1,6 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, UrlTree } from '@angular/router';
 
 export type ButtonVariant = 'default' | 'primary' | 'danger' | 'ghost' | 'link';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -167,8 +167,8 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 export class Button {
   readonly variant = input<ButtonVariant>('default');
   readonly size = input<ButtonSize>('md');
-  /** Router link; when set the button renders as `<a>`. */
-  readonly link = input<string | null>(null);
+  /** Router link (a path, or a URL tree that keeps a query); when set the button renders as `<a>`. */
+  readonly link = input<string | UrlTree | null>(null);
   readonly type = input<'button' | 'submit' | 'reset'>('button');
   readonly disabled = input<boolean>(false);
   /** Shows the spinner and sets `aria-busy`. */

@@ -16,10 +16,23 @@ const DEV_SIGNING_KEY = "dev-only-key-replace-in-non-dev-environments-via-env-va
 const ISSUER = "greenlit";
 const AUDIENCE = "greenlit-clients";
 
+/** The password `greenlit seed` gives every demo account (SeedCommandHandler.DemoPassword). */
+export const DEMO_PASSWORD = "greenlit-demo";
+
 /** The seeded people a test can sign in as. */
 export const PEOPLE = {
-  manager: { userId: "0d6f1c1e-7a3b-4c51-9a10-000000000001", name: "Maya Chen", role: "Manager" },
-  member: { userId: "0d6f1c1e-7a3b-4c51-9a10-000000000002", name: "Ana Ruiz", role: "Member" },
+  manager: {
+    userId: "0d6f1c1e-7a3b-4c51-9a10-000000000001",
+    name: "Maya Chen",
+    email: "maya@northwind.studio",
+    role: "Manager",
+  },
+  member: {
+    userId: "0d6f1c1e-7a3b-4c51-9a10-000000000002",
+    name: "Ana Ruiz",
+    email: "ana@northwind.studio",
+    role: "Member",
+  },
 } as const;
 
 export type Person = keyof typeof PEOPLE;
