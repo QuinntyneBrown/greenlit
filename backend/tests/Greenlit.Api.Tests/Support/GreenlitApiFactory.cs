@@ -48,6 +48,9 @@ public class GreenlitApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
                 ["Greenlit:Jwt:SigningKey"] = SigningKey,
                 ["Greenlit:Jwt:AccessTokenMinutes"] = "15",
                 ["Greenlit:App:Origin"] = "https://app.example.com",
+                // Google is stood in for by the fake accounts reader (ADR-012); see FakeGoogle.
+                ["Greenlit:Google:Accounts"] = "Fake",
+                ["Greenlit:Google:ClientId"] = "test-client-id.apps.googleusercontent.com",
             });
         });
     }
