@@ -133,6 +133,10 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.Property<int>("DefaultYearlyDays")
                         .HasColumnType("int");
 
+                    b.Property<string>("HolidayCountry")
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
+
                     b.Property<int>("LeaveYearStartMonth")
                         .HasColumnType("int");
 

@@ -106,6 +106,15 @@ interface MembersApi {
   fail(): Promise<void>;
 }
 
+/** Watches and steers the holiday calls (GET /api/team/holidays and its writes). */
+interface HolidaysApi {
+  /** The holiday list (GET /api/team/holidays) comes back as `body`, whatever the database holds. */
+  stubList(body: object): Promise<void>;
+  /** Reading the holiday list fails with a 500 until `recoverList()`. */
+  failList(): Promise<void>;
+  recoverList(): Promise<void>;
+}
+
 /** Watches and steers the invitation requests (GET /api/invitations/{token} and POST .../accept). */
 interface InvitationsApi {
   /** How many accept requests the page has sent so far. */
@@ -172,6 +181,7 @@ interface RequestsApi {
 }
 
 interface GlFixtures {
+  holidaysApi: HolidaysApi;
   requestsApi: RequestsApi;
   invitationsApi: InvitationsApi;
   authApi: AuthApi;
@@ -351,6 +361,18 @@ export const test = base.extend<GlFixtures>({
         await page.route(reopen, (route) => route.fulfill({ status: 500, body: "" }));
       },
       recoverReopen: () => page.unroute(reopen),
+    });
+  },
+  holidaysApi: async ({ page }, use) => {
+    const list = (url: URL) => url.pathname === "/api/team/holidays";
+    await use({
+      stubList: async (body) => {
+        await page.route(list, (route) => (route.request().method() === "GET" ? route.fulfill({ json: body }) : route.fallback()));
+      },
+      failList: async () => {
+        await page.route(list, (route) => (route.request().method() === "GET" ? route.fulfill({ status: 500, body: "" }) : route.fallback()));
+      },
+      recoverList: () => page.unroute(list),
     });
   },
   invitationsApi: async ({ page }, use) => {

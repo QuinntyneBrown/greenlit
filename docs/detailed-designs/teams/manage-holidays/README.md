@@ -60,13 +60,13 @@ The section and its dialogs call the Greenlit API, which stores the holidays in 
 
 ### Components
 
-`AddHolidayCommandHandler` checks duplicates and weekends through `WeekendRule`; removal is a soft delete so Undo can restore it.
+`AddHolidayCommandHandler` checks duplicates and weekends through `WorkingDayRule`; removal is a soft delete so Undo can restore it.
 
 ![C4 component view for manage team holidays](diagrams/c4-component.png)
 
 ### Class structure
 
-`Holiday` gains `RemovedUtc`; `WeekendRule` is the one place that decides non-working days.
+`Holiday` gains `RemovedUtc`; `WorkingDayRule` is the one place that decides non-working days.
 
 ![Class diagram for manage team holidays](diagrams/class-structure.png)
 

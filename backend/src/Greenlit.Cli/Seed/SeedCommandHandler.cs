@@ -159,6 +159,8 @@ public sealed class SeedCommandHandler
             _logger.LogInformation("Added {Team}.", DemoTeamName);
         }
 
+        team.HolidayCountry ??= "GB";
+
         for (var order = 0; order < Cast.Length; order++)
         {
             var (name, email, userId) = Cast[order];

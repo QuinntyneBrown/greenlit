@@ -14,6 +14,9 @@ public class Team
 
     public DateTimeOffset CreatedUtc { get; set; }
 
+    /// <summary>The public-holiday calendar chosen when the team was created (<c>GB</c>, <c>IE</c> or <c>US</c>); null when it chose none (ADR-008).</summary>
+    public string? HolidayCountry { get; set; }
+
     /// <summary>
     /// The fewest members who should be in on any working day (docs/detailed-designs/teams/coverage-minimum);
     /// 0 means no minimum, so no day is ever short.

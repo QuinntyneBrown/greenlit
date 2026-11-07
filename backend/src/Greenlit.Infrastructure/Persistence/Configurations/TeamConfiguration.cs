@@ -11,6 +11,7 @@ public sealed class TeamConfiguration : IEntityTypeConfiguration<Team>
         b.HasKey(x => x.Id);
         b.Property(x => x.Name).HasMaxLength(120).IsRequired();
         b.Property(x => x.TimeZone).HasMaxLength(64).IsRequired();
+        b.Property(x => x.HolidayCountry).HasMaxLength(2);
         b.HasIndex(x => x.ManagerUserId);
         b.HasMany(x => x.Members).WithOne(m => m.Team).HasForeignKey(m => m.TeamId).OnDelete(DeleteBehavior.Cascade);
         b.HasMany(x => x.Holidays).WithOne(h => h.Team).HasForeignKey(h => h.TeamId).OnDelete(DeleteBehavior.Cascade);
