@@ -86,6 +86,31 @@ export class SettingsPage extends BasePage {
     return control(this.workWeekSection(), 'Add day off');
   }
 
+  workWeekHeading(): Locator {
+    return this.workWeekSection().getByRole("heading", { level: 2, name: "Work week & holidays", exact: true });
+  }
+
+  /** The banner that says next year's public holidays are ready: "2027 UK bank holidays are ready". */
+  reviewBanner(): Locator {
+    return this.main.locator(".banner");
+  }
+
+  reviewBannerTitle(): Locator {
+    return this.reviewBanner().locator(".alert__title");
+  }
+
+  reviewBannerText(): Locator {
+    return this.reviewBanner().locator(".alert__body > div:not(.alert__title):not(.alert__actions)");
+  }
+
+  reviewHolidaysButton(): Locator {
+    return control(this.reviewBanner(), "Review holidays");
+  }
+
+  dismissReviewBannerButton(): Locator {
+    return this.reviewBanner().getByRole("button", { name: "Dismiss", exact: true });
+  }
+
   async openAddHolidayDialog(): Promise<void> {
     await this.addDayOffButton().click();
   }

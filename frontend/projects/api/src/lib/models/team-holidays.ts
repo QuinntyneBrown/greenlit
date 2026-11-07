@@ -6,6 +6,12 @@ export interface Holiday {
   readonly name: string;
 }
 
+/** Next year's public holidays, ready to review: "2027 UK bank holidays". */
+export interface HolidayReview {
+  readonly year: number;
+  readonly name: string;
+}
+
 /** The Work week & holidays section's holidays (GET /api/team/holidays). */
 export interface TeamHolidays {
   /** The year listed: the current year in the team's time zone. */
@@ -14,4 +20,6 @@ export interface TeamHolidays {
   readonly source: string | null;
   /** In date order. */
   readonly holidays: readonly Holiday[];
+  /** Set when the team's calendar has next year's holidays and the team holds none of them yet. */
+  readonly review: HolidayReview | null;
 }

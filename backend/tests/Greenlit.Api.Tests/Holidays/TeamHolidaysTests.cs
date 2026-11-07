@@ -4,6 +4,8 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
 using Greenlit.Api.Tests.Support;
+using Greenlit.Infrastructure.Persistence;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Greenlit.Api.Tests.Holidays;
 
@@ -86,6 +88,67 @@ public class TeamHolidaysTests : IClassFixture<FrozenClockApiFactory>
         (await GetAsync(team.ClientFor("Maya Chen"))).GetProperty("source").ValueKind.Should().Be(JsonValueKind.Null);
     }
 
+    [Theory]
+    [InlineData("GB", "2027 UK bank holidays")]
+    [InlineData("IE", "2027 Irish public holidays")]
+    [InlineData("US", "2027 US federal holidays")]
+    public async Task Next_years_public_holidays_are_offered_for_review_when_the_team_holds_none_of_them(string country, string name)
+    {
+        // L2-036 AC3: "2027 UK bank holidays are ready".
+        var team = await TestTeam.CreateAsync(_factory);
+        await team.SetHolidayCountryAsync(country);
+        await team.AddHolidayAsync(new DateOnly(2026, 12, 25), "Christmas Day");
+
+        var review = (await GetAsync(team.ClientFor("Maya Chen"))).GetProperty("review");
+
+        review.GetProperty("year").GetInt32().Should().Be(2027);
+        review.GetProperty("name").GetString().Should().Be(name);
+    }
+
+    [Fact]
+    public async Task Nothing_is_offered_when_the_team_already_holds_next_years_holidays()
+    {
+        var team = await TestTeam.CreateAsync(_factory);
+        await team.SetHolidayCountryAsync("GB");
+        await team.AddHolidayAsync(new DateOnly(2027, 1, 1), "New Year's Day");
+
+        (await GetAsync(team.ClientFor("Maya Chen"))).GetProperty("review").ValueKind.Should().Be(JsonValueKind.Null);
+    }
+
+    [Fact]
+    public async Task Nothing_is_offered_again_once_the_manager_has_removed_next_years_holidays()
+    {
+        var team = await TestTeam.CreateAsync(_factory);
+        await team.SetHolidayCountryAsync("GB");
+        await team.AddHolidayAsync(new DateOnly(2027, 1, 1), "New Year's Day");
+        var maya = team.ClientFor("Maya Chen");
+        var id = await HolidayIdAsync(team, "New Year's Day");
+        (await maya.DeleteAsync($"/api/team/holidays/{id}")).StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        (await GetAsync(maya)).GetProperty("review").ValueKind.Should().Be(JsonValueKind.Null);
+    }
+
+    [Fact]
+    public async Task A_team_with_no_calendar_is_offered_nothing()
+    {
+        var team = await TestTeam.CreateAsync(_factory);
+
+        (await GetAsync(team.ClientFor("Maya Chen"))).GetProperty("review").ValueKind.Should().Be(JsonValueKind.Null);
+    }
+
+    [Fact]
+    public async Task A_team_created_with_a_calendar_already_holds_next_year_so_nothing_is_offered()
+    {
+        var noor = await TestAccount.CreateAsync(_factory, "Noor Haddad");
+        var created = await _factory.ClientFor(noor).PostAsJsonAsync("/api/teams",
+            new { name = "Design team", timeZone = "Europe/London", holidayCountry = "GB", members = Array.Empty<object>() });
+        var session = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("session").GetProperty("accessToken").GetString();
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", session);
+
+        (await GetAsync(client)).GetProperty("review").ValueKind.Should().Be(JsonValueKind.Null);
+    }
+
     [Fact]
     public async Task A_member_cannot_read_the_holiday_settings()
     {
@@ -103,6 +166,13 @@ public class TeamHolidaysTests : IClassFixture<FrozenClockApiFactory>
         var response = await _factory.CreateClient().GetAsync("/api/team/holidays");
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    private async Task<Guid> HolidayIdAsync(TestTeam team, string name)
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        return db.Holidays.Single(h => h.TeamId == team.Team.Id && h.Name == name).Id;
     }
 
     private static async Task<JsonElement> GetAsync(HttpClient client)

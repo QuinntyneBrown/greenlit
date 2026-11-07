@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DOCUMENT,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 
@@ -11,6 +18,7 @@ import {
   holidayDateLabel,
 } from 'api';
 import {
+  Alert,
   Button,
   DayChips,
   EmptyState,
@@ -50,8 +58,20 @@ const WORKING_DAYS = [1, 2, 3, 4, 5];
  */
 @Component({
   selector: 'app-settings-page',
-  imports: [Button, DayChips, EmptyState, HolidayList, MemberList, Skeleton],
+  imports: [Alert, Button, DayChips, EmptyState, HolidayList, MemberList, Skeleton],
   template: `
+    @if (review(); as review) {
+      <gl-alert
+        class="review"
+        [banner]="true"
+        [dismissible]="true"
+        [title]="review.name + ' are ready'"
+        (dismissed)="reviewDismissed.set(true)"
+      >
+        Review them and add the ones your team observes.
+        <gl-button slot="actions" size="sm" (click)="reviewHolidays()">Review holidays</gl-button>
+      </gl-alert>
+    }
     <h1>Settings</h1>
     <section id="team" class="settings-section" aria-labelledby="team-title">
       <h2 id="team-title" class="section-title">Team</h2>
@@ -100,7 +120,7 @@ const WORKING_DAYS = [1, 2, 3, 4, 5];
     </section>
     @if (isManager()) {
       <section id="work-week" class="settings-section" aria-labelledby="work-week-title">
-        <h2 id="work-week-title" class="section-title">Work week &amp; holidays</h2>
+        <h2 id="work-week-title" class="section-title" tabindex="-1">Work week &amp; holidays</h2>
         <p>
           Non-working days and holidays show red on the calendar and never count against allowance.
         </p>
@@ -213,6 +233,9 @@ const WORKING_DAYS = [1, 2, 3, 4, 5];
     .holidays {
       margin-top: var(--space-2);
     }
+    .review {
+      margin-bottom: var(--space-6);
+    }
     .card-plain {
       border: 1px solid var(--color-border-default);
       border-radius: var(--radius-md);
@@ -226,6 +249,7 @@ export class SettingsPage {
   private readonly holidayService = inject(HOLIDAY_SERVICE);
   private readonly dialogs = inject(AppDialogs);
   private readonly toasts = inject(ToastService);
+  private readonly document = inject(DOCUMENT);
   private readonly attempt = signal(0);
   private readonly holidayAttempt = signal(0);
 
@@ -276,6 +300,13 @@ export class SettingsPage {
     return load.state === 'ready' ? load.holidays : null;
   });
 
+  protected readonly reviewDismissed = signal(false);
+
+  /** Next year's public holidays are ready to review (L2-036 AC3), until the manager dismisses the banner. */
+  protected readonly review = computed(() =>
+    this.reviewDismissed() ? null : (this.loadedHolidays()?.review ?? null),
+  );
+
   protected readonly source = computed(() => this.loadedHolidays()?.source ?? null);
 
   protected readonly holidays = computed<HolidayListItem[]>(() =>
@@ -297,6 +328,13 @@ export class SettingsPage {
 
   protected retryHolidays(): void {
     this.holidayAttempt.update((n) => n + 1);
+  }
+
+  /** "Review holidays": takes the manager to the holidays and puts focus on their heading. */
+  protected reviewHolidays(): void {
+    const heading = this.document.getElementById('work-week-title');
+    heading?.scrollIntoView({ block: 'start' });
+    heading?.focus({ preventScroll: true });
   }
 
   protected addDayOff(): void {

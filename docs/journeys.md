@@ -29,7 +29,7 @@ account menu, and the pending count arrive with the journeys that need them.
 | 11 | Compute allowances | Yearly days, used, booked, requested and left; over-allowance warnings. | 0 (built) |
 | 12 | Select days and use the keyboard | Select ranges by drag or arrow keys; act from selection bar. | 0 (built) |
 | 13 | Follow and cancel own requests | Member sees upcoming and past requests and cancels pending ones. | 0 (built) |
-| 14 | Manage team holidays | Manager adds and removes team holidays, shown red for everyone. | 3 |
+| 14 | Manage team holidays | Manager adds and removes team holidays, shown red for everyone. | 0 (built) |
 | 15 | Set working days | Team work week and part-time days per member, never booked. | 3 |
 | 16 | Get feedback on actions | Toasts confirm every change, with undo and retry where possible. | 2 |
 | 17 | Set the coverage minimum | Manager sets fewest people in; short days flagged on sheet. | 2 |
@@ -48,6 +48,7 @@ account menu, and the pending count arrive with the journeys that need them.
 
 ## Notes
 
+- Journey 14 is built (ADR-008). `GET /api/team/holidays` (manager only) lists the current year's holidays, the source (`Team.HolidayCountry`, set at creation) and a `review` for next year; `POST` adds a day off (409 `holiday_exists`, 400 `day_is_weekend`, and it clears days members already booked on the date); `DELETE .../{id}` soft-deletes (`RemovedUtc`) and `POST .../{id}/restore` is Undo. Settings shows Work week & holidays to the manager only, with the working-day chips read-only until journey 15. New `gl-*` components: `gl-holiday-list`, `gl-day-chips`. Deferred: importing a public-holiday calendar after creation ("Review holidays" only jumps to the section).
 - Journey 13 is built. A member's `/requests` is My requests (`GET /api/requests/mine`: `managerName`, Upcoming = pending,
   Past = decided or cancelled), served by a second route after the manager's ledger (`managerMatch`). `gl-request-list` has
   a `mine` mode. "Cancel request" opens the cancel dialog (`POST /api/requests/{id}/cancel`, 204; 404 `request_not_found`
