@@ -32,4 +32,12 @@ public sealed class RequestsController : ControllerBase
     [HttpPost("approve")]
     public async Task<ActionResult<IReadOnlyList<ApprovalResult>>> Approve([FromBody] ApproveRequestsCommand command, CancellationToken ct) =>
         Ok(await _sender.Send(command, ct));
+
+    /// <summary>Undo of an approval: the request is Pending again and its days Requested.</summary>
+    [HttpPost("{id:guid}/reopen")]
+    public async Task<IActionResult> Reopen(Guid id, CancellationToken ct)
+    {
+        await _sender.Send(new ReopenRequestCommand(id), ct);
+        return NoContent();
+    }
 }
