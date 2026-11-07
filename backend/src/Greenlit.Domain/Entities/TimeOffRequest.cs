@@ -53,6 +53,27 @@ public class TimeOffRequest
     }
 
     /// <summary>
+    /// The manager declines a Pending request, with a reason when they gave one: it becomes Declined and its
+    /// days go back to Tentative, still linked so Undo can find them (docs/detailed-designs/requests/decline-request).
+    /// Load <see cref="Days"/> first.
+    /// </summary>
+    public void Decline(Guid by, string? reason, DateTimeOffset now)
+    {
+        if (Status != RequestStatus.Pending)
+            throw new InvalidOperationException($"A {Status} request cannot be declined.");
+        Status = RequestStatus.Declined;
+        DecidedUtc = now;
+        DecidedByUserId = by;
+        DeclineReason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
+        foreach (var day in Days)
+        {
+            day.Status = DayStatus.Tentative;
+            day.ConfirmedUtc = null;
+            day.UpdatedUtc = now;
+        }
+    }
+
+    /// <summary>
     /// Undo of an approval: the request is Pending again and its days still Confirmed return to Requested.
     /// A day the manager has since changed is not in that state and is left alone. Load <see cref="Days"/> first.
     /// </summary>

@@ -43,6 +43,11 @@ public sealed class RequestsController : ControllerBase
     public async Task<ActionResult<IReadOnlyList<ApprovalResult>>> Approve([FromBody] ApproveRequestsCommand command, CancellationToken ct) =>
         Ok(await _sender.Send(command, ct));
 
+    /// <summary>The manager declines a pending request: it becomes Declined with the optional reason and its days Tentative.</summary>
+    [HttpPost("{id:guid}/decline")]
+    public async Task<ActionResult<DeclineResult>> Decline(Guid id, [FromBody] DeclineBody? body, CancellationToken ct) =>
+        Ok(await _sender.Send(new DeclineRequestCommand(id, body?.Reason), ct));
+
     /// <summary>Undo of an approval: the request is Pending again and its days Requested.</summary>
     [HttpPost("{id:guid}/reopen")]
     public async Task<IActionResult> Reopen(Guid id, CancellationToken ct)
@@ -51,3 +56,6 @@ public sealed class RequestsController : ControllerBase
         return NoContent();
     }
 }
+
+/// <summary>The body of a decline: the manager's optional reason.</summary>
+public sealed record DeclineBody(string? Reason);

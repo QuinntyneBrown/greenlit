@@ -18,9 +18,16 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Backend**
 
-- **`RequestsController`** — `POST /api/requests/{id}/decline` behind the `Manager` policy; Undo uses `reopen`.
+- **`RequestsController`** — `POST /api/requests/{id}/decline` with `{ reason }`, manager only, own team only; it answers a `DeclineResult` (request id, member name, range, days, whether the member was `emailed`, the reason) for the toast. A request that is unknown or on another team is one 404 `request_not_found`, one that is not Pending a 409 `request_not_pending`, a member caller a 403 `forbidden`. Undo uses `POST /api/requests/{id}/reopen`, which now also accepts a Declined request.
 - **`DeclineRequestCommandHandler`** — Calls `TimeOffRequest.Decline(by, reason, now)`, sets the linked days to Tentative, commits and calls `RequestNotifier.RequestDecided`.
-- **`DeclineRequestCommandValidator`** — Reason length limit: `<TO SUPPLY>`.
+- **`DeclineRequestCommandValidator`** — Reason of at most 500 characters (the same limit as a request note); blank or white space means no reason and is stored as null.
+
+**Decisions (journey 10)**
+
+- The days of a declined request keep their link to it, so Undo finds exactly them: `Reopen` on a Declined request returns every day still Tentative and linked to it to Requested. A day the member or manager has since changed is not Tentative any more, or points at a newer request, and is left alone.
+- Declining a Cancelled request is the same 409 as any request that is not Pending.
+- The email (`RequestNotifier.DeclinedAsync`) has the subject "Your time off request was declined" and quotes the reason when there is one. It is sent after the decision is saved, so a mail failure never undoes it; `emailed` is false when the member has no address or sending failed, and the toast then drops "has been emailed your reason". Without a reason the toast body is "Ben has been emailed." Undo sends no second email.
+- Privacy: the reason is shown only to the manager (ledger, detail) and emailed to the member it concerns; an error never says whether a request exists on another team.
 
 **Shared plumbing (exists today)**
 
