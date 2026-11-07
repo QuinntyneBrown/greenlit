@@ -17,6 +17,7 @@ export * from './lib/user-menu/user-menu';
 
 // actions
 export * from './lib/button/button';
+export * from './lib/switch/switch';
 
 // forms and account pages
 export * from './lib/auth-card/auth-card';

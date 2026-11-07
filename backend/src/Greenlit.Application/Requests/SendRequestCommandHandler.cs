@@ -19,12 +19,14 @@ public sealed class SendRequestCommandHandler : IRequestHandler<SendRequestComma
     private readonly IAppDbContext _db;
     private readonly ICurrentUser _currentUser;
     private readonly TimeProvider _time;
+    private readonly RequestNotifier _notifier;
 
-    public SendRequestCommandHandler(IAppDbContext db, ICurrentUser currentUser, TimeProvider time)
+    public SendRequestCommandHandler(IAppDbContext db, ICurrentUser currentUser, TimeProvider time, RequestNotifier notifier)
     {
         _db = db;
         _currentUser = currentUser;
         _time = time;
+        _notifier = notifier;
     }
 
     public async Task<RequestDto> Handle(SendRequestCommand command, CancellationToken ct)
@@ -83,6 +85,7 @@ public sealed class SendRequestCommandHandler : IRequestHandler<SendRequestComma
         }
 
         await _db.SaveChangesAsync(ct);
+        await _notifier.NewRequestAsync(team, member, request, working.Count, ct);
         return new RequestDto(
             request.Id, member.Id, member.Name,
             RequestInput.Iso(request.FirstDay), RequestInput.Iso(request.LastDay),

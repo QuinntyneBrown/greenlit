@@ -16,9 +16,9 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Backend**
 
-- **`SettingsController`** — `PUT /api/team/settings/notifications` saves `Team.NotifyNewRequests` and `Team.NotifyDecisions`.
+- **`TeamSettingsController`** — `PUT /api/team/settings/notifications` with `{ newRequests, decisions }` saves `Team.NotifyNewRequests` and `Team.NotifyDecisions` (manager only; a member is `403`, a missing value is `400`). `GET /api/team/settings` also returns `notifyNewRequests` and `notifyDecisions`. Both switches default to on for every team.
 - **`RequestNotifier`** — Application service called by the request handlers after commit. `RequestSent` emails the manager when `NotifyNewRequests` is on; `RequestDecided` emails the member, with the decline reason, when `NotifyDecisions` is on.
-- **`IEmailSender`** — Greenlit.Application abstraction introduced by this design, implemented in Greenlit.Infrastructure. It sends one templated email; the provider is `<TO SUPPLY>`.
+- **`IEmailSender`** — Greenlit.Application abstraction introduced by this design, implemented in Greenlit.Infrastructure. It sends one plain-text message. Resolved: no SMTP provider is wired in this journey. The one implementation, `LoggingEmailSender`, writes each message to the log (development and the e2e API); the API tests replace it with a recording sender. A real provider is a later swap of that single registration. The message text of each email lives in one class (`NewRequestEmail`, `ApprovalEmail`, `DeclineEmail`).
 
 **Shared plumbing (exists today)**
 
@@ -26,7 +26,9 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **`ValidationBehavior`** — MediatR pipeline behaviour in Greenlit.Application. It runs each request's FluentValidation validator before the handler and raises `ValidationException` on failure.
 - **`IAppDbContext`** — Greenlit.Application abstraction over the EF Core context, implemented by `AppDbContext` in Greenlit.Infrastructure. Handlers read and write through it in one unit of work.
 
-Delivery failures after the commit are logged and do not undo the decision. Retry behaviour is `<TO SUPPLY>`.
+Delivery failures after the commit are logged and do not undo the decision. Resolved: there is no retry. A message that cannot be handed over is logged and the request, or decision, stands; the response reports `emailed: false` for a decision.
+
+A decision email that the switch suppresses also reports `emailed: false`, so the toast does not claim the member was emailed. A member with no address is never emailed. The manager's address is the sign-in email of the team's manager.
 
 ## Requirements
 

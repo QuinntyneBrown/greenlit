@@ -28,6 +28,11 @@ public sealed class TeamSettingsController : ControllerBase
     public Task<TeamSettingsDto> SaveWorkWeek([FromBody] SaveWorkWeekCommand command, CancellationToken ct) =>
         _sender.Send(command, ct);
 
+    /// <summary>The team's two email switches (docs/detailed-designs/teams/notification-settings).</summary>
+    [HttpPut("notifications")]
+    public Task<TeamSettingsDto> SaveNotifications([FromBody] SaveNotificationsCommand command, CancellationToken ct) =>
+        _sender.Send(command, ct);
+
     /// <summary>The team's coverage minimum (docs/detailed-designs/teams/coverage-minimum).</summary>
     [HttpPut("coverage")]
     public Task<TeamSettingsDto> SaveCoverage([FromBody] SaveCoverageCommand command, CancellationToken ct) =>

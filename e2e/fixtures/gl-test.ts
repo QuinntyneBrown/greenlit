@@ -356,6 +356,17 @@ interface CoverageApi {
   recoverSave(): Promise<void>;
 }
 
+/** Watches and steers the notification saves (PUT /api/team/settings/notifications). */
+interface NotificationsApi {
+  /** How many notification saves the page has sent so far. */
+  saves(): number;
+  /** Holds notification saves until the returned function is called. */
+  holdSave(): Promise<() => void>;
+  /** Notification saves fail with a 500 until `recoverSave()`. */
+  failSave(): Promise<void>;
+  recoverSave(): Promise<void>;
+}
+
 /** Watches and steers adding an adjustment (POST /api/people/{id}/adjustments). */
 interface AdjustmentsApi {
   /** How many adjustments the page has sent so far. */
@@ -382,6 +393,7 @@ interface GlFixtures {
   removeMemberApi: RemoveMemberApi;
   adjustmentsApi: AdjustmentsApi;
   coverageApi: CoverageApi;
+  notificationsApi: NotificationsApi;
   workingDaysApi: WorkingDaysApi;
   teamSettingsApi: TeamSettingsApi;
   allowanceApi: AllowanceApi;
@@ -680,6 +692,35 @@ export const test = base.extend<GlFixtures>({
         );
       },
       recoverReopen: () => page.unroute(reopen),
+    });
+  },
+  notificationsApi: async ({ page }, use) => {
+    const pattern = "**/api/team/settings/notifications";
+    let saves = 0;
+    page.on("request", (request) => {
+      if (
+        request.method() === "PUT" &&
+        new URL(request.url()).pathname === "/api/team/settings/notifications"
+      )
+        saves++;
+    });
+    await use({
+      saves: () => saves,
+      holdSave: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      failSave: async () => {
+        await page.route(pattern, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
+      },
+      recoverSave: () => page.unroute(pattern),
     });
   },
   coverageApi: async ({ page }, use) => {

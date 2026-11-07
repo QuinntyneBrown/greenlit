@@ -34,6 +34,12 @@ public class Team
     /// <summary>The most days a manager should carry over; a stored setting, carry-over itself is an adjustment (ADR-007).</summary>
     public int MaxCarryOver { get; set; } = 5;
 
+    /// <summary>Email the manager when a member sends a request (teams/notification-settings, L2-043).</summary>
+    public bool NotifyNewRequests { get; set; } = true;
+
+    /// <summary>Email a member when their request is approved or declined (teams/notification-settings, L2-043).</summary>
+    public bool NotifyDecisions { get; set; } = true;
+
     /// <summary>The weekdays the team works; the others are red for every row (teams/working-days).</summary>
     public WorkingDays WorkingDays { get; set; } = WorkingDays.MonToFri;
 

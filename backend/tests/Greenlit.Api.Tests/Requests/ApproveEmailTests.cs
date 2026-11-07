@@ -7,7 +7,7 @@ using Greenlit.Api.Tests.Support;
 namespace Greenlit.Api.Tests.Requests;
 
 /// <summary>
-/// The decision email of an approval (L2-024 AC1, L2-043 AC3 until journey 25 adds the switch).
+/// The decision email of an approval (L2-024 AC1, L2-043 AC3, with the Decisions switch on, its default).
 /// Design: docs/detailed-designs/requests/approve-request. Emails go to the recording sender.
 /// </summary>
 public class ApproveEmailTests : IClassFixture<GreenlitApiFactory>

@@ -215,6 +215,53 @@ export class SettingsPage extends BasePage {
     await this.coverageTeamSize().waitFor({ state: "visible", timeout: 10_000 });
   }
 
+  // --- Notifications (docs/detailed-designs/teams/notification-settings) --------------------------
+
+  notificationsSection(): Locator {
+    return this.main.locator("section#notifications");
+  }
+
+  /** "Email only. Greenlit never sends daily digests." */
+  notificationsIntro(): Locator {
+    return this.notificationsSection().locator("> p");
+  }
+
+  /** The "New requests" switch; its accessible name is the label followed by the description, as in the mock. */
+  newRequestsSwitch(): Locator {
+    return this.notificationsSection().getByRole("switch", { name: /^New requests/ });
+  }
+
+  /** Flips the "New requests" switch with the keyboard: focus it, then Space. */
+  async toggleNewRequestsWithKeyboard(): Promise<void> {
+    await this.newRequestsSwitch().focus();
+    await this.page.keyboard.press("Space");
+  }
+
+  /** The "Decisions" switch. */
+  decisionsSwitch(): Locator {
+    return this.notificationsSection().getByRole("switch", { name: /^Decisions/ });
+  }
+
+  /** The description under a switch, which the switch is described by. */
+  switchDescription(label: "New requests" | "Decisions"): Locator {
+    return this.notificationsSection().locator("label.switch").filter({ hasText: label }).locator("small");
+  }
+
+  /** The notifications section's "Save changes"; it reads "Saving…" while busy. */
+  saveNotificationsButton(): Locator {
+    return this.notificationsSection().locator(".settings-actions .btn--primary");
+  }
+
+  /** The polite status next to "Save changes": "Saved" after a save. */
+  saveNotificationsStatus(): Locator {
+    return this.notificationsSection().locator(".settings-actions [aria-live='polite']");
+  }
+
+  /** Waits for the switches to show the team's saved values, i.e. for the settings to have loaded. */
+  async waitForNotifications(): Promise<void> {
+    await this.newRequestsSwitch().waitFor({ state: "visible", timeout: 10_000 });
+  }
+
   // --- Work week & holidays (docs/detailed-designs/teams/manage-holidays) -------------------------
 
   workWeekSection(): Locator {
