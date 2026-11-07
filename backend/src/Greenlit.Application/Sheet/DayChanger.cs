@@ -1,6 +1,7 @@
 using System.Globalization;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Exceptions;
+using Greenlit.Application.Requests;
 using Greenlit.Domain.Entities;
 using Greenlit.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -18,12 +19,14 @@ internal sealed class DayChanger
     private readonly IAppDbContext _db;
     private readonly ICurrentUser _currentUser;
     private readonly TimeProvider _time;
+    private readonly RequestLedger _ledger;
 
     public DayChanger(IAppDbContext db, ICurrentUser currentUser, TimeProvider time)
     {
         _db = db;
         _currentUser = currentUser;
         _time = time;
+        _ledger = new RequestLedger(db, time);
     }
 
     /// <param name="targets">Date and the status it should end up with (null: a working day).</param>
@@ -74,6 +77,8 @@ internal sealed class DayChanger
         var now = _time.GetUtcNow();
         var changes = new List<DayChangeDto>();
         var locked = 0;
+        var joining = new List<TimeOffDay>();
+        var leaving = new List<(TimeOffDay Day, Guid RequestId)>();
         foreach (var (date, target) in working.OrderBy(t => t.Date))
         {
             existing.TryGetValue(date, out var row);
@@ -85,13 +90,17 @@ internal sealed class DayChanger
                 continue;
             }
 
+            // A day leaving Requested leaves its pending request (RequestLedger).
+            if (current == DayStatus.Requested && row!.TimeOffRequestId is { } requestId)
+                leaving.Add((row, requestId));
+
             if (target is null)
             {
                 _db.TimeOffDays.Remove(row!);
             }
             else if (row is null)
             {
-                _db.TimeOffDays.Add(new TimeOffDay
+                row = new TimeOffDay
                 {
                     Id = Guid.NewGuid(),
                     TeamMemberId = member.Id,
@@ -99,7 +108,8 @@ internal sealed class DayChanger
                     Status = target.Value,
                     UpdatedUtc = now,
                     ConfirmedUtc = target == DayStatus.Confirmed ? now : null,
-                });
+                };
+                _db.TimeOffDays.Add(row);
             }
             else
             {
@@ -108,12 +118,15 @@ internal sealed class DayChanger
                 row.ConfirmedUtc = target == DayStatus.Confirmed ? now : null;
             }
 
+            if (target == DayStatus.Requested) joining.Add(row!);
+
             changes.Add(new DayChangeDto(date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), current, target));
         }
 
         if (changes.Count == 0 && locked > 0)
             throw new ForbiddenException("confirmed_locked", "Confirmed days can only be changed by the manager.");
 
+        await _ledger.ReconcileAsync(team.Id, member.Id, joining, leaving, ct);
         await _db.SaveChangesAsync(ct);
         return new ChangeSetDto(member.Id, member.Name, status, changes);
     }

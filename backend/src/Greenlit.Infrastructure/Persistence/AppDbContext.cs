@@ -12,6 +12,7 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
     public DbSet<TimeOffDay> TimeOffDays => Set<TimeOffDay>();
+    public DbSet<TimeOffRequest> TimeOffRequests => Set<TimeOffRequest>();
     public DbSet<Holiday> Holidays => Set<Holiday>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
 

@@ -9,6 +9,7 @@ public interface IAppDbContext
     DbSet<Team> Teams { get; }
     DbSet<TeamMember> TeamMembers { get; }
     DbSet<TimeOffDay> TimeOffDays { get; }
+    DbSet<TimeOffRequest> TimeOffRequests { get; }
     DbSet<Holiday> Holidays { get; }
     DbSet<Invitation> Invitations { get; }
 
