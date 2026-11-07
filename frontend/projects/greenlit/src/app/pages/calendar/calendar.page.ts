@@ -20,8 +20,10 @@ import {
   PeriodNav,
   SegmentedControl,
   SegmentedOption,
+  SelectionBar,
   TeamGrid,
   TeamGridCellStatus,
+  TeamGridSelection,
   TeamGridStroke,
 } from 'components';
 
@@ -29,6 +31,7 @@ import { AppDialogs } from '../../dialogs/app-dialogs';
 import { NewRequestData, NewRequestDialog } from '../../dialogs/new-request/new-request.dialog';
 import { ToastService } from '../../toasts/toast.service';
 import { addMonths, calendarView, columnsFor, monthTitle } from './calendar-view';
+import { selectionBarView } from './selection-view';
 import { FAILED_SAVE, PaintContext, refusedToast, savedToast } from './paint-toasts';
 import { requestSentToast } from './request-toasts';
 
@@ -75,7 +78,7 @@ function localMonth(): string {
  */
 @Component({
   selector: 'app-calendar-page',
-  imports: [PeriodNav, Legend, TeamGrid, EmptyState, Button, SegmentedControl],
+  imports: [PeriodNav, Legend, TeamGrid, SelectionBar, EmptyState, Button, SegmentedControl],
   template: `
     <div class="page-title-row">
       <gl-period-nav
@@ -150,11 +153,21 @@ function localMonth(): string {
             [cover]="view().cover"
             [loading]="load().state === 'loading'"
             [paint]="gridPaint()"
+            [selectable]="choice() === 'select'"
+            (selectionChange)="selection.set($event)"
             (stroke)="paintStroke($event)"
             (monthStep)="go($event)"
           />
         }
       }
+    }
+    @if (bar(); as bar) {
+      <gl-selection-bar
+        [title]="bar.title"
+        [workingDays]="bar.workingDays"
+        [over]="bar.over"
+        [canConfirm]="isManager()"
+      />
     }
   `,
   styles: `
@@ -268,8 +281,8 @@ export class CalendarPage {
   // ---- painting days (docs/detailed-designs/sheet/mark-days) ----
 
   protected readonly showPicker = computed(() => this.loaded() !== null && !this.isEmpty());
-  private readonly isManager = computed(() => this.loaded()?.isManager ?? false);
-  private readonly choice = signal<PaintChoice>('select');
+  protected readonly isManager = computed(() => this.loaded()?.isManager ?? false);
+  protected readonly choice = signal<PaintChoice>('select');
   protected readonly paintChoice = this.choice.asReadonly();
 
   /** L2-015 AC1-2: the manager also offers Confirmed. */
@@ -282,6 +295,18 @@ export class CalendarPage {
     { value: 'tentative', label: 'Tentative', swatch: 'tentative' },
     { value: 'clear', label: 'Clear', swatch: 'empty' },
   ]);
+
+  // ---- selecting days (docs/detailed-designs/sheet/select-days) ----
+
+  /** The range the sheet reports in Select mode; null when nothing is selected. */
+  protected readonly selection = signal<TeamGridSelection | null>(null);
+
+  /** What the selection bar shows; null hides the bar. */
+  protected readonly bar = computed(() => {
+    const sheet = this.loaded();
+    const selection = this.selection();
+    return sheet && selection ? selectionBarView(sheet, this.view().rows, selection) : null;
+  });
 
   protected readonly hint = computed(() =>
     this.isManager()

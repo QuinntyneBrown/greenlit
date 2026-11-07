@@ -214,6 +214,45 @@ export class CalendarPage extends BasePage {
     await this.page.keyboard.press(key);
   }
 
+  // ---- selecting days (docs/detailed-designs/sheet/select-days) ----
+
+  /**
+   * Selects `member`'s cells from day `from` to day `to` in Select mode: a click when they are
+   * the same, otherwise a drag with the mouse or a finger.
+   */
+  async select(member: string, from: string, to: string = from): Promise<void> {
+    await this.paint(member, from, to);
+  }
+
+  /** The cells that are selected (`aria-pressed="true"`). */
+  selectedCells(): Locator {
+    return this.grid().locator('.cell[aria-pressed="true"]');
+  }
+
+  /** The selection bar: a toolbar labelled "Selected days". */
+  selectionBar(): Locator {
+    return this.page.getByRole("toolbar", { name: "Selected days", exact: true });
+  }
+
+  /** "{member} · {range}", e.g. "Ana Ruiz · 23–25 Nov". */
+  selectionTitle(): Locator {
+    return this.selectionBar().locator(".selection-bar__title");
+  }
+
+  /** The line under the title: "3 days working" and, over the allowance, "2 days over allowance". */
+  selectionMeta(): Locator {
+    return this.selectionBar().locator(".selection-bar__meta");
+  }
+
+  /** The bar's buttons in order: Confirm (manager only), Request, Tentative, Clear, Clear selection. */
+  selectionActions(): Locator {
+    return this.selectionBar().getByRole("button");
+  }
+
+  selectionAction(name: string): Locator {
+    return this.selectionBar().getByRole("button", { name, exact: true });
+  }
+
   // ---- requesting time off (docs/detailed-designs/requests/send-request) ----
 
   /** The member's "Request time off" button beside the paint picker; the manager does not get one. */

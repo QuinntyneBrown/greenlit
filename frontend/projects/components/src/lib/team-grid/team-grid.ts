@@ -72,6 +72,12 @@ export interface TeamGridStroke {
   readonly dates: readonly string[];
 }
 
+/** A selection (sheet/select-days): a contiguous range of one member's days, in column order. */
+export interface TeamGridSelection {
+  readonly memberId: string;
+  readonly dates: readonly string[];
+}
+
 /**
  * The sheet (docs/design-system/components/team-grid.html): members down the
  * side, days across, a Left column and the Out row. A `role="grid"` labelled
@@ -93,6 +99,7 @@ export interface TeamGridStroke {
         [attr.aria-label]="label()"
         [attr.aria-busy]="loading() ? 'true' : null"
         [attr.data-painting]="paint() ? '' : null"
+        [attr.data-selecting]="selecting() ? '' : null"
         [style.--days]="columns().length"
         (pointerdown)="onDown($event)"
         (pointermove)="onMove($event)"
@@ -152,6 +159,7 @@ export interface TeamGridStroke {
                   role="gridcell"
                   class="cell"
                   [attr.data-status]="shown(r, c, cell.status)"
+                  [attr.aria-pressed]="row.editable && selecting() ? isSelected(r, c) : null"
                   [attr.data-editable]="row.editable ? '' : null"
                   [attr.data-row]="r"
                   [attr.data-col]="c"
@@ -351,6 +359,17 @@ export interface TeamGridStroke {
     .team-grid[data-painting] .cell[data-editable] {
       touch-action: none;
     }
+    /* In Select mode a horizontal drag selects; a vertical pan still scrolls the page. */
+    .team-grid[data-selecting] .cell[data-editable] {
+      touch-action: pan-y;
+    }
+    /* A selected cell is outlined; the bar and aria-pressed say it too. */
+    .cell[aria-pressed='true'] {
+      box-shadow: inset 0 0 0 2px var(--color-on-status);
+    }
+    .cell[data-status='empty'][aria-pressed='true'] {
+      box-shadow: inset 0 0 0 2px var(--color-fg-default);
+    }
     /* A cell's colour is never its only carrier: a glyph says it too (L2-048). */
     .cell[data-status='confirmed']::after {
       content: '✓';
@@ -453,6 +472,12 @@ export class TeamGrid {
   readonly paint = input<TeamGridCellStatus | null>(null);
   /** A stroke ended on an editable row. */
   readonly stroke = output<TeamGridStroke>();
+  /** Select mode: press or drag across a row to select a range; the page shows the selection bar. */
+  readonly selectable = input<boolean>(false);
+  /** The selection changed; null when it was cleared. */
+  readonly selectionChange = output<TeamGridSelection | null>();
+  /** Escape cleared a selection. */
+  readonly cleared = output<void>();
   /** PageUp (-1) or PageDown (1): the person asks for the previous or next month. */
   readonly monthStep = output<-1 | 1>();
 
@@ -464,6 +489,21 @@ export class TeamGrid {
   private readonly focusAt = signal<{ row: number; col: number } | null>(null);
   /** After a month change: the row and day of the month to put focus back on. */
   private pendingFocus: { row: number; day: number } | null = null;
+
+  /** Paint mode wins over Select mode while a colour is chosen. */
+  protected readonly selecting = computed(() => this.selectable() && !this.paint());
+  /** The chosen range on one row: `anchor` is where it began, `head` where it ends. */
+  private readonly range = signal<{ row: number; anchor: number; head: number } | null>(null);
+
+  private readonly selection = computed((): TeamGridSelection | null => {
+    const range = this.range();
+    const row = range && this.rows()[range.row];
+    if (!range || !row?.editable) return null;
+    const dates = row.cells
+      .slice(Math.min(range.anchor, range.head), Math.max(range.anchor, range.head) + 1)
+      .map((cell) => cell.date);
+    return dates.length > 0 ? { memberId: row.memberId, dates } : null;
+  });
 
   protected readonly active = computed(() => {
     const at = this.focusAt();
@@ -477,6 +517,13 @@ export class TeamGrid {
   });
 
   constructor() {
+    effect(() => this.selectionChange.emit(this.selection()));
+    // Leaving Select mode, or another month, drops the range.
+    effect(() => {
+      this.selecting();
+      this.label();
+      untracked(() => this.range.set(null));
+    });
     // A month change (PageUp, PageDown) re-renders the rows; focus returns to the same row and day.
     effect(() => {
       const rows = this.rows();
@@ -512,11 +559,15 @@ export class TeamGrid {
   protected onDown(event: PointerEvent): void {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     const cell = this.editableCellAt(event.target as Element | null);
-    if (!cell || !this.paint()) return;
+    if (!cell || !(this.paint() || this.selecting())) return;
     // Keep the move and release events coming here even when the pointer leaves the sheet.
     if (event.pointerType === 'mouse')
       (event.currentTarget as Element).setPointerCapture?.(event.pointerId);
-    this.drag.set({ row: cell.row, from: cell.col, to: cell.col });
+    const range = this.range();
+    // Shift extends the range from where it began.
+    const from =
+      this.selecting() && event.shiftKey && range?.row === cell.row ? range.anchor : cell.col;
+    this.drag.set({ row: cell.row, from, to: cell.col });
   }
 
   protected onMove(event: PointerEvent): void {
@@ -531,7 +582,38 @@ export class TeamGrid {
     this.onMove(event);
     const drag = this.drag();
     this.drag.set(null);
-    if (drag) this.emit(drag.row, drag.from, drag.to);
+    if (!drag) return;
+    if (this.selecting()) this.choose(drag.row, drag.from, drag.to);
+    else this.emit(drag.row, drag.from, drag.to);
+  }
+
+  /** Whether a cell is in the range being dragged, or else the chosen one. */
+  protected isSelected(row: number, col: number): boolean {
+    const drag = this.drag();
+    const range = drag ? { row: drag.row, anchor: drag.from, head: drag.to } : this.range();
+    return (
+      range?.row === row &&
+      col >= Math.min(range.anchor, range.head) &&
+      col <= Math.max(range.anchor, range.head)
+    );
+  }
+
+  /** Clears the range without announcing it, for the page to call after an action. */
+  clearSelection(): void {
+    this.range.set(null);
+  }
+
+  /** Puts keyboard focus back on the sheet's tab stop. */
+  focusActive(): void {
+    const active = this.active();
+    if (active) this.focusCell(active.row, active.col);
+  }
+
+  /** A press on the only selected cell takes the selection back; anything else selects. */
+  private choose(row: number, from: number, to: number): void {
+    const current = this.range();
+    const same = current?.row === row && current.anchor === from && current.head === from;
+    this.range.set(from === to && same ? null : { row, anchor: from, head: to });
   }
 
   protected isActive(row: number, col: number): boolean {
