@@ -68,6 +68,8 @@ export interface RequestDetail {
   readonly coverage: readonly SheetCoverage[];
   /** The requester's days left once their requests are approved; negative when that takes them over. */
   readonly daysLeftAfter: number;
+  /** Fewest people who should be in; null when the team has none (teams/coverage-minimum). */
+  readonly coverageMinimum: number | null;
 }
 
 /** What approving one request did (POST /api/requests/approve), for the toast. */
