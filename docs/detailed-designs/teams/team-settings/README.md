@@ -22,10 +22,10 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Backend**
 
-- **`SettingsController`** — `GET /api/team/settings` returns every section; `PUT /api/team/settings/team` saves this section. Write endpoints carry the existing `Manager` policy.
-- **`GetTeamSettingsQueryHandler`** — Returns the settings of the caller's team with `CanEdit` set from `ICurrentUser.IsManager`.
-- **`SaveTeamSectionCommandHandler`** — Updates `Team.Name`, `Team.TimeZone`, and each listed member's `Role` and `YearlyDays`.
-- **`ICurrentUser`** — Greenlit.Application abstraction introduced by this design. It exposes the caller's `UserId`, `TeamId`, `TeamMemberId` and `IsManager` from the JWT claims, so every handler scopes data to the caller's team.
+- **`TeamSectionController`** — `GET /api/team/settings/team` returns the Team section (name, time zone, `CanEdit`, the manager's name and one row per member) to every member of the caller's team; `PUT /api/team/settings/team` saves it and carries the `Manager` policy. The other sections keep the manager-only `GET /api/team/settings` of their own designs (`TeamSettingsController`); that read stays manager-only, so a member sees the Team section read-only and the other sections are not shown to them.
+- **`GetTeamSectionQueryHandler`** — Returns the caller's own team's section with `CanEdit` true for the team's manager. A row shows `Manager` when it is the team's owning manager or its stored role says so.
+- **`SaveTeamSectionCommandHandler`** — Updates `Team.Name`, `Team.TimeZone`, and each listed member's `Role` and `YearlyDays` (null: the team default applies). A member id outside the caller's team is a 404 and nothing is saved; the validator refuses an empty name, a time zone outside the L2-008 options, negative yearly days and an unknown role (400 with `errors`); the handler refuses to make the team's owning manager a Member.
+- **`ICurrentUser`** — Greenlit.Application abstraction (exists). The handlers resolve the caller's team from `UserId` (`RequestCaller`), so every query is scoped to the caller's team.
 
 **Shared plumbing (exists today)**
 
@@ -33,7 +33,13 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **`ValidationBehavior`** — MediatR pipeline behaviour in Greenlit.Application. It runs each request's FluentValidation validator before the handler and raises `ValidationException` on failure.
 - **`IAppDbContext`** — Greenlit.Application abstraction over the EF Core context, implemented by `AppDbContext` in Greenlit.Infrastructure. Handlers read and write through it in one unit of work.
 
-**Role on the membership.** The mocks give each membership a role (Member / Manager), while today `User.Role` holds it. This design adds `TeamMember.Role` and issues the `role` claim from it; `User.Role` keeps only `Admin`. `<TO SUPPLY>`: whether a team may have more than one manager, given `Team.ManagerUserId`.
+**Role on the membership.** `TeamMember.Role` (Member / Manager) already exists and is applied to the account when an invited person joins. Decision: a team has one owning manager (`Team.ManagerUserId`), who creates the team and cannot be made a Member; the Role control records the role of every other row. Changing the role of a person who has already joined does not change their account's role claim or give them ownership: managing the team stays with the owner (resolved by the simplest option that fits the existing `Manager` policy; revisit if teams need several managers).
+
+**Allowances section (journey 11 deferred it here).** Days per year, Leave year starts and Max carry-over save through the existing `PUT /api/team/settings/allowances`. A negative Days per year shows the form summary "Fix 1 thing to continue" with "Days per year must be 0 or more" and the inline "Enter 0 or more days.". When members have no yearly days of their own the page shows the banner "{Two} members have no allowance set" with "They’re using the default of {25} days until you change it." (L2-027 AC4).
+
+**Members' view.** A member sees the Team section read-only (fields disabled, no Save, no Invite) with the note "Only managers can change team settings." and "Ask {manager} if something needs updating.". The other sections read manager-only endpoints, so they are not shown to a member yet; showing them read-only needs a member-readable read of each (deferred, with Notifications).
+
+**Page behaviour.** Settings shows the section nav from 1024px wide. After a section saves, the page shows the banner "Team settings saved" with "Everyone sees the new settings straight away." (L2-009 AC7) beside the section's own "Saved" status. The Team section's "Save changes" stays enabled so pressing it with no edits can say "No changes to save" (`L2-009` AC4); the other sections enable theirs when an edit makes them differ from what is saved. Each section's draft is independent; saving one leaves the others' unsaved edits alone.
 
 ## Requirements
 

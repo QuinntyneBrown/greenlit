@@ -14,7 +14,7 @@ export class SettingsPage extends BasePage {
   }
 
   protected readyAnchor(): Locator {
-    return this.teamSection().locator(".member-list, .alert");
+    return this.teamSection().locator(".member-list, .alert, .empty");
   }
 
   heading(): Locator {
@@ -30,13 +30,89 @@ export class SettingsPage extends BasePage {
     return this.teamSection().locator(".member-list__who > :first-child");
   }
 
+  /** "Everyone who appears on the calendar. Managers can approve requests and edit any row." */
+  teamIntro(): Locator {
+    return this.teamSection().locator("p").first();
+  }
+
+  teamNameField(): Locator {
+    return this.teamSection().getByLabel("Team name", { exact: true });
+  }
+
+  timeZoneField(): Locator {
+    return this.teamSection().getByLabel("Time zone", { exact: true });
+  }
+
+  /** The "Role for {name}" control of a member's row. */
+  roleField(name: string): Locator {
+    return this.teamSection().getByLabel(`Role for ${name}`, { exact: true });
+  }
+
+  /** The "Yearly days for {name}" field of a member's row. */
+  yearlyDaysField(name: string): Locator {
+    return this.teamSection().getByLabel(`Yearly days for ${name}`, { exact: true });
+  }
+
+  /** The unit next to every yearly-days field: "days / yr". */
+  yearlyDaysUnits(): Locator {
+    return this.teamSection().locator(".days-input");
+  }
+
+  /** The Team section's "Save changes"; it reads "Saving…" while busy. */
+  saveTeamButton(): Locator {
+    return this.teamSection().locator(".settings-actions .btn--primary");
+  }
+
+  /** The polite status next to the Team section's "Save changes": "Saved" after a save. */
+  saveTeamStatus(): Locator {
+    return this.teamSection().locator(".settings-actions [aria-live='polite']");
+  }
+
+  /** The banner after a section saves: "Team settings saved". */
+  savedBanner(): Locator {
+    return this.main.locator(".alert--success.banner");
+  }
+
+  /** The "Fix 1 thing to continue" summary the Team section shows for invalid fields. */
+  teamSummary(): Locator {
+    return this.teamSection().locator(".form-summary");
+  }
+
+  /** The inline error under the Team name field. */
+  teamNameError(): Locator {
+    return this.teamSection().locator("#team-name-err");
+  }
+
+  /** "We couldn't load your settings" */
+  loadErrorTitle(): Locator {
+    return this.teamSection().locator(".empty__title");
+  }
+
+  loadErrorText(): Locator {
+    return this.teamSection().locator(".empty__text");
+  }
+
+  tryAgainButton(): Locator {
+    return control(this.teamSection(), "Try again");
+  }
+
   inviteButton(): Locator {
     return control(this.teamSection(), "Invite a member");
   }
 
   /** The read-only note a member sees instead of the controls (L2-009 AC3). */
   readOnlyNote(): Locator {
-    return this.teamSection().getByText("Only managers can change team settings.");
+    return this.teamSection().locator(".alert");
+  }
+
+  /** "Only managers can change team settings." */
+  readOnlyTitle(): Locator {
+    return this.readOnlyNote().locator(".alert__title");
+  }
+
+  /** "Ask Maya Chen if something needs updating." */
+  readOnlyBody(): Locator {
+    return this.readOnlyNote().locator(".alert__body > div:not(.alert__title):not(.alert__actions)");
   }
 
   /** The "Edit working days" button on the row of `name` (a manager's, for a part-timer). */
@@ -46,6 +122,53 @@ export class SettingsPage extends BasePage {
 
   async openInviteDialog(): Promise<void> {
     await this.inviteButton().click();
+  }
+
+  // --- Allowances (docs/detailed-designs/allowances/allowance-defaults) ----------------------------
+
+  allowancesSection(): Locator {
+    return this.main.locator("section#allowances");
+  }
+
+  allowancesIntro(): Locator {
+    return this.allowancesSection().locator("p").first();
+  }
+
+  daysPerYearField(): Locator {
+    return this.allowancesSection().getByLabel("Days per year", { exact: true });
+  }
+
+  leaveYearStartField(): Locator {
+    return this.allowancesSection().getByLabel("Leave year starts", { exact: true });
+  }
+
+  maxCarryOverField(): Locator {
+    return this.allowancesSection().getByLabel("Max carry-over", { exact: true });
+  }
+
+  /** The allowances section's "Save changes"; it reads "Saving…" while busy. */
+  saveAllowancesButton(): Locator {
+    return this.allowancesSection().locator(".settings-actions .btn--primary");
+  }
+
+  /** The polite status next to "Save changes": "Saved" after a save. */
+  saveAllowancesStatus(): Locator {
+    return this.allowancesSection().locator(".settings-actions [aria-live='polite']");
+  }
+
+  /** The "Fix 1 thing to continue" summary of invalid allowance fields. */
+  allowancesSummary(): Locator {
+    return this.allowancesSection().locator(".form-summary");
+  }
+
+  /** The inline error under Days per year. */
+  daysPerYearError(): Locator {
+    return this.allowancesSection().locator("#allow-days-err");
+  }
+
+  /** The warning banner: "Two members have no allowance set". */
+  noAllowanceBanner(): Locator {
+    return this.main.locator(".alert--warning.banner");
   }
 
   // --- Coverage (docs/detailed-designs/teams/coverage-minimum) ------------------------------------
@@ -161,7 +284,7 @@ export class SettingsPage extends BasePage {
 
   /** The banner that says next year's public holidays are ready: "2027 UK bank holidays are ready". */
   reviewBanner(): Locator {
-    return this.main.locator(".banner");
+    return this.main.locator(".alert--info.banner");
   }
 
   reviewBannerTitle(): Locator {
