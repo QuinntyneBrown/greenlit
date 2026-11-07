@@ -115,6 +115,7 @@ public class SeedCommandHandlerTests
         var days = await read.TimeOffDays.Include(d => d.TeamMember)
             .Select(d => new { d.TeamMember.Name, d.Date, d.Status })
             .ToListAsync();
+        days = days.Where(d => d.Date.Year == 2026 && d.Date.Month == 11).ToList();
         days.Where(d => d.Name == "Ana Ruiz").Select(d => (d.Date.Day, d.Status)).Should().BeEquivalentTo(new[]
         {
             (4, DayStatus.Confirmed), (5, DayStatus.Confirmed),
@@ -127,20 +128,34 @@ public class SeedCommandHandlerTests
     }
 
     [Fact]
-    public async Task Requested_days_belong_to_pending_requests()
+    public async Task The_ledger_matches_the_requests_mocks()
     {
         var options = await SeedTwiceAsync();
 
         await using var read = new AppDbContext(options);
-        var requests = await read.TimeOffRequests.Include(r => r.TeamMember).Include(r => r.Days)
+        var requests = (await read.TimeOffRequests.Include(r => r.TeamMember).Include(r => r.Days).ToListAsync())
             .OrderBy(r => r.FirstDay)
-            .Select(r => new { r.TeamMember.Name, r.FirstDay, r.LastDay, r.Note, r.Status, Days = r.Days.Count })
-            .ToListAsync();
-        requests.Should().HaveCount(3);
-        requests.Select(r => (r.Name, r.FirstDay.Day, r.LastDay.Day, r.Days)).Should().Equal(
-            ("Cleo Park", 12, 13, 2), ("Ana Ruiz", 16, 20, 5), ("Dev Patel", 18, 19, 2));
-        requests.Should().OnlyContain(r => r.Status == RequestStatus.Pending);
-        requests.Single(r => r.Name == "Ana Ruiz").Note.Should().Be("Visiting family in Seville");
+            .Select(r => new { r.TeamMember.Name, r.FirstDay, r.LastDay, r.Note, r.Status, r.DeclineReason, r.DecidedUtc, Days = r.Days.Count })
+            .ToList();
+
+        var pending = requests.Where(r => r.Status == RequestStatus.Pending).ToList();
+        pending.Select(r => (r.Name, r.FirstDay.Month, r.FirstDay.Day, r.LastDay.Day, r.Days, r.Note)).Should().Equal(
+            ("Cleo Park", 11, 12, 13, 2, "Long weekend away"),
+            ("Ana Ruiz", 11, 16, 20, 5, "Visiting family in Seville"),
+            ("Dev Patel", 11, 18, 19, 2, "Moving flat"),
+            ("Elif Yılmaz", 12, 29, 31, 3, "Winter break"));
+
+        requests.Where(r => r.Status == RequestStatus.Approved)
+            .Select(r => (r.Name, r.FirstDay.Month, r.FirstDay.Day, r.LastDay.Day, r.Days)).Should().Equal(
+                ("Cleo Park", 9, 7, 11, 5), ("Dev Patel", 10, 12, 15, 4), ("Finn Murphy", 10, 19, 23, 5));
+        requests.Where(r => r.Status == RequestStatus.Approved).Should().OnlyContain(r => r.DecidedUtc != null);
+
+        var declined = requests.Single(r => r.Status == RequestStatus.Declined);
+        (declined.Name, declined.FirstDay.Month, declined.FirstDay.Day, declined.LastDay.Day, declined.Days).Should().Be(("Ben Okafor", 12, 21, 24, 4));
+        declined.DeclineReason.Should().Be("Three people are already out that week. Could you take the 29th onward instead?");
+        var cancelled = requests.Single(r => r.Status == RequestStatus.Cancelled);
+        (cancelled.Name, cancelled.FirstDay.Month, cancelled.FirstDay.Day, cancelled.LastDay.Day, cancelled.Days).Should().Be(("Ana Ruiz", 10, 5, 6, 0));
+        requests.Should().HaveCount(9);
     }
 
     private static async Task<DbContextOptions<AppDbContext>> SeedTwiceAsync()
