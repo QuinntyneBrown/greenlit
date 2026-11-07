@@ -1,0 +1,32 @@
+/** A member's row in the Team section (GET /api/team/settings/team). */
+export interface TeamSettingsMember {
+  readonly id: string;
+  readonly name: string;
+  readonly email: string | null;
+  readonly role: 'Member' | 'Manager';
+  /** The member's own yearly days; null when the team's default applies. */
+  readonly yearlyDays: number | null;
+}
+
+/** The Team section of Settings (docs/detailed-designs/teams/team-settings). */
+export interface TeamSettingsTeam {
+  readonly name: string;
+  /** IANA time zone, one of `TIME_ZONE_OPTIONS`. */
+  readonly timeZone: string;
+  /** True for the team's manager; everyone else sees the section read-only. */
+  readonly canEdit: boolean;
+  readonly managerName: string;
+  /** In sheet order. */
+  readonly members: readonly TeamSettingsMember[];
+}
+
+/** What the manager entered in the Team section. */
+export interface SaveTeamSettingsInput {
+  readonly name: string;
+  readonly timeZone: string;
+  readonly members: readonly {
+    readonly id: string;
+    readonly role: 'Member' | 'Manager';
+    readonly yearlyDays: number | null;
+  }[];
+}

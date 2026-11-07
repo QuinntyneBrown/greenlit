@@ -41,6 +41,8 @@ export * from './lib/api/invitation.service';
 export * from './lib/api/request.service';
 export * from './lib/api/holiday.service';
 export * from './lib/api/working-days.service';
+export * from './lib/api/team-settings.service';
+export * from './lib/models/team-settings';
 export * from './lib/api/coverage.service';
 export * from './lib/api/auth.interceptor';
 
@@ -53,6 +55,7 @@ export * from './lib/api/http-invitation.service';
 export * from './lib/api/http-request.service';
 export * from './lib/api/http-holiday.service';
 export * from './lib/api/http-working-days.service';
+export * from './lib/api/http-team-settings.service';
 export * from './lib/api/http-coverage.service';
 export * from './lib/api/problem';
 export * from './lib/api/holiday-date';

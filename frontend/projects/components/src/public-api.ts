@@ -30,6 +30,7 @@ export * from './lib/dialog/dialog';
 export * from './lib/member-list/member-list';
 export * from './lib/holiday-list/holiday-list';
 export * from './lib/day-chips/day-chips';
+export * from './lib/settings-nav/settings-nav';
 
 // requests
 export * from './lib/tabs/tabs';

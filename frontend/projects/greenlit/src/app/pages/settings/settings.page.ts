@@ -7,13 +7,15 @@ import {
   signal,
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of, startWith, switchMap } from 'rxjs';
+import { catchError, forkJoin, map, of, startWith, switchMap } from 'rxjs';
 
 import {
   HOLIDAY_SERVICE,
   Holiday,
   SHEET_SERVICE,
   SheetMonth,
+  TEAM_SETTINGS_SERVICE,
+  TeamSettingsTeam,
   TeamHolidays,
   COVERAGE_SERVICE,
   WORKING_DAYS_SERVICE,
@@ -29,8 +31,8 @@ import {
   EmptyState,
   HolidayList,
   HolidayListItem,
-  MemberList,
   MemberListItem,
+  SettingsNav,
   Skeleton,
 } from 'components';
 
@@ -40,10 +42,11 @@ import { InviteMemberDialog } from '../../dialogs/invite-member/invite-member.di
 import { AddHolidayDialog, AddHolidayOutcome } from '../../dialogs/add-holiday/add-holiday.dialog';
 import { RemoveHolidayDialog } from '../../dialogs/remove-holiday/remove-holiday.dialog';
 import { ToastService } from '../../toasts/toast.service';
+import { TeamSection } from './team-section';
 
 type Load =
   | { readonly state: 'loading' }
-  | { readonly state: 'ready'; readonly sheet: SheetMonth }
+  | { readonly state: 'ready'; readonly sheet: SheetMonth; readonly team: TeamSettingsTeam }
   | { readonly state: 'error' };
 
 type HolidaysLoad =
@@ -61,7 +64,17 @@ type HolidaysLoad =
  */
 @Component({
   selector: 'app-settings-page',
-  imports: [Alert, Button, Counter, DayChips, EmptyState, HolidayList, MemberList, Skeleton],
+  imports: [
+    Alert,
+    Button,
+    Counter,
+    DayChips,
+    EmptyState,
+    HolidayList,
+    SettingsNav,
+    Skeleton,
+    TeamSection,
+  ],
   template: `
     @if (review(); as review) {
       <gl-alert
@@ -75,183 +88,186 @@ type HolidaysLoad =
         <gl-button slot="actions" size="sm" (click)="reviewHolidays()">Review holidays</gl-button>
       </gl-alert>
     }
-    <h1>Settings</h1>
-    <section id="team" class="settings-section" aria-labelledby="team-title">
-      <h2 id="team-title" class="section-title">Team</h2>
-      @switch (load().state) {
-        @case ('error') {
-          <div class="card-plain">
-            <gl-empty-state
-              tone="error"
-              title="We couldn’t load your settings"
-              text="Something went wrong on our side. Nothing was changed."
-            >
-              <svg slot="icon" class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 8v5M12 16h.01" />
-              </svg>
-              <gl-button slot="actions" (click)="retry()">Try again</gl-button>
-            </gl-empty-state>
-          </div>
-        }
-        @case ('ready') {
-          <p>
-            Everyone who appears on the calendar. Managers can approve requests and edit any row.
-          </p>
-          @if (!isManager()) {
-            <p class="note">
-              Only managers can change team settings. Ask {{ managerName() }} if something needs
-              updating.
-            </p>
-          }
-          <gl-member-list
-            label="Team members"
-            [members]="members()"
-            (actioned)="editWorkingDays($event)"
-          />
-          @if (isManager()) {
-            <div class="actions">
-              <gl-button (click)="invite()">
-                <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                Invite a member
-              </gl-button>
-            </div>
-          }
-        }
-        @default {
-          <gl-skeleton />
-        }
-      }
-    </section>
-    @if (isManager()) {
-      <section id="work-week" class="settings-section" aria-labelledby="work-week-title">
-        <h2 id="work-week-title" class="section-title" tabindex="-1">Work week &amp; holidays</h2>
-        <p>
-          Non-working days and holidays show red on the calendar and never count against allowance.
-        </p>
-        <p class="label label--days">Working days</p>
-        <gl-day-chips
-          [pressed]="pressedDays()"
-          [disabled]="weekBusy() || savedWeek() === null"
-          (toggled)="toggleDay($event)"
-        />
-        @if (noDays()) {
-          <span class="field__error">Pick at least one working day.</span>
-        }
-        @switch (holidaysLoad().state) {
-          @case ('error') {
-            <div class="card-plain holidays">
-              <gl-empty-state
-                tone="error"
-                [compact]="true"
-                title="We couldn’t load the holidays"
-                text="Something went wrong on our side. Nothing was changed."
-              >
-                <svg slot="icon" class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M12 8v5M12 16h.01" />
-                </svg>
-                <gl-button slot="actions" (click)="retryHolidays()">Try again</gl-button>
-              </gl-empty-state>
-            </div>
-          }
-          @case ('ready') {
-            <div class="toolbar-row">
-              <p class="label">Holidays</p>
-              @if (source(); as source) {
-                <p class="text-caption">{{ source }}</p>
-              }
-            </div>
-            @if (holidays().length) {
-              <gl-holiday-list
-                class="holidays"
-                label="Holidays"
-                [holidays]="holidays()"
-                (removed)="removeHoliday($event)"
-              />
-            } @else {
-              <div class="card-plain holidays">
+    <div class="settings-layout">
+      <gl-settings-nav [items]="navItems()" />
+      <div class="settings-content">
+        <h1>Settings</h1>
+        <section id="team" class="settings-section" aria-labelledby="team-title">
+          @switch (load().state) {
+            @case ('error') {
+              <h2 id="team-title" class="section-title" tabindex="-1">Team</h2>
+              <div class="card-plain">
                 <gl-empty-state
-                  [compact]="true"
-                  title="No holidays yet"
-                  text="Add the days your team is off together. They turn red for everyone and never count against allowance."
+                  tone="error"
+                  title="We couldn’t load your settings"
+                  text="Something went wrong on our side. Nothing was changed."
                 >
                   <svg slot="icon" class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24">
-                    <rect x="4" y="5" width="16" height="15" rx="2" />
-                    <path d="M4 10h16M9 3v4M15 3v4" />
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 8v5M12 16h.01" />
                   </svg>
+                  <gl-button slot="actions" (click)="retry()">Try again</gl-button>
                 </gl-empty-state>
               </div>
             }
-            <div class="actions">
-              <gl-button (click)="addDayOff()">
-                <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                Add day off
-              </gl-button>
-            </div>
+            @case ('ready') {
+              <app-team-section
+                [team]="team()!"
+                (invite)="invite()"
+                (editWorkingDays)="editWorkingDays($event)"
+              />
+            }
+            @default {
+              <h2 id="team-title" class="section-title" tabindex="-1">Team</h2>
+              <gl-skeleton />
+            }
           }
-          @default {
-            <gl-skeleton />
-          }
-        }
-        <div class="settings-actions">
-          <gl-button
-            variant="primary"
-            size="sm"
-            [busy]="weekBusy()"
-            [disabled]="!canSaveWeek()"
-            (click)="saveWorkWeek()"
-          >
-            {{ weekBusy() ? 'Saving…' : 'Save changes' }}
-          </gl-button>
-          <span aria-live="polite">{{ weekStatus() }}</span>
-        </div>
-      </section>
-    }
-    @if (isManager()) {
-      <section id="coverage" class="settings-section" aria-labelledby="coverage-title">
-        <h2 id="coverage-title" class="section-title">Coverage</h2>
-        <p>
-          The fewest people who should be in on any working day. Days below this are flagged on the
-          calendar’s “Out” row.
-        </p>
-        @if (coverageSettings(); as coverage) {
-          <fieldset>
-            <gl-counter
-              [value]="minimum()"
-              [max]="coverage.teamSize"
-              decrementLabel="Fewer people"
-              incrementLabel="More people"
-              [suffix]="'of ' + coverage.teamSize + ' people in'"
-              [disabled]="coverageBusy()"
-              (valueChange)="stepCoverage($event)"
+        </section>
+        @if (isManager()) {
+          <section id="work-week" class="settings-section" aria-labelledby="work-week-title">
+            <h2 id="work-week-title" class="section-title" tabindex="-1">
+              Work week &amp; holidays
+            </h2>
+            <p>
+              Non-working days and holidays show red on the calendar and never count against
+              allowance.
+            </p>
+            <p class="label label--days">Working days</p>
+            <gl-day-chips
+              [pressed]="pressedDays()"
+              [disabled]="weekBusy() || savedWeek() === null"
+              (toggled)="toggleDay($event)"
             />
-          </fieldset>
-        } @else {
-          <gl-skeleton />
+            @if (noDays()) {
+              <span class="field__error">Pick at least one working day.</span>
+            }
+            @switch (holidaysLoad().state) {
+              @case ('error') {
+                <div class="card-plain holidays">
+                  <gl-empty-state
+                    tone="error"
+                    [compact]="true"
+                    title="We couldn’t load the holidays"
+                    text="Something went wrong on our side. Nothing was changed."
+                  >
+                    <svg slot="icon" class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 8v5M12 16h.01" />
+                    </svg>
+                    <gl-button slot="actions" (click)="retryHolidays()">Try again</gl-button>
+                  </gl-empty-state>
+                </div>
+              }
+              @case ('ready') {
+                <div class="toolbar-row">
+                  <p class="label">Holidays</p>
+                  @if (source(); as source) {
+                    <p class="text-caption">{{ source }}</p>
+                  }
+                </div>
+                @if (holidays().length) {
+                  <gl-holiday-list
+                    class="holidays"
+                    label="Holidays"
+                    [holidays]="holidays()"
+                    (removed)="removeHoliday($event)"
+                  />
+                } @else {
+                  <div class="card-plain holidays">
+                    <gl-empty-state
+                      [compact]="true"
+                      title="No holidays yet"
+                      text="Add the days your team is off together. They turn red for everyone and never count against allowance."
+                    >
+                      <svg slot="icon" class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24">
+                        <rect x="4" y="5" width="16" height="15" rx="2" />
+                        <path d="M4 10h16M9 3v4M15 3v4" />
+                      </svg>
+                    </gl-empty-state>
+                  </div>
+                }
+                <div class="actions">
+                  <gl-button (click)="addDayOff()">
+                    <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                    Add day off
+                  </gl-button>
+                </div>
+              }
+              @default {
+                <gl-skeleton />
+              }
+            }
+            <div class="settings-actions">
+              <gl-button
+                variant="primary"
+                size="sm"
+                [busy]="weekBusy()"
+                [disabled]="!canSaveWeek()"
+                (click)="saveWorkWeek()"
+              >
+                {{ weekBusy() ? 'Saving…' : 'Save changes' }}
+              </gl-button>
+              <span aria-live="polite">{{ weekStatus() }}</span>
+            </div>
+          </section>
         }
-        <div class="settings-actions">
-          <gl-button
-            variant="primary"
-            size="sm"
-            [busy]="coverageBusy()"
-            [disabled]="!canSaveCoverage()"
-            (click)="saveCoverage()"
-          >
-            {{ coverageBusy() ? 'Saving…' : 'Save changes' }}
-          </gl-button>
-          <span aria-live="polite">{{ coverageStatus() }}</span>
-        </div>
-      </section>
-    }
+        @if (isManager()) {
+          <section id="coverage" class="settings-section" aria-labelledby="coverage-title">
+            <h2 id="coverage-title" class="section-title">Coverage</h2>
+            <p>
+              The fewest people who should be in on any working day. Days below this are flagged on
+              the calendar’s “Out” row.
+            </p>
+            @if (coverageSettings(); as coverage) {
+              <fieldset>
+                <gl-counter
+                  [value]="minimum()"
+                  [max]="coverage.teamSize"
+                  decrementLabel="Fewer people"
+                  incrementLabel="More people"
+                  [suffix]="'of ' + coverage.teamSize + ' people in'"
+                  [disabled]="coverageBusy()"
+                  (valueChange)="stepCoverage($event)"
+                />
+              </fieldset>
+            } @else {
+              <gl-skeleton />
+            }
+            <div class="settings-actions">
+              <gl-button
+                variant="primary"
+                size="sm"
+                [busy]="coverageBusy()"
+                [disabled]="!canSaveCoverage()"
+                (click)="saveCoverage()"
+              >
+                {{ coverageBusy() ? 'Saving…' : 'Save changes' }}
+              </gl-button>
+              <span aria-live="polite">{{ coverageStatus() }}</span>
+            </div>
+          </section>
+        }
+      </div>
+    </div>
   `,
   styles: `
     :host {
       display: block;
+    }
+    .settings-layout {
+      display: grid;
+      gap: var(--space-10);
+    }
+    @media (min-width: 64rem) {
+      .settings-layout {
+        grid-template-columns: 12.5rem minmax(0, 1fr);
+      }
+    }
+    .settings-content {
+      max-width: 48rem;
+      min-width: 0;
     }
     h1 {
       margin-bottom: var(--space-6);
@@ -320,6 +336,7 @@ type HolidaysLoad =
 })
 export class SettingsPage {
   private readonly sheet = inject(SHEET_SERVICE);
+  private readonly teamSettings = inject(TEAM_SETTINGS_SERVICE);
   private readonly holidayService = inject(HOLIDAY_SERVICE);
   private readonly workingDaysService = inject(WORKING_DAYS_SERVICE);
   private readonly coverageService = inject(COVERAGE_SERVICE);
@@ -332,8 +349,8 @@ export class SettingsPage {
   protected readonly load = toSignal(
     toObservable(this.attempt).pipe(
       switchMap((attempt) => {
-        const month = this.sheet.month().pipe(
-          map((sheet): Load => ({ state: 'ready', sheet })),
+        const month = forkJoin([this.sheet.month(), this.teamSettings.team()]).pipe(
+          map(([sheet, team]): Load => ({ state: 'ready', sheet, team })),
           catchError(() => of<Load>({ state: 'error' })),
         );
         // The first load shows the skeleton; a reload after inviting keeps the list on screen.
@@ -347,6 +364,22 @@ export class SettingsPage {
     const load = this.load();
     return load.state === 'ready' ? load.sheet : null;
   });
+
+  protected readonly team = computed(() => {
+    const load = this.load();
+    return load.state === 'ready' ? load.team : null;
+  });
+
+  /** The sections the viewer has, for the nav beside them. */
+  protected readonly navItems = computed(() => [
+    { id: 'team', label: 'Team' },
+    ...(this.isManager()
+      ? [
+          { id: 'work-week', label: 'Work week & holidays' },
+          { id: 'coverage', label: 'Coverage' },
+        ]
+      : []),
+  ]);
 
   protected readonly isManager = computed(() => this.ready()?.isManager ?? false);
   protected readonly managerName = computed(() => this.ready()?.managerName ?? '');
@@ -475,15 +508,6 @@ export class SettingsPage {
       id: h.id,
       date: holidayDateLabel(h.date),
       name: h.name,
-    })),
-  );
-
-  /** Rows in the sheet's display order. */
-  protected readonly members = computed<MemberListItem[]>(() =>
-    (this.ready()?.members ?? []).map((m) => ({
-      id: m.id,
-      name: m.name,
-      ...(this.isManager() ? { action: 'Edit working days' } : {}),
     })),
   );
 

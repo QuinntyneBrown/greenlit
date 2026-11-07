@@ -30,6 +30,44 @@ export class SettingsPage extends BasePage {
     return this.teamSection().locator(".member-list__who > :first-child");
   }
 
+  /** "Everyone who appears on the calendar. Managers can approve requests and edit any row." */
+  teamIntro(): Locator {
+    return this.teamSection().locator("p").first();
+  }
+
+  teamNameField(): Locator {
+    return this.teamSection().getByLabel("Team name", { exact: true });
+  }
+
+  timeZoneField(): Locator {
+    return this.teamSection().getByLabel("Time zone", { exact: true });
+  }
+
+  /** The "Role for {name}" control of a member's row. */
+  roleField(name: string): Locator {
+    return this.teamSection().getByLabel(`Role for ${name}`, { exact: true });
+  }
+
+  /** The "Yearly days for {name}" field of a member's row. */
+  yearlyDaysField(name: string): Locator {
+    return this.teamSection().getByLabel(`Yearly days for ${name}`, { exact: true });
+  }
+
+  /** The unit next to every yearly-days field: "days / yr". */
+  yearlyDaysUnits(): Locator {
+    return this.teamSection().locator(".days-input");
+  }
+
+  /** The Team section's "Save changes"; it reads "Saving…" while busy. */
+  saveTeamButton(): Locator {
+    return this.teamSection().locator(".settings-actions .btn--primary");
+  }
+
+  /** The polite status next to the Team section's "Save changes": "Saved" after a save. */
+  saveTeamStatus(): Locator {
+    return this.teamSection().locator(".settings-actions [aria-live='polite']");
+  }
+
   inviteButton(): Locator {
     return control(this.teamSection(), "Invite a member");
   }
