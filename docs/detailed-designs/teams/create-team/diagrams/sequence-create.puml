@@ -36,14 +36,14 @@ client -> ctrl : POST /api/teams
 ctrl -> handler : Send CreateTeamCommand (validator: L2-008 AC4)
 handler -> hol : For(country, year)
 hol --> handler : Public holidays
-handler -> db : Add Team, manager row, member rows, holidays, invitations
+handler -> db : Add Team, manager row, member rows, holidays (invitations: journey 5)
 alt commit succeeds
   db --> handler : Committed
-  loop each row with an email
+  loop each row with an email (journey 5, L2-010)
     handler -> mail : Send invitation (L2-008 AC5)
   end
   ctrl --> client : 201 team and session
-  page --> actor : The team's calendar
+  page --> actor : "You're all set", then "Open the calendar" (L2-008 AC7)
 else commit fails
   ctrl --> client : 500 ProblemDetails
   page --> actor : "We couldn't create your team" (L2-008 AC6)

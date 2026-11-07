@@ -95,7 +95,8 @@
         "error",
         "invalid",
         "submitting",
-        "success"
+        "success",
+        "success-no-invites"
       ],
       "route": "/create-team",
       "not_applicable": {

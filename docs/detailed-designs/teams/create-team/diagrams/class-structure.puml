@@ -17,7 +17,7 @@ class Team <<exists>> {
   +Guid ManagerUserId
   +string TimeZone
   +DateTimeOffset CreatedUtc
-  .. new ..
+  .. later journeys ..
   +string? HolidayCountry
   +WorkingDays WorkingDays
   +int DefaultYearlyDays
@@ -34,7 +34,7 @@ class TeamMember <<exists>> {
   +string? Email
   +Guid? UserId
   +int SortOrder
-  .. new ..
+  .. later journeys ..
   +MemberRole Role
   +int? YearlyDays
   +WorkingDays? WorkingDays
