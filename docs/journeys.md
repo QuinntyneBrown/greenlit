@@ -44,8 +44,8 @@ account menu, and the pending count arrive with the journeys that need them.
 | 26 | Stay informed offline | Banner when offline; Greenlit stays read-only until the connection returns. | 3 |
 | 27 | Manage the account | Change display name, email and password from the Account page. | 2.5 |
 | 28 | See clear error pages | Forbidden, server error and offline pages with recovery (not found is built). | 1 |
-| 29 | Visit the marketing page | The public page that explains Greenlit and sends a manager to create a team or sign in. | 2 |
-| | **Total remaining** | | **42** |
+| 29 | Visit the marketing page | The public page that explains Greenlit and sends a manager to create a team or sign in. | 0 (built) |
+| | **Total remaining** | | **40** |
 
 ## Notes
 
@@ -199,3 +199,6 @@ account menu, and the pending count arrive with the journeys that need them.
   far behind journey 4.
 - `docs/estimates/` is the place for per-design estimates with percent complete; this file is
   the journey-level view.
+- Journey 29 is built as its own Angular application (`frontend/projects/marketing`, port 4300 in
+  development) with behaviour specs in `e2e/tests/marketing.spec.ts`; visual parity with the mock is
+  still by eye until `e2e/tests/visual/` exists.

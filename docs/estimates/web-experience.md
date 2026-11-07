@@ -6,4 +6,4 @@
 | connectivity | 3 days | 0% |
 | error-pages | 2 days | 50% |
 | feedback-toasts | 2 days | 100% |
-| marketing-page | 2 days | 0% |
+| marketing-page | 2 days | 100% |
