@@ -26,5 +26,6 @@ sheet exactly while keeping the model small enough for a team of under ten.
 - A month view is one query: the team's members, their days in the range, and the holidays.
 - Changing a team's time zone can move which dates are weekends; the team owner decides that, and
   it is rare.
-- Half days, hours and balances are out of scope by design. If they ever come, they are a new
-  decision, not a column added quietly.
+- Half days and hours are out of scope by design. If they ever come, they are a new decision, not
+  a column added quietly. ~~Balances are out of scope.~~ Superseded by ADR-007: yearly days,
+  adjustments and days left are in scope, computed from these rows and never stored.

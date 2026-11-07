@@ -12,6 +12,7 @@ or infrastructure choice is made or revisited.
 | [ADR-004](ADR-004-eight-hour-bearer-session.md)           | A session is one eight-hour bearer token kept in the browser                       |
 | [ADR-005](ADR-005-public-holidays-from-rules.md)          | Public holidays are worked out offline from each country's rules                   |
 | [ADR-006](ADR-006-invitation-emails-logged-tokens-hashed.md) | Invitation emails are logged, and invitation tokens are stored hashed           |
+| [ADR-007](ADR-007-allowances.md)                  | Allowances are computed from day rows, never stored as a balance                   |
 
 ## Template
 
