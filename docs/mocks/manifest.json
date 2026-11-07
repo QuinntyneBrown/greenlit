@@ -160,6 +160,7 @@
         "loading",
         "empty",
         "error",
+        "approving",
         "approved",
         "declined",
         "bulk",
