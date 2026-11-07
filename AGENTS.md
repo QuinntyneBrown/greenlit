@@ -13,7 +13,7 @@ parity with the design reference.
 ## Repository layout
 
 - `backend/` — .NET solution
-- `frontend/` — Angular workspace (`greenlit`, `api`, `components`)
+- `frontend/` — Angular workspace (`greenlit`, `api`, `components`, `marketing`)
 - `e2e/` — Playwright suite
 - `docs/mocks/` — static design reference (the source of truth for the UI)
 - `docs/specs/` — requirements (`L1.md` high level, `L2.md` detailed with acceptance criteria)
@@ -70,9 +70,13 @@ LocalDB).
 
 ## Frontend architecture
 
-Workspace has three projects under `frontend/projects/`: `greenlit` (the app), `api` (service
-contracts, implementations, view models, pure helpers) and `components` (`gl-*` UI atoms, the
-design system).
+Workspace has four projects under `frontend/projects/`: `greenlit` (the app), `api` (service
+contracts, implementations, view models, pure helpers), `components` (`gl-*` UI atoms, the
+design system) and `marketing` (the single-page marketing site).
+
+The marketing site is a separately deployable Angular application at `frontend/projects/marketing`.
+It builds and deploys independently of the `greenlit` app; it may consume `components` but must
+not depend on the `greenlit` app project.
 
 ### Conventions enforced across the codebase
 
