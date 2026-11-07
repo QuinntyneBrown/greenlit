@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Greenlit.Api.Controllers;
 
 /// <summary>
-/// The invitee's side of an invitation (docs/detailed-designs/identity-and-access/accept-invitation).
+/// The invitee's side of an invitation (docs/detailed-designs/identity-and-access/accept-invitation, and sign-in-with-google).
 /// Anonymous by design: the person has no account yet, and the unguessable token in the link is the credential.
 /// </summary>
 [ApiController]
@@ -28,6 +28,13 @@ public sealed class InvitationsController : ControllerBase
     [HttpPost("{token}/accept")]
     public async Task<ActionResult<SessionDto>> Accept(string token, [FromBody] AcceptInvitationRequest request, CancellationToken ct) =>
         Ok(await _sender.Send(new AcceptInvitationCommand(token, request.Name, request.Password), ct));
+
+    /// <summary>Creates the account from the invited Google account, links it to the member's row and signs the person in (L2-052).</summary>
+    [HttpPost("{token}/accept-google")]
+    public async Task<ActionResult<SessionDto>> AcceptWithGoogle(string token, [FromBody] AcceptInvitationWithGoogleRequest request, CancellationToken ct) =>
+        Ok(await _sender.Send(new AcceptInvitationWithGoogleCommand(token, request.AccessToken), ct));
 }
 
 public sealed record AcceptInvitationRequest(string? Name, string? Password);
+
+public sealed record AcceptInvitationWithGoogleRequest(string? AccessToken);
