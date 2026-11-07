@@ -114,20 +114,20 @@ Legend: ✅ mock exists · ➖ not applicable (reason in manifest) · ❌ missin
 
 ### Dialogs
 
-| Screen | default | busy | invalid | failed | over-allowance | approved | declined | member | scroll | success | Requirements |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| Request time off (`new-request`) | [✅](dialogs/new-request/default.html) | [✅](dialogs/new-request/busy.html) | [✅](dialogs/new-request/invalid.html) | [✅](dialogs/new-request/failed.html) | [✅](dialogs/new-request/over-allowance.html) |  |  |  |  |  | `L1-003` |
-| Request detail (`request-detail`) | [✅](dialogs/request-detail/default.html) | [✅](dialogs/request-detail/busy.html) | ➖ | [✅](dialogs/request-detail/failed.html) |  | [✅](dialogs/request-detail/approved.html) | [✅](dialogs/request-detail/declined.html) | [✅](dialogs/request-detail/member.html) | [✅](dialogs/request-detail/scroll.html) |  | `L1-004` |
-| Decline request (`decline-request`) | [✅](dialogs/decline-request/default.html) | [✅](dialogs/decline-request/busy.html) | ➖ | [✅](dialogs/decline-request/failed.html) |  |  |  |  |  |  | `L1-004` |
-| Cancel request (`cancel-request`) | [✅](dialogs/cancel-request/default.html) | [✅](dialogs/cancel-request/busy.html) | ➖ | [✅](dialogs/cancel-request/failed.html) |  |  |  |  |  |  | `L1-003` |
-| Remove member (`remove-member`) | [✅](dialogs/remove-member/default.html) | [✅](dialogs/remove-member/busy.html) | ➖ | [✅](dialogs/remove-member/failed.html) |  |  |  |  |  |  | `L1-001` |
-| Invite a member (`invite-member`) | [✅](dialogs/invite-member/default.html) | [✅](dialogs/invite-member/busy.html) | [✅](dialogs/invite-member/invalid.html) | [✅](dialogs/invite-member/failed.html) |  |  |  |  |  | [✅](dialogs/invite-member/success.html) | `L1-006` |
-| Add a day off (`add-holiday`) | [✅](dialogs/add-holiday/default.html) | [✅](dialogs/add-holiday/busy.html) | [✅](dialogs/add-holiday/invalid.html) | [✅](dialogs/add-holiday/failed.html) |  |  |  |  |  |  | `L1-005` |
-| Remove holiday (`remove-holiday`) | [✅](dialogs/remove-holiday/default.html) | [✅](dialogs/remove-holiday/busy.html) | ➖ | [✅](dialogs/remove-holiday/failed.html) |  |  |  |  |  |  | `L1-005` |
-| Adjust allowance (`adjust-allowance`) | [✅](dialogs/adjust-allowance/default.html) | [✅](dialogs/adjust-allowance/busy.html) | [✅](dialogs/adjust-allowance/invalid.html) | [✅](dialogs/adjust-allowance/failed.html) |  |  |  |  |  |  | `L1-001` |
-| Edit working days (`edit-working-days`) | [✅](dialogs/edit-working-days/default.html) | [✅](dialogs/edit-working-days/busy.html) | [✅](dialogs/edit-working-days/invalid.html) | [✅](dialogs/edit-working-days/failed.html) |  |  |  |  |  |  | `L1-001` |
-| Account menu (`user-menu`) | [✅](dialogs/user-menu/default.html) | ➖ | ➖ |  |  |  |  |  |  |  | `L1-006` |
-| Sign out (`sign-out`) | [✅](dialogs/sign-out/default.html) | [✅](dialogs/sign-out/busy.html) | ➖ |  |  |  |  |  |  |  | `L1-006` |
+| Screen | default | busy | invalid | failed | over-allowance | approved | declined | member | scroll | success | taken | Requirements |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Request time off (`new-request`) | [✅](dialogs/new-request/default.html) | [✅](dialogs/new-request/busy.html) | [✅](dialogs/new-request/invalid.html) | [✅](dialogs/new-request/failed.html) | [✅](dialogs/new-request/over-allowance.html) |  |  |  |  |  | [✅](dialogs/new-request/taken.html) | `L1-003` |
+| Request detail (`request-detail`) | [✅](dialogs/request-detail/default.html) | [✅](dialogs/request-detail/busy.html) | ➖ | [✅](dialogs/request-detail/failed.html) |  | [✅](dialogs/request-detail/approved.html) | [✅](dialogs/request-detail/declined.html) | [✅](dialogs/request-detail/member.html) | [✅](dialogs/request-detail/scroll.html) |  |  | `L1-004` |
+| Decline request (`decline-request`) | [✅](dialogs/decline-request/default.html) | [✅](dialogs/decline-request/busy.html) | ➖ | [✅](dialogs/decline-request/failed.html) |  |  |  |  |  |  |  | `L1-004` |
+| Cancel request (`cancel-request`) | [✅](dialogs/cancel-request/default.html) | [✅](dialogs/cancel-request/busy.html) | ➖ | [✅](dialogs/cancel-request/failed.html) |  |  |  |  |  |  |  | `L1-003` |
+| Remove member (`remove-member`) | [✅](dialogs/remove-member/default.html) | [✅](dialogs/remove-member/busy.html) | ➖ | [✅](dialogs/remove-member/failed.html) |  |  |  |  |  |  |  | `L1-001` |
+| Invite a member (`invite-member`) | [✅](dialogs/invite-member/default.html) | [✅](dialogs/invite-member/busy.html) | [✅](dialogs/invite-member/invalid.html) | [✅](dialogs/invite-member/failed.html) |  |  |  |  |  | [✅](dialogs/invite-member/success.html) |  | `L1-006` |
+| Add a day off (`add-holiday`) | [✅](dialogs/add-holiday/default.html) | [✅](dialogs/add-holiday/busy.html) | [✅](dialogs/add-holiday/invalid.html) | [✅](dialogs/add-holiday/failed.html) |  |  |  |  |  |  |  | `L1-005` |
+| Remove holiday (`remove-holiday`) | [✅](dialogs/remove-holiday/default.html) | [✅](dialogs/remove-holiday/busy.html) | ➖ | [✅](dialogs/remove-holiday/failed.html) |  |  |  |  |  |  |  | `L1-005` |
+| Adjust allowance (`adjust-allowance`) | [✅](dialogs/adjust-allowance/default.html) | [✅](dialogs/adjust-allowance/busy.html) | [✅](dialogs/adjust-allowance/invalid.html) | [✅](dialogs/adjust-allowance/failed.html) |  |  |  |  |  |  |  | `L1-001` |
+| Edit working days (`edit-working-days`) | [✅](dialogs/edit-working-days/default.html) | [✅](dialogs/edit-working-days/busy.html) | [✅](dialogs/edit-working-days/invalid.html) | [✅](dialogs/edit-working-days/failed.html) |  |  |  |  |  |  |  | `L1-001` |
+| Account menu (`user-menu`) | [✅](dialogs/user-menu/default.html) | ➖ | ➖ |  |  |  |  |  |  |  |  | `L1-006` |
+| Sign out (`sign-out`) | [✅](dialogs/sign-out/default.html) | [✅](dialogs/sign-out/busy.html) | ➖ |  |  |  |  |  |  |  |  | `L1-006` |
 
 ### Notifications
 

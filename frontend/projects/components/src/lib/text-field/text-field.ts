@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 
-export type TextFieldType = 'text' | 'email' | 'password' | 'number' | 'search';
+export type TextFieldType = 'text' | 'email' | 'password' | 'number' | 'search' | 'date';
 
 /**
  * Text field in its form field (docs/design-system/components/text-field.html,
@@ -37,6 +37,7 @@ export type TextFieldType = 'text' | 'email' | 'password' | 'number' | 'search';
         [id]="inputId()"
         [name]="name() || inputId()"
         [attr.autocomplete]="autocomplete() || null"
+        [attr.placeholder]="placeholder() || null"
         [attr.aria-invalid]="error() ? 'true' : null"
         [attr.aria-describedby]="describedBy()"
         [readOnly]="readonly()"
@@ -134,6 +135,8 @@ export class TextField {
   readonly name = input<string>('');
   readonly type = input<TextFieldType>('text');
   readonly autocomplete = input<string>('');
+  /** Example text shown in an empty field; never the label. */
+  readonly placeholder = input<string>('');
   readonly help = input<string>('');
   /** Adds "(optional)" to the label, which is then part of the accessible name. */
   readonly optional = input<boolean>(false);
