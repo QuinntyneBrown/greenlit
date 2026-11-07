@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, combineLatest, map, of, startWith, switchMap, tap } from 'rxjs';
@@ -20,6 +27,7 @@ import {
   PeriodNav,
   SegmentedControl,
   SegmentedOption,
+  SelectionAction,
   SelectionBar,
   TeamGrid,
   TeamGridCellStatus,
@@ -46,6 +54,13 @@ const MONTH_PARAM = /^\d{4}-(0[1-9]|1[0-2])$/;
 type PaintChoice = 'select' | 'confirmed' | 'requested' | 'tentative' | 'clear';
 
 const PAINT_STATUS: Record<Exclude<PaintChoice, 'select'>, DayStatus | null> = {
+  confirmed: 'Confirmed',
+  requested: 'Requested',
+  tentative: 'Tentative',
+  clear: null,
+};
+
+const ACTION_STATUS: Record<SelectionAction, DayStatus | null> = {
   confirmed: 'Confirmed',
   requested: 'Requested',
   tentative: 'Tentative',
@@ -167,6 +182,8 @@ function localMonth(): string {
         [workingDays]="bar.workingDays"
         [over]="bar.over"
         [canConfirm]="isManager()"
+        [busy]="saving()"
+        (chosen)="actOnSelection($event)"
       />
     }
   `,
@@ -182,6 +199,8 @@ function localMonth(): string {
       gap: var(--space-4);
     }
     .toolbar-end {
+      min-width: 0;
+      max-width: 100%;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -308,6 +327,27 @@ export class CalendarPage {
     return sheet && selection ? selectionBarView(sheet, this.view().rows, selection) : null;
   });
 
+  /** An action from the bar is being saved. */
+  protected readonly saving = signal(false);
+  private readonly grid = viewChild(TeamGrid);
+
+  /** L2-016 AC3: the same change a paint stroke makes, over the selected days. */
+  protected actOnSelection(action: SelectionAction): void {
+    const selection = this.selection();
+    if (!selection || this.saving()) return;
+    this.saving.set(true);
+    this.save(
+      { memberId: selection.memberId, dates: selection.dates, status: ACTION_STATUS[action] },
+      (saved) => {
+        this.saving.set(false);
+        if (!saved) return;
+        // The change is made: the range is spent, and focus goes back to the sheet to carry on.
+        this.grid()?.clearSelection();
+        this.grid()?.focusActive();
+      },
+    );
+  }
+
   protected readonly hint = computed(() =>
     this.isManager()
       ? 'Click or drag across days to set time off.'
@@ -355,15 +395,25 @@ export class CalendarPage {
   }
 
   /** Shows the stroke at once, saves it, and puts the cells back if the save fails (L2-018 AC2). */
-  private save(stroke: DayStroke): void {
+  private save(stroke: DayStroke, settled?: (saved: boolean) => void): void {
     const before = this.applyKinds(stroke.memberId, stroke.dates, stroke.status);
     this.sheetApi.setDays(stroke).subscribe({
-      next: (set) => this.saved(set),
+      next: (set) => {
+        this.saved(set);
+        settled?.(true);
+      },
       error: (error: unknown) => {
         this.restoreKinds(stroke.memberId, before);
-        this.refused(error, () => this.save(stroke));
+        settled?.(false);
+        this.refused(error, () => this.actOnRetry(stroke, settled));
       },
     });
+  }
+
+  /** "Try again" on the failed-save toast repeats the same stroke, with the same follow-up. */
+  private actOnRetry(stroke: DayStroke, settled?: (saved: boolean) => void): void {
+    if (settled) this.saving.set(true);
+    this.save(stroke, settled);
   }
 
   private saved(set: ChangeSet): void {
