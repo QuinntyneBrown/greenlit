@@ -1,7 +1,29 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  linkedSignal,
+  output,
+  signal,
+} from '@angular/core';
 
-import { TIME_ZONE_OPTIONS, TeamSettingsTeam } from 'api';
-import { Button, MemberList, MemberListItem, SelectField, TextField } from 'components';
+import {
+  TEAM_SETTINGS_SERVICE,
+  TIME_ZONE_OPTIONS,
+  TeamSettingsMember,
+  TeamSettingsTeam,
+} from 'api';
+import {
+  Button,
+  MemberList,
+  MemberListItem,
+  MemberRoleChange,
+  MemberYearlyDaysChange,
+  SelectField,
+  TextField,
+} from 'components';
 
 /**
  * The Team section of Settings (pages/settings/default; docs/detailed-designs/teams/team-settings): the team's
@@ -22,13 +44,13 @@ import { Button, MemberList, MemberListItem, SelectField, TextField } from 'comp
     }
     <fieldset [disabled]="!team().canEdit">
       <div class="form-grid">
-        <gl-text-field label="Team name" inputId="team-name" [value]="team().name" />
+        <gl-text-field label="Team name" inputId="team-name" [(value)]="name" />
         <gl-select-field
           label="Time zone"
           selectId="team-zone"
           help="Weekends and holidays are worked out in this time zone."
           [options]="zones"
-          [value]="team().timeZone"
+          [(value)]="zone"
         />
       </div>
       <gl-member-list
@@ -37,6 +59,8 @@ import { Button, MemberList, MemberListItem, SelectField, TextField } from 'comp
         [editable]="true"
         [members]="members()"
         (actioned)="editWorkingDays.emit($event)"
+        (roleChange)="setRole($event)"
+        (yearlyDaysChange)="setYearlyDays($event)"
       />
       @if (team().canEdit) {
         <div class="invite">
@@ -51,8 +75,10 @@ import { Button, MemberList, MemberListItem, SelectField, TextField } from 'comp
     </fieldset>
     @if (team().canEdit) {
       <div class="settings-actions">
-        <gl-button variant="primary" size="sm">Save changes</gl-button>
-        <span aria-live="polite"></span>
+        <gl-button variant="primary" size="sm" [busy]="busy()" [disabled]="busy()" (click)="save()">
+          {{ busy() ? 'Saving…' : 'Save changes' }}
+        </gl-button>
+        <span aria-live="polite">{{ status() }}</span>
       </div>
     }
   `,
@@ -101,19 +127,73 @@ import { Button, MemberList, MemberListItem, SelectField, TextField } from 'comp
 })
 export class TeamSection {
   readonly team = input.required<TeamSettingsTeam>();
+  /** The team as the API now has it, after a save. */
+  readonly saved = output<TeamSettingsTeam>();
   readonly invite = output<void>();
   readonly editWorkingDays = output<MemberListItem>();
 
+  private readonly service = inject(TEAM_SETTINGS_SERVICE);
   protected readonly zones = TIME_ZONE_OPTIONS;
+
+  /** What the fields show; they follow the team again whenever the page hands over a new one. */
+  protected readonly name = linkedSignal(() => this.team().name);
+  protected readonly zone = linkedSignal(() => this.team().timeZone);
+  private readonly roles = linkedSignal<Record<string, TeamSettingsMember['role']>>(() =>
+    Object.fromEntries(this.team().members.map((m) => [m.id, m.role])),
+  );
+  private readonly days = linkedSignal<Record<string, number | null>>(() =>
+    Object.fromEntries(this.team().members.map((m) => [m.id, m.yearlyDays])),
+  );
+  protected readonly busy = signal(false);
+  protected readonly status = signal('');
 
   protected readonly members = computed<MemberListItem[]>(() =>
     this.team().members.map((m) => ({
       id: m.id,
       name: m.name,
       ...(m.email ? { detail: m.email } : {}),
-      role: m.role,
-      yearlyDays: m.yearlyDays,
+      role: this.roles()[m.id],
+      yearlyDays: this.days()[m.id],
       ...(this.team().canEdit ? { action: 'Edit working days' } : {}),
     })),
   );
+  protected setRole(change: MemberRoleChange): void {
+    this.roles.update((roles) => ({
+      ...roles,
+      [change.member.id!]: change.role as TeamSettingsMember['role'],
+    }));
+    this.status.set('');
+  }
+
+  protected setYearlyDays(change: MemberYearlyDaysChange): void {
+    this.days.update((days) => ({ ...days, [change.member.id!]: change.yearlyDays }));
+    this.status.set('');
+  }
+
+  /** "Save changes": the whole section goes as one request. */
+  protected save(): void {
+    if (this.busy()) return;
+    const team = this.team();
+    const entered = {
+      name: this.name().trim(),
+      timeZone: this.zone(),
+      members: team.members.map((m) => ({
+        id: m.id,
+        role: this.roles()[m.id],
+        yearlyDays: this.days()[m.id],
+      })),
+    };
+    this.busy.set(true);
+    this.service.saveTeam(entered).subscribe((result) => {
+      this.busy.set(false);
+      if (!result.ok) return;
+      this.status.set('Saved');
+      this.saved.emit({
+        ...team,
+        name: entered.name,
+        timeZone: entered.timeZone,
+        members: team.members.map((m, i) => ({ ...m, ...entered.members[i] })),
+      });
+    });
+  }
 }

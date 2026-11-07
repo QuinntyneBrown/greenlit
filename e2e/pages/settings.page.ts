@@ -68,6 +68,11 @@ export class SettingsPage extends BasePage {
     return this.teamSection().locator(".settings-actions [aria-live='polite']");
   }
 
+  /** The banner after a section saves: "Team settings saved". */
+  savedBanner(): Locator {
+    return this.main.locator(".alert--success.banner");
+  }
+
   inviteButton(): Locator {
     return control(this.teamSection(), "Invite a member");
   }

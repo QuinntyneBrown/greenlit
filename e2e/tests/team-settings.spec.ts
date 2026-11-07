@@ -9,7 +9,7 @@
 import { test, expect } from "../fixtures/gl-test.js";
 import { PEOPLE, inviterFor } from "../fixtures/session.js";
 import { ensureMember, ensureOwnTeam } from "../fixtures/team.js";
-import { resetTeamSection } from "../fixtures/team-settings.js";
+import { readTeamSection, resetTeamSection } from "../fixtures/team-settings.js";
 
 const TEAM = "Holiday team";
 
@@ -53,5 +53,30 @@ test.describe("The Team section", () => {
     for (const unit of await settings.yearlyDaysUnits().all()) await expect(unit).toHaveText(/^days \/ yr\s*$/);
     await expect(settings.inviteButton()).toBeVisible();
     await expect(settings.saveTeamButton()).toHaveText("Save changes");
+  });
+
+  test("saves the name and a member's yearly days for everyone, showing Saving… then Saved and a banner (L2-009 AC2, AC7)", async ({
+    pages,
+    request,
+    teamSettingsApi,
+  }, testInfo) => {
+    const settings = pages.settings;
+    const manager = inviterFor(testInfo.project.name);
+    await settings.teamNameField().fill("Product team");
+    await settings.yearlyDaysField("Teammate Holiday").fill("22");
+    const release = await teamSettingsApi.holdTeam();
+
+    await settings.saveTeamButton().click();
+
+    await expect(settings.saveTeamButton()).toHaveText("Saving…");
+    await expect(settings.saveTeamButton()).toBeDisabled();
+    release();
+    await expect(settings.saveTeamStatus()).toHaveText("Saved");
+    await expect(settings.saveTeamButton()).toHaveText("Save changes");
+    await expect(settings.savedBanner().locator(".alert__title")).toHaveText("Team settings saved");
+    await expect(settings.savedBanner()).toContainText("Everyone sees the new settings straight away.");
+    const saved = await readTeamSection(request, manager);
+    expect(saved.name).toBe("Product team");
+    expect(saved.members.find((m) => m.name === "Teammate Holiday")?.yearlyDays).toBe(22);
   });
 });

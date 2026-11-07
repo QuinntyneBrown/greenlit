@@ -88,6 +88,18 @@ type HolidaysLoad =
         <gl-button slot="actions" size="sm" (click)="reviewHolidays()">Review holidays</gl-button>
       </gl-alert>
     }
+    @if (teamSavedBanner()) {
+      <gl-alert
+        class="review"
+        tone="success"
+        [banner]="true"
+        [dismissible]="true"
+        title="Team settings saved"
+        (dismissed)="teamSavedBanner.set(false)"
+      >
+        Everyone sees the new settings straight away.
+      </gl-alert>
+    }
     <div class="settings-layout">
       <gl-settings-nav [items]="navItems()" />
       <div class="settings-content">
@@ -113,6 +125,7 @@ type HolidaysLoad =
             @case ('ready') {
               <app-team-section
                 [team]="team()!"
+                (saved)="teamSaved($event)"
                 (invite)="invite()"
                 (editWorkingDays)="editWorkingDays($event)"
               />
@@ -365,9 +378,12 @@ export class SettingsPage {
     return load.state === 'ready' ? load.sheet : null;
   });
 
+  /** The Team section as the API now has it after a save, until the page loads again. */
+  private readonly savedTeam = signal<TeamSettingsTeam | null>(null);
+  protected readonly teamSavedBanner = signal(false);
   protected readonly team = computed(() => {
     const load = this.load();
-    return load.state === 'ready' ? load.team : null;
+    return load.state === 'ready' ? (this.savedTeam() ?? load.team) : null;
   });
 
   /** The sections the viewer has, for the nav beside them. */
@@ -540,7 +556,13 @@ export class SettingsPage {
     });
   }
 
+  protected teamSaved(team: TeamSettingsTeam): void {
+    this.savedTeam.set(team);
+    this.teamSavedBanner.set(true);
+  }
+
   protected retry(): void {
+    this.savedTeam.set(null);
     this.attempt.update((n) => n + 1);
   }
 
