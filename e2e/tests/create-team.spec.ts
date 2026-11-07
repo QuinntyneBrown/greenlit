@@ -168,7 +168,7 @@ test("a new manager creates Design team and finds its rows and UK holidays on th
     name: "Design team",
     timeZone: "London (GMT+0 / BST)",
     holidays: "United Kingdom",
-    members: [{ name: "Ana Ruiz" }, { name: "Ben Okafor" }],
+    members: [{ name: "Ana Ruiz", email: "ana.created@northwind.studio" }, { name: "Ben Okafor" }],
   });
   await pages.createTeam.submit().click();
 
@@ -176,7 +176,7 @@ test("a new manager creates Design team and finds its rows and UK holidays on th
   await expect(pages.createTeam.lead()).toHaveText("Your sheet is ready.");
   await expect(pages.createTeam.readyTitle()).toHaveText("Design team is ready");
   await expect(pages.createTeam.readyText()).toHaveText(
-    "Everyone is on the calendar now, and you can invite them later from Settings.",
+    "We’ve emailed invitations to 1 person. Anyone without an email is on the calendar now, and you can invite them later from Settings.",
   );
 
   await pages.createTeam.openCalendar().click();

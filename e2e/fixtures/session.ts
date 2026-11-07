@@ -29,6 +29,10 @@ export const PEOPLE = {
   "creator-mobile": { name: "Priya Shah", email: "priya@northwind.studio" },
   "creator-tablet": { name: "Sam Lee", email: "sam@northwind.studio" },
   "creator-desktop": { name: "Tomás Silva", email: "tomas@northwind.studio" },
+  /** Manage a team of their own for the invite spec, one per viewport (see `inviterFor`). */
+  "inviter-mobile": { name: "Uma Singh", email: "uma@northwind.studio" },
+  "inviter-tablet": { name: "Vic Alvarez", email: "vic@northwind.studio" },
+  "inviter-desktop": { name: "Wren Fox", email: "wren@northwind.studio" },
 } as const;
 
 export type Person = keyof typeof PEOPLE;
@@ -43,8 +47,23 @@ export function creatorFor(project: string): Person {
   return person as Person;
 }
 
+/**
+ * The manager of the team this viewport's project invites people to. Invited people cannot be
+ * removed again yet, so the invite spec uses a team of its own per viewport instead of the demo team.
+ */
+export function inviterFor(project: string): Person {
+  const person = `inviter-${project}`;
+  if (!(person in PEOPLE)) throw new Error(`No seeded inviter for the '${project}' project.`);
+  return person as Person;
+}
+
 /** Tokens last eight hours (ADR-004), so one sign-in per person serves the whole run. */
 const tokens = new Map<Person, string>();
+
+/** Forgets the cached token, so the next `signIn` asks again, e.g. after the person has joined a team. */
+export function forgetSignIn(person: Person): void {
+  tokens.delete(person);
+}
 
 /** A bearer token for `person` from the real sign-in endpoint. */
 export async function signIn(request: APIRequestContext, person: Person): Promise<string> {

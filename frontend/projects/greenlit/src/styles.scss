@@ -4,8 +4,25 @@
  * app frame. Component styles stay encapsulated in their `gl-*` components.
  */
 
+@use '@angular/cdk' as cdk;
 @use 'styles/tokens';
 @use 'styles/foundations';
+
+// CDK overlays (dialogs): the container sits at the modal layer, the backdrop is the design
+// system's scrim, and the panel is drawn by `gl-dialog`.
+@include cdk.overlay();
+
+.cdk-overlay-container {
+  z-index: var(--z-modal);
+}
+
+.gl-backdrop {
+  background: var(--color-bg-backdrop);
+}
+
+.gl-dialog-pane {
+  max-width: 100vw;
+}
 
 .gl-frame {
   min-height: 100dvh;

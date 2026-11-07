@@ -40,6 +40,8 @@ public sealed class SeedCommandHandler
     /// <summary>
     /// Accounts on no team yet, for create-team (docs/detailed-designs/teams/create-team):
     /// Noor only opens the page; Priya, Sam and Tomás each create a team, one per e2e viewport.
+    /// Uma, Vic and Wren each create a team for the invite-a-member spec (teams/invite-member), one per viewport,
+    /// because a person invited to the demo team cannot be taken off it again.
     /// </summary>
     private static readonly (string Name, string Email, Guid UserId)[] Newcomers =
     [
@@ -47,6 +49,9 @@ public sealed class SeedCommandHandler
         ("Priya Shah", "priya@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000102")),
         ("Sam Lee", "sam@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000103")),
         ("Tomás Silva", "tomas@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000104")),
+        ("Uma Singh", "uma@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000105")),
+        ("Vic Alvarez", "vic@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000106")),
+        ("Wren Fox", "wren@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000107")),
     ];
 
     /// <summary>Public holidays: United Kingdom, 2026 (docs/mocks/README.md).</summary>

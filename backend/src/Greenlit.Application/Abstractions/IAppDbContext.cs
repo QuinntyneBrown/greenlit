@@ -10,6 +10,7 @@ public interface IAppDbContext
     DbSet<TeamMember> TeamMembers { get; }
     DbSet<TimeOffDay> TimeOffDays { get; }
     DbSet<Holiday> Holidays { get; }
+    DbSet<Invitation> Invitations { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 

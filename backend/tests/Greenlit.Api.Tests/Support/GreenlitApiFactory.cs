@@ -1,7 +1,10 @@
+using Greenlit.Application.Abstractions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Greenlit.Api.Tests.Support;
 
@@ -23,9 +26,17 @@ public class GreenlitApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     /// <summary>An in-memory SQLite database lives as long as one connection to it is open.</summary>
     private SqliteConnection? _keepAlive;
 
+    /// <summary>Every email the API sent, in place of a mail server.</summary>
+    public RecordingEmailSender Emails { get; } = new();
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+        builder.ConfigureServices(services =>
+        {
+            services.RemoveAll<IEmailSender>();
+            services.AddSingleton<IEmailSender>(Emails);
+        });
         builder.ConfigureAppConfiguration((_, cfg) =>
         {
             cfg.AddInMemoryCollection(new Dictionary<string, string?>

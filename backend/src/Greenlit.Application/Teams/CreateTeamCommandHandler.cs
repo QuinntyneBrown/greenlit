@@ -1,9 +1,11 @@
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Exceptions;
+using Greenlit.Application.Invitations;
 using Greenlit.Domain.Entities;
 using Greenlit.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Greenlit.Application.Teams;
 
@@ -12,7 +14,8 @@ namespace Greenlit.Application.Teams;
 /// the caller's own row first, one row per named member, and the chosen
 /// country's holidays for this year and next in the team's time zone. The
 /// caller becomes the manager and gets a session that names the team.
-/// Invitations arrive with journey 5 (L2-010).
+/// Every named member with an email is then sent an invitation (L2-008 AC5, L2-010); one that
+/// cannot be sent is not counted and the manager can invite that person again from Settings.
 /// </summary>
 public sealed class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, CreatedTeamDto>
 {
@@ -23,10 +26,17 @@ public sealed class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand
     private readonly IPublicHolidayProvider _holidays;
     private readonly ITokenService _tokens;
     private readonly TimeProvider _time;
+    private readonly IEmailSender _email;
+    private readonly InvitationIssuer _issuer;
+    private readonly ILogger<CreateTeamCommandHandler> _logger;
 
     public CreateTeamCommandHandler(
-        IAppDbContext db, ICurrentUser currentUser, IPublicHolidayProvider holidays, ITokenService tokens, TimeProvider time)
+        IAppDbContext db, ICurrentUser currentUser, IPublicHolidayProvider holidays, ITokenService tokens, TimeProvider time,
+        IEmailSender email, InvitationIssuer issuer, ILogger<CreateTeamCommandHandler> logger)
     {
+        _email = email;
+        _issuer = issuer;
+        _logger = logger;
         _db = db;
         _currentUser = currentUser;
         _holidays = holidays;
@@ -84,6 +94,32 @@ public sealed class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand
         await _db.SaveChangesAsync(ct);
 
         managerRow.TeamId = team.Id;
-        return new CreatedTeamDto(team.Id, team.Name, Invited: 0, _tokens.Issue(user, managerRow));
+        var invited = await InviteAsync(team, user.DisplayName, ct);
+        return new CreatedTeamDto(team.Id, team.Name, invited, _tokens.Issue(user, managerRow));
+    }
+    private async Task<int> InviteAsync(Team team, string managerName, CancellationToken ct)
+    {
+        var issued = team.Members
+            .Where(m => m.UserId is null && m.Email is not null)
+            .Select(m => _issuer.Issue(team, managerName, m, m.Email!))
+            .ToList();
+        if (issued.Count == 0) return 0;
+        foreach (var i in issued) _db.Invitations.Add(i.Invitation);
+        await _db.SaveChangesAsync(ct);
+
+        var sent = 0;
+        foreach (var i in issued)
+        {
+            try
+            {
+                await _email.SendAsync(i.Email, ct);
+                sent++;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "The invitation for {Email} could not be sent.", i.Invitation.Email);
+            }
+        }
+        return sent;
     }
 }

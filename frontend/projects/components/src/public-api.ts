@@ -23,6 +23,10 @@ export * from './lib/text-field/text-field';
 export * from './lib/select-field/select-field';
 export * from './lib/form-summary/form-summary';
 
+// dialogs and lists
+export * from './lib/dialog/dialog';
+export * from './lib/member-list/member-list';
+
 // the sheet
 export * from './lib/segmented-control/segmented-control';
 export * from './lib/team-grid/team-grid';
