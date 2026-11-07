@@ -1,61 +1,48 @@
 /**
- * Signed-in sessions for the e2e run, until sign-in (journey 2) lands.
+ * Signed-in sessions for the e2e run.
  *
  * The app keeps the bearer token in localStorage under SESSION_KEY (the `api`
- * library's LocalStorageSessionStore). These helpers mint a token the e2e API
- * accepts: HS256, signed with the Development key from
- * backend/src/Greenlit.Api/appsettings.Development.json, for a user the demo
- * seed creates with a stable id (backend/src/Greenlit.Cli/Seed).
+ * library's LocalStorageSessionStore). `signIn` gets that token the way the
+ * sign-in page does, from POST /api/auth/sign-in on the e2e API, as a person
+ * the demo seed creates (backend/src/Greenlit.Cli/Seed) with the demo
+ * password. The sign-in specs drive the page itself; every other spec starts
+ * signed in through this.
  */
 
-import { createHmac } from "node:crypto";
+import { APIRequestContext } from "@playwright/test";
 
 export const SESSION_KEY = "greenlit.session";
 
-const DEV_SIGNING_KEY = "dev-only-key-replace-in-non-dev-environments-via-env-var-please-32+bytes";
-const ISSUER = "greenlit";
-const AUDIENCE = "greenlit-clients";
+/** The e2e API the Angular dev build talks to (environment.apiBaseUrl). */
+export const API_BASE_URL = "http://localhost:5100";
 
 /** The password `greenlit seed` gives every demo account (SeedCommandHandler.DemoPassword). */
 export const DEMO_PASSWORD = "greenlit-demo";
 
 /** The seeded people a test can sign in as. */
 export const PEOPLE = {
-  manager: {
-    userId: "0d6f1c1e-7a3b-4c51-9a10-000000000001",
-    name: "Maya Chen",
-    email: "maya@northwind.studio",
-    role: "Manager",
-  },
-  member: {
-    userId: "0d6f1c1e-7a3b-4c51-9a10-000000000002",
-    name: "Ana Ruiz",
-    email: "ana@northwind.studio",
-    role: "Member",
-  },
+  manager: { name: "Maya Chen", email: "maya@northwind.studio" },
+  member: { name: "Ana Ruiz", email: "ana@northwind.studio" },
 } as const;
 
 export type Person = keyof typeof PEOPLE;
 
-function base64url(input: string | Buffer): string {
-  return Buffer.from(input).toString("base64url");
-}
+/** Tokens last eight hours (ADR-004), so one sign-in per person serves the whole run. */
+const tokens = new Map<Person, string>();
 
-/** A bearer token for `person`, valid for an hour. */
-export function tokenFor(person: Person): string {
-  const now = Math.floor(Date.now() / 1000);
-  const header = base64url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-  const payload = base64url(
-    JSON.stringify({
-      sub: PEOPLE[person].userId,
-      role: PEOPLE[person].role,
-      iss: ISSUER,
-      aud: AUDIENCE,
-      iat: now,
-      nbf: now,
-      exp: now + 3600,
-    }),
-  );
-  const signature = createHmac("sha256", DEV_SIGNING_KEY).update(`${header}.${payload}`).digest("base64url");
-  return `${header}.${payload}.${signature}`;
+/** A bearer token for `person` from the real sign-in endpoint. */
+export async function signIn(request: APIRequestContext, person: Person): Promise<string> {
+  const cached = tokens.get(person);
+  if (cached) return cached;
+  const response = await request.post(`${API_BASE_URL}/api/auth/sign-in`, {
+    data: { email: PEOPLE[person].email, password: DEMO_PASSWORD },
+  });
+  if (!response.ok()) {
+    throw new Error(
+      `Signing in as ${PEOPLE[person].email} failed with ${response.status()}. Is the e2e API up and seeded (eng/Start-E2eApi.ps1)?`,
+    );
+  }
+  const token = ((await response.json()) as { accessToken: string }).accessToken;
+  tokens.set(person, token);
+  return token;
 }

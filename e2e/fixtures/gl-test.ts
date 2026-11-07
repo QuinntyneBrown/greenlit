@@ -3,8 +3,8 @@
  *
  * Wraps `@playwright/test`'s `test` with:
  *   - `goto(routeKey)`: navigates to the right URL for whichever target we're
- *     hitting (mocks vs Angular). Once sign-in lands, guarded routes sign in
- *     first here, so specs never spell out a login.
+ *     hitting (mocks vs Angular). Guarded routes sign in first here, through
+ *     the real sign-in endpoint, so specs never spell out a login.
  *   - `pages`: namespaced page objects (e.g. `pages.calendar`).
  *   - `settle()`: wait for fonts + network idle so visual diffs are stable.
  *
@@ -14,7 +14,7 @@
 
 import { test as base, expect, TestInfo } from "@playwright/test";
 import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
-import { Person, SESSION_KEY, tokenFor } from "./session.js";
+import { Person, SESSION_KEY, signIn } from "./session.js";
 import { CalendarPage } from "../pages/calendar.page.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
@@ -78,9 +78,9 @@ export function isPhone(testInfo: TestInfo): boolean {
 export const test = base.extend<GlFixtures>({
   goto: async ({ page }, use) => {
     await use(async (key, options = {}) => {
-      // Until sign-in lands, guarded routes get a session the e2e API accepts (fixtures/session.ts).
+      // Guarded routes start signed in, with a token from POST /api/auth/sign-in (fixtures/session.ts).
       if ((guardFor(key) || options.as) && !isBaseline && !options.signedOut) {
-        const token = tokenFor(options.as ?? "manager");
+        const token = await signIn(page.request, options.as ?? "manager");
         await page.addInitScript(([k, t]) => window.localStorage.setItem(k, t), [SESSION_KEY, token]);
       }
       const path = pathFor(key);
