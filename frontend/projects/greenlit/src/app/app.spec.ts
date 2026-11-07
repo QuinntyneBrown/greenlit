@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { REQUEST_SERVICE, SESSION_STORE } from 'api';
+import { of } from 'rxjs';
+
+import { AUTH_SERVICE, REQUEST_SERVICE, SESSION_STORE } from 'api';
 import { App } from './app';
 
 describe('App', () => {
@@ -9,7 +11,11 @@ describe('App', () => {
       imports: [App],
       providers: [
         provideRouter([]),
-        { provide: SESSION_STORE, useValue: { isManager: () => false } },
+        {
+          provide: SESSION_STORE,
+          useValue: { isManager: () => false, isSignedIn: () => false, token: () => null },
+        },
+        { provide: AUTH_SERVICE, useValue: { account: () => of(null) } },
         { provide: REQUEST_SERVICE, useValue: {} },
       ],
     }).compileComponents();
