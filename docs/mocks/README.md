@@ -90,6 +90,8 @@ Screenshots go to `docs/mocks/.cache/mocks/` (git-ignored via `.cache/`) with a 
 
 Legend: ✅ mock exists · ➖ not applicable (reason in manifest) · ❌ missing
 
+States outside these columns (`failed`, `unavailable`, and the Google states `google-busy`, `google-error`, `google-unverified`, `google-new-account` on sign-in and `google-busy`, `google-mismatch`, `google-error` on accept-invite) are listed in `manifest.json` and on `index.html`.
+
 ### Pages
 
 | Screen | default | loading | empty | error | invalid | submitting | success | member | selected | painting | over-allowance | coverage-short | other-month | offline | sorted | approved | declined | bulk | member-empty | long | forbidden | not-found | edge | read-only | holidays-empty | Requirements |

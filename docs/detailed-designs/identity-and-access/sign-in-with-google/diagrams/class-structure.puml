@@ -1,0 +1,75 @@
+@startuml
+title Class structure — Sign in with Google
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+
+package "Greenlit.Domain" {
+  class User {
+    +Guid Id
+    +string Email
+    +string DisplayName
+    +string PasswordHash
+    +string? GoogleSubject
+    +UserRole Role
+    +DateTimeOffset CreatedUtc
+  }
+}
+
+package "Greenlit.Application" {
+  class SignInWithGoogleCommand <<record>> {
+    +string? AccessToken
+  }
+  class SignInWithGoogleCommandHandler {
+    +Handle(command) : SessionDto
+  }
+  class AcceptInvitationWithGoogleCommand <<record>> {
+    +string Token
+    +string? AccessToken
+  }
+  class AcceptInvitationWithGoogleCommandHandler {
+    +Handle(command) : SessionDto
+  }
+  interface IGoogleAccounts {
+    +ReadAsync(accessToken, ct) : GoogleAccount?
+  }
+  class GoogleAccount <<record>> {
+    +string Subject
+    +string Email
+    +bool EmailVerified
+    +string Name
+  }
+  interface ITokenService
+  class SessionDto <<record>>
+}
+
+package "Greenlit.Infrastructure" {
+  class GoogleAccounts {
+    -HttpClient http
+    -GoogleOptions options
+    +ReadAsync(accessToken, ct) : GoogleAccount?
+  }
+  class FakeGoogleAccounts {
+    +ReadAsync(accessToken, ct) : GoogleAccount?
+  }
+  class GoogleOptions {
+    +string ClientId
+    +string Accounts
+  }
+}
+
+SignInWithGoogleCommandHandler ..> SignInWithGoogleCommand
+SignInWithGoogleCommandHandler --> IGoogleAccounts
+SignInWithGoogleCommandHandler --> ITokenService
+SignInWithGoogleCommandHandler ..> User
+AcceptInvitationWithGoogleCommandHandler ..> AcceptInvitationWithGoogleCommand
+AcceptInvitationWithGoogleCommandHandler --> IGoogleAccounts
+AcceptInvitationWithGoogleCommandHandler --> ITokenService
+AcceptInvitationWithGoogleCommandHandler ..> User
+IGoogleAccounts ..> GoogleAccount
+GoogleAccounts ..|> IGoogleAccounts
+FakeGoogleAccounts ..|> IGoogleAccounts
+GoogleAccounts --> GoogleOptions
+ITokenService ..> SessionDto
+@enduml

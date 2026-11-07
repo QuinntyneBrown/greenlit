@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Sign in with Google
+
+Person(visitor, "Visitor", "A person who is not signed in, or an invitee")
+System_Boundary(greenlit, "Greenlit") {
+  Container(spa, "Greenlit web application", "Angular", "Sign-in and accept-invitation pages")
+  Container(api, "Greenlit API", "ASP.NET Core", "Exchanges a Google access token for a session")
+  ContainerDb(db, "Greenlit database", "SQL Server", "Users, teams, members, invitations")
+}
+System_Ext(gis, "Google Identity Services", "accounts.google.com/gsi/client", "Token client popup; returns an access token")
+System_Ext(gapi, "Google token endpoints", "oauth2.googleapis.com, googleapis.com", "tokeninfo and userinfo")
+
+Rel(visitor, spa, "Presses Continue with Google / Join with Google")
+Rel(spa, gis, "requestAccessToken()", "JavaScript")
+Rel(spa, api, "POST /api/auth/google, POST /api/invitations/{token}/accept-google", "JSON/HTTPS")
+Rel(api, gapi, "GET tokeninfo, GET userinfo", "HTTPS")
+Rel(api, db, "Reads and writes users", "EF Core")
+@enduml

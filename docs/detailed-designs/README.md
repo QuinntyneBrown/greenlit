@@ -13,6 +13,7 @@ Sign-in, password reset, invitations, account and session.
 | [Sign in](identity-and-access/sign-in/README.md) | Email and password sign-in that issues the session token. | L2-001 |
 | [Reset a forgotten password](identity-and-access/reset-password/README.md) | Reset link by email, valid for one hour and one use. | L2-002, L2-003 |
 | [Accept an invitation](identity-and-access/accept-invitation/README.md) | Invitee sets name and password; the invitation lasts seven days. | L2-004 |
+| [Sign in with Google](identity-and-access/sign-in-with-google/README.md) | Continue with Google on sign-in (existing account, or a new manager account) and Join with Google on an invitation. | L2-051, L2-052 |
 | [Manage the account](identity-and-access/manage-account/README.md) | Display name, email and password change on the Account page. | L2-005 |
 | [Use the account menu and sign out](identity-and-access/sign-out/README.md) | Account menu, confirmed sign-out and session expiry. | L2-006, L2-007 |
 

@@ -6,7 +6,8 @@
       "kind": "page",
       "title": "Sign in",
       "requirements": [
-        "L1-006"
+        "L1-006",
+        "L1-001"
       ],
       "states": [
         "default",
@@ -14,7 +15,11 @@
         "error",
         "invalid",
         "submitting",
-        "success"
+        "success",
+        "google-busy",
+        "google-error",
+        "google-unverified",
+        "google-new-account"
       ],
       "route": "/sign-in",
       "not_applicable": {
@@ -77,7 +82,10 @@
         "submitting",
         "success",
         "failed",
-        "unavailable"
+        "unavailable",
+        "google-busy",
+        "google-mismatch",
+        "google-error"
       ],
       "route": "/accept-invite/:token",
       "not_applicable": {
