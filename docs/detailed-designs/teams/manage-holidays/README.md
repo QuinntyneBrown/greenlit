@@ -17,15 +17,16 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **`WorkWeekSection`** — Lists the holidays ("Thu 1 Jan New Year's Day") with "Remove {name}" buttons and "Add day off", or the empty state "No holidays yet".
 - **`AddHolidayDialog`** — CDK Dialog in `app/dialogs/add-holiday` with Date and Name.
 - **`RemoveHolidayDialog`** — CDK Dialog in `app/dialogs/remove-holiday`. On success the page shows the toast "Removed {name}" with Undo.
-- **`HolidayService / HOLIDAY_SERVICE`** — `add(date, name)`, `remove(id)` and `restore(id)`.
+- **`HolidayService / HOLIDAY_SERVICE`** — `list()`, `add(date, name)`, `remove(id)` and `restore(id)`.
+- **`GetTeamHolidaysQueryHandler`** — `GET /api/team/holidays`: the current year's holidays in date order, the source label (from `Team.HolidayCountry`) and the review banner, all manager-only.
 
 **Backend**
 
 - **`HolidaysController`** — `POST /api/team/holidays`, `DELETE /api/team/holidays/{id}` and `POST /api/team/holidays/{id}/restore`, behind the `Manager` policy.
-- **`AddHolidayCommandHandler`** — Rejects a date that is already a holiday (code `holiday_exists`, "Mon 25 May is already a holiday (Spring bank holiday).") and a weekend date (code `day_is_weekend`). Existing `TimeOffDay` rows on the new holiday are `<TO SUPPLY>`: ADR-003 forbids a day on a holiday.
-- **`RemoveHolidayCommandHandler / RestoreHolidayCommandHandler`** — Remove soft-deletes the row (`RemovedUtc`) so Undo can restore it with its name.
-- **`GetHolidayReviewQueryHandler`** — Reports whether `IPublicHolidayProvider` has the next year's holidays not yet reviewed, for the banner "2027 UK bank holidays are ready". The review flow behind "Review holidays" is `<TO SUPPLY>`.
-- **`WeekendRule`** — Domain service that decides whether a date is a non-working day for the team or a member (shared with `teams/working-days`).
+- **`AddHolidayCommandHandler`** — Rejects a date that is already a holiday (code `holiday_exists`, "Mon 25 May is already a holiday (Spring bank holiday).") and a weekend date (code `day_is_weekend`). Existing `TimeOffDay` rows on the new holiday are deleted in the same unit of work, in any status: ADR-003 forbids a day on a holiday (ADR-008). Adding a date whose holiday was removed revives that row. Validation messages: `Pick a date.`, `Give the day off a name.` (120 characters at most).
+- **`RemoveHolidayCommandHandler / RestoreHolidayCommandHandler`** — Remove soft-deletes the row (`RemovedUtc`) so Undo can restore it with its name; restoring also deletes days booked on the date meanwhile. A holiday that is not on the caller's team is a 404 and reveals nothing; a member gets 403.
+- **`GetHolidayReviewQueryHandler`** — Reports whether `IPublicHolidayProvider` has the next year's holidays not yet reviewed, for the banner "2027 UK bank holidays are ready". "Review holidays" jumps to the Work week & holidays section; importing a calendar after creation is deferred (ADR-008).
+- **`WorkingDayRule`** — Application rule (exists today, `IsWeekend`) that decides whether a date is a weekend; `teams/working-days` extends it for per-team and per-member working days.
 
 **Shared plumbing (exists today)**
 
