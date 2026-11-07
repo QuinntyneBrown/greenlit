@@ -14,6 +14,7 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<TimeOffDay> TimeOffDays => Set<TimeOffDay>();
     public DbSet<TimeOffRequest> TimeOffRequests => Set<TimeOffRequest>();
     public DbSet<Holiday> Holidays => Set<Holiday>();
+    public DbSet<AllowanceAdjustment> AllowanceAdjustments => Set<AllowanceAdjustment>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
 
     public void DiscardChanges() => ChangeTracker.Clear();

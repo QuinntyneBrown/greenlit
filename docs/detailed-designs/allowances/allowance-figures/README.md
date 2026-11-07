@@ -26,7 +26,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 **Backend**
 
 - **`SettingsController`** — `GET /api/team/settings` (manager only) and `PUT /api/team/settings/allowances` (manager only; a member gets `403 forbidden`).
-- **`SaveAllowanceDefaultsCommandHandler`** — Saves `Team.DefaultYearlyDays`, `Team.LeaveYearStartMonth` and `Team.MaxCarryOver`; the validator rejects negative values (code `must_be_zero_or_more`).
+- **`SaveAllowanceDefaultsCommandHandler`** — Saves `Team.DefaultYearlyDays`, `Team.LeaveYearStartMonth` and `Team.MaxCarryOver`; the validator rejects negative values with a `400` whose `errors` name the field ("Enter 0 or more days.").
 - **`AllowanceCalculator`** — Greenlit.Application service that computes an `Allowance` for each member of a team and a `LeaveYear`, counting only working days (`WorkingDayRule` and the team's holidays). It is the single source of every allowance figure; `GetMonthQueryHandler`, `QuoteRequestQueryHandler` and `SetDaysCommandHandler` call it.
 - **`GetTeamSettingsQueryHandler`** — Adds `MembersWithoutAllowance` for the banner.
 - **`TimeProvider`** — the existing .NET abstraction supplies "today" (converted to the team's time zone), so tests freeze it with `FrozenClockApiFactory`. No new `IClock` is introduced.

@@ -147,6 +147,31 @@ public sealed class TestTeam
     public Task SetCoverageMinimumAsync(int minimum) =>
         _factory.WriteAsync(db => db.Teams.Single(t => t.Id == Team.Id).CoverageMinimum = minimum);
 
+    /// <summary>Gives the named person their own yearly days (otherwise the team's default applies).</summary>
+    public Task SetYearlyDaysAsync(string member, int? days) =>
+        _factory.WriteAsync(db => db.TeamMembers.Single(m => m.Id == _rows[member].Id).YearlyDays = days);
+
+    /// <summary>Adds days to (or removes them from) the named person's allowance, effective on <paramref name="effective"/>.</summary>
+    public Task AddAdjustmentAsync(string member, int days, DateOnly effective, string reason = "Carried over from 2025") =>
+        _factory.WriteAsync(db => db.AllowanceAdjustments.Add(new AllowanceAdjustment
+        {
+            Id = Guid.NewGuid(),
+            TeamMemberId = _rows[member].Id,
+            Days = days,
+            Reason = reason,
+            EffectiveDate = effective,
+            CreatedUtc = DateTimeOffset.UtcNow,
+        }));
+
+    /// <summary>Sets the team's allowance defaults.</summary>
+    public Task SetDefaultsAsync(int yearlyDays, int leaveYearStartMonth = 1) =>
+        _factory.WriteAsync(db =>
+        {
+            var team = db.Teams.Single(t => t.Id == Team.Id);
+            team.DefaultYearlyDays = yearlyDays;
+            team.LeaveYearStartMonth = leaveYearStartMonth;
+        });
+
     public Task AddHolidayAsync(DateOnly date, string name) =>
         _factory.WriteAsync(db => db.Holidays.Add(new Holiday { Id = Guid.NewGuid(), TeamId = Team.Id, Date = date, Name = name }));
 

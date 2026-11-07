@@ -11,6 +11,7 @@ public interface IAppDbContext
     DbSet<TimeOffDay> TimeOffDays { get; }
     DbSet<TimeOffRequest> TimeOffRequests { get; }
     DbSet<Holiday> Holidays { get; }
+    DbSet<AllowanceAdjustment> AllowanceAdjustments { get; }
     DbSet<Invitation> Invitations { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
