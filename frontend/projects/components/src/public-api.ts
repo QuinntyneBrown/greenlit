@@ -17,6 +17,11 @@ export * from './lib/top-bar/top-bar';
 // actions
 export * from './lib/button/button';
 
+// forms and account pages
+export * from './lib/auth-card/auth-card';
+export * from './lib/text-field/text-field';
+export * from './lib/form-summary/form-summary';
+
 // the sheet
 export * from './lib/team-grid/team-grid';
 export * from './lib/period-nav/period-nav';
@@ -30,5 +35,6 @@ export * from './lib/badge/badge';
 export * from './lib/alert/alert';
 export * from './lib/inline-message/inline-message';
 export * from './lib/skeleton/skeleton';
+export * from './lib/progress-bar/progress-bar';
 export * from './lib/empty-state/empty-state';
 export * from './lib/error-page/error-page';

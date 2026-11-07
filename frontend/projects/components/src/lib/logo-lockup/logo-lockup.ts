@@ -6,8 +6,9 @@ import { RouterLink } from '@angular/router';
  * a month in miniature with four cells tracing a check, and the lowercase
  * name with a green dot on the i.
  *
- * Rendered as a router link home labelled "Greenlit, team calendar". In the
- * top bar it also carries `topbar__brand`, as in the mocks.
+ * Rendered as a router link labelled "Greenlit, team calendar" by default; auth
+ * pages link it to sign-in as "Greenlit, sign in". In the top bar and on auth
+ * cards it also carries `topbar__brand`, as in the mocks.
  */
 @Component({
   selector: 'gl-logo-lockup',
@@ -18,7 +19,7 @@ import { RouterLink } from '@angular/router';
       class="logo-lockup"
       [class.topbar__brand]="brand()"
       [routerLink]="link()"
-      aria-label="Greenlit, team calendar"
+      [attr.aria-label]="label()"
     >
       <svg class="logo-lockup__mark" viewBox="0 0 41 30" aria-hidden="true">
         <rect class="mark__n" x="0" y="0" width="8" height="8" rx="1.75" />
@@ -97,4 +98,6 @@ export class LogoLockup {
   readonly link = input<string>('/');
   /** Set when the logo is the top bar's brand (`topbar__brand`). */
   readonly brand = input<boolean>(false);
+  /** The link's accessible name. */
+  readonly label = input<string>('Greenlit, team calendar');
 }

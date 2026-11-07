@@ -18,6 +18,7 @@ export type AlertTone = 'info' | 'success' | 'warning' | 'danger';
       class="alert"
       [class]="'alert alert--' + tone()"
       [class.banner]="banner()"
+      [class.form-summary]="summary()"
       [attr.role]="tone() === 'danger' ? 'alert' : 'status'"
     >
       @switch (tone()) {
@@ -98,6 +99,9 @@ export type AlertTone = 'info' | 'success' | 'warning' | 'danger';
       --alert-border: var(--color-danger-border);
       --alert-icon: var(--color-danger-icon);
     }
+    .form-summary {
+      border-left: 4px solid var(--color-danger-solid);
+    }
     .alert > .icon {
       width: 1.25rem;
       height: 1.25rem;
@@ -159,6 +163,8 @@ export class Alert {
   readonly title = input<string>('');
   /** Full-width page-level form. */
   readonly banner = input<boolean>(false);
+  /** The error summary of a form (`form-summary`); see `gl-form-summary`. */
+  readonly summary = input<boolean>(false);
   /** Shows a Dismiss button that emits `dismissed`. */
   readonly dismissible = input<boolean>(false);
   readonly dismissed = output<void>();
