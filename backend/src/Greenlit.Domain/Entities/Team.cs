@@ -1,3 +1,5 @@
+using Greenlit.Domain.Enums;
+
 namespace Greenlit.Domain.Entities;
 
 /// <summary>One sheet: a manager and the people whose time off they track.</summary>
@@ -31,6 +33,9 @@ public class Team
 
     /// <summary>The most days a manager should carry over; a stored setting, carry-over itself is an adjustment (ADR-007).</summary>
     public int MaxCarryOver { get; set; } = 5;
+
+    /// <summary>The weekdays the team works; the others are red for every row (teams/working-days).</summary>
+    public WorkingDays WorkingDays { get; set; } = WorkingDays.MonToFri;
 
     public ICollection<TeamMember> Members { get; set; } = new List<TeamMember>();
     public ICollection<Holiday> Holidays { get; set; } = new List<Holiday>();

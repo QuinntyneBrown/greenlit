@@ -30,6 +30,7 @@ export * from './lib/models/invited-member';
 export * from './lib/models/invitation';
 export * from './lib/models/time-off-request';
 export * from './lib/models/team-holidays';
+export * from './lib/models/week-day';
 
 // Service contracts (interface + InjectionToken)
 export * from './lib/api/session-store';
@@ -39,6 +40,7 @@ export * from './lib/api/team.service';
 export * from './lib/api/invitation.service';
 export * from './lib/api/request.service';
 export * from './lib/api/holiday.service';
+export * from './lib/api/working-days.service';
 export * from './lib/api/auth.interceptor';
 
 // Concrete implementations (imported only by composition roots)
@@ -49,5 +51,6 @@ export * from './lib/api/http-team.service';
 export * from './lib/api/http-invitation.service';
 export * from './lib/api/http-request.service';
 export * from './lib/api/http-holiday.service';
+export * from './lib/api/http-working-days.service';
 export * from './lib/api/problem';
 export * from './lib/api/holiday-date';

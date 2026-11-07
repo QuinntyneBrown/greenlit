@@ -2,6 +2,7 @@ using Greenlit.Application.Abstractions;
 using Greenlit.Application.Allowances;
 using Greenlit.Application.Exceptions;
 using Greenlit.Application.Sheet;
+using Greenlit.Application.Teams;
 using Greenlit.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -69,12 +70,13 @@ public sealed class GetRequestQueryHandler : IRequestHandler<GetRequestQuery, Re
         var rows = members
             .Select(m => new MemberRowDto(
                 m.Id, m.Name, GetMonthQueryHandler.Initials(m.Name), m.UserId == _currentUser.UserId, DaysLeft: null, Allowance: null,
-                dates.Select(date => GetMonthQueryHandler.CellFor(m.Id, date, holidays, statusOf)).ToList()))
+                dates.Select(date => GetMonthQueryHandler.CellFor(m.Id, date, holidays, statusOf, WorkingDayRule.For(team, m))).ToList(),
+                WorkingDaysNames.ToNames(WorkingDayRule.For(team, m))))
             .ToList();
 
         var coverage = dates
             .Select((date, i) => (date, i))
-            .Where(x => !WorkingDayRule.IsWeekend(x.date) && !holidays.ContainsKey(x.date))
+            .Where(x => !holidays.ContainsKey(x.date) && rows.Any(r => r.Cells[x.i].Kind != CellKind.NotWorking))
             .Select(x =>
             {
                 var kinds = rows.Select(r => r.Cells[x.i].Kind).ToList();

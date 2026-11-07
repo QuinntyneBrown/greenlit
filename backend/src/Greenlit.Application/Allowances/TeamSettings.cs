@@ -6,7 +6,7 @@ namespace Greenlit.Application.Allowances;
 public sealed record GetTeamSettingsQuery : IRequest<TeamSettingsDto>;
 
 /// <summary><c>MembersWithoutAllowance</c> counts members who use the default because they have no yearly days of their own (AC4).</summary>
-public sealed record TeamSettingsDto(int DefaultYearlyDays, int LeaveYearStartMonth, int MaxCarryOver, int MembersWithoutAllowance);
+public sealed record TeamSettingsDto(int DefaultYearlyDays, int LeaveYearStartMonth, int MaxCarryOver, int MembersWithoutAllowance, IReadOnlyList<string> WorkingDays);
 
 /// <summary>Saves the defaults (L2-027 AC1). Manager only.</summary>
 public sealed record SaveAllowanceDefaultsCommand(int? DefaultYearlyDays, int? LeaveYearStartMonth, int? MaxCarryOver) : IRequest<TeamSettingsDto>;

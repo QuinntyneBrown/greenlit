@@ -2,6 +2,7 @@ using System.Globalization;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Allowances;
 using Greenlit.Application.Exceptions;
+using Greenlit.Application.Teams;
 using Greenlit.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -74,12 +75,13 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
         var members = ordered
             .Select(m => new MemberRowDto(
                 m.Id, m.Name, Initials(m.Name), m.UserId == userId, figures[m.Id].Left, figures[m.Id],
-                dates.Select(date => CellFor(m.Id, date, holidays, statusOf)).ToList()))
+                dates.Select(date => CellFor(m.Id, date, holidays, statusOf, WorkingDayRule.For(team, m))).ToList(),
+                WorkingDaysNames.ToNames(WorkingDayRule.For(team, m))))
             .ToList();
 
         // L2-014 AC2: on each day the team works, who is out (requested or confirmed) and who is in.
         var coverage = dates
-            .Where(date => !WorkingDayRule.IsWeekend(date) && !holidays.ContainsKey(date))
+            .Where(date => !holidays.ContainsKey(date) && members.Any(m => m.Cells[date.Day - 1].Kind != CellKind.NotWorking))
             .Select(date =>
             {
                 var kinds = members.Select(m => m.Cells[date.Day - 1].Kind).ToList();
@@ -103,10 +105,11 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
         Guid memberId,
         DateOnly date,
         IReadOnlyDictionary<DateOnly, string> holidays,
-        IReadOnlyDictionary<(Guid, DateOnly), DayStatus> statusOf)
+        IReadOnlyDictionary<(Guid, DateOnly), DayStatus> statusOf,
+        WorkingDays workingDays)
     {
         if (holidays.TryGetValue(date, out var holiday)) return new CellDto(Iso(date), CellKind.Holiday, holiday);
-        if (WorkingDayRule.IsWeekend(date)) return new CellDto(Iso(date), CellKind.NotWorking, null);
+        if (WorkingDayRule.IsOffDay(date, workingDays)) return new CellDto(Iso(date), CellKind.NotWorking, null);
         if (!statusOf.TryGetValue((memberId, date), out var status)) return new CellDto(Iso(date), CellKind.Working, null);
         var kind = status switch
         {

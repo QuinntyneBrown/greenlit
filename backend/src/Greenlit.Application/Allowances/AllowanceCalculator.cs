@@ -81,8 +81,9 @@ public sealed class AllowanceCalculator
             .GroupBy(a => a.TeamMemberId)
             .ToDictionary(g => g.Key, g => g.Sum(a => a.Days));
 
-        // L2-029 AC5: weekends and holidays count in no figure.
-        var counted = days.Where(d => !WorkingDayRule.IsWeekend(d.Date) && !holidays.Contains(d.Date)).ToList();
+        // L2-029 AC5: weekends, holidays and days the member does not work count in no figure.
+        var worked = members.ToDictionary(m => m.Id, m => WorkingDayRule.For(team, m));
+        var counted = days.Where(d => !WorkingDayRule.IsOffDay(d.Date, worked[d.TeamMemberId]) && !holidays.Contains(d.Date)).ToList();
 
         return members.ToDictionary(
             m => m.Id,

@@ -1,3 +1,4 @@
+using Greenlit.Application.Sheet;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Allowances;
 using MediatR;
@@ -22,7 +23,7 @@ public sealed class QuoteRequestQueryHandler : IRequestHandler<QuoteRequestQuery
     {
         var (team, member) = await RequestCaller.FindAsync(_db, _currentUser, ct);
         var (first, last) = RequestInput.Range(request.First!, request.Last!);
-        var (working, _) = await RequestCaller.WorkingDaysAsync(_db, team.Id, first, last, ct);
+        var (working, _) = await RequestCaller.WorkingDaysAsync(_db, team.Id, WorkingDayRule.For(team, member), first, last, ct);
         var mine = (await _allowances.ComputeAsync(team, [member], ct))[member.Id];
         return new QuoteDto(working.Count, mine.Available, mine.DaysOver(working.Count));
     }

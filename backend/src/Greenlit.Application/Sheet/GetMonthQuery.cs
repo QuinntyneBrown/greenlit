@@ -22,7 +22,8 @@ public sealed record MemberRowDto(
     bool IsYou,
     int? DaysLeft,
     AllowanceFigures? Allowance,
-    IReadOnlyList<CellDto> Cells);
+    IReadOnlyList<CellDto> Cells,
+    IReadOnlyList<string> WorkingDays);
 
 /// <summary>One member's day. <c>HolidayName</c> is set when <c>Kind</c> is <see cref="CellKind.Holiday"/>.</summary>
 public sealed record CellDto(string Date, CellKind Kind, string? HolidayName);

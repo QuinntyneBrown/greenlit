@@ -1,5 +1,6 @@
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Requests;
+using Greenlit.Application.Teams;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,5 +56,6 @@ internal static class TeamSettings
             team.DefaultYearlyDays,
             team.LeaveYearStartMonth,
             team.MaxCarryOver,
-            await db.TeamMembers.AsNoTracking().CountAsync(m => m.TeamId == team.Id && m.YearlyDays == null, ct));
+            await db.TeamMembers.AsNoTracking().CountAsync(m => m.TeamId == team.Id && m.YearlyDays == null, ct),
+            WorkingDaysNames.ToNames(team.WorkingDays));
 }
