@@ -1,0 +1,46 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Sign in with Google
+
+Person(visitor, "Visitor", "A person who is not signed in, or an invitee")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(signin, "SignInPage", "Angular page", "Continue with Google and its states")
+  Component(accept, "AcceptInvitePage", "Angular page", "Join with Google and its states")
+  Component(gbtn, "GoogleButton", "gl-google-button", "The Google-branded button")
+  Component(gid, "GoogleIdentity", "GOOGLE_IDENTITY implementation", "Loads GIS and asks for an access token")
+  Component(auth, "HttpAuthService", "AUTH_SERVICE implementation", "signInWithGoogle()")
+  Component(inv, "HttpInvitationService", "INVITATION_SERVICE implementation", "acceptWithGoogle()")
+  Component(store, "SessionStore", "Angular service", "Holds the session token")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(actrl, "AuthController", "ASP.NET Core controller", "POST /api/auth/google")
+  Component(ictrl, "InvitationsController", "ASP.NET Core controller", "POST /api/invitations/{token}/accept-google")
+  Component(gsignin, "SignInWithGoogleCommandHandler", "MediatR handler", "Finds, links or creates the account")
+  Component(gaccept, "AcceptInvitationWithGoogleCommandHandler", "MediatR handler", "Joins the team with the Google account")
+  Component(gacc, "IGoogleAccounts", "Application abstraction", "Checks the token with Google")
+  Component(tokens, "ITokenService", "Application abstraction", "Issues the JWT")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Users, invitations, members")
+}
+System_Ext(google, "Google", "GIS and token endpoints")
+
+Rel(visitor, gbtn, "Presses")
+Rel(signin, gid, "requestAccessToken()")
+Rel(accept, gid, "requestAccessToken()")
+Rel(gid, google, "Popup; access token", "JavaScript")
+Rel(signin, auth, "signInWithGoogle(accessToken)")
+Rel(accept, inv, "acceptWithGoogle(token, accessToken)")
+Rel(auth, actrl, "POST /api/auth/google", "JSON/HTTPS")
+Rel(inv, ictrl, "POST .../accept-google", "JSON/HTTPS")
+Rel(auth, store, "Stores token")
+Rel(inv, store, "Stores token")
+Rel(actrl, gsignin, "Sends SignInWithGoogleCommand")
+Rel(ictrl, gaccept, "Sends AcceptInvitationWithGoogleCommand")
+Rel(gsignin, gacc, "ReadAsync(accessToken)")
+Rel(gaccept, gacc, "ReadAsync(accessToken)")
+Rel(gacc, google, "tokeninfo, userinfo", "HTTPS")
+Rel(gsignin, db, "Finds by GoogleSubject or email; links or creates", "EF Core")
+Rel(gaccept, db, "Claims the invitation; creates the user", "EF Core")
+Rel(gsignin, tokens, "Issues session")
+Rel(gaccept, tokens, "Issues session")
+@enduml

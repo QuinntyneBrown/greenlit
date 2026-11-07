@@ -635,6 +635,8 @@ button.cell[data-status="empty"]:focus-visible, button.cell[data-status="empty"]
 .auth-card h1 { font-size: var(--font-size-2xl); }
 .auth-card .lead { margin-top: var(--space-1); color: var(--color-fg-muted); }
 .auth-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2) var(--space-4); font: var(--text-body-sm); }
+.auth-divider { display: flex; align-items: center; gap: var(--space-3); color: var(--color-fg-muted); font: var(--text-caption); text-transform: lowercase; }
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; border-top: 1px solid var(--color-border-default); }
 .brand-grid { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); }
 .brand-tile { display: flex; flex-direction: column; justify-content: flex-end; min-height: 8rem; padding: var(--space-4); border-radius: var(--radius-lg); border: 1px solid var(--color-border-default); background: var(--tile-bg, var(--color-bg-surface)); color: var(--tile-fg, var(--color-fg-default)); }
 .brand-tile strong { font: var(--text-label); }

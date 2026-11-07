@@ -6,4 +6,5 @@
 | manage-account | 3 days | 100% |
 | reset-password | 3 days | 100% |
 | sign-in | 3 days | 100% |
+| sign-in-with-google | 3 days | 100% |
 | sign-out | 2 days | 100% |

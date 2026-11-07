@@ -1,0 +1,54 @@
+@startuml
+title UML sequence behaviour — Continue with Google
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+
+actor Visitor
+participant "SignInPage" as Page
+participant "GoogleIdentity" as GIS
+participant "Google" as Google
+participant "HttpAuthService" as Auth
+participant "AuthController" as Ctrl
+participant "SignInWithGoogleCommandHandler" as Handler
+participant "IGoogleAccounts" as Accounts
+database "Greenlit database" as DB
+
+Visitor -> Page : presses "Continue with Google"
+Page -> GIS : requestAccessToken()
+GIS -> Google : popup (openid email profile)
+Google --> GIS : access token | dismissed
+alt dismissed
+  GIS --> Page : dismissed
+  Page --> Visitor : form as it was (L2-051 AC2)
+else access token
+  GIS --> Page : accessToken
+  Page -> Auth : signInWithGoogle(accessToken)
+  Auth -> Ctrl : POST /api/auth/google
+  Ctrl -> Handler : SignInWithGoogleCommand
+  Handler -> Accounts : ReadAsync(accessToken)
+  Accounts -> Google : GET tokeninfo, GET userinfo
+  Google --> Accounts : aud, sub, email, email_verified, name
+  Accounts --> Handler : GoogleAccount | null
+  alt token not ours or unreadable
+    Handler --> Ctrl : 401 google_token_invalid
+  else email not verified
+    Handler --> Ctrl : 401 google_email_unverified
+  else
+    Handler -> DB : find by GoogleSubject, else by email
+    alt found by subject
+    else found by email
+      Handler -> DB : store GoogleSubject
+    else nobody
+      Handler -> DB : create manager User (no password)
+    end
+    Handler -> DB : removed member? (RemovedMembers)
+    Handler --> Ctrl : SessionDto
+  end
+  Ctrl --> Auth : 200 session | ProblemDetails
+  Auth --> Page : signed-in (new account?) | unverified | failed
+  Page --> Visitor : "Welcome back" or "Account created" (AC3, AC4)
+end
+@enduml

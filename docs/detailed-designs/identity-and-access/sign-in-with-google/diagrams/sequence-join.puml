@@ -1,0 +1,46 @@
+@startuml
+title UML sequence behaviour — Join with Google
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+
+actor Invitee
+participant "AcceptInvitePage" as Page
+participant "GoogleIdentity" as GIS
+participant "Google" as Google
+participant "HttpInvitationService" as Inv
+participant "InvitationsController" as Ctrl
+participant "AcceptInvitationWithGoogleCommandHandler" as Handler
+participant "IGoogleAccounts" as Accounts
+database "Greenlit database" as DB
+
+Invitee -> Page : presses "Join with Google"
+Page -> GIS : requestAccessToken()
+GIS -> Google : popup
+Google --> GIS : access token | dismissed
+alt dismissed
+  GIS --> Page : dismissed
+  Page --> Invitee : form as it was (L2-052 AC2)
+else access token
+  Page -> Inv : acceptWithGoogle(token, accessToken)
+  Inv -> Ctrl : POST /api/invitations/{token}/accept-google
+  Ctrl -> Handler : AcceptInvitationWithGoogleCommand
+  Handler -> DB : find open invitation (InvitationLookup)
+  Handler -> Accounts : ReadAsync(accessToken)
+  Accounts -> Google : GET tokeninfo, GET userinfo
+  Google --> Accounts : account
+  alt email differs or unverified
+    Handler --> Ctrl : 409 google_email_mismatch
+  else email has an account
+    Handler --> Ctrl : 409 account_exists
+  else
+    Handler -> DB : claim invitation; create User (GoogleSubject, no password); link row
+    Handler --> Ctrl : SessionDto
+  end
+  Ctrl --> Inv : 200 session | ProblemDetails
+  Inv --> Page : joined | mismatch | exists | expired | failed
+  Page --> Invitee : "You're in" or the matching alert
+end
+@enduml

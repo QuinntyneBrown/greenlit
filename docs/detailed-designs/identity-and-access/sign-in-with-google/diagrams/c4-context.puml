@@ -1,0 +1,13 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Sign in with Google
+
+Person(visitor, "Visitor", "A person who is not signed in, or an invitee")
+System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacation spreadsheet")
+System_Ext(google, "Google Identity", "Google accounts, OAuth 2.0 token client and token endpoints")
+
+Rel(visitor, greenlit, "Continues with Google / joins with Google")
+Rel(visitor, google, "Chooses a Google account in the popup")
+Rel(greenlit, google, "Checks the access token and reads the account", "HTTPS")
+@enduml
