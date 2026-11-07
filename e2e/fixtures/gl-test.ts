@@ -15,6 +15,7 @@
 import { test as base, expect, TestInfo } from "@playwright/test";
 import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { Person, SESSION_KEY, signIn } from "./session.js";
+import { AcceptInvitePage } from "../pages/accept-invite.page.js";
 import { CalendarPage } from "../pages/calendar.page.js";
 import { CreateTeamPage } from "../pages/create-team.page.js";
 import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
@@ -23,6 +24,7 @@ import { SettingsPage } from "../pages/settings.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
 
 interface Pages {
+  acceptInvite: AcceptInvitePage;
   calendar: CalendarPage;
   createTeam: CreateTeamPage;
   inviteMember: InviteMemberDialog;
@@ -40,6 +42,8 @@ interface GotoOptions {
   signedOut?: boolean;
   /** Open sign-in with this `returnUrl`, as the guard does. */
   returnUrl?: string;
+  /** The invitation token of an `acceptInvite` route (the one in the emailed link). */
+  token?: string;
 }
 
 /**
@@ -90,7 +94,23 @@ interface MembersApi {
   fail(): Promise<void>;
 }
 
+/** Watches and steers the invitation requests (GET /api/invitations/{token} and POST .../accept). */
+interface InvitationsApi {
+  /** How many accept requests the page has sent so far. */
+  acceptRequests(): number;
+  /** Holds the read of the invitation until the returned function is called. */
+  holdRead(): Promise<() => void>;
+  /** Holds accept requests until the returned function is called. */
+  holdAccept(): Promise<() => void>;
+  /** Reading the invitation fails with a 500 until `recoverRead()`. */
+  failRead(): Promise<void>;
+  recoverRead(): Promise<void>;
+  /** Every accept request fails with a 500. */
+  failAccept(): Promise<void>;
+}
+
 interface GlFixtures {
+  invitationsApi: InvitationsApi;
   authApi: AuthApi;
   membersApi: MembersApi;
   teamApi: TeamApi;
@@ -114,7 +134,7 @@ export const test = base.extend<GlFixtures>({
         const token = await signIn(page.request, options.as ?? "manager");
         await page.addInitScript(([k, t]) => window.localStorage.setItem(k, t), [SESSION_KEY, token]);
       }
-      const path = pathFor(key);
+      const path = pathFor(key).replace(":token", encodeURIComponent(options.token ?? "none"));
       const query = new URLSearchParams();
       if (options.month && !isBaseline) query.set("month", options.month);
       if (options.returnUrl && !isBaseline) query.set("returnUrl", options.returnUrl);
@@ -140,6 +160,38 @@ export const test = base.extend<GlFixtures>({
       },
       fail: async () => {
         await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+    });
+  },
+  invitationsApi: async ({ page }, use) => {
+    const read = "**/api/invitations/*";
+    const accept = "**/api/invitations/*/accept";
+    let accepts = 0;
+    page.on("request", (request) => {
+      if (request.method() === "POST" && /^\/api\/invitations\/[^/]+\/accept$/.test(new URL(request.url()).pathname)) accepts++;
+    });
+    const hold = async (pattern: string, method: string) => {
+      let release!: () => void;
+      const released = new Promise<void>((resolve) => (release = resolve));
+      await page.route(pattern, async (route) => {
+        if (route.request().method() !== method) return route.fallback();
+        await released;
+        await route.continue();
+      });
+      return release;
+    };
+    await use({
+      acceptRequests: () => accepts,
+      holdRead: () => hold(read, "GET"),
+      holdAccept: () => hold(accept, "POST"),
+      failRead: async () => {
+        await page.route(read, (route) =>
+          route.request().method() === "GET" ? route.fulfill({ status: 500, body: "" }) : route.fallback(),
+        );
+      },
+      recoverRead: () => page.unroute(read),
+      failAccept: async () => {
+        await page.route(accept, (route) => route.fulfill({ status: 500, body: "" }));
       },
     });
   },
@@ -215,6 +267,7 @@ export const test = base.extend<GlFixtures>({
   },
   pages: async ({ page }, use) => {
     await use({
+      acceptInvite: new AcceptInvitePage(page),
       calendar: new CalendarPage(page),
       createTeam: new CreateTeamPage(page),
       inviteMember: new InviteMemberDialog(page),
