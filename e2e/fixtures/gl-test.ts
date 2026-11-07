@@ -100,6 +100,21 @@ interface SheetApi {
   holdSaves(): Promise<() => void>;
 }
 
+/**
+ * Puts the year request (GET /api/year) into states the seeded data cannot produce: a failing API, a slow
+ * one, or a team of one.
+ */
+interface YearApi {
+  /** Every year request fails with a 500 until `recover()`. */
+  fail(): Promise<void>;
+  /** Lets year requests through again. */
+  recover(): Promise<void>;
+  /** Holds year requests until the returned function is called. */
+  hold(): Promise<() => void>;
+  /** Answers with the real year, keeping only the signed-in person's row. */
+  onlyMe(): Promise<void>;
+}
+
 /** Watches and steers the sign-in request (POST /api/auth/sign-in). */
 interface AuthApi {
   /** How many sign-in requests the page has sent so far. */
@@ -326,6 +341,7 @@ interface GlFixtures {
   membersApi: MembersApi;
   teamApi: TeamApi;
   sheetApi: SheetApi;
+  yearApi: YearApi;
   goto: (key: RouteKey, options?: GotoOptions) => Promise<void>;
   pages: Pages;
   /** Pause until web fonts have loaded and the network is idle so visual diffs are stable. */
@@ -938,6 +954,34 @@ export const test = base.extend<GlFixtures>({
         await page.route(pattern, (route) =>
           route.fulfill({ status: 500, body: "" }),
         );
+      },
+    });
+  },
+  yearApi: async ({ page }, use) => {
+    const pattern = "**/api/year**";
+    await use({
+      fail: async () => {
+        await page.route(pattern, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
+      },
+      recover: () => page.unroute(pattern),
+      hold: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      onlyMe: async () => {
+        await page.route(pattern, async (route) => {
+          const response = await route.fetch();
+          const year = await response.json();
+          year.members = year.members.filter((m: { isYou: boolean }) => m.isYou);
+          await route.fulfill({ response, json: year });
+        });
       },
     });
   },

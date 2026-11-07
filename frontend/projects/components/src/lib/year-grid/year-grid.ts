@@ -38,7 +38,12 @@ export interface YearGridRow {
   imports: [RouterLink],
   template: `
     <div class="grid-card">
-      <div class="year-grid" role="grid" [attr.aria-label]="label()">
+      <div
+        class="year-grid"
+        role="grid"
+        [attr.aria-label]="label()"
+        [attr.aria-busy]="loading() ? 'true' : null"
+      >
         <div role="row">
           <div role="columnheader"><span class="visually-hidden">Team member</span></div>
           @for (column of columns(); track column.month) {
@@ -49,29 +54,44 @@ export interface YearGridRow {
             </div>
           }
         </div>
-        @for (row of rows(); track row.memberId) {
-          <div role="row">
-            <div role="rowheader" class="year-grid__name">
-              <span class="grid-name__text">{{ row.name }}</span>
-              @if (row.you) {
-                <span class="grid-name__you">You</span>
+        @if (loading()) {
+          @for (placeholder of placeholderRows; track $index) {
+            <div role="row">
+              <div role="rowheader" class="year-grid__name">
+                <span class="skeleton skeleton--text name-placeholder" aria-hidden="true"></span>
+              </div>
+              @for (column of columns(); track column.month) {
+                <div role="gridcell">
+                  <span class="skeleton cell-placeholder" aria-hidden="true"></span>
+                </div>
               }
             </div>
-            @for (month of row.months; track month.month) {
-              <div role="gridcell">
-                <a
-                  class="year-month"
-                  routerLink="/"
-                  [queryParams]="{ month: month.month }"
-                  [attr.aria-label]="month.label"
-                >
-                  @for (day of month.days; track $index) {
-                    <span class="sliver" [attr.data-status]="day"></span>
-                  }
-                </a>
+          }
+        } @else {
+          @for (row of rows(); track row.memberId) {
+            <div role="row">
+              <div role="rowheader" class="year-grid__name">
+                <span class="grid-name__text">{{ row.name }}</span>
+                @if (row.you) {
+                  <span class="grid-name__you">You</span>
+                }
               </div>
-            }
-          </div>
+              @for (month of row.months; track month.month) {
+                <div role="gridcell">
+                  <a
+                    class="year-month"
+                    routerLink="/"
+                    [queryParams]="{ month: month.month }"
+                    [attr.aria-label]="month.label"
+                  >
+                    @for (day of month.days; track $index) {
+                      <span class="sliver" [attr.data-status]="day"></span>
+                    }
+                  </a>
+                </div>
+              }
+            </div>
+          }
         }
       </div>
     </div>
@@ -152,6 +172,39 @@ export interface YearGridRow {
     .sliver[data-status='confirmed'] {
       --status-bg: var(--color-status-confirmed);
     }
+    .skeleton {
+      display: block;
+      background: linear-gradient(
+        90deg,
+        var(--color-bg-subtle) 25%,
+        var(--color-bg-subtle-hover) 37%,
+        var(--color-bg-subtle) 63%
+      );
+      background-size: 400% 100%;
+      border-radius: var(--radius-md);
+      animation: gl-shimmer 1.4s var(--ease-standard) infinite;
+    }
+    .name-placeholder {
+      width: var(--space-24);
+      height: 0.9em;
+    }
+    .cell-placeholder {
+      width: 100%;
+      height: var(--space-6);
+    }
+    @keyframes gl-shimmer {
+      from {
+        background-position: 100% 0;
+      }
+      to {
+        background-position: 0 0;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .skeleton {
+        animation: none;
+      }
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -159,4 +212,8 @@ export class YearGrid {
   readonly label = input<string>('Time off by month');
   readonly columns = input.required<readonly YearGridColumn[]>();
   readonly rows = input<readonly YearGridRow[]>([]);
+  /** Shows placeholder rows under the headings and sets aria-busy while the year loads. */
+  readonly loading = input<boolean>(false);
+
+  protected readonly placeholderRows = [0, 1, 2, 3, 4];
 }
