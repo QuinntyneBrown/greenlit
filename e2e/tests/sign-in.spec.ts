@@ -24,7 +24,7 @@ test.describe("Sign in page", () => {
     await expect(signIn.submit()).toBeEnabled();
     await expect(signIn.forgotPassword()).toBeVisible();
     await expect(signIn.inviteNote()).toHaveText(
-      "New here? Greenlit is invite-only. Ask your manager to send you an invitation.",
+      "New here? Continue with Google to set up a team, or ask your manager to send you an invitation.",
     );
   });
 

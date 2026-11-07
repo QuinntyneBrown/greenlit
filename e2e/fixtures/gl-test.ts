@@ -45,6 +45,7 @@ import { RequestDetailDialog } from "../pages/request-detail.dialog.js";
 import { RequestsPage } from "../pages/requests.page.js";
 import { SettingsPage } from "../pages/settings.page.js";
 import { SignInPage } from "../pages/sign-in.page.js";
+import { GoogleStub } from "./google.js";
 import { YearPage } from "../pages/year.page.js";
 
 interface Pages {
@@ -163,6 +164,12 @@ interface AuthApi {
   hold(): Promise<() => void>;
   /** Every sign-in request fails with a 500. */
   fail(): Promise<void>;
+  /** How many Continue-with-Google requests (POST /api/auth/google) the page has sent so far. */
+  googleRequests(): number;
+  /** Holds Continue-with-Google requests until the returned function is called. */
+  holdGoogle(): Promise<() => void>;
+  /** Every Continue-with-Google request fails with a 500. */
+  failGoogle(): Promise<void>;
   /** Reading who is signed in (GET /api/auth/me) fails with a 500, for the account menu. */
   failAccount(): Promise<void>;
   /** How many sign-out requests (POST /api/auth/sign-out) the app has sent so far. */
@@ -286,6 +293,12 @@ interface InvitationsApi {
   recoverRead(): Promise<void>;
   /** Every accept request fails with a 500. */
   failAccept(): Promise<void>;
+  /** How many Join-with-Google requests (POST .../accept-google) the page has sent so far. */
+  acceptGoogleRequests(): number;
+  /** Holds Join-with-Google requests until the returned function is called. */
+  holdAcceptGoogle(): Promise<() => void>;
+  /** Every Join-with-Google request fails with a 500. */
+  failAcceptGoogle(): Promise<void>;
 }
 
 /** Watches and steers the request calls (POST /api/requests and GET /api/requests/quote). */
@@ -473,6 +486,8 @@ interface GlFixtures {
   passwordResetApi: PasswordResetApi;
   accountApi: AccountApi;
   authApi: AuthApi;
+  /** Google, stood in for: what the next Continue/Join with Google comes to (fixtures/google.ts). */
+  google: GoogleStub;
   membersApi: MembersApi;
   teamApi: TeamApi;
   sheetApi: SheetApi;
@@ -527,7 +542,9 @@ export const test = base.extend<GlFixtures>({
   },
   authApi: async ({ page }, use) => {
     const pattern = "**/api/auth/sign-in";
+    const google = "**/api/auth/google";
     let count = 0;
+    let googleCount = 0;
     let signOuts = 0;
     page.on("request", (request) => {
       if (
@@ -537,12 +554,32 @@ export const test = base.extend<GlFixtures>({
         count++;
       if (
         request.method() === "POST" &&
+        new URL(request.url()).pathname === "/api/auth/google"
+      )
+        googleCount++;
+      if (
+        request.method() === "POST" &&
         new URL(request.url()).pathname === "/api/auth/sign-out"
       )
         signOuts++;
     });
     await use({
       requests: () => count,
+      googleRequests: () => googleCount,
+      holdGoogle: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(google, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      failGoogle: async () => {
+        await page.route(google, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
+      },
       signOuts: () => signOuts,
       holdSignOut: async () => {
         let release!: () => void;
@@ -1078,15 +1115,21 @@ export const test = base.extend<GlFixtures>({
   invitationsApi: async ({ page }, use) => {
     const read = "**/api/invitations/*";
     const accept = "**/api/invitations/*/accept";
+    const acceptGoogle = "**/api/invitations/*/accept-google";
     let accepts = 0;
+    let acceptsGoogle = 0;
     page.on("request", (request) => {
+      const path = new URL(request.url()).pathname;
       if (
         request.method() === "POST" &&
-        /^\/api\/invitations\/[^/]+\/accept$/.test(
-          new URL(request.url()).pathname,
-        )
+        /^\/api\/invitations\/[^/]+\/accept$/.test(path)
       )
         accepts++;
+      if (
+        request.method() === "POST" &&
+        /^\/api\/invitations\/[^/]+\/accept-google$/.test(path)
+      )
+        acceptsGoogle++;
     });
     const hold = async (pattern: string, method: string) => {
       let release!: () => void;
@@ -1115,7 +1158,19 @@ export const test = base.extend<GlFixtures>({
           route.fulfill({ status: 500, body: "" }),
         );
       },
+      acceptGoogleRequests: () => acceptsGoogle,
+      holdAcceptGoogle: () => hold(acceptGoogle, "POST"),
+      failAcceptGoogle: async () => {
+        await page.route(acceptGoogle, (route) =>
+          route.fulfill({ status: 500, body: "" }),
+        );
+      },
     });
+  },
+  google: async ({ page }, use) => {
+    const stub = new GoogleStub(page);
+    await stub.install();
+    await use(stub);
   },
   membersApi: async ({ page }, use) => {
     const pattern = "**/api/team/members";

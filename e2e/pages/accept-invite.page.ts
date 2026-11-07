@@ -68,6 +68,16 @@ export class AcceptInvitePage extends BasePage {
     return this.summary().getByRole("link");
   }
 
+  /** "Join with Google" above the form (L2-052 AC1). */
+  joinWithGoogle(): Locator {
+    return this.main.getByRole("button", { name: "Join with Google", exact: true });
+  }
+
+  /** The "or" rule between Join with Google and the password form. */
+  divider(): Locator {
+    return this.main.getByRole("separator", { name: "or", exact: true });
+  }
+
   /** The sentence under a field: "name", "password" or "confirm". */
   fieldError(field: "name" | "password" | "confirm"): Locator {
     return this.main.locator(`#ai-${field === "password" ? "pw" : field}-err`);

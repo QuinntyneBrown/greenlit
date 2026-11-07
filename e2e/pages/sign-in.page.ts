@@ -47,7 +47,21 @@ export class SignInPage extends BasePage {
     return this.main.getByRole("link", { name: "Forgot your password?", exact: true });
   }
 
-  /** The invite-only note under the card. */
+  /** The "or" rule between the password form and Continue with Google (L2-051 AC1). */
+  divider(): Locator {
+    return this.main.getByRole("separator", { name: "or", exact: true });
+  }
+
+  continueWithGoogle(): Locator {
+    return this.main.getByRole("button", { name: "Continue with Google", exact: true });
+  }
+
+  /** "Set up your team now" on the panel a new Google account gets (L2-051 AC4). */
+  setUpTeamNow(): Locator {
+    return this.main.getByRole("link", { name: "Set up your team now", exact: true });
+  }
+
+  /** The note under the card: where a newcomer can go. */
   inviteNote(): Locator {
     return this.main.locator(".auth-card > .text-caption");
   }
