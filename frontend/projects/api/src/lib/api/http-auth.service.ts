@@ -4,7 +4,14 @@ import { Observable, catchError, map, of, tap } from 'rxjs';
 
 import { Session } from '../models/session';
 import { API_BASE_URL, apiUrl } from './api-base-url';
-import { AuthService, SignInResult } from './auth.service';
+import {
+  AuthService,
+  CheckResetLinkResult,
+  RequestPasswordResetResult,
+  ResetPasswordResult,
+  SignInResult,
+} from './auth.service';
+import { problemCode } from './problem';
 import { SESSION_STORE } from './session-store';
 
 /** POST /api/auth/sign-in; keeps the token in the session store on success. */
@@ -31,4 +38,54 @@ export class HttpAuthService implements AuthService {
         ),
       );
   }
+
+  requestPasswordReset(email: string): Observable<RequestPasswordResetResult> {
+    return this.http.post<void>(apiUrl(this.baseUrl, 'api/auth/password-reset'), { email }).pipe(
+      map((): RequestPasswordResetResult => ({ outcome: 'sent' })),
+      catchError(() => of<RequestPasswordResetResult>({ outcome: 'failed' })),
+    );
+  }
+
+  checkResetLink(token: string): Observable<CheckResetLinkResult> {
+    return this.http
+      .get<void>(apiUrl(this.baseUrl, `api/auth/password-reset/${encodeURIComponent(token)}`))
+      .pipe(
+        map((): CheckResetLinkResult => ({ outcome: 'open' })),
+        catchError((error: unknown) =>
+          of<CheckResetLinkResult>(
+            isExpired(error) ? { outcome: 'expired' } : { outcome: 'failed' },
+          ),
+        ),
+      );
+  }
+
+  resetPassword(
+    token: string,
+    password: string,
+    confirmPassword: string,
+  ): Observable<ResetPasswordResult> {
+    return this.http
+      .post<void>(apiUrl(this.baseUrl, 'api/auth/password-reset/confirm'), {
+        token,
+        password,
+        confirmPassword,
+      })
+      .pipe(
+        map((): ResetPasswordResult => ({ outcome: 'updated' })),
+        catchError((error: unknown) =>
+          of<ResetPasswordResult>(
+            isExpired(error) ? { outcome: 'expired' } : { outcome: 'failed' },
+          ),
+        ),
+      );
+  }
+}
+
+/** 410 `reset_link_expired`: the link is used, past its hour or was never issued. */
+function isExpired(error: unknown): boolean {
+  return (
+    error instanceof HttpErrorResponse &&
+    error.status === 410 &&
+    problemCode(error) === 'reset_link_expired'
+  );
 }

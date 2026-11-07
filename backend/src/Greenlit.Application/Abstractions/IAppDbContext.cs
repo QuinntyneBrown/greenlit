@@ -13,6 +13,7 @@ public interface IAppDbContext
     DbSet<Holiday> Holidays { get; }
     DbSet<AllowanceAdjustment> AllowanceAdjustments { get; }
     DbSet<Invitation> Invitations { get; }
+    DbSet<PasswordResetToken> PasswordResetTokens { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 

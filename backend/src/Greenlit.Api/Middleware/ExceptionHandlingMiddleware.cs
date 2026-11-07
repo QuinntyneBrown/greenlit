@@ -48,6 +48,10 @@ public sealed class ExceptionHandlingMiddleware
         {
             await WriteAsync(context, StatusCodes.Status410Gone, "Gone", ex.Message, code: ex.Code, extensions: ex.Extensions);
         }
+        catch (ServiceUnavailableException ex)
+        {
+            await WriteAsync(context, StatusCodes.Status503ServiceUnavailable, "Service unavailable", ex.Message, code: ex.Code);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception processing {Path}", context.Request.Path);

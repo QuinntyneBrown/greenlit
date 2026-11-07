@@ -50,6 +50,7 @@ public static class DependencyInjection
         services.AddSingleton<IPublicHolidayProvider, RuleBasedPublicHolidayProvider>();
         services.AddSingleton<IEmailSender, LoggingEmailSender>();
         services.AddSingleton<IInvitationLinks, InvitationLinks>();
+        services.AddSingleton<IPasswordResetLinks, PasswordResetLinks>();
 
         return services;
     }

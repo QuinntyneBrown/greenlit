@@ -14,5 +14,5 @@ System_Ext(email, "Email provider", "Delivers invitation, reset and notification
 Rel(visitor, spa, "Requests and uses a reset link through", "HTTPS")
 Rel(spa, api, "Calls", "JSON/HTTPS")
 Rel(api, db, "Reads and writes", "EF Core")
-Rel(api, email, "Sends email via", "SMTP <TO SUPPLY>")
+Rel(api, email, "Sends email via", "Logged in development (ADR-006)")
 @enduml

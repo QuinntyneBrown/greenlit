@@ -26,5 +26,5 @@ Rel(ctrl, conf, "Sends ResetPasswordCommand")
 Rel(req, mail, "Sends link")
 Rel(req, db, "Saves token hash", "EF Core")
 Rel(conf, db, "Reads token, updates user", "EF Core")
-Rel(mail, email, "Delivers", "SMTP <TO SUPPLY>")
+Rel(mail, email, "Delivers", "Logged in development (ADR-006)")
 @enduml
