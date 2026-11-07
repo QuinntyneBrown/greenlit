@@ -4,9 +4,9 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map, startWith, switchMap } from 'rxjs';
 
 import { PERSON_SERVICE, Person } from 'api';
-import { Avatar, Skeleton, Stat } from 'components';
+import { Avatar, Legend, MonthMini, Skeleton, Stat } from 'components';
 
-import { facts, subtitle } from './person-view';
+import { facts, miniMonths, subtitle } from './person-view';
 
 type Load = { readonly state: 'loading' } | { readonly state: 'ready'; readonly person: Person };
 
@@ -17,7 +17,7 @@ type Load = { readonly state: 'loading' } | { readonly state: 'ready'; readonly 
  */
 @Component({
   selector: 'app-person-page',
-  imports: [RouterLink, Avatar, Stat, Skeleton],
+  imports: [RouterLink, Avatar, Stat, Skeleton, Legend, MonthMini],
   template: `
     @if (person(); as p) {
       <a class="back-link" routerLink="/">
@@ -42,6 +42,21 @@ type Load = { readonly state: 'loading' } | { readonly state: 'ready'; readonly 
         </div>
       </header>
       <gl-stat class="person-facts" [facts]="facts()" />
+      <section class="year" aria-labelledby="year-title">
+        <div class="toolbar-row">
+          <h2 id="year-title" class="section-title">{{ p.year }} at a glance</h2>
+          <gl-legend />
+        </div>
+        <div class="card-plain">
+          <div class="month-mini-grid">
+            @for (month of months(); track month.title) {
+              <div>
+                <gl-month-mini [title]="month.title" [offset]="month.offset" [days]="month.days" />
+              </div>
+            }
+          </div>
+        </div>
+      </section>
     } @else {
       <gl-skeleton shape="rect" width="100%" height="var(--space-24)" />
     }
@@ -102,6 +117,42 @@ type Load = { readonly state: 'loading' } | { readonly state: 'ready'; readonly 
     .person-facts {
       margin-top: var(--space-8);
     }
+    .year {
+      margin-top: var(--space-10);
+    }
+    .toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+    .section-title {
+      font: var(--text-h3);
+    }
+    .card-plain {
+      margin-top: var(--space-5);
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-lg);
+    }
+    .month-mini-grid {
+      display: grid;
+      gap: var(--space-8);
+      grid-template-columns: minmax(0, 1fr);
+      padding: var(--space-5);
+    }
+    @media (min-width: 40rem) {
+      .month-mini-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (min-width: 64rem) {
+      .month-mini-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        padding: var(--space-8);
+      }
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -129,6 +180,10 @@ export class PersonPage {
   protected readonly subtitle = computed(() => {
     const p = this.person();
     return p ? subtitle(p) : '';
+  });
+  protected readonly months = computed(() => {
+    const p = this.person();
+    return p ? miniMonths(p) : [];
   });
   protected readonly facts = computed(() => {
     const p = this.person();

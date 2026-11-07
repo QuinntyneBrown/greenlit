@@ -56,4 +56,33 @@ export class PersonPage extends BasePage {
   fact(label: string): Locator {
     return this.main.locator(".facts > div", { has: this.page.locator("dt", { hasText: new RegExp(`^${label}$`) }) }).locator("dd");
   }
+
+  // ---- the year at a glance ----
+
+  /** "2026 at a glance". */
+  yearHeading(): Locator {
+    return this.main.getByRole("heading", { level: 2, name: /at a glance$/ });
+  }
+
+  /** The legend beside the year heading. */
+  legendItems(): Locator {
+    return this.main.getByRole("list", { name: "Legend" }).locator(".legend__item");
+  }
+
+  /** The twelve month titles in order. */
+  monthTitles(): Locator {
+    return this.main.locator(".month-mini__title");
+  }
+
+  /** The weekday initials of the first month: M T W T F S S. */
+  weekdayInitials(): Locator {
+    return this.main.locator(".month-mini__days").first().locator(".mini-head");
+  }
+
+  /** One day of a month, found by its name, e.g. `day("November", 16)` is "16 November: Requested". */
+  day(month: string, day: number): Locator {
+    return this.main
+      .locator(".month-mini-grid > div", { has: this.page.locator(".month-mini__title", { hasText: month }) })
+      .locator(`.mini-day[aria-label^="${day} ${month}:"]`);
+  }
 }
