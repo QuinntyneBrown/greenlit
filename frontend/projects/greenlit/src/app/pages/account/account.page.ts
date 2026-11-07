@@ -1,10 +1,35 @@
-import { ChangeDetectionStrategy, Component, inject, linkedSignal, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Injector,
+  afterNextRender,
+  computed,
+  inject,
+  linkedSignal,
+  signal,
+  viewChild,
+} from '@angular/core';
 
 import { ACCOUNT_SERVICE, Account } from 'api';
-import { Alert, Button, Skeleton, TextField } from 'components';
+import {
+  Alert,
+  Button,
+  FormSummary,
+  FormSummaryItem,
+  InlineMessage,
+  Skeleton,
+  TextField,
+} from 'components';
 
 import { AppDialogs } from '../../dialogs/app-dialogs';
 import { SignOutDialog } from '../../dialogs/sign-out/sign-out.dialog';
+
+const MIN_PASSWORD = 10;
+
+interface Status {
+  readonly tone: 'success' | 'danger';
+  readonly text: string;
+}
 
 type Load =
   | { readonly state: 'loading' }
@@ -18,7 +43,7 @@ type Load =
  */
 @Component({
   selector: 'app-account-page',
-  imports: [Alert, Button, Skeleton, TextField],
+  imports: [Alert, Button, FormSummary, InlineMessage, Skeleton, TextField],
   template: `
     <div class="account">
       <h1>Account</h1>
@@ -77,6 +102,9 @@ type Load =
           <section class="settings-section" aria-labelledby="pw-title">
             <h2 id="pw-title" class="section-title">Password</h2>
             <p>Use at least 10 characters.</p>
+            @if (submitted() && summaryItems().length) {
+              <gl-form-summary class="summary" [items]="summaryItems()" />
+            }
             <div class="stack">
               <gl-text-field
                 label="Current password"
@@ -84,6 +112,9 @@ type Load =
                 type="password"
                 autocomplete="current-password"
                 [(value)]="current"
+                [error]="currentError()"
+                [readonly]="passwordBusy()"
+                (valueChange)="currentWrong.set(false)"
               />
               <gl-text-field
                 label="New password"
@@ -91,6 +122,9 @@ type Load =
                 type="password"
                 autocomplete="new-password"
                 [(value)]="next"
+                [error]="shown('new') ? newError() : ''"
+                [readonly]="passwordBusy()"
+                (blurred)="touch('new')"
               />
               <gl-text-field
                 label="Confirm new password"
@@ -98,11 +132,26 @@ type Load =
                 type="password"
                 autocomplete="new-password"
                 [(value)]="confirm"
+                [error]="shown('confirm') ? confirmError() : ''"
+                [readonly]="passwordBusy()"
+                (blurred)="touch('confirm')"
               />
             </div>
             <div class="settings-actions">
-              <gl-button variant="primary" size="sm">Update password</gl-button>
-              <span aria-live="polite"></span>
+              <gl-button
+                variant="primary"
+                size="sm"
+                [busy]="passwordBusy()"
+                [disabled]="passwordBusy()"
+                (click)="updatePassword()"
+              >
+                {{ passwordBusy() ? 'Saving…' : 'Update password' }}
+              </gl-button>
+              <span aria-live="polite">
+                @if (passwordStatus(); as status) {
+                  <gl-inline-message [tone]="status.tone">{{ status.text }}</gl-inline-message>
+                }
+              </span>
             </div>
           </section>
           <section class="settings-section" aria-labelledby="out-title">
@@ -140,6 +189,10 @@ type Load =
     }
     .settings-section + .settings-section {
       margin-top: var(--space-10);
+    }
+    .summary {
+      display: block;
+      margin-top: var(--space-4);
     }
     .form-grid {
       display: grid;
@@ -184,6 +237,34 @@ export class AccountPage {
   protected readonly current = signal('');
   protected readonly next = signal('');
   protected readonly confirm = signal('');
+  protected readonly passwordBusy = signal(false);
+  protected readonly passwordStatus = signal<Status | null>(null);
+  /** True after the API said the current password is wrong; clears when the person edits it. */
+  protected readonly currentWrong = signal(false);
+  protected readonly submitted = signal(false);
+  private readonly touched = signal<ReadonlySet<'new' | 'confirm'>>(new Set());
+  private readonly injector = inject(Injector);
+  private readonly summary = viewChild(FormSummary);
+
+  protected readonly currentError = computed(() =>
+    this.currentWrong() ? 'That isn’t your current password.' : '',
+  );
+  protected readonly newError = computed(() =>
+    this.next().length >= MIN_PASSWORD ? '' : 'Use at least 10 characters.',
+  );
+  protected readonly confirmError = computed(() =>
+    this.confirm() === this.next() ? '' : 'This doesn’t match the new password.',
+  );
+
+  /** The summary repeats each field error as a link (pages/account/invalid). */
+  protected readonly summaryItems = computed<FormSummaryItem[]>(() => {
+    const items: FormSummaryItem[] = [];
+    if (this.newError()) {
+      items.push({ field: 'pw-new', message: 'New password must be at least 10 characters' });
+    }
+    if (this.confirmError()) items.push({ field: 'pw-confirm', message: "Passwords don't match" });
+    return items;
+  });
 
   constructor() {
     this.read();
@@ -197,6 +278,45 @@ export class AccountPage {
   private read(): void {
     this.service.get().subscribe((account) => {
       this.load.set(account ? { state: 'ready', account } : { state: 'error' });
+    });
+  }
+
+  protected shown(field: 'new' | 'confirm'): boolean {
+    return this.submitted() || this.touched().has(field);
+  }
+
+  protected touch(field: 'new' | 'confirm'): void {
+    if (this.touched().has(field)) return;
+    this.touched.update((set) => new Set([...set, field]));
+  }
+
+  /** Checks the new password first and sends nothing while it is invalid; then changes it. */
+  protected updatePassword(): void {
+    if (this.passwordBusy()) return;
+    this.submitted.set(true);
+    this.passwordStatus.set(null);
+    if (this.summaryItems().length) {
+      afterNextRender(() => this.summary()?.focus(), { injector: this.injector });
+      return;
+    }
+    this.passwordBusy.set(true);
+    this.service.changePassword(this.current(), this.next(), this.confirm()).subscribe((result) => {
+      this.passwordBusy.set(false);
+      if (result.outcome === 'updated') {
+        this.current.set('');
+        this.next.set('');
+        this.confirm.set('');
+        this.submitted.set(false);
+        this.touched.set(new Set());
+        this.passwordStatus.set({ tone: 'success', text: 'Password updated' });
+      } else if (result.outcome === 'current-wrong') {
+        this.currentWrong.set(true);
+      } else {
+        this.passwordStatus.set({
+          tone: 'danger',
+          text: 'We couldn’t update your password. Nothing was changed.',
+        });
+      }
     });
   }
 
