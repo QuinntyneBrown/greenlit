@@ -15,6 +15,15 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
   template: `
     <div class="dialog__panel">
       <div class="dialog__header">
+        @if (tone()) {
+          <div
+            class="dialog__icon"
+            [class]="'dialog__icon dialog__icon--' + tone()"
+            aria-hidden="true"
+          >
+            <ng-content select="[slot=icon]" />
+          </div>
+        }
         <div class="dialog__heading">
           <h2 class="dialog__title" [id]="titleId()">{{ title() }}</h2>
           @if (description()) {
@@ -65,6 +74,22 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
     }
     .dialog__heading {
       flex: 1;
+    }
+    .dialog__icon {
+      display: grid;
+      place-items: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--radius-full);
+      flex: none;
+    }
+    .dialog__icon--danger {
+      background: var(--color-danger-bg);
+      color: var(--color-danger-icon);
+    }
+    .dialog__icon--info {
+      background: var(--color-info-bg);
+      color: var(--color-info-icon);
     }
     .dialog__title {
       font: var(--text-h3);
@@ -130,6 +155,8 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 export class Dialog {
   readonly title = input.required<string>();
   readonly description = input<string>('');
+  /** A round icon before the title, `danger` or `info`; the icon itself goes in `[slot=icon]`. */
+  readonly tone = input<'danger' | 'info' | null>(null);
   /** The id of the title, which the CDK dialog names itself by. */
   readonly titleId = input<string>('dlg-title');
   readonly descriptionId = input<string>('dlg-title-desc');

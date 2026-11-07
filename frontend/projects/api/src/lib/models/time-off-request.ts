@@ -75,6 +75,19 @@ export interface ApprovalResult {
   readonly inOnShortDate: number | null;
 }
 
+/** What declining one request did (POST /api/requests/{id}/decline), for the toast. */
+export interface DeclineResult {
+  readonly requestId: string;
+  readonly memberName: string;
+  readonly firstDay: string;
+  readonly lastDay: string;
+  readonly days: number;
+  /** The reason the manager gave, else null. */
+  readonly reason: string | null;
+  /** The member was emailed; false when they have no address or the mail could not be sent. */
+  readonly emailed: boolean;
+}
+
 /** The working days a range would take (GET /api/requests/quote). */
 export interface RequestQuote {
   readonly days: number;

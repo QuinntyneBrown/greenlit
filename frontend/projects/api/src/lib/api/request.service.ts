@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 
 import {
   ApprovalResult,
+  DeclineResult,
   NewRequest,
   RequestCounts,
   RequestDetail,
@@ -25,7 +26,9 @@ export interface RequestService {
   get(id: string): Observable<RequestDetail>;
   /** Approves pending requests, all or none: their days turn Confirmed and the members are emailed. Manager only. */
   approve(ids: readonly string[]): Observable<readonly ApprovalResult[]>;
-  /** Undo of an approval: the request is Pending again and its days Requested. Manager only. */
+  /** Declines a pending request with an optional reason: its days return to Tentative and the member is emailed. Manager only. */
+  decline(id: string, reason: string | null): Observable<DeclineResult>;
+  /** Undo of a decision: the request is Pending again and its days Requested. Manager only. */
   reopen(id: string): Observable<void>;
 }
 

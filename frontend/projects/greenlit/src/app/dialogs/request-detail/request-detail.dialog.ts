@@ -17,6 +17,13 @@ import { rangeLabel, sentLabel } from '../../pages/calendar/request-toasts';
 import { stateOf } from '../../pages/requests/request-rows';
 import { requestWeeks } from './request-weeks';
 
+/**
+ * What the drawer closes with: the approval it recorded, or the manager's wish to decline (the page then
+ * opens the Decline request dialog), or nothing.
+ */
+export type RequestDetailResult =
+  { readonly approved: ApprovalResult } | { readonly decline: true } | null;
+
 /** What the Requests page tells the drawer: the request to show. */
 export interface RequestDetailData {
   readonly request: RequestSummary;
@@ -35,8 +42,9 @@ type Weeks =
  * declined one says why. The body scrolls while the footer stays in view. Approve shows "Approving…" and
  * keeps the drawer open until the decision is recorded (Esc and Close are off meanwhile); a failure says
  * the request is still pending and offers "Try approving again". It closes with the approval so the page can
- * confirm it. If the weeks cannot be loaded the rest still shows, with a way to try again. "Days left
- * after" waits for allowances (journey 11) and Decline is journey 10.
+ * confirm it. If the weeks cannot be loaded the rest still shows, with a way to try again. Decline in the
+ * footer closes the drawer with a wish to decline, and the page asks for the reason. "Days left after" waits for
+ * allowances (journey 11).
  */
 @Component({
   selector: 'app-request-detail-dialog',
@@ -95,6 +103,7 @@ type Weeks =
       </section>
       <div slot="footer" class="actions">
         @if (pending) {
+          <gl-button [disabled]="busy()" (click)="decline()">Decline</gl-button>
           <gl-button variant="approve" [busy]="busy()" [disabled]="busy()" (click)="approve()">
             {{ busy() ? 'Approving…' : failed() ? 'Try approving again' : 'Approve' }}
           </gl-button>
@@ -147,7 +156,7 @@ type Weeks =
 })
 export class RequestDetailDialog {
   private readonly requests = inject(REQUEST_SERVICE);
-  private readonly ref = inject<DialogRef<ApprovalResult | null>>(DialogRef);
+  private readonly ref = inject<DialogRef<RequestDetailResult>>(DialogRef);
 
   protected readonly request = inject<RequestDetailData>(DIALOG_DATA).request;
   protected readonly state = stateOf(this.request);
@@ -198,12 +207,16 @@ export class RequestDetailDialog {
     this.failed.set(false);
     this.busy.set(true);
     this.requests.approve([this.request.id]).subscribe({
-      next: ([result]) => this.ref.close(result),
+      next: ([approved]) => this.ref.close({ approved }),
       error: () => {
         this.busy.set(false);
         this.failed.set(true);
       },
     });
+  }
+
+  protected decline(): void {
+    this.ref.close({ decline: true });
   }
 
   protected close(): void {

@@ -7,7 +7,7 @@ using Greenlit.Api.Tests.Support;
 namespace Greenlit.Api.Tests.Requests;
 
 /// <summary>
-/// POST /api/requests/{id}/reopen: Undo of an approval (L2-024 AC3).
+/// POST /api/requests/{id}/reopen: Undo of an approval (L2-024 AC3) or of a decline (L2-025).
 /// Design: docs/detailed-designs/requests/approve-request. November 2026: the 16th is a Monday.
 /// </summary>
 public class ReopenRequestTests : IClassFixture<GreenlitApiFactory>
@@ -123,8 +123,68 @@ public class ReopenRequestTests : IClassFixture<GreenlitApiFactory>
 
         var response = await ReopenAsync(team, "Maya Chen", id);
 
-        await AssertProblem(response, HttpStatusCode.Conflict, "request_not_approved");
+        await AssertProblem(response, HttpStatusCode.Conflict, "request_not_decided");
         KindOf(await MonthAsync(team), "Ana Ruiz", "2026-11-16").Should().Be("Requested");
+    }
+
+    [Fact]
+    public async Task Undoing_a_decline_puts_the_request_back_to_pending_without_its_reason_and_its_days_to_requested()
+    {
+        // L2-025 toast "Undo".
+        var team = await TestTeam.CreateAsync(_factory);
+        await team.AddMemberAsync("Ana Ruiz");
+        var id = await DeclinedRequestAsync(team);
+
+        var response = await ReopenAsync(team, "Maya Chen", id);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        (await team.RequestsOfAsync("Ana Ruiz")).Should().ContainSingle()
+            .Which.Should().Be(new RequestRow("2026-11-16", "2026-11-20", null, "Pending", 5));
+        var month = await MonthAsync(team);
+        foreach (var date in new[] { "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20" })
+            KindOf(month, "Ana Ruiz", date).Should().Be("Requested");
+        var listed = await Json(await team.ClientFor("Maya Chen").GetAsync("/api/requests"));
+        listed[0].GetProperty("declineReason").ValueKind.Should().Be(JsonValueKind.Null);
+    }
+
+    [Fact]
+    public async Task Undoing_a_decline_leaves_a_day_the_member_has_since_changed()
+    {
+        var team = await TestTeam.CreateAsync(_factory);
+        await team.AddMemberAsync("Ana Ruiz");
+        var id = await DeclinedRequestAsync(team);
+        (await team.ClientFor("Ana Ruiz").PutAsJsonAsync("/api/sheet/days", new { memberId = team.MemberIdOf("Ana Ruiz"), dates = new[] { "2026-11-18" }, status = (string?)null }))
+            .StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var response = await ReopenAsync(team, "Maya Chen", id);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        var month = await MonthAsync(team);
+        KindOf(month, "Ana Ruiz", "2026-11-17").Should().Be("Requested");
+        KindOf(month, "Ana Ruiz", "2026-11-18").Should().Be("Working");
+    }
+
+    [Fact]
+    public async Task A_member_cannot_undo_a_decline()
+    {
+        var team = await TestTeam.CreateAsync(_factory);
+        await team.AddMemberAsync("Ana Ruiz");
+        var id = await DeclinedRequestAsync(team);
+
+        var response = await ReopenAsync(team, "Ana Ruiz", id);
+
+        await AssertProblem(response, HttpStatusCode.Forbidden, "forbidden");
+        (await team.RequestsOfAsync("Ana Ruiz")).Single().Status.Should().Be("Declined");
+    }
+
+    private static async Task<Guid> DeclinedRequestAsync(TestTeam team)
+    {
+        var sent = await team.ClientFor("Ana Ruiz").PostAsJsonAsync("/api/requests", new { firstDay = "2026-11-16", lastDay = "2026-11-20" });
+        sent.StatusCode.Should().Be(HttpStatusCode.Created);
+        var id = (await Json(sent)).GetProperty("id").GetGuid();
+        (await team.ClientFor("Maya Chen").PostAsJsonAsync($"/api/requests/{id}/decline", new { reason = "Dev is already out." }))
+            .StatusCode.Should().Be(HttpStatusCode.OK);
+        return id;
     }
 
     private static async Task<Guid> ApprovedRequestAsync(TestTeam team, string member = "Ana Ruiz", string manager = "Maya Chen")

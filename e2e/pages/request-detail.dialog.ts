@@ -81,6 +81,11 @@ export class RequestDetailDialog {
     return this.dialog().locator(".drawer__footer .btn--approve");
   }
 
+  /** The footer's Decline button; it opens the Decline request dialog. */
+  decline(): Locator {
+    return this.dialog().locator(".drawer__footer .btn:not(.btn--approve)");
+  }
+
   close(): Locator {
     return this.dialog().getByRole("button", { name: "Close", exact: true });
   }
