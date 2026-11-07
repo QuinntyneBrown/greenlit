@@ -63,7 +63,7 @@ public sealed class GetRequestQueryHandler : IRequestHandler<GetRequestQuery, Re
 
         var rows = members
             .Select(m => new MemberRowDto(
-                m.Id, m.Name, GetMonthQueryHandler.Initials(m.Name), m.UserId == _currentUser.UserId, DaysLeft: null,
+                m.Id, m.Name, GetMonthQueryHandler.Initials(m.Name), m.UserId == _currentUser.UserId, DaysLeft: null, Allowance: null,
                 dates.Select(date => GetMonthQueryHandler.CellFor(m.Id, date, holidays, statusOf)).ToList()))
             .ToList();
 

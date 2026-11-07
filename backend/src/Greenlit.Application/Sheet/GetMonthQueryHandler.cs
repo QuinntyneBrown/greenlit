@@ -1,5 +1,6 @@
 using System.Globalization;
 using Greenlit.Application.Abstractions;
+using Greenlit.Application.Allowances;
 using Greenlit.Application.Exceptions;
 using Greenlit.Domain.Enums;
 using MediatR;
@@ -16,12 +17,14 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
     private readonly IAppDbContext _db;
     private readonly ICurrentUser _currentUser;
     private readonly TimeProvider _time;
+    private readonly AllowanceCalculator _allowances;
 
-    public GetMonthQueryHandler(IAppDbContext db, ICurrentUser currentUser, TimeProvider time)
+    public GetMonthQueryHandler(IAppDbContext db, ICurrentUser currentUser, TimeProvider time, AllowanceCalculator allowances)
     {
         _db = db;
         _currentUser = currentUser;
         _time = time;
+        _allowances = allowances;
     }
 
     public async Task<MonthDto> Handle(GetMonthQuery request, CancellationToken ct)
@@ -65,11 +68,12 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
             .ToDictionaryAsync(h => h.Date, h => h.Name, ct);
         var statusOf = stored.ToDictionary(d => (d.TeamMemberId, d.Date), d => d.Status);
 
+        var figures = await _allowances.ComputeAsync(team, ordered, ct);
         var dates = Enumerable.Range(0, last.Day).Select(month.AddDays).ToList();
 
         var members = ordered
             .Select(m => new MemberRowDto(
-                m.Id, m.Name, Initials(m.Name), m.UserId == userId, DaysLeft: null,
+                m.Id, m.Name, Initials(m.Name), m.UserId == userId, figures[m.Id].Left, figures[m.Id],
                 dates.Select(date => CellFor(m.Id, date, holidays, statusOf)).ToList()))
             .ToList();
 

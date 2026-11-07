@@ -1,3 +1,4 @@
+using Greenlit.Application.Allowances;
 using MediatR;
 
 namespace Greenlit.Application.Sheet;
@@ -20,6 +21,7 @@ public sealed record MemberRowDto(
     string Initials,
     bool IsYou,
     int? DaysLeft,
+    AllowanceFigures? Allowance,
     IReadOnlyList<CellDto> Cells);
 
 /// <summary>One member's day. <c>HolidayName</c> is set when <c>Kind</c> is <see cref="CellKind.Holiday"/>.</summary>
