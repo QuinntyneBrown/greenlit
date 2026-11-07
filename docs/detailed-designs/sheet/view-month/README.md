@@ -18,11 +18,11 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Frontend**
 
-- **`CalendarPage`** — App-shell page at `/` (`page: 'calendar'`). It replaces today's `SheetPage` at `/sheet`; `<TO SUPPLY>`: whether `/sheet` redirects. It owns the month cursor, the "Previous month", "Next month" and "Today" controls, and the loading, empty and error states.
+- **`CalendarPage`** — App-shell page at `/` (`page: 'calendar'`). It replaced the old `SheetPage`; `/sheet` shows the not-found page (L2-049 AC5). It owns the month cursor, the "Previous month", "Next month" and "Today" controls, and the loading, empty and error states.
 - **`TeamGrid`** — `gl-team-grid` component: a `role="grid"` table labelled "Time off, {Month yyyy}" with column headers "Mon 2 Nov", one row per member, the Left column and the Out row. The signed-in member's row comes first, marked "You".
 - **`SheetCell`** — `gl-sheet-cell` component. It renders the colour, the glyph ("?", "…", "✓") and the accessible name "{member}, {Day d Mon}: {state}", where state is Working, Not working, a holiday name, Tentative, Requested or Confirmed.
 - **`OutCell`** — Shows "{n}" or "·" and the accessible name "{n} out, {m} in", adding ". Below the minimum of {min}" with an outline when flagged.
-- **`SheetService / SHEET_SERVICE`** — Contract and injection token in the `api` project: `month(yyyyMm)`, `setDays(change)` and `restore(snapshot)`. `HttpSheetService` is the implementation bound in `app.config.ts`.
+- **`SheetService / SHEET_SERVICE`** — Contract and injection token in the `api` project: `month(yyyyMm)` now; `setDays(change)` and `restore(snapshot)` arrive with `sheet/mark-days`. `HttpSheetService` is the implementation bound in `app.config.ts`.
 
 **Backend**
 
@@ -81,3 +81,18 @@ The calendar page loads one month from the Greenlit API, which reads it from the
 The member's own row comes first (`L2-012` AC2). Each cell carries its state in its accessible name and glyph as well as its colour (`L2-013`, `L2-048`). Days below the minimum are outlined on the Out row (`L2-042` AC1).
 
 ![Sequence diagram: load and render a month](diagrams/sequence-load-month.png)
+
+## Decisions (journey 1, 7 Nov 2026)
+
+Journey 1 builds this design before sign-in, allowances, coverage settings and per-member working days exist. These decisions keep it complete for what it owns and leave clear seams for the rest.
+
+| Topic | Decision |
+|---|---|
+| Month in the address | The calendar reads `?month=yyyy-MM`; without it the page shows the current month in the team's time zone. Previous, Next and Today change the parameter, so a month can be bookmarked and reloaded. |
+| Session before sign-in | The endpoint keeps the authenticated fallback policy. The `api` project gets a `SESSION_STORE` contract that holds the bearer token and an interceptor that sends it. Sign-in (`identity-and-access/sign-in`) will write the token; until then the Playwright fixture writes one minted with the development signing key for a seeded user. No anonymous endpoint is added. |
+| Caller identity | `ICurrentUser` reads the `sub` claim (user id) and resolves the caller's team member row and team; the caller is the manager when `Team.ManagerUserId` is their id. A caller with no team gets 404 `team_not_found`. |
+| Left column | `DaysLeft` is `null` until `allowances/allowance-figures` lands (ADR-003 keeps balances out of scope until it is superseded). The cell shows "–" with the accessible name "Days left not set up yet". L2-014 AC1 is delivered with journey 11. |
+| Coverage minimum | `Team` has no minimum yet, so `CoverageMinimum` is `null` and no day is flagged. The Out cell already renders the flag when `BelowMinimum` is true; `teams/coverage-minimum` (journey 17) adds the value. L2-042 AC1 is delivered there. |
+| Member working days | Only weekends and holidays are non-working until `teams/working-days` (journey 15); L2-013 AC2's part-time case and L2-014 AC3 are delivered there. The query resolves non-working days in one place (`WorkingDayRule`) so that journey only extends it. |
+| Read-only cells | Cells render as `role="gridcell"` elements with the mock's classes, not buttons, until `sheet/mark-days` makes them editable; names link to the person page once `allowances/person-page` exists. |
+| Seed data | The demo seed is the mocks' cast: "Design team" in Europe/London with the UK holidays and the November days of `pages/calendar/default`, and stable user ids for Maya Chen (manager) and Ana Ruiz (member). |
