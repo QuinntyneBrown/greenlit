@@ -14,7 +14,7 @@ export class SettingsPage extends BasePage {
   }
 
   protected readyAnchor(): Locator {
-    return this.teamSection().locator(".member-list, .alert");
+    return this.teamSection().locator(".member-list, .alert, .empty");
   }
 
   heading(): Locator {
@@ -81,6 +81,19 @@ export class SettingsPage extends BasePage {
   /** The inline error under the Team name field. */
   teamNameError(): Locator {
     return this.teamSection().locator("#team-name-err");
+  }
+
+  /** "We couldn't load your settings" */
+  loadErrorTitle(): Locator {
+    return this.teamSection().locator(".empty__title");
+  }
+
+  loadErrorText(): Locator {
+    return this.teamSection().locator(".empty__text");
+  }
+
+  tryAgainButton(): Locator {
+    return control(this.teamSection(), "Try again");
   }
 
   inviteButton(): Locator {

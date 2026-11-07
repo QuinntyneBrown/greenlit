@@ -80,6 +80,26 @@ test.describe("The Team section", () => {
     expect(saved.members.find((m) => m.name === "Teammate Holiday")?.yearlyDays).toBe(22);
   });
 
+  test("a Team section that cannot be read says so and Try again loads it (L2-009 AC6)", async ({
+    goto,
+    pages,
+    teamSettingsApi,
+  }, testInfo) => {
+    const settings = pages.settings;
+    await teamSettingsApi.failLoad();
+    await goto("settings", { as: inviterFor(testInfo.project.name) });
+    await settings.waitForReady();
+
+    await expect(settings.loadErrorTitle()).toHaveText("We couldn’t load your settings");
+    await expect(settings.loadErrorText()).toHaveText("Something went wrong on our side. Nothing was changed.");
+    await expect(settings.teamNameField()).toHaveCount(0);
+
+    await teamSettingsApi.recoverLoad();
+    await settings.tryAgainButton().click();
+
+    await expect(settings.teamNameField()).toHaveValue(TEAM);
+  });
+
   test("Save changes with no edits says so and sends nothing, even after an edit is undone (L2-009 AC4)", async ({
     pages,
     teamSettingsApi,
