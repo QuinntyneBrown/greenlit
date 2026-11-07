@@ -24,6 +24,8 @@ import {
   SESSION_STORE,
   SHEET_SERVICE,
   TEAM_SERVICE,
+  PERSON_SERVICE,
+  HttpPersonService,
   YEAR_SERVICE,
   HttpYearService,
   authInterceptor,
@@ -57,5 +59,6 @@ export const appConfig: ApplicationConfig = {
     { provide: INVITATION_SERVICE, useExisting: HttpInvitationService },
     { provide: REQUEST_SERVICE, useExisting: HttpRequestService },
     { provide: YEAR_SERVICE, useExisting: HttpYearService },
+    { provide: PERSON_SERVICE, useExisting: HttpPersonService },
   ],
 };

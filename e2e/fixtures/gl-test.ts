@@ -14,6 +14,7 @@
 
 import { test as base, expect, TestInfo } from "@playwright/test";
 import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
+import { personIdOf } from "./people.js";
 import { Person, SESSION_KEY, expiredToken, signIn } from "./session.js";
 import { AccountMenu } from "../pages/account-menu.js";
 import { SessionExpiredPage } from "../pages/session-expired.page.js";
@@ -32,6 +33,7 @@ import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
 import { NewRequestDialog } from "../pages/new-request.dialog.js";
 import { MarketingPage } from "../pages/marketing.page.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
+import { PersonPage } from "../pages/person.page.js";
 import { RequestDetailDialog } from "../pages/request-detail.dialog.js";
 import { RequestsPage } from "../pages/requests.page.js";
 import { SettingsPage } from "../pages/settings.page.js";
@@ -57,6 +59,7 @@ interface Pages {
   requestDetail: RequestDetailDialog;
   declineRequest: DeclineRequestDialog;
   cancelRequest: CancelRequestDialog;
+  person: PersonPage;
   requests: RequestsPage;
   settings: SettingsPage;
   signIn: SignInPage;
@@ -76,6 +79,10 @@ interface GotoOptions {
   expiredSession?: boolean;
   /** Open sign-in with this `returnUrl`, as the guard does. */
   returnUrl?: string;
+  /** Open a person route on this member's page, found by name through the API (an `as` viewer, the manager by default). */
+  person?: string;
+  /** Open a person route on this id, as given (for an id no one has). */
+  personId?: string;
   /** The invitation token of an `acceptInvite` route (the one in the emailed link). */
   token?: string;
 }
@@ -113,6 +120,23 @@ interface YearApi {
   hold(): Promise<() => void>;
   /** Answers with the real year, keeping only the signed-in person's row. */
   onlyMe(): Promise<void>;
+}
+
+/**
+ * Puts a person's page (GET /api/people/{id}) into states the seeded data cannot produce: a failing API, a slow
+ * one, or a person the seed does not hold.
+ */
+interface PersonApi {
+  /** Every person request fails with a 500 until `recover()`. */
+  fail(): Promise<void>;
+  /** Lets person requests through again. */
+  recover(): Promise<void>;
+  /** Holds person requests until the returned function is called. */
+  hold(): Promise<() => void>;
+  /** Every person comes back as the real person changed by `change`. */
+  change(change: (person: any) => void): Promise<void>;
+  /** How many person requests the page has sent so far. */
+  requests(): number;
 }
 
 /** Watches and steers the sign-in request (POST /api/auth/sign-in). */
@@ -342,6 +366,7 @@ interface GlFixtures {
   teamApi: TeamApi;
   sheetApi: SheetApi;
   yearApi: YearApi;
+  personApi: PersonApi;
   goto: (key: RouteKey, options?: GotoOptions) => Promise<void>;
   pages: Pages;
   /** Pause until web fonts have loaded and the network is idle so visual diffs are stable. */
@@ -373,10 +398,14 @@ export const test = base.extend<GlFixtures>({
           [SESSION_KEY, expiredToken()],
         );
       }
-      const path = pathFor(key).replace(
+      let path = pathFor(key).replace(
         ":token",
         encodeURIComponent(options.token ?? "none"),
       );
+      if (!isBaseline && (options.person || options.personId)) {
+        const id = options.personId ?? (await personIdOf(page.request, options.as ?? "manager", options.person!));
+        path = path.replace(":id", id);
+      }
       const query = new URLSearchParams();
       if (options.month && !isBaseline) query.set("month", options.month);
       if (options.year && !isBaseline) query.set("year", options.year);
@@ -957,6 +986,37 @@ export const test = base.extend<GlFixtures>({
       },
     });
   },
+  personApi: async ({ page }, use) => {
+    const pattern = "**/api/people/**";
+    let count = 0;
+    page.on("request", (request) => {
+      if (request.method() === "GET" && new URL(request.url()).pathname.startsWith("/api/people/")) count++;
+    });
+    await use({
+      fail: async () => {
+        await page.route(pattern, (route) => route.fulfill({ status: 500, body: "" }));
+      },
+      recover: () => page.unroute(pattern),
+      hold: async () => {
+        let release!: () => void;
+        const released = new Promise<void>((resolve) => (release = resolve));
+        await page.route(pattern, async (route) => {
+          await released;
+          await route.continue();
+        });
+        return release;
+      },
+      change: async (change) => {
+        await page.route(pattern, async (route) => {
+          const response = await route.fetch();
+          const person = await response.json();
+          change(person);
+          await route.fulfill({ response, json: person });
+        });
+      },
+      requests: () => count,
+    });
+  },
   yearApi: async ({ page }, use) => {
     const pattern = "**/api/year**";
     await use({
@@ -1057,6 +1117,7 @@ export const test = base.extend<GlFixtures>({
       signIn: new SignInPage(page),
       signOutDialog: new SignOutDialog(page),
       year: new YearPage(page),
+      person: new PersonPage(page),
     });
   },
   settle: async ({ page }, use) => {

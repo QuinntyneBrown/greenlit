@@ -33,6 +33,7 @@ export * from './lib/models/time-off-request';
 export * from './lib/models/team-holidays';
 export * from './lib/models/week-day';
 export * from './lib/models/year';
+export * from './lib/models/person';
 
 // Service contracts (interface + InjectionToken)
 export * from './lib/api/session-store';
@@ -47,6 +48,7 @@ export * from './lib/api/team-settings.service';
 export * from './lib/models/team-settings';
 export * from './lib/api/coverage.service';
 export * from './lib/api/year.service';
+export * from './lib/api/person.service';
 export * from './lib/api/auth.interceptor';
 export * from './lib/api/session-expired.interceptor';
 
@@ -62,5 +64,6 @@ export * from './lib/api/http-working-days.service';
 export * from './lib/api/http-team-settings.service';
 export * from './lib/api/http-coverage.service';
 export * from './lib/api/http-year.service';
+export * from './lib/api/http-person.service';
 export * from './lib/api/problem';
 export * from './lib/api/holiday-date';

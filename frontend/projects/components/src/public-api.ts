@@ -47,6 +47,9 @@ export * from './lib/allowance-table/allowance-table';
 export * from './lib/selection-bar/selection-bar';
 export * from './lib/period-nav/period-nav';
 export * from './lib/legend/legend';
+export * from './lib/stat/stat';
+export * from './lib/month-mini/month-mini';
+export * from './lib/run-list/run-list';
 
 // identity and status
 export * from './lib/avatar/avatar';
