@@ -568,6 +568,8 @@ export class TeamGrid {
     const from =
       this.selecting() && event.shiftKey && range?.row === cell.row ? range.anchor : cell.col;
     this.drag.set({ row: cell.row, from, to: cell.col });
+    // The pointer captured the press, so the browser will not focus the cell itself.
+    this.focusCell(cell.row, cell.col, true);
   }
 
   protected onMove(event: PointerEvent): void {
@@ -659,6 +661,14 @@ export class TeamGrid {
         this.monthStep.emit(event.key === 'PageUp' ? -1 : 1);
         return;
       }
+      case 'Escape':
+        // Escape clears a selection; the focus stays on the cell.
+        if (this.range()) {
+          event.preventDefault();
+          this.range.set(null);
+          this.cleared.emit();
+        }
+        return;
       case 'Enter':
       case ' ':
         event.preventDefault();
@@ -728,10 +738,10 @@ export class TeamGrid {
     return null;
   }
 
-  private focusCell(row: number, col: number): void {
+  private focusCell(row: number, col: number, preventScroll = false): void {
     this.host.nativeElement
       .querySelector<HTMLElement>(`.cell[data-row="${row}"][data-col="${col}"]`)
-      ?.focus();
+      ?.focus({ preventScroll });
   }
 
   private cellAt(element: Element | null): { row: number; col: number } | null {

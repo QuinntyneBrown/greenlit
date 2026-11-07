@@ -170,12 +170,14 @@ function localMonth(): string {
             [paint]="gridPaint()"
             [selectable]="choice() === 'select'"
             (selectionChange)="selection.set($event)"
+            (cleared)="selectionCleared()"
             (stroke)="paintStroke($event)"
             (monthStep)="go($event)"
           />
         }
       }
     }
+    <p class="visually-hidden" role="status">{{ announcement() }}</p>
     @if (bar(); as bar) {
       <gl-selection-bar
         [title]="bar.title"
@@ -184,6 +186,7 @@ function localMonth(): string {
         [canConfirm]="isManager()"
         [busy]="saving()"
         (chosen)="actOnSelection($event)"
+        (dismissed)="dismissSelection()"
       />
     }
   `,
@@ -326,6 +329,28 @@ export class CalendarPage {
     const selection = this.selection();
     return sheet && selection ? selectionBarView(sheet, this.view().rows, selection) : null;
   });
+
+  /** The polite status: how many days are selected, nothing once it is cleared. */
+  protected readonly announcement = computed(() => {
+    const n = this.selection()?.dates.length ?? 0;
+    return n === 0 ? '' : `${n} ${n === 1 ? 'day' : 'days'} selected`;
+  });
+
+  /** L2-016 AC4: "Clear selection" on the bar. */
+  protected dismissSelection(): void {
+    this.grid()?.clearSelection();
+    this.grid()?.focusActive();
+    this.selectionCleared();
+  }
+
+  /** L2-016 AC4: Escape or "Clear selection" cleared the range. */
+  protected selectionCleared(): void {
+    this.toasts.show({
+      tone: 'info',
+      title: 'Selection cleared',
+      body: 'Pick days to start again.',
+    });
+  }
 
   /** An action from the bar is being saved. */
   protected readonly saving = signal(false);

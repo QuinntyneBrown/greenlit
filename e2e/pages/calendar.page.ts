@@ -253,6 +253,11 @@ export class CalendarPage extends BasePage {
     return this.selectionBar().getByRole("button", { name, exact: true });
   }
 
+  /** The polite status that says how many days are selected ("3 days selected"). */
+  selectionAnnouncement(): Locator {
+    return this.main.getByRole("status");
+  }
+
   // ---- requesting time off (docs/detailed-designs/requests/send-request) ----
 
   /** The member's "Request time off" button beside the paint picker; the manager does not get one. */
