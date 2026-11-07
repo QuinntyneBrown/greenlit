@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Greenlit.Cli.Seed;
+using Greenlit.Domain.Enums;
 using Greenlit.Infrastructure.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -7,12 +8,64 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Greenlit.Cli.Tests.Seed;
 
+/// <summary>
+/// The demo seed is the mocks' cast (docs/mocks/README.md): Design team in
+/// Europe/London with the UK holidays and the November days of
+/// pages/calendar/default, so the e2e calendar shows what the mock shows.
+/// </summary>
 public class SeedCommandHandlerTests
 {
     [Fact]
-    public async Task Seeding_twice_leaves_one_demo_team()
+    public async Task Seeding_twice_leaves_one_design_team_with_the_cast()
     {
-        await using var connection = new SqliteConnection("Data Source=:memory:");
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        var team = await read.Teams.Include(t => t.Members).SingleAsync();
+        team.Name.Should().Be(SeedCommandHandler.DemoTeamName);
+        team.TimeZone.Should().Be("Europe/London");
+        team.Members.OrderBy(m => m.SortOrder).Select(m => m.Name).Should().Equal(
+            "Maya Chen", "Ana Ruiz", "Ben Okafor", "Cleo Park", "Dev Patel", "Elif Yılmaz", "Finn Murphy");
+        (await read.Users.CountAsync()).Should().Be(7);
+        (await read.Holidays.CountAsync()).Should().Be(8);
+    }
+
+    [Fact]
+    public async Task The_manager_and_a_member_have_stable_ids_for_the_e2e_session()
+    {
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        var team = await read.Teams.SingleAsync();
+        team.ManagerUserId.Should().Be(SeedCommandHandler.MayaUserId);
+        var ana = await read.TeamMembers.SingleAsync(m => m.Name == "Ana Ruiz");
+        ana.UserId.Should().Be(SeedCommandHandler.AnaUserId);
+        (await read.Users.SingleAsync(u => u.Id == SeedCommandHandler.MayaUserId)).Email.Should().Be(SeedCommandHandler.DemoManagerEmail);
+    }
+
+    [Fact]
+    public async Task November_matches_the_calendar_mock()
+    {
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        var days = await read.TimeOffDays.Include(d => d.TeamMember)
+            .Select(d => new { d.TeamMember.Name, d.Date, d.Status })
+            .ToListAsync();
+        days.Where(d => d.Name == "Ana Ruiz").Select(d => (d.Date.Day, d.Status)).Should().BeEquivalentTo(new[]
+        {
+            (4, DayStatus.Confirmed), (5, DayStatus.Confirmed),
+            (16, DayStatus.Requested), (17, DayStatus.Requested), (18, DayStatus.Requested), (19, DayStatus.Requested), (20, DayStatus.Requested),
+        });
+        days.Where(d => d.Name == "Ben Okafor").Should().HaveCount(5).And.OnlyContain(d => d.Status == DayStatus.Tentative);
+        days.Where(d => d.Name == "Cleo Park").Select(d => d.Date.Day).Should().BeEquivalentTo(new[] { 12, 13 });
+        days.Where(d => d.Name == "Dev Patel").Select(d => d.Date.Day).Should().BeEquivalentTo(new[] { 18, 19 });
+        days.Should().HaveCount(16);
+    }
+
+    private static async Task<DbContextOptions<AppDbContext>> SeedTwiceAsync()
+    {
+        var connection = new SqliteConnection("Data Source=:memory:");
         await connection.OpenAsync();
         var options = new DbContextOptionsBuilder<AppDbContext>().UseSqlite(connection).Options;
 
@@ -28,9 +81,6 @@ public class SeedCommandHandlerTests
             exit.Should().Be(0);
         }
 
-        await using var read = new AppDbContext(options);
-        (await read.Teams.CountAsync()).Should().Be(1);
-        (await read.Users.CountAsync(u => u.Email == SeedCommandHandler.DemoManagerEmail)).Should().Be(1);
-        (await read.TeamMembers.CountAsync()).Should().Be(5);
+        return options;
     }
 }
