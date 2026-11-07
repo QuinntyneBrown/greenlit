@@ -1,4 +1,5 @@
 using Greenlit.Application.Abstractions;
+using Greenlit.Application.Allowances;
 using MediatR;
 
 namespace Greenlit.Application.Requests;
@@ -8,18 +9,21 @@ public sealed class QuoteRequestQueryHandler : IRequestHandler<QuoteRequestQuery
 {
     private readonly IAppDbContext _db;
     private readonly ICurrentUser _currentUser;
+    private readonly AllowanceCalculator _allowances;
 
-    public QuoteRequestQueryHandler(IAppDbContext db, ICurrentUser currentUser)
+    public QuoteRequestQueryHandler(IAppDbContext db, ICurrentUser currentUser, AllowanceCalculator allowances)
     {
         _db = db;
         _currentUser = currentUser;
+        _allowances = allowances;
     }
 
     public async Task<QuoteDto> Handle(QuoteRequestQuery request, CancellationToken ct)
     {
-        var (team, _) = await RequestCaller.FindAsync(_db, _currentUser, ct);
+        var (team, member) = await RequestCaller.FindAsync(_db, _currentUser, ct);
         var (first, last) = RequestInput.Range(request.First!, request.Last!);
         var (working, _) = await RequestCaller.WorkingDaysAsync(_db, team.Id, first, last, ct);
-        return new QuoteDto(working.Count);
+        var mine = (await _allowances.ComputeAsync(team, [member], ct))[member.Id];
+        return new QuoteDto(working.Count, mine.Available, mine.DaysOver(working.Count));
     }
 }

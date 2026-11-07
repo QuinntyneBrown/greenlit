@@ -48,11 +48,7 @@ test.describe("Calendar cells", () => {
     await expect(await pages.calendar.outCell("Mon 23 Nov")).toHaveAccessibleName("0 out, 7 in");
   });
 
-  test("until allowances are set up, the Left column says so (L2-014 AC1 arrives with allowances)", async ({
-    pages,
-  }) => {
-    await expect(pages.calendar.daysLeft("Ana Ruiz")).toHaveAccessibleName("Days left not set up yet");
-  });
+
 });
 
 test("a team holiday is red for everyone and named (L2-013 AC3)", async ({ goto, pages }) => {

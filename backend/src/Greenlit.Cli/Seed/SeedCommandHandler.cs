@@ -82,6 +82,28 @@ public sealed class SeedCommandHandler
         ("Dev Patel", 18, DayStatus.Requested), ("Dev Patel", 19, DayStatus.Requested),
     ];
 
+    /// <summary>Yearly days and the adjustment each person carries (docs/mocks/README.md, pages/year/default).</summary>
+    private static readonly (string Member, int YearlyDays, int Adjustment, string Reason)[] Allowances =
+    [
+        ("Maya Chen", 25, 0, ""),
+        ("Ana Ruiz", 25, 3, "Carried over from 2025"),
+        ("Ben Okafor", 27, 2, "Long service"),
+        ("Cleo Park", 25, 0, ""),
+        ("Dev Patel", 20, 0, ""),
+        ("Elif Yılmaz", 25, 0, ""),
+        ("Finn Murphy", 22, 1, "Offsite Saturday"),
+    ];
+
+    /// <summary>The rest of Ana's 2026 as pages/person/default shows it, so her 17 used days leave 11 of 28.</summary>
+    private static readonly (DateOnly First, DateOnly Last, DayStatus Status)[] AnaYear =
+    [
+        (new(2026, 1, 2), new(2026, 1, 2), DayStatus.Confirmed),
+        (new(2026, 4, 7), new(2026, 4, 10), DayStatus.Confirmed),
+        (new(2026, 7, 13), new(2026, 7, 17), DayStatus.Confirmed),
+        (new(2026, 7, 20), new(2026, 7, 24), DayStatus.Confirmed),
+        (new(2026, 12, 29), new(2026, 12, 31), DayStatus.Tentative),
+    ];
+
     /// <summary>What seeds before sign-in stored instead of a hash.</summary>
     private const string LegacyPlaceholder = "seed-placeholder";
 
@@ -159,6 +181,12 @@ public sealed class SeedCommandHandler
         foreach (var (memberName, day, status) in November)
             AddDay(team, memberName, new DateOnly(2026, 11, day), status, now, existing);
 
+        foreach (var (first, last, status) in AnaYear)
+            for (var date = first; date <= last; date = date.AddDays(1))
+                AddDay(team, "Ana Ruiz", date, status, now, existing);
+
+        await SeedAllowancesAsync(team, now, ct);
+
         foreach (var (memberName, date) in WinterBreak) AddDay(team, memberName, date, DayStatus.Requested, now, existing);
         await SeedRequestsAsync(team, ct);
         await SeedHistoryAsync(team, now, ct);
@@ -166,6 +194,31 @@ public sealed class SeedCommandHandler
         var written = await _db.SaveChangesAsync(ct);
         _logger.LogInformation("Seed complete ({Rows} rows written).", written);
         return 0;
+    }
+
+    /// <summary>
+    /// Gives each person their yearly days when they have none, and their adjustment when it is not there yet
+    /// (looked up by member and reason), so a second seed adds nothing and never overwrites an edit.
+    /// </summary>
+    private async Task SeedAllowancesAsync(Team team, DateTimeOffset now, CancellationToken ct)
+    {
+        var ids = team.Members.Select(m => m.Id).ToList();
+        var stored = await _db.AllowanceAdjustments.Where(a => ids.Contains(a.TeamMemberId)).ToListAsync(ct);
+        foreach (var (name, yearlyDays, adjustment, reason) in Allowances)
+        {
+            var member = team.Members.Single(m => m.Name == name);
+            member.YearlyDays ??= yearlyDays;
+            if (adjustment == 0 || stored.Any(a => a.TeamMemberId == member.Id && a.Reason == reason)) continue;
+            _db.AllowanceAdjustments.Add(new AllowanceAdjustment
+            {
+                Id = Guid.NewGuid(),
+                TeamMemberId = member.Id,
+                Days = adjustment,
+                Reason = reason,
+                EffectiveDate = new DateOnly(2026, 1, 1),
+                CreatedUtc = now,
+            });
+        }
     }
 
     /// <summary>The notes on the pending requests, as pages/requests/default shows them.</summary>

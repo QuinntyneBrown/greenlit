@@ -22,6 +22,36 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Greenlit.Domain.Entities.AllowanceAdjustment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Days")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("EffectiveDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("TeamMemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamMemberId", "EffectiveDate");
+
+                    b.ToTable("AllowanceAdjustments");
+                });
+
             modelBuilder.Entity("Greenlit.Domain.Entities.Holiday", b =>
                 {
                     b.Property<Guid>("Id")
@@ -100,8 +130,17 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedUtc")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int>("DefaultYearlyDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LeaveYearStartMonth")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("ManagerUserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("MaxCarryOver")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -148,6 +187,9 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("YearlyDays")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -275,6 +317,17 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Greenlit.Domain.Entities.AllowanceAdjustment", b =>
+                {
+                    b.HasOne("Greenlit.Domain.Entities.TeamMember", "TeamMember")
+                        .WithMany("Adjustments")
+                        .HasForeignKey("TeamMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TeamMember");
+                });
+
             modelBuilder.Entity("Greenlit.Domain.Entities.Holiday", b =>
                 {
                     b.HasOne("Greenlit.Domain.Entities.Team", "Team")
@@ -346,6 +399,8 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Greenlit.Domain.Entities.TeamMember", b =>
                 {
+                    b.Navigation("Adjustments");
+
                     b.Navigation("Invitations");
 
                     b.Navigation("Requests");

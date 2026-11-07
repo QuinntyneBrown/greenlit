@@ -12,7 +12,7 @@ Settings holds the defaults for new people in its Allowances section: days per y
 
 **over allowance** — state in which a member's days left minus their requested days is below zero
 
-`<TO SUPPLY>`: how Max carry-over applies at the end of a leave year. The mocks show the field and a manual "Carried over from 2025" adjustment, but no year-end step.
+**Max carry-over** is a stored setting only (ADR-007). Greenlit runs no year-end step: the manager enters carry-over as an adjustment with a reason (journey 23, "Carried over from 2025"), and the setting is the ceiling the Allowances section will show.
 
 ## Description
 
@@ -25,11 +25,11 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Backend**
 
-- **`SettingsController`** — `PUT /api/team/settings/allowances`.
-- **`SaveAllowanceDefaultsCommandHandler`** — Saves `Team.DefaultYearlyDays`, `Team.LeaveYearStartMonth` and `Team.MaxCarryOver`; the validator rejects negative values (code `must_be_zero_or_more`).
-- **`AllowanceCalculator`** — Domain service that computes an `Allowance` for a member and a `LeaveYear`, using `WeekendRule` to count only working days. It is the single source of every allowance figure.
+- **`SettingsController`** — `GET /api/team/settings` (manager only) and `PUT /api/team/settings/allowances` (manager only; a member gets `403 forbidden`).
+- **`SaveAllowanceDefaultsCommandHandler`** — Saves `Team.DefaultYearlyDays`, `Team.LeaveYearStartMonth` and `Team.MaxCarryOver`; the validator rejects negative values with a `400` whose `errors` name the field ("Enter 0 or more days.").
+- **`AllowanceCalculator`** — Greenlit.Application service that computes an `Allowance` for each member of a team and a `LeaveYear`, counting only working days (`WorkingDayRule` and the team's holidays). It is the single source of every allowance figure; `GetMonthQueryHandler`, `QuoteRequestQueryHandler` and `SetDaysCommandHandler` call it.
 - **`GetTeamSettingsQueryHandler`** — Adds `MembersWithoutAllowance` for the banner.
-- **`IClock`** — Greenlit.Application abstraction introduced by this design. It returns the current instant and the team's local date, so tests fix "today".
+- **`TimeProvider`** — the existing .NET abstraction supplies "today" (converted to the team's time zone), so tests freeze it with `FrozenClockApiFactory`. No new `IClock` is introduced.
 
 **Shared plumbing (exists today)**
 
@@ -51,7 +51,18 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 | Left | Allowance − Used − Booked |
 | Left after requests | Left − Requested; the member is *over* when it is below 0 |
 
-**Decision record.** ADR-003 states that balances are out of scope. The requirements in `docs/specs` (from the mocks) introduce allowances, so this subsystem needs a new ADR that supersedes that clause before implementation: `<TO SUPPLY>`.
+**Decision record.** ADR-007 supersedes ADR-003's clause that balances are out of scope.
+
+**Where the figures surface (journey 11).**
+
+- `GET /api/sheet`: each member row's `daysLeft` is **Left**, and `allowance` carries every figure (`yearlyDays`, `adjustments`, `allowance`, `used`, `booked`, `requested`, `tentative`, `left`). The calendar's Left column shows `daysLeft`, negative with a minus sign.
+- `GET /api/requests/quote`: also returns `daysAvailable` (Left minus Requested, shown as "You have {n} days left to request." before any dates; negative counts as 0) and `daysOver`, how many days the caller's requested days would exceed their days left once the quoted days are added: `max(0, requested + days − left)`. The dialog adds "That’s {n} days over." when it is above zero (L2-030 AC3).
+- `POST /api/sheet/days` (paint): the change set also returns `daysOver`, the caller's over-allowance after the stroke; the toast says "That’s {n} days over your allowance." when it is above zero (L2-030 AC2 for painted days; the selection bar is journey 12).
+- The person page and the year table (journeys 21 and 22) read the same figures.
+
+**Security and privacy.** Every endpoint is authenticated by the fallback policy. Figures are scoped to the caller's team; a member's sheet response includes the team's allowance figures because the Left column shows them to everyone (L2-014 AC1). `GET`/`PUT` of the defaults are manager only. A warning never blocks (L2-030 AC4), and errors reveal nothing about other teams.
+
+**Open decisions resolved.** The over-allowance test counts the member's pending requested days: a new request is over by `requested + new days − left`. Team defaults when a team is created: 25 days per year, leave year starts in January, max carry-over 5. The Allowances section and the missing-allowance banner on the Settings page are built with journey 18; this journey ships their endpoints (`GET`/`PUT`, `membersWithoutAllowance`).
 
 ## Requirements
 

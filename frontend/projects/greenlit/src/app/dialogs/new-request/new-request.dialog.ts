@@ -13,7 +13,7 @@ import {
 import { toObservable } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
 
-import { REQUEST_SERVICE, SentRequest, problemCode } from 'api';
+import { REQUEST_SERVICE, RequestQuote, SentRequest, problemCode } from 'api';
 import { Alert, Button, Dialog, FormSummary, FormSummaryItem, TextField, Well } from 'components';
 
 const FIRST_ID = 'nr-start';
@@ -23,18 +23,23 @@ const NOTE_ID = 'nr-note';
 const END_BEFORE_START = 'The end date is before the start date';
 const DAYS_TAKEN = 'Some of those days are already requested or confirmed';
 
-/** What the calendar tells the dialog: who will be asked. */
+/** What the calendar tells the dialog: who will be asked, and how many days the member can still request. */
 export interface NewRequestData {
   readonly managerName: string;
+  /** Days left minus days already requested, never below zero; null when the figures are not known. */
+  readonly daysToRequest: number | null;
 }
+
+const plural = (n: number): string => `${n} ${n === 1 ? 'day' : 'days'}`;
 
 /**
  * Request time off (docs/detailed-designs/requests/send-request, L2-019): a first day, a last day
  * and an optional note, opened from the member's calendar. As the dates change it counts the
  * working days; a last day before the first, or days already requested, name the problem and send
  * nothing; a send shows "Sending…" with the fields read-only; a failure keeps the dates and offers
- * "Try again". Days left and the over-allowance warning arrive with journey 11. The dialog closes
- * with the stored request when one was sent.
+ * "Try again". Before any dates it says how many days are left to request; with dates it says how many are
+ * left after the request, or how many it is over (L2-019 AC1-AC3, L2-030 AC3), and never blocks sending. The
+ * dialog closes with the stored request when one was sent.
  */
 @Component({
   selector: 'app-new-request-dialog',
@@ -88,9 +93,17 @@ export interface NewRequestData {
           } @else if (problem(); as text) {
             <span class="problem">{{ text }}</span>
           } @else if (days() === null) {
+            @if (toRequest !== null) {
+              You have {{ plural(toRequest) }} left to request.
+            }
             Weekends and holidays aren’t counted.
           } @else {
-            <strong>{{ days() }} {{ days() === 1 ? 'day' : 'days' }}</strong> from your allowance.
+            <strong>{{ plural(days()!) }}</strong> from your allowance.
+            @if (over() > 0) {
+              <span class="over"> That’s {{ plural(over()) }} over.</span>
+            } @else if (daysAfter() !== null) {
+              {{ plural(daysAfter()!) }} left after this.
+            }
           }
         </gl-well>
         <button class="submit-on-enter" type="submit" tabindex="-1" aria-hidden="true"></button>
@@ -120,6 +133,10 @@ export interface NewRequestData {
     .problem {
       color: var(--color-danger-fg);
     }
+    .over {
+      color: var(--color-danger-fg);
+      font-weight: var(--font-weight-semibold);
+    }
     .actions {
       display: contents;
     }
@@ -141,7 +158,10 @@ export class NewRequestDialog {
   private readonly injector = inject(Injector);
   private readonly summary = viewChild(FormSummary);
 
-  protected readonly manager = inject<NewRequestData>(DIALOG_DATA).managerName;
+  private readonly data = inject<NewRequestData>(DIALOG_DATA);
+  protected readonly manager = this.data.managerName;
+  protected readonly toRequest = this.data.daysToRequest;
+  protected readonly plural = plural;
   protected readonly firstId = FIRST_ID;
   protected readonly lastId = LAST_ID;
   protected readonly noteId = NOTE_ID;
@@ -163,12 +183,23 @@ export class NewRequestDialog {
   private readonly range = computed(() =>
     this.bothSet() && !this.reversed() ? `${this.first()}|${this.last()}` : null,
   );
-  private readonly quoted = signal<{ range: string; days: number } | null>(null);
+  private readonly quoted = signal<({ range: string } & RequestQuote) | null>(null);
 
   /** Working days in the range; null until known (a quote that failed also leaves it null). */
-  protected readonly days = computed(() => {
+  protected readonly days = computed(() => this.currentQuote()?.days ?? null);
+
+  private readonly currentQuote = computed(() => {
     const quote = this.quoted();
-    return quote && quote.range === this.range() ? quote.days : null;
+    return quote && quote.range === this.range() ? quote : null;
+  });
+
+  /** How many days over the allowance the request is; 0 when it is not (L2-030 AC3). */
+  protected readonly over = computed(() => this.currentQuote()?.daysOver ?? 0);
+
+  /** Days left to request once these are taken, when the quote knows the allowance. */
+  protected readonly daysAfter = computed(() => {
+    const quote = this.currentQuote();
+    return quote ? Math.max(0, quote.daysAvailable - quote.days) : null;
   });
 
   /** The line under the fields when something is wrong (dialogs/new-request/invalid, taken). */
@@ -213,7 +244,7 @@ export class NewRequestDialog {
           if (!range) return of(null);
           const [first, last] = range.split('|');
           return this.requests.quote(first, last).pipe(
-            map((quote) => ({ range, days: quote.days })),
+            map((quote) => ({ range, ...quote })),
             catchError(() => of(null)),
           );
         }),

@@ -30,6 +30,11 @@ export class RequestDetailDialog {
     return this.dialog().locator(".facts div", { hasText: "Sent" }).locator("dd");
   }
 
+  /** The figure under "Days left after": the member's days left once their requests are approved. */
+  daysLeftAfter(): Locator {
+    return this.dialog().locator(".facts div", { hasText: "Days left after" }).locator("dd");
+  }
+
   note(): Locator {
     return this.dialog().locator(".quote");
   }

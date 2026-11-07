@@ -39,6 +39,11 @@ export class NewRequestDialog {
     return this.dialog().locator(".well");
   }
 
+  /** The warning inside the count line when the request goes over the allowance ("That’s 4 days over."). */
+  overage(): Locator {
+    return this.count().locator("span", { hasText: " over." });
+  }
+
   /** The "Send request" button; it reads "Sending…" while busy and "Try again" after a failure. */
   send(): Locator {
     return this.dialog().locator(".dialog__footer .btn--primary");

@@ -20,6 +20,15 @@ public class Team
     /// </summary>
     public int CoverageMinimum { get; set; }
 
+    /// <summary>Yearly days a member gets when they have none of their own (allowances/allowance-figures).</summary>
+    public int DefaultYearlyDays { get; set; } = 25;
+
+    /// <summary>Month (1-12) the leave year starts in; 1 is a calendar year.</summary>
+    public int LeaveYearStartMonth { get; set; } = 1;
+
+    /// <summary>The most days a manager should carry over; a stored setting, carry-over itself is an adjustment (ADR-007).</summary>
+    public int MaxCarryOver { get; set; } = 5;
+
     public ICollection<TeamMember> Members { get; set; } = new List<TeamMember>();
     public ICollection<Holiday> Holidays { get; set; } = new List<Holiday>();
 }

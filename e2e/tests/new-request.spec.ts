@@ -1,5 +1,5 @@
 // Acceptance Test
-// Traces to: L2-019 (New request); L2-030 AC3 and L2-019 AC1-AC3 days left are journey 11
+// Traces to: L2-019 (New request); the days left in the dialog are covered by allowances.spec.ts
 // Description: A member asks for a run of days from the calendar; the dialog counts the working days,
 //              refuses a bad range, and sending turns the days yellow.
 // Data: the demo seed, December 2026. Ana's 7-11 Dec is blank and cleared after each test; Christmas Day
@@ -33,7 +33,7 @@ test.describe("Requesting time off", () => {
     await expect(dialog.firstDay()).toHaveAttribute("type", "date");
     await expect(dialog.lastDay()).toHaveAttribute("type", "date");
     await expect(dialog.note()).toHaveAttribute("placeholder", "e.g. Family trip");
-    await expect(dialog.count()).toHaveText("Weekends and holidays aren’t counted.");
+    await expect(dialog.count()).toHaveText("You have 6 days left to request. Weekends and holidays aren’t counted.");
     await expect(dialog.cancel()).toBeVisible();
     await expect(dialog.send()).toHaveText("Send request");
     await expect(dialog.send()).toBeDisabled();
@@ -79,10 +79,10 @@ test.describe("Requesting time off", () => {
     const dialog = pages.newRequest;
 
     await dialog.fill({ first: "2026-12-07", last: "2026-12-11" });
-    await expect(dialog.count()).toHaveText("5 days from your allowance.");
+    await expect(dialog.count()).toHaveText("5 days from your allowance. 1 day left after this.");
 
     await dialog.fill({ last: "2026-12-07" });
-    await expect(dialog.count()).toHaveText("1 day from your allowance.");
+    await expect(dialog.count()).toHaveText("1 day from your allowance. 5 days left after this.");
     await expect(dialog.send()).toBeEnabled();
   });
 
@@ -95,7 +95,7 @@ test.describe("Requesting time off", () => {
     // Wed 23 Dec to Mon 28 Dec: Fri 25 and Mon 28 are holidays, 26 and 27 a weekend.
     await dialog.fill({ first: "2026-12-23", last: "2026-12-28" });
 
-    await expect(dialog.count()).toHaveText("2 days from your allowance.");
+    await expect(dialog.count()).toHaveText("2 days from your allowance. 4 days left after this.");
   });
 
   test("a range of only non-working days has nothing to send", async ({ goto, pages }) => {
@@ -199,7 +199,7 @@ test.describe("Requesting time off", () => {
     await expect(dialog.firstDay()).toHaveValue("2026-12-07");
     await expect(dialog.lastDay()).toHaveValue("2026-12-08");
     await expect(dialog.note()).toHaveValue("Dentist");
-    await expect(dialog.count()).toHaveText("2 days from your allowance.");
+    await expect(dialog.count()).toHaveText("2 days from your allowance. 4 days left after this.");
 
     await requestsApi.recover();
     await dialog.send().click();

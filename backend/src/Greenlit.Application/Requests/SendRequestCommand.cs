@@ -11,7 +11,11 @@ public sealed record SendRequestCommand(string? FirstDay, string? LastDay, strin
 /// <summary>How many working days a range would take, as the dialog asks while the dates change (L2-019 AC2).</summary>
 public sealed record QuoteRequestQuery(string? First, string? Last) : IRequest<QuoteDto>;
 
-public sealed record QuoteDto(int Days);
+/// <summary>
+/// The working days of the range, how many days the caller can still request (Left minus Requested, never below zero),
+/// and how many days over that the range would take them (L2-019 AC1-3, L2-030 AC3).
+/// </summary>
+public sealed record QuoteDto(int Days, int DaysAvailable, int DaysOver);
 
 /// <summary>A request as the client sees it; <c>Days</c> counts its working days.</summary>
 public sealed record RequestDto(

@@ -56,6 +56,8 @@ export interface RequestDetail {
   readonly members: readonly SheetMember[];
   /** The Out row for the working days of those weeks. */
   readonly coverage: readonly SheetCoverage[];
+  /** The requester's days left once their requests are approved; negative when that takes them over. */
+  readonly daysLeftAfter: number;
 }
 
 /** What approving one request did (POST /api/requests/approve), for the toast. */
@@ -91,4 +93,8 @@ export interface DeclineResult {
 /** The working days a range would take (GET /api/requests/quote). */
 export interface RequestQuote {
   readonly days: number;
+  /** Days the caller can still request: days left minus what is already requested, never below zero. */
+  readonly daysAvailable: number;
+  /** How many days over their days left the caller's requests would be with these days added; 0 when not over. */
+  readonly daysOver: number;
 }

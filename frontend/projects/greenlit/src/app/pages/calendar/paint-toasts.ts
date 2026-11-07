@@ -35,14 +35,26 @@ export function savedToast(
         title: `${days(n)} marked confirmed${forWhom}`,
         body: 'They’re green on the calendar now.',
       };
-    case 'Requested':
-      return context.ownRow
-        ? {
-            tone: 'success',
-            title: `Requested ${days(n)}`,
-            body: context.callerIsManager ? undefined : `${context.managerName} will be notified.`,
-          }
-        : { tone: 'success', title: `Marked ${days(n)} requested${forWhom}` };
+    case 'Requested': {
+      // L2-030 AC5: a warning, never a block.
+      const over =
+        set.daysOver > 0
+          ? `That’s ${days(set.daysOver)} over ${context.ownRow ? 'your' : 'their'} allowance.`
+          : '';
+      if (!context.ownRow) {
+        return {
+          tone: over ? 'warning' : 'success',
+          title: `Marked ${days(n)} requested${forWhom}`,
+          body: over || undefined,
+        };
+      }
+      const notified = context.callerIsManager ? '' : `${context.managerName} will be notified.`;
+      return {
+        tone: over ? 'warning' : 'success',
+        title: `Requested ${days(n)}`,
+        body: [notified, over].filter(Boolean).join(' ') || undefined,
+      };
+    }
     case 'Tentative':
       return { tone: 'success', title: `Marked ${days(n)} tentative${forWhom}` };
     default:
