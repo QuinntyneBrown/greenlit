@@ -1,0 +1,34 @@
+@startuml
+title UML sequence behaviour — Open the app and navigate
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Team user" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "Angular router" as router
+  participant "App" as app
+  participant "AppNav" as nav
+  participant "Routed page" as page
+end box
+actor -> router : Open /
+router -> app : NavigationEnd, data { shell: app, page: calendar }
+app -> app : Stamp body data-page="calendar"
+app -> nav : Render "Main" links
+nav --> actor : "Calendar" with aria-current="page" (L2-049 AC2, AC3)
+router -> page : CalendarPage in main#main (L2-049 AC1)
+actor -> router : Open /sheet (or any unknown address)
+router -> app : data { page: not-found }
+router -> page : NotFoundPage
+page --> actor : "This page doesn’t exist", "Back to calendar" (L2-049 AC5, L2-046 AC1)
+@enduml

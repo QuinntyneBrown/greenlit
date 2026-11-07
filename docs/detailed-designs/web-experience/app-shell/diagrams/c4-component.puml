@@ -1,0 +1,27 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Show the app shell and main navigation
+
+Person(person, "Team user", "A manager or member of a team")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(app, "App", "Angular shell component", "Route data, chrome, main")
+  Component(router, "Route table", "app.routes.ts", "Calendar at /, not-found at **")
+  Component(skip, "SkipLink", "gl-skip-link", "Skip to content")
+  Component(top, "TopBar", "gl-top-bar", "Header")
+  Component(logo, "LogoLockup", "gl-logo-lockup", "Greenlit, team calendar")
+  Component(nav, "AppNav", "gl-app-nav", "Main navigation")
+  Component(pages, "CalendarPage, NotFoundPage", "Angular pages", "Screens")
+  Component(err, "ErrorPage", "gl-error-page", "Not-found layout")
+}
+
+Rel(person, skip, "Tabs to")
+Rel(person, nav, "Navigates with")
+Rel(router, app, "Route data")
+Rel(app, skip, "Renders")
+Rel(app, top, "Renders when shell is app")
+Rel(top, logo, "Contains")
+Rel(top, nav, "Contains")
+Rel(router, pages, "Loads")
+Rel(pages, err, "Not-found uses")
+@enduml

@@ -70,6 +70,7 @@ Toasts, connection banners and error pages shared by every screen.
 
 | Feature | Summary | L2 requirements |
 |---|---|---|
+| [Show the app shell and main navigation](web-experience/app-shell/README.md) | Route table, chrome, design tokens and the core gl-* components every screen reuses. | L2-049, L2-046, L2-047 |
 | [Report outcomes with toasts](web-experience/feedback-toasts/README.md) | Toast lifetime, pause, undo and dismiss rules shared by every feature. | L2-044, L2-018 |
 | [Handle connection changes](web-experience/connectivity/README.md) | Offline, reconnecting, unstable, back-online and sync-failure banners; read-only while offline. | L2-045 |
 | [Show error pages](web-experience/error-pages/README.md) | Not found, forbidden, server error with reference, and offline pages. | L2-046 |

@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Show the app shell and main navigation
+
+class App <<exists>> {
+  #shell: Signal<AppShell>
+  -readShellData(): ShellData
+}
+class ShellData <<exists>> {
+  +shell: 'app' | 'bare'
+  +page: string
+}
+class TopBar <<new>>
+class LogoLockup <<new>> {
+  +href: string
+}
+class AppNav <<new>> {
+  +items: NavItem[]
+}
+class NavItem <<new>> {
+  +label: string
+  +path: string
+}
+class Button <<new>> {
+  +variant: ButtonVariant
+  +routerLink?: string
+  +type: 'button' | 'submit'
+}
+class ErrorPage <<new>> {
+  +title: string
+  +text: string
+}
+class NotFoundPage <<new>>
+class CalendarPage <<new>>
+App --> ShellData
+App ..> TopBar : renders
+TopBar ..> LogoLockup
+TopBar ..> AppNav
+AppNav *-- "4" NavItem
+NotFoundPage ..> ErrorPage
+ErrorPage ..> Button : actions
+@enduml

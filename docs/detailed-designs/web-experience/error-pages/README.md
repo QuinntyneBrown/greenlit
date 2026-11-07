@@ -14,7 +14,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Frontend**
 
-- **`NotFoundPage`** — Route `**` (`page: 'not-found'`): "This page doesn’t exist". It replaces today's `**` redirect to `/sheet`.
+- **`NotFoundPage`** — Route `**` (`page: 'not-found'`): "This page doesn’t exist". It replaces the former `**` redirect to `/sheet`; `/sheet` itself now shows this page (`L2-049` AC5).
 - **`ForbiddenPage`** — `page: 'forbidden'`: "You don’t have access to this". A route guard sends members here from manager-only routes.
 - **`ServerErrorPage`** — `page: 'server-error'`: "Something went wrong on our side" with "Error reference {ref}.", "Try again" and "Back to calendar".
 - **`OfflinePage`** — `page: 'offline'`: "You’re offline" with "Try again".
