@@ -158,3 +158,86 @@ test.describe("The requests ledger", () => {
     await expect(pages.requests.rows()).toHaveCount(4);
   });
 });
+
+test.describe("The request detail", () => {
+  test("opening a pending request shows its facts, the note and the team for its week with the Out row (L2-023 AC1, AC2)", async ({
+    goto,
+    pages,
+  }) => {
+    await goto("requests");
+    await pages.requests.waitForReady();
+
+    await pages.requests.open("Ana Ruiz").click();
+
+    const detail = pages.requestDetail;
+    await expect(detail.title()).toHaveText("Ana Ruiz");
+    await expect(detail.description()).toHaveText("16–20 Nov · 5 days");
+    await expect(detail.status()).toHaveText("Pending");
+    await expect(detail.note()).toHaveText("“Visiting family in Seville”");
+
+    await expect(detail.days()).toHaveCount(7);
+    await expect(detail.days().first()).toHaveAttribute("aria-label", "Mon 16 Nov");
+    await expect(detail.days().last()).toHaveAttribute("aria-label", "Sun 22 Nov");
+    await expect(detail.members()).toHaveText(["Maya Chen", "Ana Ruiz", "Ben Okafor", "Cleo Park", "Dev Patel", "Elif Yılmaz", "Finn Murphy"]);
+    await expect(detail.cell("Ana Ruiz", "Mon 16 Nov")).toHaveAttribute("data-status", "requested");
+    await expect(detail.cell("Ana Ruiz", "Fri 20 Nov")).toHaveAttribute("data-status", "requested");
+    await expect(detail.cell("Ana Ruiz", "Sat 21 Nov")).toHaveAttribute("data-status", "off");
+    await expect(detail.cell("Dev Patel", "Tue 17 Nov")).toHaveAttribute("data-status", "empty");
+    await expect(detail.cell("Dev Patel", "Wed 18 Nov")).toHaveAttribute("data-status", "requested");
+    await expect(detail.cell("Dev Patel", "Thu 19 Nov")).toHaveAttribute("data-status", "requested");
+    await expect(detail.out(0)).toHaveAttribute("aria-label", "1 out, 6 in");
+    await expect(detail.out(2)).toHaveAttribute("aria-label", "2 out, 5 in");
+    await expect(detail.actions()).toHaveText(["Approve"]);
+  });
+
+  test("an approved request shows its status and offers no decision (L2-023 AC3)", async ({ goto, pages }) => {
+    await goto("requests");
+    await pages.requests.waitForReady();
+    await pages.requests.openTab("Approved");
+
+    await pages.requests.open("Finn Murphy").click();
+
+    const detail = pages.requestDetail;
+    await expect(detail.title()).toHaveText("Finn Murphy");
+    await expect(detail.status()).toHaveText("Approved");
+    await expect(detail.note()).toHaveText("“Half-term with my niece”");
+    await expect(detail.cell("Finn Murphy", "Mon 19 Oct")).toHaveAttribute("data-status", "confirmed");
+    await expect(detail.actions()).toHaveCount(0);
+    await expect(detail.declineReason()).toHaveCount(0);
+  });
+
+  test("a declined request shows the reason and offers no decision (L2-023 AC3)", async ({ goto, pages }) => {
+    await goto("requests");
+    await pages.requests.waitForReady();
+    await pages.requests.openTab("Declined");
+
+    await pages.requests.open("Ben Okafor").click();
+
+    const detail = pages.requestDetail;
+    await expect(detail.status()).toHaveText("Declined");
+    await expect(detail.declineReason()).toHaveText("Decline reason: Three people are already out that week. Could you take the 29th onward instead?");
+    await expect(detail.cell("Ben Okafor", "Mon 21 Dec")).toHaveAttribute("data-status", "tentative");
+    await expect(detail.actions()).toHaveCount(0);
+  });
+
+  test("a long note shows in full and the body scrolls while the actions stay in view (L2-023 AC4)", async ({ goto, pages, requestsApi }) => {
+    await requestsApi.changeDetail((detail) => {
+      detail.request.note = LONG_NOTE.repeat(3);
+      // Many more people than a phone or a laptop screen has room for.
+      detail.members = Array.from({ length: 5 }, (_, i) => detail.members.map((m: { name: string }) => ({ ...m, name: `${m.name} ${i}` }))).flat();
+    });
+
+    await goto("requests");
+    await pages.requests.waitForReady();
+
+    await pages.requests.open("Elif Yılmaz").click();
+
+    const detail = pages.requestDetail;
+    await expect(detail.note()).toHaveText(`“${LONG_NOTE.repeat(3)}”`);
+    const scrolls = await detail.body().evaluate((body) => body.scrollHeight > body.clientHeight);
+    expect(scrolls).toBe(true);
+    await expect(detail.approve()).toBeInViewport();
+    await detail.body().evaluate((body) => body.scrollTo(0, body.scrollHeight));
+    await expect(detail.approve()).toBeInViewport();
+  });
+});

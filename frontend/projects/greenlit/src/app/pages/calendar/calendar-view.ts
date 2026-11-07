@@ -1,5 +1,11 @@
-import { CellKind, SheetMonth } from 'api';
-import { TeamGridCellStatus, TeamGridColumn, TeamGridCover, TeamGridRow } from 'components';
+import { CellKind, SheetCell, SheetCoverage, SheetMonth } from 'api';
+import {
+  TeamGridCell,
+  TeamGridCellStatus,
+  TeamGridColumn,
+  TeamGridCover,
+  TeamGridRow,
+} from 'components';
 
 /**
  * Turns the API's month into what the sheet shows: column headings, cell
@@ -57,19 +63,24 @@ function isWeekend(iso: string): boolean {
   return day === 0 || day === 6;
 }
 
+/** The heading of one day's column. */
+export function columnFor(date: string, today: string | null, holiday: boolean): TeamGridColumn {
+  return {
+    label: dayLabel(date),
+    initial: WEEKDAY_INITIALS[utcDate(date).getUTCDay()],
+    day: utcDate(date).getUTCDate(),
+    off: isWeekend(date) || holiday,
+    today: date === today,
+  };
+}
+
 /** Column headings for a month; holidays come from the loaded data when there is any. */
 export function columnsFor(
   month: string,
   today: string | null,
   holidays: ReadonlySet<string> = new Set(),
 ): TeamGridColumn[] {
-  return datesOf(month).map((date) => ({
-    label: dayLabel(date),
-    initial: WEEKDAY_INITIALS[utcDate(date).getUTCDay()],
-    day: utcDate(date).getUTCDate(),
-    off: isWeekend(date) || holidays.has(date),
-    today: date === today,
-  }));
+  return datesOf(month).map((date) => columnFor(date, today, holidays.has(date)));
 }
 
 const STATUS: Record<CellKind, TeamGridCellStatus> = {
@@ -88,6 +99,27 @@ const STATE_WORDS: Record<Exclude<CellKind, 'Holiday'>, string> = {
   Requested: 'Requested',
   Confirmed: 'Confirmed',
 };
+
+/** One cell, named so that its state travels in words too (L2-013, L2-048). */
+export function cellFor(memberName: string, cell: SheetCell): TeamGridCell {
+  return {
+    date: cell.date,
+    status: STATUS[cell.kind],
+    label: `${memberName}, ${dayLabel(cell.date)}: ${
+      cell.kind === 'Holiday' ? (cell.holidayName ?? 'Holiday') : STATE_WORDS[cell.kind]
+    }`,
+  };
+}
+
+/** The Out row's cell for one working day (L2-014). */
+export function coverOf(day: SheetCoverage, coverageMinimum: number | null): TeamGridCover {
+  const flagged = day.belowMinimum && coverageMinimum !== null;
+  return {
+    text: day.out === 0 ? '·' : `${day.out}`,
+    label: `${day.out} out, ${day.in} in${flagged ? `. Below the minimum of ${coverageMinimum}` : ''}`,
+    level: flagged ? 'short' : day.out === 0 ? 'none' : 'some',
+  };
+}
 
 export interface CalendarView {
   readonly label: string;
@@ -109,13 +141,7 @@ export function calendarView(sheet: SheetMonth): CalendarView {
       editable: sheet.isManager || member.isYou,
       // L2-012 AC2: a member's own row is marked "You"; the manager's view marks no row.
       you: member.isYou && !sheet.isManager,
-      cells: member.cells.map((cell) => ({
-        date: cell.date,
-        status: STATUS[cell.kind],
-        label: `${member.name}, ${dayLabel(cell.date)}: ${
-          cell.kind === 'Holiday' ? (cell.holidayName ?? 'Holiday') : STATE_WORDS[cell.kind]
-        }`,
-      })),
+      cells: member.cells.map((cell) => cellFor(member.name, cell)),
       left: left === null ? '–' : `${left}`,
       leftLabel:
         left === null
@@ -127,13 +153,7 @@ export function calendarView(sheet: SheetMonth): CalendarView {
   const byDate = new Map(sheet.coverage.map((c) => [c.date, c]));
   const cover = datesOf(sheet.month).map((date): TeamGridCover | null => {
     const day = byDate.get(date);
-    if (!day) return null;
-    const flagged = day.belowMinimum && sheet.coverageMinimum !== null;
-    return {
-      text: day.out === 0 ? '·' : `${day.out}`,
-      label: `${day.out} out, ${day.in} in${flagged ? `. Below the minimum of ${sheet.coverageMinimum}` : ''}`,
-      level: flagged ? 'short' : day.out === 0 ? 'none' : 'some',
-    };
+    return day ? coverOf(day, sheet.coverageMinimum) : null;
   });
   return {
     label: `Time off, ${monthTitle(sheet.month)}`,

@@ -41,7 +41,7 @@ export interface TabItem {
           [attr.aria-selected]="tab.id === selected()"
           [attr.tabindex]="tab.id === selected() ? null : -1"
           (click)="selectedChange.emit(tab.id)"
-          (keydown)="onKey($event)"
+          (keydown)="onKey($event, tab.id)"
         >
           {{ tab.label }}
           @if (tab.count !== undefined) {
@@ -124,9 +124,10 @@ export class Tabs {
   /** A tab was pressed or reached with the keyboard. */
   readonly selectedChange = output<string>();
 
-  protected onKey(event: KeyboardEvent): void {
+  protected onKey(event: KeyboardEvent, from: string): void {
     const tabs = this.tabs();
-    const current = tabs.findIndex((t) => t.id === this.selected());
+    // Counted from the tab the key was pressed on, which is current even before a new selection renders.
+    const current = tabs.findIndex((t) => t.id === from);
     const last = tabs.length - 1;
     const target =
       event.key === 'ArrowRight'

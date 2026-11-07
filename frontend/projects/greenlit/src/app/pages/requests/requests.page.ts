@@ -236,7 +236,11 @@ export class RequestsPage {
     if (!request) return;
     const data: RequestDetailData = { request };
     this.dialogs
-      .openDrawer<ApprovalResult | null>(RequestDetailDialog, '.drawer__footer .btn', data)
+      .openDrawer<ApprovalResult | null>(
+        RequestDetailDialog,
+        request.status === 'Pending' ? '.drawer__footer .btn' : '.drawer__close',
+        data,
+      )
       .closed.subscribe((result) => {
         if (result) this.approved(result);
       });

@@ -143,8 +143,8 @@ interface RequestsApi {
   holdList(): Promise<() => void>;
   /** The pending list is `entries` and the Pending count their number, whatever the database holds. */
   stubPending(entries: object[]): Promise<void>;
-  /** Opens request `id` with its real detail changed by `change` (GET /api/requests/{id}). */
-  changeDetail(id: string, change: (detail: any) => void): Promise<void>;
+  /** Every request opened (GET /api/requests/{id}) comes back as its real detail changed by `change`. */
+  changeDetail(change: (detail: any) => void): Promise<void>;
 }
 
 interface GlFixtures {
@@ -244,8 +244,8 @@ export const test = base.extend<GlFixtures>({
           await route.fulfill({ response, json: { ...(await response.json()), pending: entries.length } });
         });
       },
-      changeDetail: async (id, change) => {
-        await page.route(`**/api/requests/${id}`, async (route) => {
+      changeDetail: async (change) => {
+        await page.route(/\/api\/requests\/[0-9a-f-]{36}$/, async (route) => {
           const response = await route.fetch();
           const detail = await response.json();
           change(detail);

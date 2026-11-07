@@ -34,6 +34,48 @@ export class RequestDetailDialog {
     return this.dialog().locator(".quote");
   }
 
+  /** "Decline reason: ..." on a declined request. */
+  declineReason(): Locator {
+    return this.dialog().locator(".decline-reason");
+  }
+
+  /** The scrolling part of the drawer, above the footer. */
+  body(): Locator {
+    return this.dialog().locator(".drawer__body");
+  }
+
+  /** The buttons in the footer: Approve while the request is pending, none after. */
+  actions(): Locator {
+    return this.dialog().locator(".drawer__footer .btn");
+  }
+
+  // ---- "Team those weeks" ----
+
+  /** The grid of every member for the request's weeks. */
+  team(): Locator {
+    return this.dialog().getByRole("grid", { name: "Team those weeks", exact: true });
+  }
+
+  /** The day headings, e.g. "Mon 16 Nov". */
+  days(): Locator {
+    return this.team().locator("[role=columnheader][aria-label]");
+  }
+
+  /** The members' names down the side. */
+  members(): Locator {
+    return this.team().locator(".grid-name__text");
+  }
+
+  /** One member's cell on one day: its name carries the state, "Ana Ruiz, Mon 16 Nov: Requested". */
+  cell(member: string, day: string): Locator {
+    return this.team().getByRole("gridcell", { name: new RegExp(`^${member}, ${day}: `) });
+  }
+
+  /** The Out row's figure for a day: "2 out, 5 in". */
+  out(index: number): Locator {
+    return this.team().locator(".cover").nth(index);
+  }
+
   /** The footer's Approve button: "Approving…" while busy, "Try approving again" after a failure. */
   approve(): Locator {
     return this.dialog().locator(".drawer__footer .btn--approve");
