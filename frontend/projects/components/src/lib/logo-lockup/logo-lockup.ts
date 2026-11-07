@@ -10,7 +10,9 @@ import { RouterLink } from '@angular/router';
  * Rendered as a router link labelled "Greenlit, team calendar" by default; auth
  * pages link it to sign-in as "Greenlit, sign in"; the marketing site gives it
  * a plain `href` (`#top`). In the top bar and on auth cards it also carries
- * `topbar__brand`, as in the mocks.
+ * `topbar__brand`, as in the mocks. The default size is `--font-size-2xl`;
+ * a container sets `--gl-logo-lockup-size` to choose another (auth cards
+ * use `--font-size-3xl`).
  */
 @Component({
   selector: 'gl-logo-lockup',
@@ -61,7 +63,7 @@ import { RouterLink } from '@angular/router';
       display: inline-flex;
       align-items: center;
       gap: 0.28em;
-      font-size: var(--font-size-xl);
+      font-size: var(--gl-logo-lockup-size, var(--font-size-2xl));
       color: var(--color-fg-default);
       text-decoration: none;
     }
