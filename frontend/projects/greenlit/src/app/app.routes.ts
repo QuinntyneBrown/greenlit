@@ -36,6 +36,12 @@ export const routes: Routes = [
       import('./pages/create-team/create-team.page').then((m) => m.CreateTeamPage),
   },
   {
+    path: 'accept-invite/:token',
+    data: { shell: 'bare', page: 'accept-invite' },
+    loadComponent: () =>
+      import('./pages/accept-invite/accept-invite.page').then((m) => m.AcceptInvitePage),
+  },
+  {
     path: 'sign-in',
     data: { shell: 'bare', page: 'sign-in' },
     canActivate: [signedOutGuard],

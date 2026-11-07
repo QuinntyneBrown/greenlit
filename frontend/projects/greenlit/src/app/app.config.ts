@@ -6,8 +6,10 @@ import {
   API_BASE_URL,
   AUTH_SERVICE,
   HttpAuthService,
+  HttpInvitationService,
   HttpSheetService,
   HttpTeamService,
+  INVITATION_SERVICE,
   LocalStorageSessionStore,
   SESSION_STORE,
   SHEET_SERVICE,
@@ -35,5 +37,6 @@ export const appConfig: ApplicationConfig = {
     { provide: SHEET_SERVICE, useExisting: HttpSheetService },
     { provide: AUTH_SERVICE, useExisting: HttpAuthService },
     { provide: TEAM_SERVICE, useExisting: HttpTeamService },
+    { provide: INVITATION_SERVICE, useExisting: HttpInvitationService },
   ],
 };

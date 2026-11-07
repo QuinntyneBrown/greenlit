@@ -18,7 +18,7 @@
 export type RouteGuard = "auth" | "manager";
 
 /** `body[data-page]` value every screen stamps (route data in the app). */
-export type PageSlug = "calendar" | "create-team" | "not-found" | "settings" | "sign-in";
+export type PageSlug = "accept-invite" | "calendar" | "create-team" | "not-found" | "settings" | "sign-in";
 
 interface RouteEntry {
   readonly app: string;
@@ -28,6 +28,7 @@ interface RouteEntry {
 }
 
 export const ROUTES = {
+  acceptInvite: { app: "/accept-invite/:token", mock: "/pages/accept-invite/default.html", page: "accept-invite" },
   calendar: { app: "/", mock: "/pages/calendar/default.html", guard: "auth", page: "calendar" },
   createTeam: { app: "/create-team", mock: "/pages/create-team/default.html", guard: "auth", page: "create-team" },
   notFound: { app: "/no-such-page", mock: "/pages/not-found/default.html", page: "not-found" },
