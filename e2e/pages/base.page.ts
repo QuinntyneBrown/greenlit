@@ -52,4 +52,28 @@ export abstract class BasePage {
   skipLink(): Locator {
     return this.page.locator("a.skip-link");
   }
+
+  /** The Greenlit logo in the top bar: a link home labelled "Greenlit, team calendar". */
+  logo(): Locator {
+    return this.page.locator("header.topbar").getByRole("link", { name: "Greenlit, team calendar", exact: true });
+  }
+
+  /** The navigation labelled "Main" in the top bar. */
+  mainNav(): Locator {
+    return this.page.getByRole("navigation", { name: "Main", exact: true });
+  }
+
+  /** The links of the main navigation, in document order. */
+  mainNavLinks(): Locator {
+    return this.mainNav().locator("a.app-nav__link");
+  }
+
+  /** The main-navigation link whose visible label starts with `label`. */
+  mainNavLink(label: string): Locator {
+    return this.mainNav().getByRole("link", { name: new RegExp(`^${label}\\b`) });
+  }
+
+  async openFromMainNav(label: string): Promise<void> {
+    await this.mainNavLink(label).click();
+  }
 }

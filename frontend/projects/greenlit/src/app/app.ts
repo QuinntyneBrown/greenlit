@@ -10,7 +10,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 
-import { SkipLink } from 'components';
+import { AppNav, AppNavItem, SkipLink, TopBar } from 'components';
 
 /**
  * Application shell.
@@ -35,9 +35,17 @@ interface ShellData {
 
 const DEFAULT_SHELL: ShellData = { shell: 'app', page: '' };
 
+/** The four destinations of the main navigation, in mock order (L2-049). */
+export const MAIN_NAV: readonly AppNavItem[] = [
+  { label: 'Calendar', link: '/', exact: true },
+  { label: 'Year', link: '/year' },
+  { label: 'Requests', link: '/requests' },
+  { label: 'Settings', link: '/settings' },
+];
+
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SkipLink],
+  imports: [RouterOutlet, SkipLink, TopBar, AppNav],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -56,6 +64,7 @@ export class App {
   );
 
   protected readonly shell = computed(() => this.shellData().shell);
+  protected readonly mainNav = MAIN_NAV;
 
   constructor() {
     effect(() => {

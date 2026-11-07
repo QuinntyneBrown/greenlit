@@ -10,3 +10,6 @@
 
 // shell
 export * from './lib/skip-link/skip-link';
+export * from './lib/logo-lockup/logo-lockup';
+export * from './lib/app-nav/app-nav';
+export * from './lib/top-bar/top-bar';

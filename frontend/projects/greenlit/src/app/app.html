@@ -1,9 +1,19 @@
 <gl-skip-link />
+@if (shell() === 'app') {
+  <gl-top-bar>
+    <gl-app-nav [items]="mainNav" />
+  </gl-top-bar>
+}
 <!--
   One outlet, always mounted. Toggling classes (rather than switching between
   outlet branches) keeps the routed component alive when the shell data
   changes on NavigationEnd.
 -->
-<main id="main" class="gl-frame" [class.gl-frame--bare]="shell() === 'bare'">
+<main
+  id="main"
+  class="gl-frame"
+  [class.shell]="shell() === 'app'"
+  [class.gl-frame--bare]="shell() === 'bare'"
+>
   <router-outlet />
 </main>

@@ -16,6 +16,18 @@ test.describe("Calendar", () => {
     await expect(pages.calendar.main).toBeVisible();
   });
 
+  test("the header shows the logo and the Main navigation in order (L2-049 AC2)", async ({ pages }) => {
+    await expect(pages.calendar.logo()).toBeVisible();
+    await expect(pages.calendar.mainNavLinks()).toHaveText(["Calendar", "Year", "Requests", "Settings"]);
+  });
+
+  test("Calendar is the only current navigation item (L2-049 AC3)", async ({ pages }) => {
+    await expect(pages.calendar.mainNavLink("Calendar")).toHaveAttribute("aria-current", "page");
+    for (const label of ["Year", "Requests", "Settings"]) {
+      await expect(pages.calendar.mainNavLink(label)).not.toHaveAttribute("aria-current", /.*/);
+    }
+  });
+
   test("the skip link is the first focusable element and targets main (L2-049 AC4, L2-047 AC3)", async ({
     page,
     pages,
