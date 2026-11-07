@@ -16,15 +16,15 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Frontend**
 
-- **`WorkWeekSection`** — Shows the team's Working days as toggles Mon to Sun and saves them with the section's "Save changes".
-- **`EditWorkingDaysDialog`** — CDK Dialog in `app/dialogs/edit-working-days`, opened from the person page. It requires at least one day ("Pick at least one working day.").
+- **`WorkWeekSection`** — Shows the team's Working days as toggles Mon to Sun and saves them with the section's own "Save changes" (disabled until an edit; "Saving…", then "Saved"; a failure keeps the chips and offers Try again in a toast).
+- **`EditWorkingDaysDialog`** — CDK Dialog in `app/dialogs/edit-working-days`, opened from a member's "Edit working days" button (the person page arrives with journey 22). It requires at least one day ("Pick at least one working day.").
 
 **Backend**
 
-- **`SettingsController`** — `PUT /api/team/settings/work-week` saves `Team.WorkingDays`.
+- **`TeamSettingsController`** — `PUT /api/team/settings/work-week` saves `Team.WorkingDays`.
 - **`MembersController`** — `PUT /api/team/members/{id}/working-days` saves `TeamMember.WorkingDays`; sending the team's days clears the override.
-- **`SaveWorkWeekCommandHandler / SetMemberWorkingDaysCommandHandler`** — Validate a non-empty set and save it.
-- **`WeekendRule`** — Domain service: a date is non-working for a member when it is a holiday, or its weekday is outside the member's working days (or the team's when the member has none).
+- **`SaveWorkWeekCommandHandler / SetMemberWorkingDaysCommandHandler`** (Application/Teams) — Validate a non-empty set and save it.
+- **`WorkingDayRule`** — Domain service: a date is non-working for a member when it is a holiday, or its weekday is outside the member's working days (or the team's when the member has none).
 - **`WorkingDays`** — New `[Flags]` enum, Mon = 1 … Sun = 64.
 
 **Shared plumbing (exists today)**
@@ -58,13 +58,13 @@ The manager sets the team's and each part-timer's working days in Greenlit.
 
 ### Containers
 
-The section and the dialog save through the Greenlit API; every view reads the result through `WeekendRule`.
+The section and the dialog save through the Greenlit API; every view reads the result through `WorkingDayRule`.
 
 ![C4 container view for set working days](diagrams/c4-container.png)
 
 ### Components
 
-Two endpoints save the two levels; `WeekendRule` combines them with the holidays.
+Two endpoints save the two levels; `WorkingDayRule` combines them with the holidays.
 
 ![C4 component view for set working days](diagrams/c4-component.png)
 
