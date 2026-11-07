@@ -51,6 +51,9 @@ interface SheetApi {
   hold(): Promise<() => void>;
   /** Answers with the real month, keeping only the signed-in person's row. */
   onlyMe(): Promise<void>;
+  /** Saving days (PUT /api/sheet/days) fails with a 500 until `recoverSaves()`. */
+  failSaves(): Promise<void>;
+  recoverSaves(): Promise<void>;
 }
 
 /** Watches and steers the sign-in request (POST /api/auth/sign-in). */
@@ -157,6 +160,12 @@ export const test = base.extend<GlFixtures>({
         });
         return release;
       },
+      failSaves: async () => {
+        await page.route("**/api/sheet/days", (route) =>
+          route.request().method() === "PUT" ? route.fulfill({ status: 500, body: "" }) : route.fallback(),
+        );
+      },
+      recoverSaves: () => page.unroute("**/api/sheet/days"),
       onlyMe: async () => {
         await page.route(pattern, async (route) => {
           const response = await route.fetch();

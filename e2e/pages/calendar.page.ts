@@ -120,4 +120,90 @@ export class CalendarPage extends BasePage {
   stateAction(name: string): Locator {
     return control(this.main.locator(".empty"), name);
   }
+
+  // ---- marking days (docs/detailed-designs/sheet/mark-days) ----
+
+  /** The paint picker: a radio group labelled "Paint". */
+  paintPicker(): Locator {
+    return this.main.getByRole("radiogroup", { name: "Paint", exact: true });
+  }
+
+  /** The names of the paint options, in order. */
+  paintOptions(): Locator {
+    return this.paintPicker().getByRole("radio");
+  }
+
+  paintOption(name: string): Locator {
+    return this.paintPicker().getByRole("radio", { name, exact: true });
+  }
+
+  /** Chooses a paint colour: "Confirmed", "Requested", "Tentative" or "Clear". */
+  async choosePaint(name: string): Promise<void> {
+    await this.paintOption(name).click();
+  }
+
+  /** The line beside the legend that says how to paint. */
+  hint(): Locator {
+    return this.main.locator(".toolbar-row .text-caption");
+  }
+
+  /**
+   * Drags across `member`'s cells from day `from` to day `to` ("Mon 23 Nov"), with the mouse on a
+   * desktop and with a finger on a phone. `from` equal to `to` is a single press.
+   */
+  async paint(member: string, from: string, to: string = from): Promise<void> {
+    const first = this.cell(member, from);
+    const last = this.cell(member, to);
+    // Bring the whole run into the part of the sheet the sticky name column does not cover.
+    const lastHandle = (await last.elementHandle())!;
+    await first.evaluate((a, b) => {
+      const card = a.closest(".grid-card") as HTMLElement;
+      const covered = card.querySelector(".grid-name")!.getBoundingClientRect().right + 4;
+      const visibleRight = Math.min(card.getBoundingClientRect().right, window.innerWidth) - 4;
+      const ra = a.getBoundingClientRect();
+      const rb = b.getBoundingClientRect();
+      const low = Math.min(ra.left, rb.left);
+      const high = Math.max(ra.right, rb.right);
+      if (low < covered) card.scrollLeft -= covered - low;
+      else if (high > visibleRight) card.scrollLeft += high - visibleRight;
+    }, lastHandle);
+    await first.scrollIntoViewIfNeeded();
+    // Let the scroll and the paint colour's touch handling reach the compositor before a finger lands.
+    await this.page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+    const a = (await first.boundingBox())!;
+    const b = (await last.boundingBox())!;
+    const start = { x: a.x + a.width / 2, y: a.y + a.height / 2 };
+    const end = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+    const touch = await this.page.evaluate(() => navigator.maxTouchPoints > 0);
+    if (touch) {
+      const cdp = await this.page.context().newCDPSession(this.page);
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [start] });
+      for (let i = 1; i <= 8; i++) {
+        const x = start.x + ((end.x - start.x) * i) / 8;
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: start.y }] });
+      }
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+      await cdp.detach();
+    } else {
+      await this.page.mouse.move(start.x, start.y);
+      await this.page.mouse.down();
+      await this.page.mouse.move(end.x, end.y, { steps: 8 });
+      await this.page.mouse.up();
+    }
+  }
+
+  /** Every toast on screen, newest first. */
+  toasts(): Locator {
+    return this.page.locator(".toast");
+  }
+
+  /** The toast whose title is `title`. */
+  toast(title: string): Locator {
+    return this.toasts().filter({ has: this.page.locator(".toast__title", { hasText: title }) });
+  }
+
+  /** The toast's action button ("Undo", "Try again") or its Dismiss button. */
+  toastAction(title: string, name: string): Locator {
+    return this.toast(title).getByRole("button", { name, exact: true });
+  }
 }

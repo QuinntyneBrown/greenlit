@@ -24,6 +24,7 @@ export * from './lib/select-field/select-field';
 export * from './lib/form-summary/form-summary';
 
 // the sheet
+export * from './lib/segmented-control/segmented-control';
 export * from './lib/team-grid/team-grid';
 export * from './lib/period-nav/period-nav';
 export * from './lib/legend/legend';
@@ -33,6 +34,7 @@ export * from './lib/avatar/avatar';
 export * from './lib/badge/badge';
 
 // feedback
+export * from './lib/toast/toast';
 export * from './lib/alert/alert';
 export * from './lib/inline-message/inline-message';
 export * from './lib/skeleton/skeleton';

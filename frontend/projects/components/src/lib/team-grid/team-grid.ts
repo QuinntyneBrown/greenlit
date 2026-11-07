@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DOCUMENT,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 
 import { initialsOf } from '../avatar/avatar';
 
@@ -20,13 +29,18 @@ export interface TeamGridColumn {
 export type TeamGridCellStatus = 'empty' | 'off' | 'tentative' | 'requested' | 'confirmed';
 
 export interface TeamGridCell {
+  /** `yyyy-MM-dd`. */
+  readonly date: string;
   readonly status: TeamGridCellStatus;
   /** "{member}, {Day d Mon}: {state}": the state always travels in the name too (L2-048). */
   readonly label: string;
 }
 
 export interface TeamGridRow {
+  readonly memberId: string;
   readonly name: string;
+  /** The caller may paint this row: its cells take a press, a drag or Enter. */
+  readonly editable: boolean;
   /** The signed-in person's row, marked "You". */
   readonly you: boolean;
   readonly cells: readonly TeamGridCell[];
@@ -47,11 +61,20 @@ export interface TeamGridCover {
   readonly level: 'none' | 'some' | 'short';
 }
 
+/** One paint stroke: the days a press, drag or key covered on one member's row, in column order. */
+export interface TeamGridStroke {
+  readonly memberId: string;
+  readonly dates: readonly string[];
+}
+
 /**
  * The sheet (docs/design-system/components/team-grid.html): members down the
  * side, days across, a Left column and the Out row. A `role="grid"` labelled
- * "Time off, {Month yyyy}". Read-only until marking days (sheet/mark-days)
- * makes cells editable. While `loading`, the headings render with placeholder
+ * "Time off, {Month yyyy}". Cells of an `editable` row can be painted
+ * (sheet/mark-days): press or drag across a run of cells with the mouse or a
+ * finger, or press Enter or Space on a focused cell. The run previews in the
+ * `paint` colour while the pointer is down and is emitted as a `stroke` on
+ * release; the page decides what it means. While `loading`, the headings render with placeholder
  * rows and the grid is `aria-busy`.
  */
 @Component({
@@ -63,7 +86,12 @@ export interface TeamGridCover {
         role="grid"
         [attr.aria-label]="label()"
         [attr.aria-busy]="loading() ? 'true' : null"
+        [attr.data-painting]="paint() ? '' : null"
         [style.--days]="columns().length"
+        (pointerdown)="onDown($event)"
+        (pointermove)="onMove($event)"
+        (pointerup)="onUp($event)"
+        (pointercancel)="drag.set(null)"
       >
         <div role="row">
           <div role="columnheader" class="grid-corner">
@@ -102,7 +130,7 @@ export interface TeamGridCover {
             </div>
           }
         } @else {
-          @for (row of rows(); track row.name) {
+          @for (row of rows(); track row.name; let r = $index) {
             <div role="row">
               <div role="rowheader" class="grid-name">
                 <span class="avatar avatar--sm" aria-hidden="true">{{ initials(row.name) }}</span>
@@ -111,13 +139,19 @@ export interface TeamGridCover {
                   <span class="grid-name__you">You</span>
                 }
               </div>
-              @for (cell of row.cells; track $index) {
+              @for (cell of row.cells; track $index; let c = $index) {
                 <div
                   role="gridcell"
                   class="cell"
-                  [attr.data-status]="cell.status"
+                  [attr.data-status]="shown(r, c, cell.status)"
+                  [attr.data-editable]="row.editable ? '' : null"
+                  [attr.data-row]="r"
+                  [attr.data-col]="c"
+                  [attr.tabindex]="row.editable ? 0 : null"
                   [attr.aria-label]="cell.label"
                   [attr.title]="cell.label"
+                  (keydown.enter)="press($event, r, c)"
+                  (keydown.space)="press($event, r, c)"
                 ></div>
               }
               <div
@@ -295,6 +329,14 @@ export interface TeamGridCover {
     .cell[data-status='off'] {
       --status-bg: var(--color-status-off);
     }
+    .cell[data-editable] {
+      cursor: pointer;
+    }
+    /* With a paint colour chosen a finger drags to paint instead of scrolling the sheet. */
+    .team-grid[data-painting],
+    .team-grid[data-painting] .cell[data-editable] {
+      touch-action: none;
+    }
     /* A cell's colour is never its only carrier: a glyph says it too (L2-048). */
     .cell[data-status='confirmed']::after {
       content: '✓';
@@ -390,8 +432,67 @@ export class TeamGrid {
   /** The Out row, aligned with `columns`. */
   readonly cover = input<readonly (TeamGridCover | null)[]>([]);
   readonly loading = input<boolean>(false);
+  /** The colour a stroke previews; `empty` for Clear. Null: painting is off. */
+  readonly paint = input<TeamGridCellStatus | null>(null);
+  /** A stroke ended on an editable row. */
+  readonly stroke = output<TeamGridStroke>();
+
+  private readonly document = inject(DOCUMENT);
+  protected readonly drag = signal<{ row: number; from: number; to: number } | null>(null);
 
   protected readonly placeholderRows = Array.from({ length: 5 });
   protected readonly covers = computed(() => this.columns().map((_, i) => this.cover()[i] ?? null));
   protected readonly initials = initialsOf;
+
+  /** What a cell draws: the preview colour inside a running stroke, except on red days. */
+  protected shown(row: number, col: number, status: TeamGridCellStatus): TeamGridCellStatus {
+    const drag = this.drag();
+    const paint = this.paint();
+    if (!drag || !paint || status === 'off' || drag.row !== row) return status;
+    return col >= Math.min(drag.from, drag.to) && col <= Math.max(drag.from, drag.to)
+      ? paint
+      : status;
+  }
+
+  protected onDown(event: PointerEvent): void {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    const cell = this.editableCellAt(event.target as Element | null);
+    if (!cell || !this.paint()) return;
+    // Keep the move and release events coming here even when the pointer leaves the sheet.
+    if (event.pointerType === 'mouse')
+      (event.currentTarget as Element).setPointerCapture?.(event.pointerId);
+    this.drag.set({ row: cell.row, from: cell.col, to: cell.col });
+  }
+
+  protected onMove(event: PointerEvent): void {
+    const drag = this.drag();
+    if (!drag) return;
+    const cell = this.editableCellAt(this.document.elementFromPoint(event.clientX, event.clientY));
+    if (cell && cell.row === drag.row && cell.col !== drag.to)
+      this.drag.set({ ...drag, to: cell.col });
+  }
+
+  protected onUp(event: PointerEvent): void {
+    this.onMove(event);
+    const drag = this.drag();
+    this.drag.set(null);
+    if (drag) this.emit(drag.row, drag.from, drag.to);
+  }
+
+  protected press(event: Event, row: number, col: number): void {
+    event.preventDefault();
+    if (this.paint()) this.emit(row, col, col);
+  }
+
+  private emit(rowIndex: number, from: number, to: number): void {
+    const row = this.rows()[rowIndex];
+    if (!row?.editable) return;
+    const dates = row.cells.slice(Math.min(from, to), Math.max(from, to) + 1).map((c) => c.date);
+    this.stroke.emit({ memberId: row.memberId, dates });
+  }
+
+  private editableCellAt(element: Element | null): { row: number; col: number } | null {
+    const cell = element?.closest<HTMLElement>('[data-editable]');
+    return cell ? { row: Number(cell.dataset['row']), col: Number(cell.dataset['col']) } : null;
+  }
 }
