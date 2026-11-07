@@ -17,7 +17,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 **Frontend**
 
 - **`PersonPage`** — App-shell page (`page: 'person'`) at `/people/{id}`, and at `/person` for the signed-in person's own page (the account menu's "My time off", `L2-006` AC5). It shows the header (name, job title, "Joined {Mon yyyy}", non-standard working days), "{n} days left in {year}" with the over-allowance text, the `gl-stat` figures, the `gl-month-mini` year, Upcoming and Taken lists (`gl-run-list`), and the manager sections. It handles the loading, forbidden, not-found and error states. The member's own page offers "Request time off", which opens the request dialog of `requests/send-request`. The manager's "Edit working days" opens the dialog of `teams/working-days`.
-- **`PersonService / PERSON_SERVICE`** — `get(id)` (the person also names the manager, for the request dialog), where the id is a member's id or `me`. The actions of `allowances/adjust-allowance` and `teams/remove-member` join the service with their journeys (23 and 24).
+- **`PersonService / PERSON_SERVICE`** — `get(id)` (the person also names the manager, for the request dialog), where the id is a member's id or `me`. `adjust(memberId, days, reason)` (`allowances/adjust-allowance`, journey 23) is on the service; the action of `teams/remove-member` joins it with journey 24.
 - **Names link to the page.** For the manager, a name in the allowance table of the year page links to `/people/{id}`; a member's names stay text (`allowances/year-overview`).
 
 **Backend**
@@ -78,7 +78,7 @@ A member sees only their own page (`L2-035` AC1); a removed member's page is not
 ## Decisions
 
 - **Which year.** The page shows the leave year that contains today (`ADR-007`): the figures are its allowance, "{year}" is the year it starts in, and "{year} at a glance" is that calendar year.
-- **Hidden until built.** "Adjust allowance" (journey 23) and "Remove {first name}" (journey 24) are not shown until those journeys land; the manager's page shows the adjustments list and Working days. `L2-034` AC1 is fully true once they land.
+- **Hidden until built.** "Remove {first name}" (journey 24) is not shown until that journey lands; "Adjust allowance" (journey 23) now opens `adjust-allowance`. `L2-034` AC1 is fully true once Remove lands.
 - **Settings keeps its Edit working days buttons.** The Team list in Settings still opens the same dialog; the person page is a second entry point, not a replacement.
 - **Over allowance.** The big number turns red (`data-over`) and the caption adds "{n} days over once requests are approved" when requested days exceed days left (`ADR-007`).
 - **Day labels.** Each mini day is named "{d} {Month}: {Confirmed|Requested|Tentative|Working|Not working|{holiday name}}"; the colour is never the only carrier.
