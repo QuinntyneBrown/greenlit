@@ -112,6 +112,50 @@ test.describe("Confirming a removal", () => {
   });
 });
 
+test.describe("A removal that fails", () => {
+  test.beforeEach(async ({ request }, testInfo) => {
+    await ensureOwnTeam(request, removerFor(testInfo.project.name), "Removal team");
+  });
+
+  test("says nothing was changed, keeps Dina on the calendar, and Yes, remove Dina tries again (L2-011 AC3)", async ({
+    goto,
+    pages,
+    removeMemberApi,
+    request,
+  }, testInfo) => {
+    const manager = removerFor(testInfo.project.name);
+    await ensureMember(request, manager, "Dina Brandt");
+    await goto("person", { as: manager, person: "Dina Brandt" });
+    await pages.person.waitForReady();
+    await removeMemberApi.fail();
+    await pages.person.remove("Dina").click();
+
+    await pages.removeMember.confirm().click();
+
+    const dialog = pages.removeMember;
+    await expect(dialog.failure()).toContainText("We couldn’t remove Dina");
+    await expect(dialog.failure()).toContainText("Check your connection and try again. Nothing was changed.");
+    await expect(dialog.confirm()).toHaveText("Yes, remove Dina");
+    await expect(dialog.confirm()).toBeEnabled();
+    await expect(dialog.cancel()).toBeEnabled();
+    await dialog.cancel().click();
+    await goto("calendar", { as: manager });
+    await pages.calendar.waitForReady();
+    await expect(pages.calendar.memberNames()).toContainText(["Dina Brandt"]);
+
+    await goto("person", { as: manager, person: "Dina Brandt" });
+    await pages.person.waitForReady();
+    await pages.person.remove("Dina").click();
+    await dialog.confirm().click();
+    await expect(dialog.failure()).toBeVisible();
+    await removeMemberApi.recover();
+    await dialog.confirm().click();
+    await expect(dialog.dialog()).toBeHidden();
+    await pages.calendar.waitForReady();
+    await expect(pages.calendar.memberNames()).not.toContainText(["Dina Brandt"]);
+  });
+});
+
 test.describe("A member's own page", () => {
   test("offers no Remove (L2-034 AC2)", async ({ goto, pages }) => {
     await goto("memberPerson", { as: "member", person: "Ana Ruiz" });

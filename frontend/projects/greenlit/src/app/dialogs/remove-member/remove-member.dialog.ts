@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@ang
 
 import { TEAM_SERVICE } from 'api';
 
-import { Button, Dialog } from 'components';
+import { Alert, Button, Dialog } from 'components';
 
 /** What the person page tells the dialog: whom to remove. */
 export interface RemoveMemberData {
@@ -15,7 +15,7 @@ export interface RemoveMemberData {
 /** Remove member (dialogs/remove-member, docs/detailed-designs/teams/remove-member, L2-011). */
 @Component({
   selector: 'app-remove-member-dialog',
-  imports: [Dialog, Button],
+  imports: [Dialog, Alert, Button],
   template: `
     <gl-dialog
       [title]="'Remove ' + data.firstName + ' from the team?'"
@@ -27,6 +27,11 @@ export interface RemoveMemberData {
       <svg slot="icon" class="icon" aria-hidden="true" viewBox="0 0 24 24">
         <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
       </svg>
+      @if (failed()) {
+        <gl-alert tone="danger" [title]="'We couldn’t remove ' + data.firstName">
+          Check your connection and try again. Nothing was changed.
+        </gl-alert>
+      }
       <ul>
         <li>{{ data.firstName }}’s days stay in the history.</li>
         <li>{{ data.firstName }} won’t appear on the calendar or sign in.</li>
@@ -43,6 +48,10 @@ export interface RemoveMemberData {
   styles: `
     :host {
       display: block;
+    }
+    gl-alert {
+      display: block;
+      margin-bottom: var(--space-4);
     }
     ul {
       display: flex;
@@ -63,6 +72,7 @@ export class RemoveMemberDialog {
   protected readonly data = inject<RemoveMemberData>(DIALOG_DATA);
 
   protected readonly busy = signal(false);
+  protected readonly failed = signal(false);
 
   constructor() {
     // Esc and the backdrop do nothing while the member is being removed.
@@ -73,9 +83,15 @@ export class RemoveMemberDialog {
 
   protected remove(): void {
     if (this.busy()) return;
+    this.failed.set(false);
     this.busy.set(true);
     this.team.remove(this.data.memberId).subscribe((result) => {
-      if (result.ok) this.ref.close(true);
+      if (result.ok) {
+        this.ref.close(true);
+        return;
+      }
+      this.busy.set(false);
+      this.failed.set(true);
     });
   }
 
