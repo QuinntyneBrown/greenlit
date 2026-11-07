@@ -492,8 +492,16 @@ export class TeamGrid {
 
   /** Paint mode wins over Select mode while a colour is chosen. */
   protected readonly selecting = computed(() => this.selectable() && !this.paint());
-  /** The chosen range on one row: `anchor` is where it began, `head` where it ends. */
-  private readonly range = signal<{ row: number; anchor: number; head: number } | null>(null);
+  /**
+   * The chosen range on one row: `anchor` is where it began, `head` where it ends. While `open`
+   * (after Enter) the arrow keys move the head instead of only moving focus.
+   */
+  private readonly range = signal<{
+    row: number;
+    anchor: number;
+    head: number;
+    open: boolean;
+  } | null>(null);
 
   private readonly selection = computed((): TeamGridSelection | null => {
     const range = this.range();
@@ -615,7 +623,7 @@ export class TeamGrid {
   private choose(row: number, from: number, to: number): void {
     const current = this.range();
     const same = current?.row === row && current.anchor === from && current.head === from;
-    this.range.set(from === to && same ? null : { row, anchor: from, head: to });
+    this.range.set(from === to && same ? null : { row, anchor: from, head: to, open: false });
   }
 
   protected isActive(row: number, col: number): boolean {
@@ -673,14 +681,41 @@ export class TeamGrid {
       case ' ':
         event.preventDefault();
         if (this.paint()) this.emit(here.row, here.col, here.col);
+        else if (this.selecting()) this.toggleOpen(here.row, here.col);
         return;
       default:
         return;
     }
     event.preventDefault();
-    if (target) {
-      this.focusAt.set(target);
-      this.focusCell(target.row, target.col);
+    if (!target) return;
+    const range = this.range();
+    const horizontal = event.key === 'ArrowRight' || event.key === 'ArrowLeft';
+    if (this.selecting() && this.rows()[here.row]?.editable) {
+      if (range?.open && target.row === range.row) {
+        // After Enter the keys move the end of the range.
+        this.range.set({ ...range, head: target.col });
+      } else if (range?.open) {
+        return;
+      } else if (event.shiftKey && horizontal) {
+        // Shift+arrow starts or extends a range from the cell the key was pressed on.
+        const from = range?.row === here.row && range.head === here.col ? range.anchor : here.col;
+        this.range.set({ row: here.row, anchor: from, head: target.col, open: false });
+      }
+    }
+    this.focusAt.set(target);
+    this.focusCell(target.row, target.col);
+  }
+
+  /** Enter or Space in Select mode: start a range here, or end the one being extended. */
+  private toggleOpen(row: number, col: number): void {
+    if (!this.rows()[row]?.editable) return;
+    const range = this.range();
+    if (range?.open) {
+      this.range.set({ ...range, open: false });
+    } else if (range?.row === row && range.anchor === col && range.head === col) {
+      this.range.set(null);
+    } else {
+      this.range.set({ row, anchor: col, head: col, open: true });
     }
   }
 

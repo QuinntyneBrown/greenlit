@@ -253,6 +253,24 @@ export class CalendarPage extends BasePage {
     return this.selectionBar().getByRole("button", { name, exact: true });
   }
 
+  /** The selection bar's button that has keyboard focus. */
+  focusedAction(): Locator {
+    return this.selectionBar().locator("button:focus");
+  }
+
+  /**
+   * Gets keyboard focus onto the cell for `member` and `day` using only keys: Tab from the top of the page
+   * into the sheet, then the arrow keys and Home.
+   */
+  async keyboardTo(member: string, day: string): Promise<void> {
+    await this.page.locator("body").press("Tab");
+    for (let i = 0; i < 40 && (await this.focusedCell().count()) === 0; i++) await this.press("Tab");
+    const nameOfFocused = async (): Promise<string> => (await this.focusedCell().getAttribute("aria-label")) ?? "";
+    for (let i = 0; i < 12 && !(await nameOfFocused()).startsWith(`${member}, `); i++) await this.press("ArrowDown");
+    await this.press("Home");
+    for (let i = 0; i < 40 && !(await nameOfFocused()).startsWith(`${member}, ${day}: `); i++) await this.press("ArrowRight");
+  }
+
   /** The polite status that says how many days are selected ("3 days selected"). */
   selectionAnnouncement(): Locator {
     return this.main.getByRole("status");
