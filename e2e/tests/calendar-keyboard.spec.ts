@@ -1,5 +1,5 @@
 // Acceptance Test
-// Traces to: L2-047 AC1 (the grid half), L2-048
+// Traces to: L2-047 AC1 (the grid half), AC4, L2-048
 // Description: The sheet is one tab stop and moves with the arrow keys, Home, End and the page keys.
 // Data: the demo seed, November and December 2026. 1 Nov is a Sunday, 25 Dec a holiday, nothing is changed.
 
@@ -71,5 +71,16 @@ test.describe("The keyboard on the sheet", () => {
     await pages.calendar.press("PageUp");
     await expect(pages.calendar.title()).toHaveText("November 2026");
     await expect(pages.calendar.focusedCell()).toHaveAccessibleName(/^Ana Ruiz, Tue 24 Nov: /);
+  });
+
+  test("a dialog closed from the keyboard returns focus to the control that opened it (L2-047 AC4)", async ({ pages }) => {
+    await pages.calendar.requestTimeOff().focus();
+    await pages.calendar.press("Enter");
+    await expect(pages.newRequest.dialog()).toBeVisible();
+
+    await pages.calendar.press("Escape");
+
+    await expect(pages.newRequest.dialog()).toHaveCount(0);
+    await expect(pages.calendar.requestTimeOff()).toBeFocused();
   });
 });
