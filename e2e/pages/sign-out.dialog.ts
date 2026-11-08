@@ -18,7 +18,7 @@ export class SignOutDialog {
     return this.dialog().locator("#dlg-title");
   }
 
-  /** "You’ll need your email and password to get back in." */
+  /** The description under the title; the sign-out dialog has none. */
   description(): Locator {
     return this.dialog().locator("#dlg-title-desc");
   }

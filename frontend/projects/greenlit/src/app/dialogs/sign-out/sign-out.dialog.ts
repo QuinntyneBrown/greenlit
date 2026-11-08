@@ -17,13 +17,7 @@ import { AccountState } from '../../account/account-state';
   selector: 'app-sign-out-dialog',
   imports: [Dialog, Button],
   template: `
-    <gl-dialog
-      title="Sign out of Greenlit?"
-      description="You’ll need your email and password to get back in."
-      tone="info"
-      [busy]="busy()"
-      (closed)="stay()"
-    >
+    <gl-dialog title="Sign out of Greenlit?" tone="info" [busy]="busy()" (closed)="stay()">
       <svg slot="icon" class="icon" aria-hidden="true" viewBox="0 0 24 24">
         <path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9" />
       </svg>

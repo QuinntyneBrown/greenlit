@@ -18,7 +18,7 @@ test.describe("Signing out", () => {
     const dialog = pages.signOutDialog;
     await expect(dialog.dialog()).toBeVisible();
     await expect(dialog.title()).toHaveText("Sign out of Greenlit?");
-    await expect(dialog.description()).toHaveText("You’ll need your email and password to get back in.");
+    await expect(dialog.description()).toHaveCount(0);
     await expect(dialog.body()).toHaveText("Anything you’ve already saved stays saved.");
     await expect(dialog.stay()).toBeEnabled();
     await expect(dialog.signOut()).toHaveText("Sign out");
