@@ -17,7 +17,8 @@ import { defineConfig, devices } from "@playwright/test";
  *
  * Snapshot path convention: tests under `tests/visual/` use
  * `toHaveScreenshot()` whose baselines live in
- * `tests/visual/<spec>.spec.ts-snapshots/<name>-<project>-win32.png`. The
+ * `tests/visual/<spec>.spec.ts-snapshots/<name>-<project>-<platform>.png` (the
+ * committed baselines are `linux`, as captured in CI-like containers). The
  * baseline capture shares the same project names as the verify run so they
  * read/write the same files.
  *
