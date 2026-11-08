@@ -63,20 +63,23 @@ public class TeamHolidaysTests : IClassFixture<FrozenClockApiFactory>
             .Should().Equal("Christmas Day");
     }
 
-    [Fact]
-    public async Task The_source_names_the_public_holiday_calendar_chosen_when_the_team_was_created()
+    [Theory]
+    [InlineData("GB", "Public holidays: United Kingdom")]
+    [InlineData("CA", "Public holidays: Canada")]
+    [InlineData("IT", "Public holidays: Italy")]
+    public async Task The_source_names_the_public_holiday_calendar_chosen_when_the_team_was_created(string country, string source)
     {
         // L2-036 AC1: "Public holidays: United Kingdom".
         var noor = await TestAccount.CreateAsync(_factory, "Noor Haddad");
         var created = await _factory.ClientFor(noor).PostAsJsonAsync("/api/teams",
-            new { name = "Design team", timeZone = "Europe/London", holidayCountry = "GB", members = Array.Empty<object>() });
+            new { name = "Design team", timeZone = "Europe/London", holidayCountry = country, members = Array.Empty<object>() });
         var session = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("session").GetProperty("accessToken").GetString();
         var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", session);
 
         var holidays = await GetAsync(client);
 
-        holidays.GetProperty("source").GetString().Should().Be("Public holidays: United Kingdom");
+        holidays.GetProperty("source").GetString().Should().Be(source);
         holidays.GetProperty("holidays").GetArrayLength().Should().BeGreaterThan(0);
     }
 
@@ -92,6 +95,8 @@ public class TeamHolidaysTests : IClassFixture<FrozenClockApiFactory>
     [InlineData("GB", "2027 UK bank holidays")]
     [InlineData("IE", "2027 Irish public holidays")]
     [InlineData("US", "2027 US federal holidays")]
+    [InlineData("CA", "2027 Canadian public holidays")]
+    [InlineData("IT", "2027 Italian public holidays")]
     public async Task Next_years_public_holidays_are_offered_for_review_when_the_team_holds_none_of_them(string country, string name)
     {
         // L2-036 AC3: "2027 UK bank holidays are ready".

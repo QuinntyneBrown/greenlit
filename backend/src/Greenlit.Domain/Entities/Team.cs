@@ -16,7 +16,7 @@ public class Team
 
     public DateTimeOffset CreatedUtc { get; set; }
 
-    /// <summary>The public-holiday calendar chosen when the team was created (<c>GB</c>, <c>IE</c> or <c>US</c>); null when it chose none (ADR-008).</summary>
+    /// <summary>The public-holiday calendar chosen when the team was created (<c>GB</c>, <c>IE</c>, <c>US</c>, <c>CA</c> or <c>IT</c>); null when it chose none (ADR-008).</summary>
     public string? HolidayCountry { get; set; }
 
     /// <summary>

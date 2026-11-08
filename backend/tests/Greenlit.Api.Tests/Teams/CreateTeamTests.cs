@@ -202,6 +202,64 @@ public class CreateTeamTests : IClassFixture<FrozenClockApiFactory>
     }
 
     [Fact]
+    public async Task Canada_copies_the_statutory_holidays_of_ontario_with_substitute_days()
+    {
+        // L2-008 AC2/AC5: Canada is offered, and its holidays become team holidays (ADR-005).
+        var noor = await TestAccount.CreateAsync(_factory);
+
+        var created = await CreatedAsync(_factory.ClientFor(noor), Request(timeZone: "America/New_York", holidayCountry: "CA"));
+
+        var client = SessionClient(created);
+        (await HolidaysAsync(client, 2026)).Should().Equal(
+            ("2026-01-01", "New Year's Day"),
+            ("2026-02-16", "Family Day"),
+            ("2026-04-03", "Good Friday"),
+            ("2026-05-18", "Victoria Day"),
+            ("2026-07-01", "Canada Day"),
+            ("2026-09-07", "Labour Day"),
+            ("2026-10-12", "Thanksgiving"),
+            ("2026-12-25", "Christmas Day"),
+            ("2026-12-28", "Boxing Day (substitute)"));
+        (await HolidaysAsync(client, 2027)).Should().Equal(
+            ("2027-01-01", "New Year's Day"),
+            ("2027-02-15", "Family Day"),
+            ("2027-03-26", "Good Friday"),
+            ("2027-05-24", "Victoria Day"),
+            ("2027-07-01", "Canada Day"),
+            ("2027-09-06", "Labour Day"),
+            ("2027-10-11", "Thanksgiving"),
+            ("2027-12-27", "Christmas Day (substitute)"),
+            ("2027-12-28", "Boxing Day (substitute)"));
+    }
+
+    [Fact]
+    public async Task Italy_copies_the_national_holidays_that_fall_on_weekdays()
+    {
+        // L2-008 AC2/AC5: Italy is offered; it has no substitute days, so a weekend holiday stays a weekend.
+        var noor = await TestAccount.CreateAsync(_factory);
+
+        var created = await CreatedAsync(_factory.ClientFor(noor), Request(timeZone: "Europe/Paris", holidayCountry: "IT"));
+
+        var client = SessionClient(created);
+        (await HolidaysAsync(client, 2026)).Should().Equal(
+            ("2026-01-01", "New Year's Day"),
+            ("2026-01-06", "Epiphany"),
+            ("2026-04-06", "Easter Monday"),
+            ("2026-05-01", "Labour Day"),
+            ("2026-06-02", "Republic Day"),
+            ("2026-12-08", "Immaculate Conception"),
+            ("2026-12-25", "Christmas Day"));
+        (await HolidaysAsync(client, 2027)).Should().Equal(
+            ("2027-01-01", "New Year's Day"),
+            ("2027-01-06", "Epiphany"),
+            ("2027-03-29", "Easter Monday"),
+            ("2027-06-02", "Republic Day"),
+            ("2027-10-04", "St Francis of Assisi's Day"),
+            ("2027-11-01", "All Saints' Day"),
+            ("2027-12-08", "Immaculate Conception"));
+    }
+
+    [Fact]
     public async Task None_stores_no_holidays()
     {
         var noor = await TestAccount.CreateAsync(_factory);
