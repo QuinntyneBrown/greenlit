@@ -2,6 +2,8 @@ using Azure;
 using Azure.Communication.Email;
 using Azure.Identity;
 using Greenlit.Application.Abstractions;
+using EmailMessage = Greenlit.Application.Abstractions.EmailMessage;
+using AcsMessage = Azure.Communication.Email.EmailMessage;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -33,7 +35,7 @@ public sealed class AcsEmailSender : IEmailSender
     public async Task SendAsync(EmailMessage message, CancellationToken ct = default)
     {
         var content = new EmailContent(message.Subject) { PlainText = message.Body, Html = message.Html ?? string.Empty };
-        var email = new Azure.Communication.Email.EmailMessage(
+        var email = new AcsMessage(
             senderAddress: _options.From,
             recipientAddress: message.To,
             content: content);
