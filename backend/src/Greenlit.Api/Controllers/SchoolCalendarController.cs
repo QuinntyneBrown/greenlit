@@ -25,4 +25,31 @@ public sealed class SchoolCalendarController : ControllerBase
         var child = await _sender.Send(command, ct);
         return Created($"/api/team/settings/team", child);
     }
+
+    /// <summary>The team's closures, earliest first; any member reads them (L2-061 AC5).</summary>
+    [HttpGet("closures")]
+    public Task<IReadOnlyList<ClosureDto>> Closures(CancellationToken ct) => _sender.Send(new GetClosuresQuery(), ct);
+
+    [HttpPost("closures")]
+    [Authorize(Policy = "Manager")]
+    public async Task<ActionResult<ClosureDto>> AddClosure([FromBody] AddClosureCommand command, CancellationToken ct)
+    {
+        var closure = await _sender.Send(command, ct);
+        return Created($"/api/team/closures/{closure.Id}", closure);
+    }
+
+    [HttpPut("closures/{id:guid}")]
+    [Authorize(Policy = "Manager")]
+    public Task<ClosureDto> UpdateClosure(Guid id, [FromBody] ClosureRequest request, CancellationToken ct) =>
+        _sender.Send(new UpdateClosureCommand(id, request.Label, request.FirstDay, request.LastDay, request.MemberId), ct);
+
+    [HttpDelete("closures/{id:guid}")]
+    [Authorize(Policy = "Manager")]
+    public async Task<IActionResult> DeleteClosure(Guid id, CancellationToken ct)
+    {
+        await _sender.Send(new DeleteClosureCommand(id), ct);
+        return NoContent();
+    }
 }
+
+public sealed record ClosureRequest(string? Label, DateOnly? FirstDay, DateOnly? LastDay, Guid? MemberId);

@@ -106,7 +106,14 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
             CoverageMinimum: CoverageFlag.Minimum(team.CoverageMinimum),
             members,
             coverage,
-            team.SchoolCalendar);
+            team.SchoolCalendar,
+            // Closures are only shown, never counted (L2-061 AC4, AC5); none while the setting is off (L2-059 AC4).
+            team.SchoolCalendar
+                ? (await _db.SchoolClosures.AsNoTracking()
+                        .Where(c => c.TeamId == team.Id && c.FirstDay <= last && c.LastDay >= month)
+                        .ToListAsync(ct))
+                    .OrderBy(c => c.FirstDay).Select(ClosureDto.From).ToList()
+                : []);
     }
 
     internal static CellDto CellFor(
