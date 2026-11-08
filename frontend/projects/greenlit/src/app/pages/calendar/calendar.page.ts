@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ApplicationRef,
   computed,
   effect,
   inject,
@@ -165,6 +166,7 @@ function localMonth(): string {
         } @else {
           <gl-team-grid
             class="region"
+            (keydown.tab)="tabToBar($event)"
             [label]="view().label"
             [columns]="view().columns"
             [rows]="gridRows()"
@@ -379,6 +381,19 @@ export class CalendarPage {
   /** An action from the bar is being saved. */
   protected readonly saving = signal(false);
   private readonly grid = viewChild(TeamGrid);
+  private readonly selectionBar = viewChild(SelectionBar);
+  private readonly appRef = inject(ApplicationRef);
+
+  /**
+   * Tab from the sheet with days selected goes to the selection bar (L2-047, sheet/select-days), even when it comes
+   * before the bar's first render: the bar is rendered then and there, so the next key already reaches it.
+   */
+  protected tabToBar(event: Event): void {
+    if (!this.bar()) return;
+    event.preventDefault();
+    if (!this.selectionBar()) this.appRef.tick();
+    this.selectionBar()?.focus();
+  }
 
   /** L2-016 AC3: the same change a paint stroke makes, over the selected days. */
   protected actOnSelection(action: SelectionAction): void {

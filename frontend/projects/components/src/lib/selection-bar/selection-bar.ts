@@ -258,6 +258,11 @@ export class SelectionBar {
     { key: 'dismiss', label: 'Clear selection' },
   ]);
 
+  /** Moves focus to the toolbar's tab stop, as Tab from the sheet does (L2-047). */
+  focus(): void {
+    this.host.nativeElement.querySelectorAll<HTMLElement>('button')[this.stop()]?.focus();
+  }
+
   /** Arrow keys, Home and End move among the buttons (the toolbar pattern). */
   protected onKey(event: KeyboardEvent): void {
     const count = this.buttons().length;
