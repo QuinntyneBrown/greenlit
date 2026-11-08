@@ -1,0 +1,58 @@
+/**
+ * Fresh people and teams for the several-teams and school-calendar specs (L2-055 to L2-062), made through the real
+ * API so no seeded person's data changes. A fresh account comes from Continue with Google on the e2e API, whose fake
+ * Google reader (ADR-012) accepts a made-up account: a new address becomes a new manager account on no team.
+ */
+
+import { APIRequestContext } from "@playwright/test";
+import { invitationToken, freshEmail } from "./invitation.js";
+import { API_BASE_URL } from "./session.js";
+
+export interface FreshPerson {
+  name: string;
+  email: string;
+  /** The latest session token: it names the team the person was last put on. */
+  token: string;
+}
+
+function fakeGoogleToken(name: string, email: string): string {
+  const account = { sub: `e2e-${email}`, email, name, email_verified: true };
+  return "fake-google." + Buffer.from(JSON.stringify(account)).toString("base64url");
+}
+
+/** A new account called `name` on no team, signed in through Continue with Google. */
+export async function freshPerson(request: APIRequestContext, name: string): Promise<FreshPerson> {
+  const email = freshEmail(name.split(" ")[0].toLowerCase());
+  return { name, email, token: await googleSession(request, name, email) };
+}
+
+/** A session for the account with `email` through Continue with Google (the sign-in team, L2-054 AC1, L2-056 AC4). */
+export async function googleSession(request: APIRequestContext, name: string, email: string): Promise<string> {
+  const response = await request.post(`${API_BASE_URL}/api/auth/google`, {
+    data: { accessToken: fakeGoogleToken(name, email) },
+  });
+  if (!response.ok()) throw new Error(`Continue with Google as ${email} failed with ${response.status()}.`);
+  return ((await response.json()) as { accessToken: string }).accessToken;
+}
+
+/** `person` creates a team called `name` with no one invited; their token then names it. Returns the team's id. */
+export async function createTeam(request: APIRequestContext, person: FreshPerson, name: string): Promise<string> {
+  const response = await request.post(`${API_BASE_URL}/api/teams`, {
+    headers: { Authorization: `Bearer ${person.token}` },
+    data: { name, timeZone: "Europe/London", holidayCountry: "GB", members: [] },
+  });
+  if (!response.ok()) throw new Error(`Creating ${name} failed with ${response.status()}.`);
+  const created = (await response.json()) as { teamId: string; session: { accessToken: string } };
+  person.token = created.session.accessToken;
+  return created.teamId;
+}
+
+/** `manager` (on the team their token names) invites `email`; returns the invitation token from the API log. */
+export async function inviteTo(request: APIRequestContext, manager: FreshPerson, name: string, email: string): Promise<string> {
+  const response = await request.post(`${API_BASE_URL}/api/team/members`, {
+    headers: { Authorization: `Bearer ${manager.token}` },
+    data: { name, email, role: "Member" },
+  });
+  if (!response.ok()) throw new Error(`Inviting ${email} failed with ${response.status()}.`);
+  return invitationToken(email);
+}

@@ -48,17 +48,18 @@ test.describe("Calendar navigation", () => {
 });
 
 test.describe("Calendar states", () => {
-  test("a team of only the manager shows the empty state (L2-012 AC6)", async ({ goto, pages, sheetApi }) => {
+  test("a team of only the manager shows the sheet with their row, not an empty state (L2-012 AC6, L2-057 AC2)", async ({
+    goto,
+    pages,
+    sheetApi,
+  }) => {
     await sheetApi.onlyMe();
     await goto("calendar", { month: "2026-11" });
     await pages.calendar.waitForReady();
 
-    await expect(pages.calendar.emptyState()).toContainText("No one on the team yet");
-    await expect(pages.calendar.emptyState()).toContainText(
-      "Invite your team from Settings to start planning time off.",
-    );
-    await expect(pages.calendar.stateAction("Open settings")).toBeVisible();
-    await expect(pages.calendar.grid()).toHaveCount(0);
+    await expect(pages.calendar.emptyState()).toHaveCount(0);
+    await expect(pages.calendar.memberNames()).toHaveText(["Maya Chen"]);
+    await expect(pages.calendar.paintPicker()).toBeVisible();
   });
 
   test("a failed load says so and Try again recovers (L2-012 AC7)", async ({ goto, pages, sheetApi }) => {

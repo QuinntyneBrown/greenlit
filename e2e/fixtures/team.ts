@@ -19,8 +19,8 @@ export async function ensureOwnTeam(request: APIRequestContext, person: Person, 
 }
 
 /**
- * Puts a second row on `manager`'s team through the real API, so the calendar shows a sheet instead of "No one on
- * the team yet". Safe to run again: inviting a pending address again only sends a new link.
+ * Puts a second row on `manager`'s team through the real API, so a spec has someone besides the manager on
+ * the sheet. Safe to run again: inviting a pending address again only sends a new link.
  */
 export async function ensureMember(request: APIRequestContext, manager: Person, name: string): Promise<void> {
   const token = await signIn(request, manager);

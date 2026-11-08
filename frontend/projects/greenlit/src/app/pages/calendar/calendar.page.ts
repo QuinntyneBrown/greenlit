@@ -295,7 +295,8 @@ export class CalendarPage {
   /** L2-012 AC6: nobody on the team but the manager. */
   protected readonly isEmpty = computed(() => {
     const sheet = this.loaded();
-    return sheet !== null && sheet.members.length <= 1;
+    // A team of one shows its manager's row (L2-057 AC2); only a month with no rows at all is empty.
+    return sheet !== null && sheet.members.length === 0;
   });
 
   protected readonly view = computed(() => {

@@ -13,7 +13,7 @@ Below the grid, a table gives each person's allowance for the year: Allowance, U
 - **A sliver per day.** The grid draws one sliver per calendar day (mock `pages/year/default`), so each month carries its days' statuses as well as the confirmed count the cell is named by. Weekends, holidays and days a member does not work are `off`; a day with no row is `empty`.
 - **Names link to the person page.** For the manager, a name in the allowance table links to `/people/{id}` (built with `allowances/person-page`); the mock links only the table, not the grid, and member mocks never link. A member's names stay text.
 - **Sorting is the client's.** The endpoint returns the rows with the caller first, then in team order; "Most days left first" reorders them in the browser and toggles back (`aria-pressed`).
-- **Empty means no one but the manager.** As on the calendar (`L2-012` AC6), a team of one shows "No one on the team yet".
+- **Empty means no rows at all.** A team of one shows its manager's row (`L2-057`, `L2-012` AC6); "No one on the team yet" is kept only for a year with no rows.
 - **Errors.** A year that is not a four-digit year from 2000 to 2100 answers 400 with the validation `code`; a caller on no team is 404 `not_found`; no session is 401. Nothing in an error names another team.
 
 ## Description

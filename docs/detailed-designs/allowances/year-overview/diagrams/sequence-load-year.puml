@@ -39,7 +39,7 @@ alt loaded
   ctrl --> client : 200 YearDto
   page --> actor : "Time off by month" and "Allowance in 2026" (L2-031 AC1, L2-032 AC1)
 else no members
-  page --> actor : "No one on the team yet" (L2-031 AC5)
+  page --> actor : no rows at all: "No one on the team yet" (L2-031 AC5; a team of one shows its row, L2-057)
 else failed
   page --> actor : "We couldn't load the year" (L2-031 AC6)
 end
