@@ -73,6 +73,11 @@ export class AcceptInvitePage extends BasePage {
     return this.main.getByRole("button", { name: "Join with Google", exact: true });
   }
 
+  /** Google's "G" mark before the Join with Google label (L2-052 AC1). */
+  googleMark(): Locator {
+    return this.joinWithGoogle().locator("svg");
+  }
+
   /** The "or" rule between Join with Google and the password form. */
   divider(): Locator {
     return this.main.getByRole("separator", { name: "or", exact: true });
