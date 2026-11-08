@@ -176,7 +176,6 @@ type Load =
           </section>
           <section class="settings-section" aria-labelledby="out-title">
             <h2 id="out-title" class="section-title">Sign out</h2>
-            <p>You'll need your email and password to get back in.</p>
             <div class="settings-actions">
               <gl-button (click)="signOut()">
                 <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">

@@ -38,7 +38,7 @@ test.describe("Account page", () => {
     await expect(page.newPassword()).toHaveAttribute("autocomplete", "new-password");
     await expect(page.confirmPassword()).toHaveAttribute("type", "password");
     await expect(page.updatePassword()).toHaveText("Update password");
-    await expect(page.sectionIntro("Sign out")).toHaveText("You'll need your email and password to get back in.");
+    await expect(page.sectionIntro("Sign out")).toHaveCount(0);
     await expect(page.signOut()).toBeVisible();
   });
 
