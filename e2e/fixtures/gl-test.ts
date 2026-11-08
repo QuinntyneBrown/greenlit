@@ -1278,10 +1278,11 @@ export const test = base.extend<GlFixtures>({
       });
       return release;
     };
-    const fail = (pattern: string | RegExp) =>
-      page.route(pattern, (route) =>
+    const fail = async (pattern: string | RegExp): Promise<void> => {
+      await page.route(pattern, (route) =>
         route.request().method() === "OPTIONS" ? route.fallback() : route.fulfill({ status: 500, body: "" }),
       );
+    };
     await use({
       holdMine: () => hold(mine),
       failMine: () => fail(mine),
