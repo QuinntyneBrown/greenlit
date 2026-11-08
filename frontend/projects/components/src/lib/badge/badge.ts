@@ -33,6 +33,10 @@ export type BadgeTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
       border-radius: 50%;
       background: currentColor;
     }
+    /* An icon badge (Active, Default in Your teams) leads with the projected icon instead of the dot. */
+    .badge--icon::before {
+      display: none;
+    }
     .badge--info {
       background: var(--color-info-bg);
       color: var(--color-info-fg);
@@ -60,9 +64,13 @@ export type BadgeTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
 })
 export class Badge {
   readonly tone = input<BadgeTone>('neutral');
+  /** True when the label leads with a projected icon, which replaces the dot. */
+  readonly icon = input<boolean>(false);
 
-  protected readonly toneClass = computed(() =>
-    this.tone() === 'neutral' ? 'badge' : `badge badge--${this.tone()}`,
+  protected readonly toneClass = computed(
+    () =>
+      (this.tone() === 'neutral' ? 'badge' : `badge badge--${this.tone()}`) +
+      (this.icon() ? ' badge--icon' : ''),
   );
 }
 
