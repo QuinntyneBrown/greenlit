@@ -1,3 +1,4 @@
+using Greenlit.Application.Auth;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Exceptions;
 using Greenlit.Application.Invitations;
@@ -96,7 +97,7 @@ public sealed class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand
 
         managerRow.TeamId = team.Id;
         var invited = await InviteAsync(team, user.DisplayName, ct);
-        return new CreatedTeamDto(team.Id, team.Name, invited, _tokens.Issue(user, managerRow));
+        return new CreatedTeamDto(team.Id, team.Name, invited, await Sessions.IssueAsync(_db, _tokens, user, managerRow, ct));
     }
     private async Task<int> InviteAsync(Team team, string managerName, CancellationToken ct)
     {

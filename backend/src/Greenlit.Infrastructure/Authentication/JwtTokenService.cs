@@ -4,6 +4,7 @@ using System.Text;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Auth;
 using Greenlit.Domain.Entities;
+using Greenlit.Domain.Enums;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -21,7 +22,7 @@ public sealed class JwtTokenService : ITokenService
         _time = time;
     }
 
-    public SessionDto Issue(User user, TeamMember? member)
+    public SessionDto Issue(User user, TeamMember? member, UserRole role)
     {
         var now = _time.GetUtcNow();
         var expires = now.AddMinutes(_options.AccessTokenMinutes);
@@ -29,7 +30,7 @@ public sealed class JwtTokenService : ITokenService
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new("role", user.Role.ToString()),
+            new("role", role.ToString()),
         };
         if (member is not null)
         {
@@ -51,7 +52,7 @@ public sealed class JwtTokenService : ITokenService
             expires,
             user.Id,
             user.DisplayName,
-            user.Role,
+            role,
             member?.TeamId);
     }
 }

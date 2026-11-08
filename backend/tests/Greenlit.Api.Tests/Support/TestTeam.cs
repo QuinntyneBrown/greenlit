@@ -112,6 +112,26 @@ public sealed class TestTeam
         return row;
     }
 
+    /// <summary>
+    /// Puts the account of <paramref name="name"/> on <paramref name="from"/> on this team as a row too (L2-055): one
+    /// person, two memberships.
+    /// </summary>
+    public async Task<TeamMember> AddExistingMemberAsync(TestTeam from, string name)
+    {
+        var user = from._users[name];
+        var row = new TeamMember { Id = Guid.NewGuid(), TeamId = Team.Id, Name = name, Email = user.Email, UserId = user.Id, SortOrder = _rows.Count };
+        await _factory.WriteAsync(db => db.TeamMembers.Add(row));
+        _rows[name] = row;
+        _users[name] = user;
+        return row;
+    }
+
+    /// <summary>The account behind the named row.</summary>
+    public User UserOf(string name) => _users[name];
+
+    /// <summary>The named person's row on this team.</summary>
+    public TeamMember RowOf(string name) => _rows[name];
+
     public Task SetDayAsync(string member, DateOnly date, DayStatus status) =>
         _factory.WriteAsync(db => db.TimeOffDays.Add(new TimeOffDay
         {

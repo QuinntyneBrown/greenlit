@@ -57,6 +57,8 @@ public sealed class AcceptInvitationCommandHandler : IRequestHandler<AcceptInvit
             DisplayName = name,
             Role = open.Member.Role,
             CreatedUtc = now,
+            // The team a person joins first is the one sign-in opens while they manage none (L2-056 AC4, ADR-015).
+            DefaultTeamId = open.Team.Id,
         };
         user.PasswordHash = _hasher.Hash(user, request.Password!);
         _db.Users.Add(user);
@@ -77,6 +79,6 @@ public sealed class AcceptInvitationCommandHandler : IRequestHandler<AcceptInvit
             }
             throw;
         }
-        return _tokens.Issue(user, open.Member);
+        return await Sessions.IssueAsync(_db, _tokens, user, open.Member, ct);
     }
 }

@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Greenlit.Application.Teams;
 
 /// <summary>
-/// The team a session opens on when nothing else names one (L2-054 AC1, AC12; ADR-014): the person's default team
-/// while they manage it, else the earliest created team they manage, else the team they have a live row on.
+/// The team a session opens on when nothing else names one (L2-054 AC1, AC12, L2-056 AC4; ADR-014, ADR-015): the
+/// person's default team while they manage it, else the earliest created team they manage; for a person who manages
+/// none, their default team (the team they joined first) while they have a live row on it, else the earliest created
+/// team they have a live row on.
 /// The stored default is never trusted alone, so a stale one can never open a team the person no longer manages.
 /// </summary>
 public static class TeamChoice
@@ -39,9 +41,20 @@ public static class TeamChoice
             var stored = await db.Users.AsNoTracking().Where(u => u.Id == userId).Select(u => u.DefaultTeamId).FirstOrDefaultAsync(ct);
             return stored is { } id && managed.Contains(id) ? id : managed[0];
         }
-        return await db.TeamMembers.AsNoTracking()
-            .Where(m => m.UserId == userId)
-            .Select(m => (Guid?)m.TeamId)
-            .FirstOrDefaultAsync(ct);
+        var memberships = await MembershipTeamIdsAsync(db, userId, ct);
+        if (memberships.Count == 0) return null;
+        var joinedFirst = await db.Users.AsNoTracking().Where(u => u.Id == userId).Select(u => u.DefaultTeamId).FirstOrDefaultAsync(ct);
+        return joinedFirst is { } first && memberships.Contains(first) ? first : memberships[0];
     }
+
+    /// <summary>
+    /// The ids of every team the person has a live row on, as manager or member, oldest first (L2-055, ADR-015).
+    /// Sorted in memory for the same reason as <see cref="ManagedTeamIdsAsync"/>.
+    /// </summary>
+    public static async Task<List<Guid>> MembershipTeamIdsAsync(IAppDbContext db, Guid userId, CancellationToken ct) =>
+        (await db.Teams.AsNoTracking()
+            .Where(t => t.Members.Any(m => m.UserId == userId))
+            .Select(t => new { t.Id, t.CreatedUtc })
+            .ToListAsync(ct))
+        .OrderBy(t => t.CreatedUtc).Select(t => t.Id).ToList();
 }

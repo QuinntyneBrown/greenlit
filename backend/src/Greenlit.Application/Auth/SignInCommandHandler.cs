@@ -56,7 +56,7 @@ public sealed class SignInCommandHandler : IRequestHandler<SignInCommand, Sessio
             throw new UnauthorizedException(RemovedMembers.Code, RemovedMembers.Detail);
 
         var member = await TeamChoice.ForSignInAsync(_db, user.Id, ct);
-        return _tokens.Issue(user, member);
+        return await Sessions.IssueAsync(_db, _tokens, user, member, ct);
     }
 
     private static UnauthorizedException Mismatch() =>

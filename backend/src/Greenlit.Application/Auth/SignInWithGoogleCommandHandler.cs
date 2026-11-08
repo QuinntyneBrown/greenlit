@@ -68,6 +68,6 @@ public sealed class SignInWithGoogleCommandHandler : IRequestHandler<SignInWithG
             throw new UnauthorizedException(RemovedMembers.Code, RemovedMembers.Detail);
 
         var member = await TeamChoice.ForSignInAsync(_db, user.Id, ct);
-        return GoogleSessionDto.From(_tokens.Issue(user, member), newAccount);
+        return GoogleSessionDto.From(await Sessions.IssueAsync(_db, _tokens, user, member, ct), newAccount);
     }
 }
