@@ -47,6 +47,7 @@ import {
 
 import { AppDialogs } from '../../dialogs/app-dialogs';
 import { EditWorkingDaysDialog } from '../../dialogs/edit-working-days/edit-working-days.dialog';
+import { AddChildDialog } from '../../dialogs/add-child/add-child.dialog';
 import { InviteMemberDialog } from '../../dialogs/invite-member/invite-member.dialog';
 import { AddHolidayDialog, AddHolidayOutcome } from '../../dialogs/add-holiday/add-holiday.dialog';
 import { RemoveHolidayDialog } from '../../dialogs/remove-holiday/remove-holiday.dialog';
@@ -160,6 +161,8 @@ type HolidaysLoad =
                 [team]="team()!"
                 (saved)="teamSaved($event)"
                 (invite)="invite()"
+                [schoolCalendar]="schoolCalendarOn()"
+                (addChild)="addChild()"
                 (editWorkingDays)="editWorkingDays($event)"
               />
             }
@@ -904,6 +907,13 @@ export class SettingsPage {
       .closed.subscribe((saved) => {
         if (saved) this.retry();
       });
+  }
+
+  /** "Add a child" (L2-060 AC2): the dialog, then the Team section again with the new row. */
+  protected addChild(): void {
+    this.dialogs.open<boolean>(AddChildDialog, '#ac-name').closed.subscribe((added) => {
+      if (added) this.retry();
+    });
   }
 
   protected invite(): void {

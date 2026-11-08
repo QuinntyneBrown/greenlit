@@ -27,6 +27,8 @@ export interface SheetMember {
   readonly cells: readonly SheetCell[];
   /** The weekdays this person works: their own, else the team's (teams/working-days). */
   readonly workingDays: readonly WeekDay[];
+  /** A child while the school calendar is on (L2-060): no allowance and no days left. */
+  readonly isChild: boolean;
 }
 
 /** The Out row for one team working day. Weekends and holidays have no entry. */
@@ -51,4 +53,6 @@ export interface SheetMonth {
   /** In display order: a member's own row first. */
   readonly members: readonly SheetMember[];
   readonly coverage: readonly SheetCoverage[];
+  /** The team's school calendar is on (L2-059): children and closures show. */
+  readonly schoolCalendar: boolean;
 }

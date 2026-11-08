@@ -21,8 +21,10 @@ export interface YearMember {
   readonly isYou: boolean;
   /** January to December. */
   readonly months: readonly YearMonth[];
-  /** The allowance for the leave year that starts in this year. */
-  readonly allowance: AllowanceFigures;
+  /** The allowance for the leave year that starts in this year; null for a child (L2-060 AC3). */
+  readonly allowance: AllowanceFigures | null;
+  /** A child while the school calendar is on (L2-060). */
+  readonly isChild: boolean;
 }
 
 /** The team's year (GET /api/year, docs/detailed-designs/allowances/year-overview). */

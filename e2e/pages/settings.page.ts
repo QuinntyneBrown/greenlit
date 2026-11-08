@@ -264,6 +264,27 @@ export class SettingsPage extends BasePage {
 
   // --- School calendar (docs/detailed-designs/teams/school-calendar, L2-059 to L2-062) ------------
 
+  /** The "Child" checkbox on a member's row in the Team section, named "{name} is a child" (L2-060 AC1). */
+  childCheckbox(name: string): Locator {
+    return this.teamSection().getByRole("checkbox", { name: `${name} is a child`, exact: true });
+  }
+
+  /** A member's row in the Team section. */
+  memberRow(name: string): Locator {
+    return this.teamSection().locator(".member-list > li").filter({ hasText: name });
+  }
+
+  /** "No allowance" in place of the yearly-days field on a child's row. */
+  noAllowance(name: string): Locator {
+    return this.memberRow(name).locator(".member-list__no-allowance");
+  }
+
+  /** "Add a child", beside "Invite a member" while the school calendar is on. */
+  addChildButton(): Locator {
+    return this.teamSection().getByRole("button", { name: "Add a child", exact: true });
+  }
+
+
   schoolSection(): Locator {
     return this.main.locator("section#school");
   }

@@ -20,6 +20,7 @@ import {
   Alert,
   Button,
   FormSummary,
+  MemberChildChange,
   MemberList,
   MemberListItem,
   MemberRoleChange,
@@ -75,6 +76,7 @@ import { ToastService } from '../../toasts/toast.service';
         (actioned)="editWorkingDays.emit($event)"
         (roleChange)="setRole($event)"
         (yearlyDaysChange)="setYearlyDays($event)"
+        (childChange)="setChild($event)"
       />
       @if (team().canEdit) {
         <div class="invite">
@@ -84,6 +86,14 @@ import { ToastService } from '../../toasts/toast.service';
             </svg>
             Invite a member
           </gl-button>
+          @if (schoolCalendar()) {
+            <gl-button (click)="addChild.emit()">
+              <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Add a child
+            </gl-button>
+          }
         </div>
       }
     </fieldset>
@@ -134,6 +144,9 @@ import { ToastService } from '../../toasts/toast.service';
       margin-top: var(--space-6);
     }
     .invite {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
       margin-top: var(--space-4);
     }
     .settings-actions {
@@ -150,6 +163,9 @@ export class TeamSection {
   /** The team as the API now has it, after a save. */
   readonly saved = output<TeamSettingsTeam>();
   readonly invite = output<void>();
+  /** The school calendar is on (L2-059): rows carry the Child mark and "Add a child" shows (L2-060). */
+  readonly schoolCalendar = input<boolean>(false);
+  readonly addChild = output<void>();
   readonly editWorkingDays = output<MemberListItem>();
 
   private readonly service = inject(TEAM_SETTINGS_SERVICE);
@@ -164,6 +180,9 @@ export class TeamSection {
   private readonly days = linkedSignal<Record<string, number | null>>(() =>
     Object.fromEntries(this.team().members.map((m) => [m.id, m.yearlyDays])),
   );
+  private readonly children = linkedSignal<Record<string, boolean>>(() =>
+    Object.fromEntries(this.team().members.map((m) => [m.id, m.isChild])),
+  );
   protected readonly busy = signal(false);
   protected readonly status = signal('');
   protected readonly nameError = signal('');
@@ -176,6 +195,7 @@ export class TeamSection {
       ...(m.email ? { detail: m.email } : {}),
       role: this.roles()[m.id],
       yearlyDays: this.days()[m.id],
+      ...(this.schoolCalendar() && !m.isTeamManager ? { child: this.children()[m.id] } : {}),
       ...(this.team().canEdit ? { action: 'Edit working days' } : {}),
     })),
   );
@@ -192,7 +212,11 @@ export class TeamSection {
       entered.timeZone !== team.timeZone ||
       entered.members.some((m, i) => {
         const before = team.members[i];
-        return m.role !== before.role || m.yearlyDays !== before.yearlyDays;
+        return (
+          m.role !== before.role ||
+          m.yearlyDays !== before.yearlyDays ||
+          m.isChild !== before.isChild
+        );
       })
     );
   }
@@ -202,6 +226,11 @@ export class TeamSection {
       ...roles,
       [change.member.id!]: change.role as TeamSettingsMember['role'],
     }));
+    this.status.set('');
+  }
+
+  protected setChild(change: MemberChildChange): void {
+    this.children.update((children) => ({ ...children, [change.member.id!]: change.child }));
     this.status.set('');
   }
 
@@ -221,6 +250,7 @@ export class TeamSection {
         id: m.id,
         role: this.roles()[m.id],
         yearlyDays: this.days()[m.id],
+        isChild: this.children()[m.id],
       })),
     };
     if (!entered.name) {

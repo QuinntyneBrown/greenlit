@@ -19,6 +19,8 @@ export interface AllowanceTableRow {
   readonly requestedPercent: number;
   /** "{used + booked} of {allowance} days taken or booked, {requested} requested": the bar's name. */
   readonly usageLabel: string;
+  /** A child (L2-060 AC3): the figures give way to "No allowance" (pages/year/school-calendar). */
+  readonly noAllowance?: boolean;
 }
 
 /**
@@ -78,25 +80,30 @@ export interface AllowanceTableRow {
                     }
                   </span>
                 </td>
-                <td class="num">{{ row.allowance }}</td>
-                <td class="num">{{ row.used }}</td>
-                <td class="num">{{ row.booked }}</td>
-                <td class="num">{{ row.requested }}</td>
-                <td class="num left">{{ row.left }}</td>
-                <td class="usage-cell">
-                  <div class="usage-bar" role="img" [attr.aria-label]="row.usageLabel">
-                    <span
-                      class="usage-bar__seg"
-                      data-status="confirmed"
-                      [style.--value]="row.takenPercent + '%'"
-                    ></span>
-                    <span
-                      class="usage-bar__seg"
-                      data-status="requested"
-                      [style.--value]="row.requestedPercent + '%'"
-                    ></span>
-                  </div>
-                </td>
+                @if (row.noAllowance) {
+                  <td class="num" colspan="5"><span class="text-muted">No allowance</span></td>
+                  <td class="usage-cell"></td>
+                } @else {
+                  <td class="num">{{ row.allowance }}</td>
+                  <td class="num">{{ row.used }}</td>
+                  <td class="num">{{ row.booked }}</td>
+                  <td class="num">{{ row.requested }}</td>
+                  <td class="num left">{{ row.left }}</td>
+                  <td class="usage-cell">
+                    <div class="usage-bar" role="img" [attr.aria-label]="row.usageLabel">
+                      <span
+                        class="usage-bar__seg"
+                        data-status="confirmed"
+                        [style.--value]="row.takenPercent + '%'"
+                      ></span>
+                      <span
+                        class="usage-bar__seg"
+                        data-status="requested"
+                        [style.--value]="row.requestedPercent + '%'"
+                      ></span>
+                    </div>
+                  </td>
+                }
               </tr>
             }
           </tbody>

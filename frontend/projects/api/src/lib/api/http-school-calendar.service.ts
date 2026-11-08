@@ -3,7 +3,12 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 
 import { API_BASE_URL, apiUrl } from './api-base-url';
-import { SchoolCalendarSaveResult, SchoolCalendarService } from './school-calendar.service';
+import {
+  AddChildResult,
+  AddedChild,
+  SchoolCalendarSaveResult,
+  SchoolCalendarService,
+} from './school-calendar.service';
 
 /** The school calendar endpoints of the API (docs/detailed-designs/teams/school-calendar). */
 @Injectable({ providedIn: 'root' })
@@ -17,6 +22,15 @@ export class HttpSchoolCalendarService implements SchoolCalendarService {
       .pipe(
         map((): SchoolCalendarSaveResult => ({ ok: true })),
         catchError(() => of<SchoolCalendarSaveResult>({ ok: false })),
+      );
+  }
+
+  addChild(name: string, email: string | null): Observable<AddChildResult> {
+    return this.http
+      .post<AddedChild>(apiUrl(this.baseUrl, 'api/team/children'), { name, email })
+      .pipe(
+        map((child): AddChildResult => ({ outcome: 'added', child })),
+        catchError(() => of<AddChildResult>({ outcome: 'failed' })),
       );
   }
 }

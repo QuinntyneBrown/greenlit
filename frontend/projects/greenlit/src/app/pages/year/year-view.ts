@@ -59,6 +59,21 @@ function percent(days: number, allowance: number): number {
 export function allowanceRows(year: TeamYear, sortedByDaysLeft: boolean): AllowanceTableRow[] {
   const rows = year.members.map((member): AllowanceTableRow => {
     const a = member.allowance;
+    // A child has no allowance (L2-060 AC3); children sort last.
+    if (a === null)
+      return {
+        memberId: member.id,
+        name: member.name,
+        allowance: 0,
+        used: 0,
+        booked: 0,
+        requested: 0,
+        left: Number.NEGATIVE_INFINITY,
+        takenPercent: 0,
+        requestedPercent: 0,
+        usageLabel: 'No allowance',
+        noAllowance: true,
+      };
     const taken = a.used + a.booked;
     return {
       memberId: member.id,

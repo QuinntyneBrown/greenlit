@@ -51,7 +51,10 @@ export interface Person {
   readonly isYou: boolean;
   /** The signed-in person is the manager. */
   readonly canManage: boolean;
-  readonly allowance: AllowanceFigures;
+  /** Null for a child (L2-060 AC3): no allowance and no days left. */
+  readonly allowance: AllowanceFigures | null;
+  /** A child while the school calendar is on (L2-060). */
+  readonly isChild: boolean;
   /** Requested days beyond the days left; 0 when they fit. */
   readonly daysOver: number;
   readonly months: readonly PersonMonth[];

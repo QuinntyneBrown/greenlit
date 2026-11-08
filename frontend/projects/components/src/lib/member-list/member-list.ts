@@ -15,6 +15,18 @@ export interface MemberListItem {
   readonly role?: string;
   /** The row's own yearly days (null: the team's default), shown when the list is `editable`. */
   readonly yearlyDays?: number | null;
+  /**
+   * The Child mark (L2-060, pages/settings/school-calendar): left out, the row has no Child control; true or false,
+   * an editable list shows the checkbox "Child" named "{name} is a child", and a child shows "No allowance" instead of
+   * the yearly-days field.
+   */
+  readonly child?: boolean;
+}
+
+/** The Child mark set or cleared in a row. */
+export interface MemberChildChange {
+  readonly member: MemberListItem;
+  readonly child: boolean;
 }
 
 /** A role chosen in a row. */
@@ -61,22 +73,37 @@ export interface MemberYearlyDaysChange {
               <option value="Member" [selected]="member.role === 'Member'">Member</option>
               <option value="Manager" [selected]="member.role === 'Manager'">Manager</option>
             </select>
-            <label class="days-input">
-              <input
-                #daysControl
-                class="input input--sm"
-                type="number"
-                min="0"
-                [value]="member.yearlyDays ?? ''"
-                [attr.aria-label]="'Yearly days for ' + member.name"
-                (input)="
-                  yearlyDaysChange.emit({
-                    member,
-                    yearlyDays: daysControl.value === '' ? null : daysControl.valueAsNumber,
-                  })
-                "
-              />days / yr
-            </label>
+            @if (member.child !== undefined) {
+              <label class="choice member-list__child">
+                <input
+                  #childControl
+                  type="checkbox"
+                  [checked]="member.child"
+                  [attr.aria-label]="member.name + ' is a child'"
+                  (change)="childChange.emit({ member, child: childControl.checked })"
+                />Child
+              </label>
+            }
+            @if (member.child) {
+              <span class="member-list__no-allowance">No allowance</span>
+            } @else {
+              <label class="days-input">
+                <input
+                  #daysControl
+                  class="input input--sm"
+                  type="number"
+                  min="0"
+                  [value]="member.yearlyDays ?? ''"
+                  [attr.aria-label]="'Yearly days for ' + member.name"
+                  (input)="
+                    yearlyDaysChange.emit({
+                      member,
+                      yearlyDays: daysControl.value === '' ? null : daysControl.valueAsNumber,
+                    })
+                  "
+                />days / yr
+              </label>
+            }
           }
           @if (member.action) {
             <gl-button
@@ -113,6 +140,24 @@ export interface MemberYearlyDaysChange {
     }
     li:last-child {
       border-bottom: 0;
+    }
+    .member-list__child {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      min-height: var(--target-min);
+      font: var(--text-caption);
+      color: var(--color-fg-default);
+      cursor: pointer;
+    }
+    .member-list__child input {
+      width: 1.125rem;
+      height: 1.125rem;
+      accent-color: var(--color-accent);
+    }
+    .member-list__no-allowance {
+      font: var(--text-caption);
+      color: var(--color-fg-muted);
     }
     .member-list__who {
       flex: 1;
@@ -198,4 +243,5 @@ export class MemberList {
   readonly actioned = output<MemberListItem>();
   readonly roleChange = output<MemberRoleChange>();
   readonly yearlyDaysChange = output<MemberYearlyDaysChange>();
+  readonly childChange = output<MemberChildChange>();
 }

@@ -142,9 +142,11 @@ export function calendarView(sheet: SheetMonth): CalendarView {
       // L2-012 AC2: a member's own row is marked "You"; the manager's view marks no row.
       you: member.isYou && !sheet.isManager,
       cells: member.cells.map((cell) => cellFor(member.name, cell)),
-      left: left === null ? '–' : `${left}`,
-      leftLabel:
-        left === null
+      // A child has no allowance (L2-060 AC3): a dash named "No allowance".
+      left: member.isChild ? '—' : left === null ? '–' : `${left}`,
+      leftLabel: member.isChild
+        ? 'No allowance'
+        : left === null
           ? 'Days left not set up yet'
           : `${left} ${Math.abs(left) === 1 ? 'day' : 'days'} left`,
       over: left !== null && left < 0,
