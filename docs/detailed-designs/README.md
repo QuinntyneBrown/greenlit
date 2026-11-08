@@ -31,6 +31,7 @@ Team setup, settings, membership, holidays, working days, coverage and email swi
 | [Set working days](teams/working-days/README.md) | Team work week and per-member working days for part-timers. | L2-039, L2-040 |
 | [Set the coverage minimum](teams/coverage-minimum/README.md) | Stepper for the fewest people in on a working day. | L2-041 |
 | [Send email notifications](teams/notification-settings/README.md) | Two switches for new-request and decision emails. | L2-043 |
+| [Branded email](web-experience/branded-email/README.md) | Every email as branded HTML with a text twin, delivered through Azure Communication Services. | L2-053 |
 
 ## sheet
 

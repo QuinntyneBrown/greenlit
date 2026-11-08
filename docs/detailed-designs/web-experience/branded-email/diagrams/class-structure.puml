@@ -1,0 +1,53 @@
+@startuml
+title Class structure — Branded email
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+
+package "Greenlit.Application" {
+  class EmailMessage <<record>> {
+    +string To
+    +string Subject
+    +string Body
+    +string? Html
+  }
+  interface IEmailSender {
+    +SendAsync(message, ct)
+  }
+  class EmailLayout {
+    +{static} Render(heading, bodyHtml, buttonLabel, buttonHref, note, preheader, appOrigin) : string
+    +{static} Paragraph(text) : string
+    +{static} Quote(text) : string
+    +{static} Status(label, kind) : string
+  }
+  class InvitationEmail
+  class PasswordResetEmail
+  class NewRequestEmail
+  class ApprovalEmail
+  class DeclineEmail
+  interface IAppLinks {
+    +Origin : string
+  }
+}
+package "Greenlit.Infrastructure" {
+  class EmailOptions {
+    +string Sender
+    +string Endpoint
+    +string From
+    +string FromName
+  }
+  class AcsEmailSender
+  class LoggingEmailSender
+}
+InvitationEmail ..> EmailLayout
+PasswordResetEmail ..> EmailLayout
+NewRequestEmail ..> EmailLayout
+ApprovalEmail ..> EmailLayout
+DeclineEmail ..> EmailLayout
+InvitationEmail ..> EmailMessage
+AcsEmailSender ..|> IEmailSender
+LoggingEmailSender ..|> IEmailSender
+AcsEmailSender --> EmailOptions
+IEmailSender ..> EmailMessage
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Branded email
+
+Container_Boundary(api_b, "Greenlit API") {
+  Component(handlers, "Handlers", "InviteMember, CreateTeam, RequestPasswordReset, RequestNotifier", "Decide who to email and when")
+  Component(composers, "Email composers", "InvitationEmail, PasswordResetEmail, NewRequestEmail, ApprovalEmail, DeclineEmail", "The words of each email, text and HTML")
+  Component(layout, "EmailLayout", "Greenlit.Application", "Renders the branded HTML from heading, body, button, note")
+  Component(sender, "IEmailSender", "Application abstraction", "Sends one EmailMessage (To, Subject, Body, Html)")
+  Component(acs, "AcsEmailSender", "Greenlit.Infrastructure", "Azure.Communication.Email with DefaultAzureCredential")
+  Component(log, "LoggingEmailSender", "Greenlit.Infrastructure", "Writes the plain text to the log (dev, tests, e2e)")
+  Component(opts, "EmailOptions", "Greenlit:Email", "Sender (Log | Acs), Endpoint, From, FromName")
+}
+System_Ext(acsx, "Azure Communication Services")
+Rel(handlers, composers, "Compose(...)")
+Rel(composers, layout, "Render(...)")
+Rel(handlers, sender, "SendAsync")
+Rel(acs, acsx, "Send", "HTTPS")
+Rel_U(acs, sender, "implements")
+Rel_U(log, sender, "implements")
+Rel(acs, opts, "reads")
+@enduml
