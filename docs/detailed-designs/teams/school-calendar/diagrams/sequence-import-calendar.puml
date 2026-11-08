@@ -1,0 +1,38 @@
+@startuml
+title UML sequence behaviour — Import a school calendar
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "ImportCalendarDialog" as dlg
+  participant "HttpSchoolCalendarService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "SchoolCalendarController" as ctrl
+end box
+box "Backend — Greenlit.Application" #ECFDF3
+  participant "ImportCalendarCommandHandler" as handler
+  participant "IcsCalendar" as ics
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> dlg : child Leo, maple-grove.ics; "Import"
+dlg -> client : importCalendar(memberId, file)
+client -> ctrl : POST /api/team/children/{memberId}/calendar (multipart, <= 1 MB)
+ctrl -> handler : ImportCalendarCommand(memberId, text)
+handler -> db : active team managed by caller, SchoolCalendar on, member is a child
+handler -> ics : Parse(text)
+alt a calendar with all-day events
+  ics --> handler : events (<= 500)
+  handler -> db : delete Leo's closures where Imported; insert one per event (Imported = true)
+  ctrl --> client : 200 { imported: 9 }
+  dlg --> actor : "Imported 9 closures for Leo" (L2-062 AC1, AC2)
+else unreadable, too big, too many or no all-day event
+  ctrl --> client : 400 calendar_unreadable, nothing changed
+  dlg --> actor : "That file isn't a calendar we can read" (AC5)
+end
+@enduml

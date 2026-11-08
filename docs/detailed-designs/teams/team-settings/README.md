@@ -50,6 +50,8 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | L2 ID | Refines (L1) | Requirement |
 |-------|--------------|-------------|
 | `L2-009` | `L1-002` | **Team settings.** Settings has the sections Team, Allowances, Work week & holidays, Coverage and Notifications, each saved on its own. Only managers can change them. |
+| `L2-059` | `L1-016` | **School calendar setting.** A manager-only team setting, off by default; off hides children and closures and keeps them. |
+| `L2-060` | `L1-016` | **Child members.** A manager-set member attribute: no allowance, no days left; a login-less child's days are saved as Confirmed. |
 
 ## Diagrams
 
@@ -82,3 +84,9 @@ Reads go to one query handler; the Team section saves through its own command ha
 A section with no edits never calls the API (`L2-009` AC4). A failure keeps the values as entered (`L2-009` AC5). A member never sees the save button (`L2-009` AC3).
 
 ![Sequence diagram: save the Team section](diagrams/sequence-save-team-section.png)
+
+## Open questions answered (ADR-015, 8 Nov 2026)
+
+- **A sixth section.** "School calendar" (`section#school`, nav "School calendar") follows Notifications and precedes Your teams. It is saved with its own "Save changes" through `PUT /api/team/settings/school-calendar` (`{ schoolCalendar }`) and read with the team settings (`GET /api/team/settings` gains `schoolCalendar`). See `teams/school-calendar` for the closures it lists.
+- **Team section while the school calendar is on.** Each row but the manager's gains the checkbox "Child" (`aria-label` "{name} is a child"); a child row shows "No allowance" instead of the yearly-days field; `PUT /api/team/settings/team` carries `isChild` per row and refuses a child mark on the manager's row or while the setting is off (`400 child_not_allowed`). "Add a child" sits beside "Invite a member".
+- **Who sees the section editable?** The manager of the active team, read from the settings DTO's `isManager`, which is per team: a manager of another team who is a member here sees it read-only (`L2-055` AC4).

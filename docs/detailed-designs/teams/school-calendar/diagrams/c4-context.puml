@@ -1,0 +1,14 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System context — School calendar
+
+Person(manager, "Manager", "Runs a household team; marks children and closures")
+Person(member, "Member", "A partner, or a child who signs in")
+System(greenlit, "Greenlit", "Team time off, one month at a time")
+System_Ext(school, "School calendar file", "An .ics export the manager downloads from a school")
+
+Rel(manager, greenlit, "Turns the school calendar on, marks children, adds and imports closures")
+Rel(member, greenlit, "Sees closures on the children's rows")
+Rel(manager, school, "Downloads once")
+@enduml

@@ -32,6 +32,7 @@ class MyTeamDto {
   Name : string
   Active : bool
   IsDefault : bool
+  Manages : bool
 }
 class TeamChoice <<static>> {
   ForSignInAsync(db, userId) : TeamMember?
@@ -46,7 +47,7 @@ interface ICurrentUser {
 User "1" --> "0..*" Team : manages >
 User ..> Team : DefaultTeamId
 Team "1" *-- "1..*" TeamMember
-TeamMember "0..*" --> "0..1" User
+TeamMember "0..*" --> "0..1" User : membership >
 TeamChoice ..> User
 ActiveTeam ..> ICurrentUser
 ActiveTeam ..> TeamChoice

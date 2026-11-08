@@ -1,0 +1,38 @@
+@startuml
+title UML sequence behaviour — Add a school closure
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "SchoolCalendarSection" as ui
+  participant "SchoolClosureDialog" as dlg
+  participant "HttpSchoolCalendarService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "SchoolCalendarController" as ctrl
+end box
+box "Backend — Greenlit.Application" #ECFDF3
+  participant "AddClosureCommandHandler" as handler
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> ui : "Add a closure"
+ui -> dlg : open (children of the team)
+actor -> dlg : "PA day", 20 Nov, 20 Nov, "All children"; "Add closure"
+dlg -> client : addClosure({ label, firstDay, lastDay, memberId: null })
+client -> ctrl : POST /api/team/closures
+ctrl -> handler : AddClosureCommand
+handler -> db : active team managed by caller, SchoolCalendar on; member is a child of it
+alt valid
+  handler -> db : insert SchoolClosure (Imported = false)
+  ctrl --> client : 201 ClosureDto
+  dlg --> actor : closes; toast "Closure added" (L2-061 AC1)
+else invalid or off
+  ctrl --> client : 400 errors / child_not_allowed; 403 for a member
+  dlg --> actor : "Fix 2 things to continue" or "We couldn't save the closure"
+end
+@enduml

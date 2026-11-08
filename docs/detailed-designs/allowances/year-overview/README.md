@@ -45,6 +45,9 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 |-------|--------------|-------------|
 | `L2-031` | `L1-007` | **Year grid.** The year page shows the whole team's confirmed time off month by month. |
 | `L2-032` | `L1-007` | **Allowance table on the year page.** Below the grid, a table shows each person's allowance for the year. |
+| `L2-057` | `L1-015` | **A team of one.** A team whose only member is its manager is complete and usable on every screen. |
+| `L2-060` | `L1-016` | **Child members.** A manager-set member attribute: no allowance, no days left; a login-less child's days are saved as Confirmed. |
+| `L2-061` | `L1-016` | **School closures.** Labelled date ranges on one child's or all children's rows, shown with an icon and text, never red, counted nowhere. |
 
 ## Diagrams
 
@@ -77,3 +80,9 @@ Each `YearMemberDto` has twelve `YearMonthDto` (a confirmed count and a status p
 Sorting by Left is a client-side reorder (`L2-032` AC3). Selecting a month cell opens the calendar on that month (`L2-031` AC3).
 
 ![Sequence diagram: load the year and open a month](diagrams/sequence-load-year.png)
+
+## Open questions answered (ADR-015, 8 Nov 2026)
+
+- **A team of one** shows the manager's row in the grid and the table (`pages/year/team-of-one`).
+- **A child** shows "No allowance" across the figure columns of the allowance table (`pages/year/school-calendar`); sorting by a figure puts children last.
+- **Closures are not drawn or counted** on the year grid (`L2-061` AC5).

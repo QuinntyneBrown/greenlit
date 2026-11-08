@@ -83,7 +83,7 @@ Three things in the current code assume one team per member:
     email is the invitation's; otherwise `403 invitation_other_account` and nothing changes.
     The client compares the addresses first to show "This invitation is for someone else"; the
     API enforces it.
-  - `POST /api/invitations/{token}/google` (L2-052): when the verified Google email has an
+  - `POST /api/invitations/{token}/accept-google` (L2-052): when the verified Google email has an
     account, attaches it (and links the Google subject as sign-in does) instead of `409
     account_exists`.
 - `POST /api/invitations/{token}/accept` (name and password) keeps creating an account and still
@@ -95,10 +95,10 @@ Three things in the current code assume one team per member:
 ### The school calendar
 
 - **A team setting.** `Team.SchoolCalendar` (bool, default false), read and saved through the
-  existing settings endpoints in a new section (`PUT /api/team/school-calendar`), manager only.
+  existing settings endpoints in a new section (`PUT /api/team/settings/school-calendar`), manager only.
   Turning it off deletes nothing; every reader applies "child" and "closure" only while it is on.
 - **A member attribute.** `TeamMember.IsChild` (bool, default false), saved with the Team section
-  (`PUT /api/team/section`) and set by "Add a child" (`POST /api/team/children`, name and an
+  (`PUT /api/team/settings/team`) and set by "Add a child" (`POST /api/team/children`, name and an
   optional email). The manager's own row cannot be a child, and nothing is marked a child while
   the school calendar is off (`400 child_not_allowed`). A member is a child for every reader
   only while `IsChild && Team.SchoolCalendar`.

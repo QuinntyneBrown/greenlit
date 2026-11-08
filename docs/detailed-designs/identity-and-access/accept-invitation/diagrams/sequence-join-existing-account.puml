@@ -1,0 +1,41 @@
+@startuml
+title UML sequence behaviour — Accept an invitation with an existing account
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Invitee (Sam Chen)" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "AcceptInvitePage" as ui
+  participant "HttpInvitationService" as client
+end box
+box "Backend — Greenlit.Application" #ECFDF3
+  participant "Join / SignInAndJoin handlers" as handler
+  participant "InvitationMembership" as attach
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> ui : opens /accept-invite/{token}
+ui -> client : GET /api/invitations/{token}
+client --> ui : { teamName, managerName, email, accountExists: true }
+alt signed out
+  ui --> actor : "Sign in and join" (Password) or "Join with Google"
+  actor -> ui : password; "Sign in and join"
+  ui -> client : POST /api/invitations/{token}/sign-in { password }
+  client -> handler : SignInAndJoinCommand
+  handler -> db : account with the invitation's email; check password
+else signed in as sam@chenhome.net
+  ui --> actor : "You're signed in as sam@chenhome.net." "Join the team"
+  ui -> client : POST /api/invitations/{token}/join
+  client -> handler : JoinInvitationCommand (caller)
+else signed in as another address
+  ui --> actor : "This invitation is for someone else" (nothing sent)
+end
+handler -> attach : AttachAsync(invitation, user)
+attach -> db : claim invitation; row.UserId = user; DefaultTeamId ??= team
+attach --> handler : session naming the inviting team
+handler --> client : 200 SessionDto / 401 invalid_credentials / 403 invitation_other_account
+ui --> actor : "You're in" "Welcome to Chen family." "Open the calendar"
+@enduml

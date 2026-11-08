@@ -12,7 +12,7 @@ Sign-in, password reset, invitations, account and session.
 |---|---|---|
 | [Sign in](identity-and-access/sign-in/README.md) | Email and password sign-in that issues the session token. | L2-001 |
 | [Reset a forgotten password](identity-and-access/reset-password/README.md) | Reset link by email, valid for one hour and one use. | L2-002, L2-003 |
-| [Accept an invitation](identity-and-access/accept-invitation/README.md) | Invitee sets name and password; the invitation lasts seven days. | L2-004 |
+| [Accept an invitation](identity-and-access/accept-invitation/README.md) | Invitee sets name and password, or joins with the account they already have; the invitation lasts seven days. | L2-004, L2-058 |
 | [Sign in with Google](identity-and-access/sign-in-with-google/README.md) | Continue with Google on sign-in (existing account, or a new manager account) and Join with Google on an invitation. | L2-051, L2-052 |
 | [Manage the account](identity-and-access/manage-account/README.md) | Display name, email and password change on the Account page. | L2-005 |
 | [Use the account menu and sign out](identity-and-access/sign-out/README.md) | Account menu, confirmed sign-out and session expiry. | L2-006, L2-007 |
@@ -23,9 +23,10 @@ Team setup, settings, membership, holidays, working days, coverage and email swi
 
 | Feature | Summary | L2 requirements |
 |---|---|---|
-| [Create a team](teams/create-team/README.md) | Team name, time zone, public holidays and the first rows in one form. | L2-008 |
+| [Create a team](teams/create-team/README.md) | Team name, time zone, public holidays and the first rows in one form; anyone may create one, and a team of one is complete. | L2-008, L2-055, L2-057 |
 | [Edit team settings](teams/team-settings/README.md) | Settings page: sections saved separately, read-only for members. | L2-009 |
-| [Run several teams](teams/switch-team/README.md) | Default team on sign-in, "Your teams" in Settings and the header team switcher. | L2-054, L2-008, L2-049 |
+| [Run several teams](teams/switch-team/README.md) | Default team on sign-in, "Your teams" in Settings and the header team switcher, for managers and for members of several teams. | L2-054, L2-055, L2-056, L2-008, L2-049 |
+| [Keep a school calendar](teams/school-calendar/README.md) | The school calendar setting, child members, school closures and `.ics` import. | L2-059, L2-060, L2-061, L2-062 |
 | [Invite a member](teams/invite-member/README.md) | Adds a row at once and emails a seven-day invitation. | L2-010 |
 | [Remove a member](teams/remove-member/README.md) | Soft removal that keeps history and blocks sign-in. | L2-011 |
 | [Manage team holidays](teams/manage-holidays/README.md) | Holiday list, add with duplicate and weekend checks, remove with undo. | L2-036, L2-037, L2-038 |

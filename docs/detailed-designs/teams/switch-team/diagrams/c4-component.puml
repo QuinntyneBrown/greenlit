@@ -12,8 +12,8 @@ Container_Boundary(spa_b, "Greenlit web application") {
 }
 Container_Boundary(api_b, "Greenlit API") {
   Component(ctrl, "TeamsController", "ASP.NET Core controller", "/api/teams")
-  Component(mine, "GetMyTeamsQueryHandler", "MediatR handler", "Teams the caller manages")
-  Component(sw, "SwitchTeamCommandHandler", "MediatR handler", "New session for a managed team")
+  Component(mine, "GetMyTeamsQueryHandler", "MediatR handler", "Teams the caller belongs to, with manages")
+  Component(sw, "SwitchTeamCommandHandler", "MediatR handler", "New session for a team the caller belongs to")
   Component(def, "SetDefaultTeamCommandHandler", "MediatR handler", "User.DefaultTeamId")
   Component(signin, "SignInCommandHandler", "MediatR handler", "Session for TeamChoice")
   Component(active, "ActiveTeam / TeamChoice", "Application helpers", "Active team from the session; sign-in team")
