@@ -50,6 +50,25 @@ public sealed class SchoolCalendarController : ControllerBase
         await _sender.Send(new DeleteClosureCommand(id), ct);
         return NoContent();
     }
+
+    /// <summary>
+    /// Imports a school's calendar file (.ics, one multipart field <c>file</c>) for one child (L2-062). A file over
+    /// 1 MB is not read at all.
+    /// </summary>
+    [HttpPost("children/{id:guid}/calendar")]
+    [Authorize(Policy = "Manager")]
+    [RequestSizeLimit(IcsCalendar.MaxBytes + 64 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = IcsCalendar.MaxBytes + 64 * 1024)]
+    public async Task<ImportedCalendarDto> ImportCalendar(Guid id, IFormFile? file, CancellationToken ct)
+    {
+        string? text = null;
+        if (file is not null && file.Length <= IcsCalendar.MaxBytes)
+        {
+            using var reader = new StreamReader(file.OpenReadStream());
+            text = await reader.ReadToEndAsync(ct);
+        }
+        return await _sender.Send(new ImportCalendarCommand(id, text), ct);
+    }
 }
 
 public sealed record ClosureRequest(string? Label, DateOnly? FirstDay, DateOnly? LastDay, Guid? MemberId);
