@@ -151,6 +151,39 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.ToTable("PasswordResetTokens");
                 });
 
+            modelBuilder.Entity("Greenlit.Domain.Entities.SchoolClosure", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly>("FirstDay")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("Imported")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<DateOnly>("LastDay")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("TeamMemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamId", "TeamMemberId");
+
+                    b.ToTable("SchoolClosures");
+                });
+
             modelBuilder.Entity("Greenlit.Domain.Entities.Team", b =>
                 {
                     b.Property<Guid>("Id")
@@ -190,6 +223,9 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.Property<bool>("NotifyNewRequests")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("SchoolCalendar")
+                        .HasColumnType("bit");
+
                     b.Property<string>("TimeZone")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -215,6 +251,9 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("IsChild")
+                        .HasColumnType("bit");
 
                     b.Property<string>("JobTitle")
                         .HasMaxLength(120)
@@ -430,6 +469,17 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Greenlit.Domain.Entities.SchoolClosure", b =>
+                {
+                    b.HasOne("Greenlit.Domain.Entities.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Greenlit.Domain.Entities.TeamMember", b =>
