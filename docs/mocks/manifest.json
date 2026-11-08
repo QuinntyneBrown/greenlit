@@ -142,7 +142,8 @@
         "L2-057",
         "L2-059",
         "L2-060",
-        "L2-061"
+        "L2-061",
+        "L2-063"
       ],
       "states": [
         "default",
@@ -160,7 +161,12 @@
         "team-of-one",
         "member-several-teams",
         "school-calendar",
-        "school-calendar-member"
+        "school-calendar-member",
+        "phone",
+        "phone-member",
+        "phone-picking",
+        "phone-range",
+        "phone-day"
       ],
       "route": "/"
     },

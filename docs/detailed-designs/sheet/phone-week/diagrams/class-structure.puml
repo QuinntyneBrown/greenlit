@@ -1,0 +1,56 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — The calendar on a phone
+
+class CalendarPage <<existing>> {
+  +phone: Signal<boolean>
+  #markFromWeek(mark: WeekMark): void
+}
+class CalendarWeek <<new>> {
+  +sheet: SheetMonth
+  +readOnly: boolean
+  +week: Signal<number>
+  +openDate: Signal<string | null>
+  +range: Signal<WeekRange | null>
+  +mark: Output<WeekMark>
+  +cleared: Output<void>
+  +clear(): void
+}
+class WeekRange <<new>> {
+  +memberId: string
+  +from: string
+  +to: string | null
+}
+class WeekMark <<new>> {
+  +memberId: string
+  +dates: string[]
+  +status: DayStatus | null
+}
+class "week-view" as WeekView <<new>> {
+  +weeksOf(month): string[][]
+  +weekOf(weeks, date): number
+  +shortRuns(sheet): ShortRun[]
+  +clashText(sheet, memberId, dates): string | null
+  +rangeTitle(from, to): string
+}
+class WeekStrip <<new, gl-week-strip>>
+class WeekTabs <<new, gl-week-tabs>>
+class MarkSheet <<new, gl-mark-sheet>>
+
+CalendarPage *-- CalendarWeek
+CalendarWeek --> WeekView
+CalendarWeek *-- WeekTabs
+CalendarWeek *-- WeekStrip
+CalendarWeek *-- MarkSheet
+CalendarWeek --> WeekRange
+CalendarWeek ..> WeekMark : emits
+@enduml
