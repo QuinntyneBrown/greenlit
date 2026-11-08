@@ -1,0 +1,14 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Branded email
+
+Person(person, "Member or manager", "Receives invitations, reset links and request notifications")
+System(greenlit, "Greenlit", "Shared team time-off sheet that replaces the vacation spreadsheet")
+System_Ext(acs, "Azure Communication Services", "Delivers email from no-reply@mail.greenlit.rocks")
+System_Ext(namecheap, "Namecheap", "DNS for greenlit.rocks; forwards incoming mail to the owner")
+
+Rel(greenlit, acs, "Sends HTML + text email", "HTTPS, managed identity")
+Rel(acs, person, "Delivers")
+Rel(person, namecheap, "Replies to anyone@greenlit.rocks reach the owner's mailbox")
+@enduml

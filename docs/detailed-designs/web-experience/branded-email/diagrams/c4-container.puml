@@ -1,0 +1,15 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Branded email
+
+Person(person, "Member or manager")
+System_Boundary(greenlit, "Greenlit") {
+  Container(api, "Greenlit API", "ASP.NET Core", "Composes each email from EmailLayout and hands it to IEmailSender")
+  ContainerDb(db, "Greenlit database", "SQL Server", "Teams, invitations, requests")
+}
+System_Ext(acs, "Azure Communication Services Email", "acs-greenlit-prod, domain mail.greenlit.rocks")
+Rel(api, db, "Reads who to tell", "EF Core")
+Rel(api, acs, "EmailClient.SendAsync (HTML + plain text)", "HTTPS, DefaultAzureCredential")
+Rel(acs, person, "Delivers from Greenlit <no-reply@mail.greenlit.rocks>")
+@enduml

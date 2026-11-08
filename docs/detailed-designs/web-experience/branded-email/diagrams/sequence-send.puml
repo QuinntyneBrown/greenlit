@@ -1,0 +1,30 @@
+@startuml
+title UML sequence behaviour — Send a branded email
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+
+participant "Handler" as H
+participant "Email composer" as C
+participant "EmailLayout" as L
+participant "IEmailSender" as S
+participant "Azure Communication Services" as A
+
+H -> C : Compose(to, names, dates, link)
+C -> L : Render(heading, body, button, note)
+L --> C : html
+C --> H : EmailMessage(To, Subject, Body, Html)
+H -> S : SendAsync(message)
+alt Greenlit:Email:Sender = Acs
+  S -> A : send From "Greenlit <no-reply@mail.greenlit.rocks>", text + html
+  A --> S : accepted | refused
+  alt refused
+    S --> H : throws (ADR-006: the caller undoes what the message announced)
+  end
+else Log (dev, tests, e2e)
+  S -> S : log "Email to {To}: {Subject}\n{Body}"
+end
+S --> H : done
+@enduml

@@ -1,0 +1,10 @@
+Subject: Reset your Greenlit password
+
+Hi Maya,
+
+Someone asked to reset the password for your Greenlit account.
+
+Choose a new password:
+https://app.greenlit.rocks/reset-password/z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4j3i2h1g0f9
+
+The link works for one hour and only once. If you didn't ask for it, you can ignore this email.

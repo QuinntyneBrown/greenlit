@@ -628,6 +628,74 @@
         "persistent"
       ],
       "opens_from": "settings"
+    },
+    {
+      "id": "invitation",
+      "kind": "email",
+      "title": "Invitation email",
+      "requirements": [
+        "L1-011",
+        "L1-001"
+      ],
+      "states": [
+        "default"
+      ],
+      "not_applicable": {
+        "loading": "An email is static once sent.",
+        "empty": "An email always has its message.",
+        "error": "A failed send is reported in the app, not in an email."
+      }
+    },
+    {
+      "id": "password-reset",
+      "kind": "email",
+      "title": "Password reset email",
+      "requirements": [
+        "L1-011",
+        "L1-001"
+      ],
+      "states": [
+        "default"
+      ],
+      "not_applicable": {
+        "loading": "An email is static once sent.",
+        "empty": "An email always has its message.",
+        "error": "A failed send is reported in the app, not in an email."
+      }
+    },
+    {
+      "id": "approval",
+      "kind": "email",
+      "title": "Approval email",
+      "requirements": [
+        "L1-011",
+        "L1-001"
+      ],
+      "states": [
+        "default"
+      ],
+      "not_applicable": {
+        "loading": "An email is static once sent.",
+        "empty": "An email always has its message.",
+        "error": "A failed send is reported in the app, not in an email."
+      }
+    },
+    {
+      "id": "decline",
+      "kind": "email",
+      "title": "Decline email",
+      "requirements": [
+        "L1-011",
+        "L1-001"
+      ],
+      "states": [
+        "default"
+      ],
+      "not_applicable": {
+        "loading": "An email is static once sent.",
+        "empty": "An email always has its message.",
+        "error": "A failed send is reported in the app, not in an email."
+      }
     }
   ]
 }

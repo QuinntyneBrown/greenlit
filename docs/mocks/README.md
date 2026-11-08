@@ -90,6 +90,11 @@ Screenshots go to `docs/mocks/.cache/mocks/` (git-ignored via `.cache/`) with a 
 
 Legend: ✅ mock exists · ➖ not applicable (reason in manifest) · ❌ missing
 
+Emails (`emails/<name>/default.html`, with the plain-text twin beside each as `default.txt`) are the
+five messages Greenlit sends (L2-053): invitation, password reset, new request, approval and decline.
+They carry inline styles only, with values from the design tokens, because mail clients ignore
+stylesheets; the HTML is what the API's `EmailLayout` produces.
+
 States outside these columns (`failed`, `unavailable`, and the Google states `google-busy`, `google-error`, `google-unverified`, `google-new-account` on sign-in and `google-busy`, `google-mismatch`, `google-error` on accept-invite) are listed in `manifest.json` and on `index.html`.
 
 ### Pages
