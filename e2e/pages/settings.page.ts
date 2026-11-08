@@ -399,6 +399,32 @@ export class SettingsPage extends BasePage {
     return this.yourTeamsSection().locator("p").first();
   }
 
+  /** The list of teams, one row each (the region the visual spec compares). */
+  teamList(): Locator {
+    return this.yourTeamsSection().locator("ul.team-list");
+  }
+
+  /** The row under the list that holds "Add another team". */
+  yourTeamsActions(): Locator {
+    return this.yourTeamsSection().locator(".settings-actions");
+  }
+
+  /**
+   * Moves the region onto whole pixels by relative positioning (nothing else moves), so the mock and the app, whose
+   * content above it ends at different fractions of a pixel, rasterise it the same way. Applied alike to baseline and
+   * verify.
+   */
+  async alignToPixelGrid(region: Locator): Promise<void> {
+    await region.evaluate((el: HTMLElement) => {
+      const box = el.getBoundingClientRect();
+      const top = box.top + window.scrollY;
+      const left = box.left + window.scrollX;
+      el.style.position = "relative";
+      el.style.top = `${Math.ceil(top) - top}px`;
+      el.style.left = `${Math.ceil(left) - left}px`;
+    });
+  }
+
   /** The team names in the list, oldest first. */
   teamNames(): Locator {
     return this.yourTeamsSection().locator(".team-list__name");

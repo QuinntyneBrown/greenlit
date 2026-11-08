@@ -162,6 +162,13 @@ export const ROUTES = {
     guard: "auth",
     page: "settings",
   },
+  /** Settings as a manager of two teams sees it, for the Your teams region (L2-054). */
+  yourTeams: {
+    app: "/settings",
+    mock: "/pages/settings/your-teams.html?chrome=0",
+    guard: "auth",
+    page: "settings",
+  },
   signIn: {
     app: "/sign-in",
     mock: "/pages/sign-in/default.html",
