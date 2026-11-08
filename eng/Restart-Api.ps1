@@ -13,7 +13,8 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $backend = Join-Path $repoRoot 'backend'
 
 $running = Get-Process -Name dotnet, Greenlit.Api -ErrorAction SilentlyContinue |
-    Where-Object { $_.CommandLine -like '*Greenlit.Api*' }
+    # The apphost is named Greenlit.Api; CommandLine is only filled in on Linux and Windows, not macOS.
+    Where-Object { $_.ProcessName -eq 'Greenlit.Api' -or $_.CommandLine -like '*Greenlit.Api*' }
 foreach ($p in $running) {
     Write-Host "Stopping API process $($p.Id)."
     Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
