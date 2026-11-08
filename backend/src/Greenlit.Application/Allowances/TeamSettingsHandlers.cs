@@ -61,5 +61,6 @@ internal static class TeamSettings
             team.CoverageMinimum,
             await db.TeamMembers.AsNoTracking().CountAsync(m => m.TeamId == team.Id, ct),
             team.NotifyNewRequests,
-            team.NotifyDecisions);
+            team.NotifyDecisions,
+            team.SchoolCalendar);
 }

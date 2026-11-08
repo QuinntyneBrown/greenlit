@@ -262,6 +262,43 @@ export class SettingsPage extends BasePage {
     await this.newRequestsSwitch().waitFor({ state: "visible", timeout: 10_000 });
   }
 
+  // --- School calendar (docs/detailed-designs/teams/school-calendar, L2-059 to L2-062) ------------
+
+  schoolSection(): Locator {
+    return this.main.locator("section#school");
+  }
+
+  /** The "School calendar" link of the settings section nav (in the page at every width). */
+  schoolNavLink(): Locator {
+    return this.main
+      .getByRole("navigation", { name: "Settings sections", includeHidden: true })
+      .getByRole("link", { name: "School calendar", exact: true, includeHidden: true });
+  }
+
+  /** "For a family: mark children, and add the days school is closed to their rows." */
+  schoolIntro(): Locator {
+    return this.schoolSection().locator("p").first();
+  }
+
+  /** The "Use the school calendar" switch. */
+  schoolSwitch(): Locator {
+    return this.schoolSection().getByRole("switch", { name: /^Use the school calendar/ });
+  }
+
+  /** The two lines under the switch. */
+  schoolSwitchHelp(): Locator {
+    return this.schoolSection().locator("label.switch small");
+  }
+
+  /** The section's "Save changes"; it reads "Saving…" while busy. */
+  saveSchoolButton(): Locator {
+    return this.schoolSection().locator(".settings-actions .btn--primary");
+  }
+
+  saveSchoolStatus(): Locator {
+    return this.schoolSection().locator(".settings-actions [aria-live='polite']");
+  }
+
   // --- Work week & holidays (docs/detailed-designs/teams/manage-holidays) -------------------------
 
   workWeekSection(): Locator {

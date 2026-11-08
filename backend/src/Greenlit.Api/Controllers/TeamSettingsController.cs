@@ -37,4 +37,9 @@ public sealed class TeamSettingsController : ControllerBase
     [HttpPut("coverage")]
     public Task<TeamSettingsDto> SaveCoverage([FromBody] SaveCoverageCommand command, CancellationToken ct) =>
         _sender.Send(command, ct);
+
+    /// <summary>The team's school calendar switch (docs/detailed-designs/teams/school-calendar, L2-059).</summary>
+    [HttpPut("school-calendar")]
+    public Task<TeamSettingsDto> SaveSchoolCalendar([FromBody] SaveSchoolCalendarCommand command, CancellationToken ct) =>
+        _sender.Send(command, ct);
 }
