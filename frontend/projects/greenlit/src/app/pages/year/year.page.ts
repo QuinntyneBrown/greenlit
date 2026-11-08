@@ -19,7 +19,7 @@ type Load =
  * Year (pages/year, docs/detailed-designs/allowances/year-overview, L2-031, L2-032): the whole team's
  * twelve months as slivers of colour, each month a link to the calendar, and below it each person's
  * allowance. The year lives in the address (`?year=yyyy`) so it survives a reload; without it this
- * browser's current year is shown. A team of only the manager shows an empty state (as the calendar does);
+ * browser's current year is shown. A team of one shows its single row (L2-057); only a year with no rows is empty;
  * a year that cannot be loaded says so and offers Try again.
  */
 @Component({
@@ -139,7 +139,8 @@ export class YearPage {
   });
 
   /** L2-031 AC5: nobody on the team but the manager. */
-  protected readonly isEmpty = computed(() => (this.loaded()?.members.length ?? 0) <= 1);
+  /** A team of one shows its manager's row (L2-057); only a year with no rows at all is empty. */
+  protected readonly isEmpty = computed(() => (this.loaded()?.members.length ?? 0) === 0);
 
   protected readonly isManager = computed(() => this.loaded()?.isManager ?? false);
   protected readonly columns = computed(() => yearColumns(this.year()));

@@ -1,32 +1,24 @@
 // Acceptance Test
-// Traces to: L2-031 AC5, L2-031 AC6
-// Description: A team of only the manager says so and offers Settings; a year that cannot be loaded says
+// Traces to: L2-031 AC5, L2-031 AC6, L2-057 AC2
+// Description: A team of only the manager shows its one row; a year that cannot be loaded says
 //              so and Try again loads it; while loading, the headings show with placeholder rows.
 // Data: the demo seed, with the year request steered by the yearApi fixture.
 
 import { test, expect } from "../fixtures/gl-test.js";
 
 test.describe("Year states", () => {
-  test("a team of only the manager shows the empty state (L2-031 AC5)", async ({ goto, pages, yearApi }) => {
+  test("a team of only the manager shows the grid and the table with their row (L2-031 AC5, L2-057 AC2)", async ({
+    goto,
+    pages,
+    yearApi,
+  }) => {
     await yearApi.onlyMe();
     await goto("year", { year: "2026" });
     await pages.year.waitForReady();
 
-    await expect(pages.year.noticeTitle()).toHaveText("No one on the team yet");
-    await expect(pages.year.noticeText()).toHaveText("Invite your team from Settings to see their year here.");
-    await expect(pages.year.openSettings()).toBeVisible();
-    await expect(pages.year.grid()).toHaveCount(0);
-    await expect(pages.year.table()).toHaveCount(0);
-  });
-
-  test("Open settings goes to Settings (L2-031 AC5)", async ({ goto, page, pages, yearApi }) => {
-    await yearApi.onlyMe();
-    await goto("year", { year: "2026" });
-    await pages.year.waitForReady();
-
-    await pages.year.openSettings().click();
-
-    await expect(page).toHaveURL(/\/settings$/);
+    await expect(pages.year.notice()).toHaveCount(0);
+    await expect(pages.year.memberNames()).toHaveText(["Maya Chen"]);
+    await expect(pages.year.tablePeople()).toHaveText(["Maya Chen"]);
   });
 
   test("a failed load says so and Try again recovers (L2-031 AC6)", async ({ goto, pages, yearApi }) => {

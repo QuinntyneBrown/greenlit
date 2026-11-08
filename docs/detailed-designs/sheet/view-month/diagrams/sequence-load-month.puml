@@ -47,7 +47,7 @@ alt loaded
   page -> grid : Render rows, own row first, Left column, Out row
   grid --> actor : "Time off, November 2026" (L2-012 AC1, L2-013, L2-014)
 else no members
-  page --> actor : "No one on the team yet" (L2-012 AC6)
+  page --> actor : no rows at all: "No one on the team yet" (L2-012 AC6; a team of one shows its row, L2-057)
 else failed
   ctrl --> client : 500 ProblemDetails
   page --> actor : "We couldn't load the calendar" (L2-012 AC7)
