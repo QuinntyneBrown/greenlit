@@ -290,12 +290,26 @@ public class CreateTeamTests : IClassFixture<FrozenClockApiFactory>
     }
 
     [Theory]
+    [InlineData("Europe/Rome")]
+    [InlineData("America/Toronto")]
+    public async Task A_team_is_created_in_rome_or_toronto(string timeZone)
+    {
+        // L2-008 AC2: Rome (CET) and Toronto (ET) are offered.
+        var noor = await TestAccount.CreateAsync(_factory);
+
+        var created = await CreatedAsync(_factory.ClientFor(noor), Request(timeZone: timeZone));
+
+        var section = await SessionClient(created).GetFromJsonAsync<JsonElement>("/api/team/settings/team");
+        section.GetProperty("timeZone").GetString().Should().Be(timeZone);
+    }
+
+    [Theory]
     [InlineData("Europe/Berlin")]
     [InlineData("Mars/Olympus")]
     [InlineData("")]
     public async Task A_time_zone_outside_the_offered_list_is_refused(string timeZone)
     {
-        // L2-008 AC2: London, Dublin, "Paris, Berlin (CET)" and New York.
+        // L2-008 AC2: London, Dublin, "Paris, Berlin (CET)", Rome, New York and Toronto.
         var noor = await TestAccount.CreateAsync(_factory);
 
         var response = await CreateAsync(_factory.ClientFor(noor), Request(timeZone: timeZone));
