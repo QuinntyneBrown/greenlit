@@ -122,6 +122,28 @@ screen, so only the test users listed there can continue with Google in the mean
 e2e API never reach Google: `Greenlit:Google:Accounts=Fake` makes the API read made-up tokens
 (`eng/Start-E2eApi.ps1` sets it).
 
+#### Email
+
+Every email is a branded HTML message with a plain-text twin (L2-053, ADR-013). By default
+(`Greenlit:Email:Sender=Log`) the API writes the text to its log, which is how development, the
+tests and the e2e API read invitation and reset links. Production sends through Azure
+Communication Services from `Greenlit <no-reply@mail.greenlit.rocks>` (resources
+`acs-email-greenlit-prod` and `acs-greenlit-prod` in `rg-greenlit-prod`; the sender domain
+`mail.greenlit.rocks` is verified with TXT, SPF and two DKIM CNAME records at Namecheap). The API
+authenticates with its managed identity, so there is no key to keep:
+
+```bash
+# once: give the API's identity the right to send
+PID=$(az webapp identity assign -g rg-greenlit-prod -n app-greenlit-api-prod --query principalId -o tsv)
+az role assignment create --assignee-object-id "$PID" --assignee-principal-type ServicePrincipal \
+  --role Contributor --scope "$(az communication show -n acs-greenlit-prod -g rg-greenlit-prod --query id -o tsv)"
+```
+
+and the App Service settings `Greenlit__Email__Sender=Acs`,
+`Greenlit__Email__Endpoint=https://acs-greenlit-prod.unitedstates.communication.azure.com` and
+`Greenlit__Email__From=no-reply@mail.greenlit.rocks`. Mail sent to any address at greenlit.rocks
+is forwarded by Namecheap to the owner's mailbox.
+
 The API does not apply migrations on startup. Use the CLI:
 
 ```powershell
