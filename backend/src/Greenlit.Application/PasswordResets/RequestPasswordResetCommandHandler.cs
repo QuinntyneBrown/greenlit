@@ -17,13 +17,15 @@ public sealed class RequestPasswordResetCommandHandler : IRequestHandler<Request
     private readonly IAppDbContext _db;
     private readonly IEmailSender _email;
     private readonly IPasswordResetLinks _links;
+    private readonly IAppLinks _app;
     private readonly TimeProvider _time;
 
-    public RequestPasswordResetCommandHandler(IAppDbContext db, IEmailSender email, IPasswordResetLinks links, TimeProvider time)
+    public RequestPasswordResetCommandHandler(IAppDbContext db, IEmailSender email, IPasswordResetLinks links, IAppLinks app, TimeProvider time)
     {
         _db = db;
         _email = email;
         _links = links;
+        _app = app;
         _time = time;
     }
 
@@ -49,7 +51,7 @@ public sealed class RequestPasswordResetCommandHandler : IRequestHandler<Request
 
         try
         {
-            await _email.SendAsync(PasswordResetEmail.Compose(user.DisplayName, user.Email, _links.For(token)), ct);
+            await _email.SendAsync(PasswordResetEmail.Compose(user.DisplayName, user.Email, _links.For(token), _app.Origin), ct);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

@@ -62,7 +62,13 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
         services.AddSingleton<ITokenService, JwtTokenService>();
         services.AddSingleton<IPublicHolidayProvider, RuleBasedPublicHolidayProvider>();
-        services.AddSingleton<IEmailSender, LoggingEmailSender>();
+        // Email delivery (ADR-013): the log by default; Azure Communication Services when configuration asks for it.
+        services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
+        services.AddSingleton<IEmailSender>(sp =>
+            sp.GetRequiredService<IOptions<EmailOptions>>().Value.UsesAcs
+                ? ActivatorUtilities.CreateInstance<AcsEmailSender>(sp)
+                : ActivatorUtilities.CreateInstance<LoggingEmailSender>(sp));
+        services.AddSingleton<IAppLinks, AppLinks>();
         services.AddSingleton<IInvitationLinks, InvitationLinks>();
         services.AddSingleton<IPasswordResetLinks, PasswordResetLinks>();
 

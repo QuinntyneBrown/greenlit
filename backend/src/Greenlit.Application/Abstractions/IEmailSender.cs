@@ -1,7 +1,10 @@
 namespace Greenlit.Application.Abstractions;
 
-/// <summary>One plain-text email.</summary>
-public sealed record EmailMessage(string To, string Subject, string Body);
+/// <summary>
+/// One email: <paramref name="Body"/> is the plain text, <paramref name="Html"/> the branded part
+/// (L2-053). Both say the same thing and carry the same links; the log sender writes the text.
+/// </summary>
+public sealed record EmailMessage(string To, string Subject, string Body, string? Html = null);
 
 /// <summary>
 /// Sends email; implemented in Greenlit.Infrastructure. Throws when the message cannot be

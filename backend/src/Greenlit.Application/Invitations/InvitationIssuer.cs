@@ -16,11 +16,13 @@ public sealed record IssuedInvitation(Invitation Invitation, EmailMessage Email)
 public sealed class InvitationIssuer
 {
     private readonly IInvitationLinks _links;
+    private readonly IAppLinks _app;
     private readonly TimeProvider _time;
 
-    public InvitationIssuer(IInvitationLinks links, TimeProvider time)
+    public InvitationIssuer(IInvitationLinks links, IAppLinks app, TimeProvider time)
     {
         _links = links;
+        _app = app;
         _time = time;
     }
 
@@ -40,7 +42,7 @@ public sealed class InvitationIssuer
             SentUtc = now,
             ExpiresUtc = now + Invitation.Lifetime,
         };
-        return new IssuedInvitation(invitation, InvitationEmail.Compose(team.Name, managerName, member.Name, email, _links.For(token)));
+        return new IssuedInvitation(invitation, InvitationEmail.Compose(team.Name, managerName, member.Name, email, _links.For(token), _app.Origin));
     }
 
     private static string Base64Url(byte[] bytes) =>
