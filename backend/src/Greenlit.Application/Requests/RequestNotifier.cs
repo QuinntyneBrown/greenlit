@@ -15,12 +15,14 @@ public sealed class RequestNotifier
 {
     private readonly IAppDbContext _db;
     private readonly IEmailSender _email;
+    private readonly IAppLinks _links;
     private readonly ILogger<RequestNotifier> _logger;
 
-    public RequestNotifier(IAppDbContext db, IEmailSender email, ILogger<RequestNotifier> logger)
+    public RequestNotifier(IAppDbContext db, IEmailSender email, IAppLinks links, ILogger<RequestNotifier> logger)
     {
         _db = db;
         _email = email;
+        _links = links;
         _logger = logger;
     }
 
@@ -37,7 +39,7 @@ public sealed class RequestNotifier
                 .Select(u => new { u.Email, u.DisplayName }).FirstOrDefaultAsync(ct);
             if (manager is null || string.IsNullOrWhiteSpace(manager.Email)) return;
             await _email.SendAsync(
-                NewRequestEmail.Compose(manager.Email, manager.DisplayName, member.Name, request.FirstDay, request.LastDay, days, request.Note), ct);
+                NewRequestEmail.Compose(manager.Email, manager.DisplayName, member.Name, request.FirstDay, request.LastDay, days, request.Note, _links), ct);
         }
         catch (Exception ex)
         {
@@ -48,12 +50,12 @@ public sealed class RequestNotifier
     /// <summary>True when the approval email was sent; false when the member has no address or sending failed.</summary>
     public Task<bool> ApprovedAsync(Team team, string managerName, TimeOffRequest request, CancellationToken ct) =>
         SendAsync(request, "approval", address =>
-            ApprovalEmail.Compose(address, request.TeamMember.Name, managerName, request.FirstDay, request.LastDay), ct);
+            ApprovalEmail.Compose(address, request.TeamMember.Name, managerName, request.FirstDay, request.LastDay, _links), ct);
 
     /// <summary>True when the decline email, with the reason when there is one, was sent; false when the member has no address or sending failed.</summary>
     public Task<bool> DeclinedAsync(string managerName, TimeOffRequest request, CancellationToken ct) =>
         SendAsync(request, "decline", address =>
-            DeclineEmail.Compose(address, request.TeamMember.Name, managerName, request.FirstDay, request.LastDay, request.DeclineReason), ct);
+            DeclineEmail.Compose(address, request.TeamMember.Name, managerName, request.FirstDay, request.LastDay, request.DeclineReason, _links), ct);
 
     private async Task<bool> SendAsync(TimeOffRequest request, string kind, Func<string, EmailMessage> compose, CancellationToken ct)
     {
