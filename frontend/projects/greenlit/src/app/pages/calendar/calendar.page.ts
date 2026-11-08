@@ -126,7 +126,7 @@ function localMonth(): string {
       }
     </div>
     <div class="toolbar-row">
-      <gl-legend />
+      <gl-legend [schoolClosed]="schoolCalendar()" />
       @if (showPicker()) {
         <p class="text-caption">{{ hint() }}</p>
       }
@@ -321,6 +321,8 @@ export class CalendarPage {
 
   protected readonly showPicker = computed(() => this.loaded() !== null && !this.isEmpty());
   protected readonly isManager = computed(() => this.loaded()?.isManager ?? false);
+  /** The school calendar is on: the legend says what the closure icon means (L2-061 AC3). */
+  protected readonly schoolCalendar = computed(() => this.loaded()?.schoolCalendar ?? false);
   protected readonly choice = signal<PaintChoice>('select');
   protected readonly paintChoice = this.choice.asReadonly();
 

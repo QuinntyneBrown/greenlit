@@ -36,6 +36,7 @@ import { CancelRequestDialog } from "../pages/cancel-request.dialog.js";
 import { DeclineRequestDialog } from "../pages/decline-request.dialog.js";
 import { InviteMemberDialog } from "../pages/invite-member.dialog.js";
 import { AddChildDialog } from "../pages/add-child.dialog.js";
+import { DeleteClosureDialog, SchoolClosureDialog } from "../pages/school-closure.dialog.js";
 import { NewRequestDialog } from "../pages/new-request.dialog.js";
 import { MarketingPage } from "../pages/marketing.page.js";
 import { NotFoundPage } from "../pages/not-found.page.js";
@@ -69,6 +70,8 @@ interface Pages {
   createTeam: CreateTeamPage;
   inviteMember: InviteMemberDialog;
   addChild: AddChildDialog;
+  schoolClosure: SchoolClosureDialog;
+  deleteClosure: DeleteClosureDialog;
   newRequest: NewRequestDialog;
   marketing: MarketingPage;
   notFound: NotFoundPage;
@@ -1541,6 +1544,8 @@ export const test = base.extend<GlFixtures>({
       createTeam: new CreateTeamPage(page),
       inviteMember: new InviteMemberDialog(page),
       addChild: new AddChildDialog(page),
+      schoolClosure: new SchoolClosureDialog(page),
+      deleteClosure: new DeleteClosureDialog(page),
       newRequest: new NewRequestDialog(page),
       marketing: new MarketingPage(page),
       notFound: new NotFoundPage(page),

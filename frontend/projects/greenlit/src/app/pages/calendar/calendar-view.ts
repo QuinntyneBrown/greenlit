@@ -1,4 +1,4 @@
-import { CellKind, SheetCell, SheetCoverage, SheetMonth } from 'api';
+import { CellKind, SheetCell, SheetCoverage, SheetMember, SheetMonth } from 'api';
 import {
   TeamGridCell,
   TeamGridCellStatus,
@@ -111,6 +111,29 @@ export function cellFor(memberName: string, cell: SheetCell): TeamGridCell {
   };
 }
 
+/**
+ * A child's cell inside a school closure (L2-061 AC3): the closure's label joins the accessible name and the cell
+ * draws the school icon; its status and colour stay as they are (AC7). Other rows never show closures (AC4).
+ */
+export function withClosure(
+  cell: TeamGridCell,
+  member: SheetMember,
+  sheet: SheetMonth,
+): TeamGridCell {
+  if (!member.isChild) return cell;
+  const labels = (sheet.closures ?? [])
+    .filter(
+      (c) =>
+        (c.memberId === null || c.memberId === member.id) &&
+        c.firstDay <= cell.date &&
+        c.lastDay >= cell.date,
+    )
+    .map((c) => c.label);
+  if (labels.length === 0) return cell;
+  const closure = labels.join(' and ');
+  return { ...cell, closure, label: `${cell.label}, school closed: ${closure}` };
+}
+
 /** The Out row's cell for one working day (L2-014). */
 export function coverOf(day: SheetCoverage, coverageMinimum: number | null): TeamGridCover {
   const flagged = day.belowMinimum && coverageMinimum !== null;
@@ -141,7 +164,7 @@ export function calendarView(sheet: SheetMonth): CalendarView {
       editable: sheet.isManager || member.isYou,
       // L2-012 AC2: a member's own row is marked "You"; the manager's view marks no row.
       you: member.isYou && !sheet.isManager,
-      cells: member.cells.map((cell) => cellFor(member.name, cell)),
+      cells: member.cells.map((cell) => withClosure(cellFor(member.name, cell), member, sheet)),
       // A child has no allowance (L2-060 AC3): a dash named "No allowance".
       left: member.isChild ? '—' : left === null ? '–' : `${left}`,
       leftLabel: member.isChild

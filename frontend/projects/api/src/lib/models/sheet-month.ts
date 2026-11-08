@@ -1,4 +1,5 @@
 import { AllowanceFigures } from './allowance-figures';
+import { SchoolClosure } from './school-closure';
 import { WeekDay } from './week-day';
 
 /** What a day cell is (mirrors `Greenlit.Application.Sheet.CellKind`). Red days are separate from time off. */
@@ -55,4 +56,6 @@ export interface SheetMonth {
   readonly coverage: readonly SheetCoverage[];
   /** The team's school calendar is on (L2-059): children and closures show. */
   readonly schoolCalendar: boolean;
+  /** The closures that touch this month; empty while the school calendar is off (L2-061). */
+  readonly closures: readonly SchoolClosure[];
 }

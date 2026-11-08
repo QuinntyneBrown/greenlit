@@ -92,3 +92,20 @@ export async function addChild(request: APIRequestContext, manager: FreshPerson,
   if (!response.ok()) throw new Error(`Adding ${name} failed with ${response.status()}.`);
   return ((await response.json()) as { id: string }).id;
 }
+
+/** Adds a closure on `manager`'s active team (POST /api/team/closures); `memberId` null is all children. */
+export async function addClosure(
+  request: APIRequestContext,
+  manager: FreshPerson,
+  label: string,
+  firstDay: string,
+  lastDay: string,
+  memberId: string | null = null,
+): Promise<string> {
+  const response = await request.post(`${API_BASE_URL}/api/team/closures`, {
+    headers: { Authorization: `Bearer ${manager.token}` },
+    data: { label, firstDay, lastDay, memberId },
+  });
+  if (!response.ok()) throw new Error(`Adding the closure ${label} failed with ${response.status()}.`);
+  return ((await response.json()) as { id: string }).id;
+}

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 /**
  * Legend (docs/design-system/components/legend.html): what each colour on the
@@ -12,6 +12,15 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
         <li class="legend__item">
           <span class="swatch" [attr.data-status]="item.status" aria-hidden="true"></span
           >{{ item.label }}
+        </li>
+      }
+      @if (schoolClosed()) {
+        <li class="legend__item">
+          <svg class="icon legend__closure" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M2 9.5 12 5l10 4.5L12 14z" />
+            <path d="M6 11.5V16c3.5 2.5 8.5 2.5 12 0v-4.5" />
+          </svg>
+          School closed
         </li>
       }
     </ul>
@@ -32,6 +41,17 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       font: var(--text-caption);
       color: var(--color-fg-muted);
       white-space: nowrap;
+    }
+    .legend__closure {
+      width: 0.875rem;
+      height: 0.875rem;
+      flex: none;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      color: var(--color-fg-default);
     }
     .swatch {
       width: 0.75rem;
@@ -56,6 +76,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Legend {
+  /** The school calendar is on (L2-061 AC3): the legend adds "School closed" with the closure icon. */
+  readonly schoolClosed = input<boolean>(false);
   protected readonly items = [
     { status: 'confirmed', label: 'Confirmed' },
     { status: 'requested', label: 'Requested' },

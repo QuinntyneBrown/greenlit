@@ -39,6 +39,8 @@ export interface TeamGridCell {
   readonly status: TeamGridCellStatus;
   /** "{member}, {Day d Mon}: {state}": the state always travels in the name too (L2-048). */
   readonly label: string;
+  /** A school closure on a child's row (L2-061): drawn as an icon, never as a colour; the label says it too. */
+  readonly closure?: string;
 }
 
 export interface TeamGridRow {
@@ -166,7 +168,15 @@ export interface TeamGridSelection {
                   [attr.tabindex]="cell.status === 'off' ? null : isActive(r, c) ? 0 : -1"
                   [attr.aria-label]="cell.label"
                   [attr.title]="cell.label"
-                ></div>
+                  [attr.data-closure]="cell.closure ? 'true' : null"
+                >
+                  @if (cell.closure) {
+                    <svg class="icon cell__closure" aria-hidden="true" viewBox="0 0 24 24">
+                      <path d="M2 9.5 12 5l10 4.5L12 14z" />
+                      <path d="M6 11.5V16c3.5 2.5 8.5 2.5 12 0v-4.5" />
+                    </svg>
+                  }
+                </div>
               }
               @if (showLeft()) {
                 <div
@@ -379,6 +389,31 @@ export interface TeamGridSelection {
     }
     .cell[data-status='tentative']::after {
       content: '?';
+    }
+    /* A school closure on a child's row (L2-061): an icon in the corner, centred on a day with no glyph; never red. */
+    .cell[data-closure] {
+      position: relative;
+    }
+    .cell__closure {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 0.75rem;
+      height: 0.75rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.25;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      color: var(--color-on-status);
+      pointer-events: none;
+    }
+    .cell[data-status='empty'] .cell__closure,
+    .cell[data-status='off'] .cell__closure {
+      position: static;
+      width: 1rem;
+      height: 1rem;
+      color: var(--color-fg-default);
     }
     .skeleton {
       display: block;

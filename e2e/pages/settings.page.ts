@@ -279,6 +279,49 @@ export class SettingsPage extends BasePage {
     return this.memberRow(name).locator(".member-list__no-allowance");
   }
 
+  /** The list of closures, named "School closures". */
+  closureList(): Locator {
+    return this.schoolSection().getByRole("list", { name: "School closures", exact: true });
+  }
+
+  /** The closures' labels, earliest first. */
+  closureLabels(): Locator {
+    return this.closureList().locator(".closure-list__label");
+  }
+
+  /** A closure's row, by its label. */
+  closureRow(label: string): Locator {
+    return this.closureList()
+      .locator(".closure-list__item")
+      .filter({ has: this.page.locator(".closure-list__label", { hasText: new RegExp(`^${label}$`) }) });
+  }
+
+  /** "Fri 20 Nov 2026 · All children" under a closure's label. */
+  closureMeta(label: string): Locator {
+    return this.closureRow(label).locator(".closure-list__meta");
+  }
+
+  editClosure(label: string): Locator {
+    return this.schoolSection().getByRole("button", { name: `Edit ${label}`, exact: true });
+  }
+
+  deleteClosure(label: string): Locator {
+    return this.schoolSection().getByRole("button", { name: `Delete ${label}`, exact: true });
+  }
+
+  addClosureButton(): Locator {
+    return this.schoolSection().getByRole("button", { name: "Add a closure", exact: true });
+  }
+
+  importCalendarButton(): Locator {
+    return this.schoolSection().getByRole("button", { name: "Import a calendar", exact: true });
+  }
+
+  /** The empty state ("No closures yet") or the note when no one is a child. */
+  closuresNote(): Locator {
+    return this.schoolSection().locator(".empty, .closures-note");
+  }
+
   /** "Add a child", beside "Invite a member" while the school calendar is on. */
   addChildButton(): Locator {
     return this.teamSection().getByRole("button", { name: "Add a child", exact: true });
