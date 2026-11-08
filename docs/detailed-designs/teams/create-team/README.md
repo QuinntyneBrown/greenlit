@@ -37,7 +37,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **`ValidationBehavior`** — MediatR pipeline behaviour in Greenlit.Application. It runs each request's FluentValidation validator before the handler and raises `ValidationException` on failure.
 - **`IAppDbContext`** — Greenlit.Application abstraction over the EF Core context, implemented by `AppDbContext` in Greenlit.Infrastructure. Handlers read and write through it in one unit of work.
 
-**Time-zone options.** The mocks offer four options: London (GMT+0 / BST), Dublin, "Paris, Berlin (CET)" and New York (ET). They map to `Europe/London`, `Europe/Dublin`, `Europe/Paris` and `America/New_York`.
+**Time-zone options.** The mocks offer six options: London (GMT+0 / BST), Dublin, "Paris, Berlin (CET)", Rome (CET), New York (ET) and Toronto (ET). They map to `Europe/London`, `Europe/Dublin`, `Europe/Paris`, `Europe/Rome`, `America/New_York` and `America/Toronto`. Rome and Toronto keep the same clock as Paris and New York; they are offered so a team in those cities finds its own name.
 
 **Public-holiday calendars.** United Kingdom (`GB`, the bank holidays of England and Wales), Ireland (`IE`), United States (`US`, federal holidays), Canada (`CA`, the statutory holidays of Ontario), Italy (`IT`, national holidays) and "None, I'll add my own" (`none`).
 
@@ -97,7 +97,7 @@ Validation failures stop the request before any write (`L2-008` AC4). The single
 | Busy and failed states | While the request runs, the button is busy (`aria-busy="true"`, disabled) and every text field is read-only (`pages/create-team/submitting`). Any failure other than validation shows "We couldn't create your team" with "Something went wrong on our side. Nothing was saved, so you can try again." above the form, keeping every value (`pages/create-team/error`). |
 | Success | The card becomes `pages/create-team/success`: "You're all set", "Your sheet is ready.", "{team name} is ready" and "Open the calendar". With `invited` above zero the alert says "We've emailed invitations to N people…"; with none it says "Everyone is on the calendar now, and you can invite them later from Settings." (`pages/create-team/success-no-invites`, added in this journey). Until journey 5 every team shows the second. |
 | Loading state | `pages/create-team/loading` is not reached in this journey: the page needs no data before it renders. |
-| Time-zone list | Four options, as the mocks and `L2-008` AC2 show; `Europe/Berlin` is not offered on its own ("Paris, Berlin (CET)" is `Europe/Paris`). |
+| Time-zone list | Six options, as the mocks and `L2-008` AC2 show; `Europe/Berlin` is not offered on its own ("Paris, Berlin (CET)" is `Europe/Paris`). |
 | Diagrams | The `.puml` sources record this journey's shape; their PNGs are regenerated with PlantUML when a renderer is available. |
 
 ## Security and privacy
