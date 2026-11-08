@@ -20,4 +20,7 @@ public sealed class HttpCurrentUser : ICurrentUser
             return Guid.TryParse(id, out var parsed) ? parsed : null;
         }
     }
+
+    public Guid? TeamId =>
+        Guid.TryParse(_http.HttpContext?.User.FindFirstValue("team_id"), out var parsed) ? parsed : null;
 }

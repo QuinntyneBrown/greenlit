@@ -1,5 +1,6 @@
 using Greenlit.Domain.Enums;
 using Greenlit.Application.Abstractions;
+using Greenlit.Application.Teams;
 using Greenlit.Application.Exceptions;
 using Greenlit.Application.Sheet;
 using Greenlit.Domain.Entities;
@@ -17,8 +18,9 @@ internal static class RequestCaller
         IAppDbContext db, ICurrentUser currentUser, CancellationToken ct)
     {
         var userId = currentUser.UserId ?? throw new NotFoundException("Team", "the signed-in user");
+        var activeTeamId = await ActiveTeam.IdAsync(db, currentUser, ct);
         var team = await db.Teams.AsNoTracking()
-            .Where(t => t.ManagerUserId == userId || t.Members.Any(m => m.UserId == userId))
+            .Where(t => t.Id == activeTeamId && (t.ManagerUserId == userId || t.Members.Any(m => m.UserId == userId)))
             .FirstOrDefaultAsync(ct)
             ?? throw new NotFoundException("Team", "the signed-in user");
         var member = await db.TeamMembers
@@ -34,8 +36,9 @@ internal static class RequestCaller
     public static async Task<Team> FindManagedTeamAsync(IAppDbContext db, ICurrentUser currentUser, CancellationToken ct)
     {
         var userId = currentUser.UserId ?? throw new NotFoundException("Team", "the signed-in user");
+        var activeTeamId = await ActiveTeam.IdAsync(db, currentUser, ct);
         var team = await db.Teams.AsNoTracking()
-            .Where(t => t.ManagerUserId == userId || t.Members.Any(m => m.UserId == userId))
+            .Where(t => t.Id == activeTeamId && (t.ManagerUserId == userId || t.Members.Any(m => m.UserId == userId)))
             .FirstOrDefaultAsync(ct)
             ?? throw new NotFoundException("Team", "the signed-in user");
         if (team.ManagerUserId != userId)

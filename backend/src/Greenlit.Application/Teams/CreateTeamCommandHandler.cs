@@ -50,9 +50,10 @@ public sealed class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand
         var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId, ct)
             ?? throw new UnauthorizedException("unauthorized", "Sign in to create a team.");
 
-        var onATeam = await _db.Teams.AnyAsync(t => t.ManagerUserId == userId, ct)
-            || await _db.TeamMembers.AnyAsync(m => m.UserId == userId, ct);
-        if (onATeam) throw new ConflictException(TeamExists, "You're already on a team.");
+        // L2-008 AC8, ADR-014: a person on no team, or a manager, may create a team; a person who is on a team
+        // they do not manage (a member) may not.
+        var memberElsewhere = await _db.TeamMembers.AnyAsync(m => m.UserId == userId && m.Team.ManagerUserId != userId, ct);
+        if (memberElsewhere) throw new ConflictException(TeamExists, "You're already on a team.");
 
         var now = _time.GetUtcNow();
         var team = new Team

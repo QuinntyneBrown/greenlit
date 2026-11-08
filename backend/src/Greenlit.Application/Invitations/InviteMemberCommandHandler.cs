@@ -1,4 +1,5 @@
 using Greenlit.Application.Abstractions;
+using Greenlit.Application.Teams;
 using Greenlit.Application.Exceptions;
 using Greenlit.Domain.Entities;
 using Greenlit.Domain.Enums;
@@ -34,7 +35,8 @@ public sealed class InviteMemberCommandHandler : IRequestHandler<InviteMemberCom
     public async Task<InvitedMemberDto> Handle(InviteMemberCommand request, CancellationToken ct)
     {
         var userId = _currentUser.UserId ?? throw new UnauthorizedException("unauthorized", "Sign in to invite people.");
-        var team = await _db.Teams.Include(t => t.Members).SingleOrDefaultAsync(t => t.ManagerUserId == userId, ct)
+        var activeTeamId = await ActiveTeam.IdAsync(_db, _currentUser, ct);
+        var team = await _db.Teams.Include(t => t.Members).SingleOrDefaultAsync(t => t.Id == activeTeamId && t.ManagerUserId == userId, ct)
             ?? throw new ForbiddenException("forbidden", "Only the team's manager can invite people.");
 
         var name = request.Name!.Trim();

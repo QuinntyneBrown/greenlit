@@ -373,19 +373,37 @@ public class CreateTeamTests : IClassFixture<FrozenClockApiFactory>
     }
 
     [Fact]
-    public async Task A_manager_cannot_create_a_second_team()
+    public async Task A_manager_can_create_another_team_which_becomes_active_but_not_default()
     {
-        // L2-008 AC8: one team per person.
-        var team = await TestTeam.CreateAsync(_factory, "Maya Chen");
+        // L2-008 AC8 (reworded), L2-054 AC5. Given a manager of Design team, when they create Product team,
+        // then it is created, the returned session names it and opens its sheet, and Design team stays the default.
+        var design = await TestTeam.CreateAsync(_factory, "Maya Chen");
+        await design.AddMemberAsync("Ana Ruiz");
+        await design.SetDefaultTeamAsync(design.Team.Id);
 
-        var response = await CreateAsync(team.ClientFor("Maya Chen"), Request(name: "Second team"));
+        var created = await CreatedAsync(design.ClientFor("Maya Chen"), Request(name: "Product team", members:
+        [
+            new { name = "Raj Mehta", email = (string?)null },
+        ]));
 
-        await ShouldBeTeamExistsAsync(response);
+        var productId = created.GetProperty("teamId").GetGuid();
+        productId.Should().NotBe(design.Team.Id);
+        created.GetProperty("session").GetProperty("teamId").GetGuid().Should().Be(productId);
+        var month = await MonthAsync(SessionClient(created), "2026-11");
+        month.GetProperty("isManager").GetBoolean().Should().BeTrue();
+        month.GetProperty("members").EnumerateArray().Select(m => m.GetProperty("name").GetString())
+            .Should().Equal("Maya Chen", "Raj Mehta");
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<Greenlit.Infrastructure.Persistence.AppDbContext>();
+        db.Teams.Count(t => t.ManagerUserId == design.Manager.Id).Should().Be(2);
+        db.Users.Single(u => u.Id == design.Manager.Id).DefaultTeamId.Should().Be(design.Team.Id);
     }
 
     [Fact]
     public async Task A_member_with_a_row_on_a_team_cannot_create_one()
     {
+        // L2-008 AC8: a person who is on a team only as a member is refused.
         var team = await TestTeam.CreateAsync(_factory, "Maya Chen");
         await team.AddMemberAsync("Ana Ruiz");
 
@@ -395,18 +413,33 @@ public class CreateTeamTests : IClassFixture<FrozenClockApiFactory>
     }
 
     [Fact]
-    public async Task Creating_twice_keeps_only_the_first_team()
+    public async Task A_member_whose_row_says_manager_on_someone_elses_team_cannot_create_one()
     {
+        // L2-008 AC8, L2-054 AC7: the Manager role on another manager's team is not managing a team.
+        var team = await TestTeam.CreateAsync(_factory, "Maya Chen");
+        var ana = await team.AddMemberAsync("Ana Ruiz");
+        await _factory.WriteAsync(db => db.TeamMembers.Single(m => m.Id == ana.Id).Role = Greenlit.Domain.Enums.UserRole.Manager);
+
+        var response = await CreateAsync(team.ClientFor("Ana Ruiz"), Request(name: "Ana's team"));
+
+        await ShouldBeTeamExistsAsync(response);
+    }
+
+    [Fact]
+    public async Task Creating_twice_makes_two_teams_and_only_the_first_is_the_default()
+    {
+        // L2-054 AC1, AC5: the first team is the default; the second becomes active only.
         var noor = await TestAccount.CreateAsync(_factory);
         var client = _factory.ClientFor(noor);
-        await CreatedAsync(client, Request());
+        var first = await CreatedAsync(client, Request());
 
-        var again = await CreateAsync(client, Request(name: "Another team"));
+        var second = await CreatedAsync(client, Request(name: "Another team"));
 
-        await ShouldBeTeamExistsAsync(again);
+        second.GetProperty("session").GetProperty("teamId").GetGuid().Should().Be(second.GetProperty("teamId").GetGuid());
         await using var scope = _factory.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<Greenlit.Infrastructure.Persistence.AppDbContext>();
-        db.Teams.Count(t => t.ManagerUserId == noor.Id).Should().Be(1);
+        db.Teams.Count(t => t.ManagerUserId == noor.Id).Should().Be(2);
+        db.Users.Single(u => u.Id == noor.Id).DefaultTeamId.Should().Be(first.GetProperty("teamId").GetGuid());
     }
 
     [Fact]

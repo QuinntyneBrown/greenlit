@@ -29,9 +29,10 @@ public sealed class GetPersonQueryHandler : IRequestHandler<GetPersonQuery, Pers
     {
         var userId = _currentUser.UserId ?? throw new NotFoundException("Team", "the signed-in user");
 
+        var activeTeamId = await ActiveTeam.IdAsync(_db, _currentUser, ct);
         var team = await _db.Teams.AsNoTracking()
             .Include(t => t.Members)
-            .Where(t => t.ManagerUserId == userId || t.Members.Any(m => m.UserId == userId))
+            .Where(t => t.Id == activeTeamId && (t.ManagerUserId == userId || t.Members.Any(m => m.UserId == userId)))
             .FirstOrDefaultAsync(ct)
             ?? throw new NotFoundException("Team", "the signed-in user");
 
