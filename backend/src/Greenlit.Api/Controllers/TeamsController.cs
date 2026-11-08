@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Greenlit.Api.Controllers;
 
-/// <summary>Create a team (docs/detailed-designs/teams/create-team). Authenticated by the fallback policy.</summary>
+/// <summary>
+/// Create a team (docs/detailed-designs/teams/create-team) and run several (docs/detailed-designs/teams/switch-team).
+/// Authenticated by the fallback policy; the handlers decide who may do what.
+/// </summary>
 [ApiController]
 [Route("api/teams")]
 public sealed class TeamsController : ControllerBase
@@ -26,6 +29,11 @@ public sealed class TeamsController : ControllerBase
             ct);
         return StatusCode(StatusCodes.Status201Created, created);
     }
+
+    /// <summary>The teams the caller manages, oldest first, with the active and the default marked; empty for anyone else.</summary>
+    [HttpGet("mine")]
+    public async Task<ActionResult<IReadOnlyList<MyTeamDto>>> Mine(CancellationToken ct) =>
+        Ok(await _sender.Send(new GetMyTeamsQuery(), ct));
 }
 
 public sealed record CreateTeamRequest(string? Name, string? TimeZone, string? HolidayCountry, IReadOnlyList<CreateTeamMemberRequest>? Members);
