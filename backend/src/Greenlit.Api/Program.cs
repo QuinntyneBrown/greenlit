@@ -108,13 +108,6 @@ try
         await scope.ServiceProvider.GetRequiredService<AppDbContext>().EnsureSqliteSchemaAsync();
     }
 
-    // Email delivery (ADR-013): Acs needs its endpoint and From address, so a half-set configuration fails here, not on the first email.
-    var emailOptions = app.Services.GetRequiredService<IOptions<EmailOptions>>().Value;
-    if (emailOptions.UsesAcs && string.IsNullOrWhiteSpace(emailOptions.Endpoint))
-        throw new InvalidOperationException($"{EmailOptions.SectionName}:Endpoint is required when {EmailOptions.SectionName}:Sender is {EmailOptions.AcsSender}.");
-    if (emailOptions.UsesAcs && string.IsNullOrWhiteSpace(emailOptions.From))
-        throw new InvalidOperationException($"{EmailOptions.SectionName}:From is required when {EmailOptions.SectionName}:Sender is {EmailOptions.AcsSender}.");
-
     // The fake Google reader mints accounts from hand-made tokens; it is for tests and e2e runs only (ADR-012).
     if (Greenlit.Infrastructure.DependencyInjection.UsesFakeGoogle(app.Configuration) && app.Environment.IsProduction())
         throw new InvalidOperationException("Greenlit:Google:Accounts=Fake is for tests and e2e runs; Production reads accounts from Google.");

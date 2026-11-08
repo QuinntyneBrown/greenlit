@@ -63,7 +63,13 @@ public static class DependencyInjection
         services.AddSingleton<ITokenService, JwtTokenService>();
         services.AddSingleton<IPublicHolidayProvider, RuleBasedPublicHolidayProvider>();
         // Email delivery (ADR-013): the log by default; Azure Communication Services when configuration asks for it.
-        services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
+        services.AddOptions<EmailOptions>()
+            .Bind(configuration.GetSection(EmailOptions.SectionName))
+            .Validate(o => !o.UsesAcs || !string.IsNullOrWhiteSpace(o.Endpoint),
+                $"{EmailOptions.SectionName}:Endpoint is required when {EmailOptions.SectionName}:Sender is {EmailOptions.AcsSender}.")
+            .Validate(o => !o.UsesAcs || !string.IsNullOrWhiteSpace(o.From),
+                $"{EmailOptions.SectionName}:From is required when {EmailOptions.SectionName}:Sender is {EmailOptions.AcsSender}.")
+            .ValidateOnStart();
         services.AddSingleton<IEmailSender>(sp =>
             sp.GetRequiredService<IOptions<EmailOptions>>().Value.UsesAcs
                 ? ActivatorUtilities.CreateInstance<AcsEmailSender>(sp)
