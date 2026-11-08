@@ -1,10 +1,11 @@
 // Acceptance Test
-// Traces to: L2-052
+// Traces to: L2-052, L2-058 AC3
 // Description: Join with Google on the accept-invitation page: the invited Google account joins the team; another
 //              address, an unverified one, an existing account, a dead link and a failure are reported in place.
 // Data: every test invites a fresh address through the real API as the viewport's inviter (see accept-invite.spec);
 //       Google is a stand-in (fixtures/google.ts) read by the e2e API's fake accounts reader (ADR-012).
 
+import { createTeam, freshMemberOf, freshPerson, inviteTo } from "../fixtures/households.js";
 import { test, expect } from "../fixtures/gl-test.js";
 import { freshEmail, invite, join, paintDays } from "../fixtures/invitation.js";
 import { API_BASE_URL, PEOPLE, SESSION_KEY, inviterFor } from "../fixtures/session.js";
@@ -154,25 +155,26 @@ test.describe("Joining with Google", () => {
     );
   });
 
-  test("an address that already has an account is told to sign in (L2-052 AC6)", async ({
+  test("an address that already has an account joins with that account (L2-052 AC6, L2-058 AC3)", async ({
     goto,
     google,
+    page,
     pages,
-    request,
-  }, testInfo) => {
-    // Ana already has an account on the demo team; the inviter's own team can still invite her address (as "Ana R.", so the
-    // working-days spec, which keeps an "Ana Ruiz" row on that team, never meets two of her).
-    const invitation = await invite(request, inviterFor(testInfo.project.name), "Ana R.", PEOPLE.member.email);
-    await goto("acceptInvite", { token: invitation.token });
+  }) => {
+    const omar = await freshPerson(page.request, "Omar Haddad");
+    await createTeam(page.request, omar, "Product team");
+    const sam = await freshMemberOf(page.request, omar, "Sam Chen");
+    const maya = await freshPerson(page.request, "Maya Chen");
+    await createTeam(page.request, maya, "Chen family");
+    const token = await inviteTo(page.request, maya, "Sam Chen", sam.email);
+    await goto("acceptInvite", { token });
     await pages.acceptInvite.waitForReady();
-    const accept = pages.acceptInvite;
-    await google.willChoose({ email: PEOPLE.member.email, name: PEOPLE.member.name });
+    await google.willChoose({ email: sam.email, name: sam.name });
 
-    await accept.joinWithGoogle().click();
+    await pages.acceptInvite.joinWithGoogle().click();
 
-    await expect(accept.failureTitle()).toHaveText("You already have a Greenlit account");
-    await expect(accept.failureText()).toHaveText("Sign in with this email to continue.");
-    await expect(accept.goToSignIn()).toBeVisible();
+    await expect(pages.acceptInvite.lead()).toHaveText("Chen family is now one of your teams.");
+    await expect(pages.acceptInvite.welcomeText()).toHaveText("Welcome to Chen family. Your row is on the calendar.");
   });
 
   test("a link that was already used shows the expired state (L2-052 AC7)", async ({
