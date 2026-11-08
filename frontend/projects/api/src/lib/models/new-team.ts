@@ -29,7 +29,9 @@ export const TIME_ZONE_OPTIONS: readonly TeamOption[] = [
   { value: 'Europe/London', label: 'London (GMT+0 / BST)' },
   { value: 'Europe/Dublin', label: 'Dublin' },
   { value: 'Europe/Paris', label: 'Paris, Berlin (CET)' },
+  { value: 'Europe/Rome', label: 'Rome (CET)' },
   { value: 'America/New_York', label: 'New York (ET)' },
+  { value: 'America/Toronto', label: 'Toronto (ET)' },
 ];
 
 /** The public-holiday calendars the page offers (L2-008 AC2), the United Kingdom first. */

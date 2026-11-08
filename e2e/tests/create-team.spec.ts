@@ -37,7 +37,9 @@ test.describe("Creating a team, the form", () => {
       "London (GMT+0 / BST)",
       "Dublin",
       "Paris, Berlin (CET)",
+      "Rome (CET)",
       "New York (ET)",
+      "Toronto (ET)",
     ]);
     await expect(form.timeZone()).toHaveValue("Europe/London");
     expect(await form.optionLabels(form.publicHolidays())).toEqual([
