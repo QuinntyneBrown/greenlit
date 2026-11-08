@@ -17,12 +17,13 @@ public sealed record PersonDto(
     string ManagerName,
     bool IsYou,
     bool CanManage,
-    AllowanceFigures Allowance,
+    AllowanceFigures? Allowance,
     int DaysOver,
     IReadOnlyList<PersonMonthDto> Months,
     IReadOnlyList<RunDto> Upcoming,
     IReadOnlyList<RunDto> Taken,
-    IReadOnlyList<AdjustmentDto> Adjustments);
+    IReadOnlyList<AdjustmentDto> Adjustments,
+    bool IsChild);
 
 /// <summary>One allowance adjustment: days added (or removed, when negative), why, and from when.</summary>
 public sealed record AdjustmentDto(Guid Id, int Days, string Reason, DateOnly EffectiveDate);

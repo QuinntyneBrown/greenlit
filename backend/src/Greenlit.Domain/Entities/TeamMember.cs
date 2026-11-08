@@ -33,6 +33,13 @@ public class TeamMember
     /// <summary>The day they joined the team, shown on their page as "Joined Mar 2022"; null when unknown.</summary>
     public DateOnly? JoinedOn { get; set; }
 
+    /// <summary>
+    /// The manager marked this member as a child (L2-060, ADR-015): an attribute, not a role. It counts only while the
+    /// team's school calendar is on; then the member has no allowance, and a child with no email has their days
+    /// confirmed when the manager marks them.
+    /// </summary>
+    public bool IsChild { get; set; }
+
     /// <summary>When the manager removed the person (soft removal, L2-011); null while they are on the team. Their days and adjustments stay as history.</summary>
     public DateTimeOffset? RemovedUtc { get; set; }
 

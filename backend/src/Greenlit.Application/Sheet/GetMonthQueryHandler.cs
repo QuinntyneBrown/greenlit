@@ -1,6 +1,7 @@
 using System.Globalization;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Allowances;
+using Greenlit.Application.SchoolCalendar;
 using Greenlit.Application.Coverage;
 using Greenlit.Application.Exceptions;
 using Greenlit.Application.Teams;
@@ -76,9 +77,13 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
 
         var members = ordered
             .Select(m => new MemberRowDto(
-                m.Id, m.Name, Initials(m.Name), m.UserId == userId, figures[m.Id].Left, figures[m.Id],
+                // A child has no allowance and no days left (L2-060 AC3).
+                m.Id, m.Name, Initials(m.Name), m.UserId == userId,
+                SchoolCalendarRules.IsChild(team, m) ? null : figures[m.Id].Left,
+                SchoolCalendarRules.IsChild(team, m) ? null : figures[m.Id],
                 dates.Select(date => CellFor(m.Id, date, holidays, statusOf, WorkingDayRule.For(team, m))).ToList(),
-                WorkingDaysNames.ToNames(WorkingDayRule.For(team, m))))
+                WorkingDaysNames.ToNames(WorkingDayRule.For(team, m)),
+                SchoolCalendarRules.IsChild(team, m)))
             .ToList();
 
         // L2-014 AC2: on each day the team works, who is out (requested or confirmed) and who is in.
@@ -100,7 +105,8 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
             managerName,
             CoverageMinimum: CoverageFlag.Minimum(team.CoverageMinimum),
             members,
-            coverage);
+            coverage,
+            team.SchoolCalendar);
     }
 
     internal static CellDto CellFor(

@@ -37,7 +37,7 @@ internal static class TeamSection
             team.TimeZone,
             canEdit,
             await RequestCaller.ManagerNameAsync(db, team, ct),
-            rows.Select(m => new TeamSectionMemberDto(m.Id, m.Name, m.Email, (m.UserId == team.ManagerUserId ? Domain.Enums.UserRole.Manager : m.Role).ToString(), m.YearlyDays)).ToList(),
+            rows.Select(m => new TeamSectionMemberDto(m.Id, m.Name, m.Email, (m.UserId == team.ManagerUserId ? Domain.Enums.UserRole.Manager : m.Role).ToString(), m.YearlyDays, m.IsChild)).ToList(),
             team.SchoolCalendar);
     }
 }

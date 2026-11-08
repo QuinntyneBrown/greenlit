@@ -1,3 +1,4 @@
+using Greenlit.Application.SchoolCalendar;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Allowances;
 using Greenlit.Application.Coverage;
@@ -73,7 +74,8 @@ public sealed class GetRequestQueryHandler : IRequestHandler<GetRequestQuery, Re
             .Select(m => new MemberRowDto(
                 m.Id, m.Name, GetMonthQueryHandler.Initials(m.Name), m.UserId == _currentUser.UserId, DaysLeft: null, Allowance: null,
                 dates.Select(date => GetMonthQueryHandler.CellFor(m.Id, date, holidays, statusOf, WorkingDayRule.For(team, m))).ToList(),
-                WorkingDaysNames.ToNames(WorkingDayRule.For(team, m))))
+                WorkingDaysNames.ToNames(WorkingDayRule.For(team, m)),
+                SchoolCalendarRules.IsChild(team, m)))
             .ToList();
 
         var coverage = dates

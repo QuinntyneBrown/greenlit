@@ -1,3 +1,4 @@
+using Greenlit.Application.SchoolCalendar;
 using System.Globalization;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Teams;
@@ -54,6 +55,13 @@ internal sealed class DayChanger
         var isManager = team.ManagerUserId == userId;
         if (!DayChangePolicy.MayEditRow(isManager, userId, member.UserId))
             throw new ForbiddenException("not_your_row", "You can only change your own days.");
+
+        // A login-less child's days are the manager's to mark, and they are confirmed with no request (L2-060 AC4).
+        if (isManager && SchoolCalendarRules.ConfirmsDirectly(team, member))
+        {
+            targets = targets.Select(t => (t.Date, t.Target is null ? (DayStatus?)null : DayStatus.Confirmed)).ToList();
+            if (status is not null) status = DayStatus.Confirmed;
+        }
 
         var dates = targets.Select(t => t.Date).Distinct().ToList();
         var holidays = (await _db.Holidays.AsNoTracking()

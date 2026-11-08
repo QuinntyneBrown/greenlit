@@ -15,7 +15,8 @@ public sealed record YearMemberDto(
     string Initials,
     bool IsYou,
     IReadOnlyList<YearMonthDto> Months,
-    AllowanceFigures Allowance);
+    AllowanceFigures? Allowance,
+    bool IsChild);
 
 /// <summary>
 /// One month of a member's row. <c>Confirmed</c> counts confirmed working days; <c>Days</c> has one entry per
