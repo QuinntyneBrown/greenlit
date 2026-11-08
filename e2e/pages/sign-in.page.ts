@@ -56,6 +56,11 @@ export class SignInPage extends BasePage {
     return this.main.getByRole("button", { name: "Continue with Google", exact: true });
   }
 
+  /** Google's "G" mark before the Continue with Google label (L2-051 AC1). */
+  googleMark(): Locator {
+    return this.continueWithGoogle().locator("svg");
+  }
+
   /** "Set up your team now" on the panel a new Google account gets (L2-051 AC4). */
   setUpTeamNow(): Locator {
     return this.main.getByRole("link", { name: "Set up your team now", exact: true });

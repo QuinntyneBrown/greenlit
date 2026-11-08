@@ -24,7 +24,7 @@ test.describe("Joining with Google", () => {
     await ensureOwnTeam(request, inviterFor(testInfo.project.name), TEAM);
   });
 
-  test("the card offers Google above the form (L2-052 AC1)", async ({ goto, pages, request }, testInfo) => {
+  test("the card offers Google, with its G mark, above the form (L2-052 AC1)", async ({ goto, pages, request }, testInfo) => {
     const invitation = await invite(request, inviterFor(testInfo.project.name), "Finn Murphy", freshEmail("finn"));
 
     await goto("acceptInvite", { token: invitation.token });
@@ -32,6 +32,7 @@ test.describe("Joining with Google", () => {
 
     const accept = pages.acceptInvite;
     await expect(accept.joinWithGoogle()).toBeEnabled();
+    await expect(accept.googleMark()).toBeVisible();
     await expect(accept.divider()).toHaveText("or");
     await expect(accept.name()).toHaveValue("Finn Murphy");
     await expect(accept.email()).toHaveValue(invitation.email);

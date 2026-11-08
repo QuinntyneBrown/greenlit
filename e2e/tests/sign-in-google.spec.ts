@@ -15,11 +15,12 @@ test.describe("Continue with Google", () => {
     await pages.signIn.waitForReady();
   });
 
-  test("the card offers Google below the password form (L2-051 AC1)", async ({ pages }) => {
+  test("the card offers Google, with its G mark, below the password form (L2-051 AC1)", async ({ pages }) => {
     const signIn = pages.signIn;
     await expect(signIn.divider()).toHaveText("or");
     await expect(signIn.continueWithGoogle()).toBeEnabled();
     await expect(signIn.continueWithGoogle()).toHaveAttribute("type", "button");
+    await expect(signIn.googleMark()).toBeVisible();
     await expect(signIn.inviteNote()).toHaveText(
       "New here? Continue with Google to set up a team, or ask your manager to send you an invitation.",
     );
