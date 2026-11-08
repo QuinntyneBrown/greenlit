@@ -1,6 +1,19 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { ManagedTeam, SESSION_STORE, TEAM_SERVICE } from 'api';
+
+import { ToastService } from '../toasts/toast.service';
+import { TeamSwitchReuseStrategy } from './team-switch-reuse-strategy';
+
+/** What is in flight: a switch or a default change for one team. */
+export interface TeamsBusy {
+  readonly teamId: string;
+  readonly action: 'switch' | 'default';
+}
+
+/** Screens that belong to one team's person: after a switch they give way to the calendar (L2-054 AC11). */
+const PER_PERSON = /^\/(people\/[^/?#]+|person)(?=$|[?#])/;
 
 export type ManagedTeamsLoad =
   | { readonly state: 'loading' }
@@ -15,8 +28,13 @@ export type ManagedTeamsLoad =
 export class ManagedTeamsState {
   private readonly teamService = inject(TEAM_SERVICE);
   private readonly session = inject(SESSION_STORE);
+  private readonly router = inject(Router);
+  private readonly reuse = inject(TeamSwitchReuseStrategy);
+  private readonly toasts = inject(ToastService);
 
   readonly load = signal<ManagedTeamsLoad>({ state: 'loading' });
+  /** The switch or default change in flight; null when none. */
+  readonly busy = signal<TeamsBusy | null>(null);
 
   /** The teams once read; empty while loading, after a failure and for anyone who manages none. */
   readonly teams = computed(() => {
@@ -49,6 +67,58 @@ export class ManagedTeamsState {
       error: () => {
         if (this.loadedFor === token) this.load.set({ state: 'error' });
       },
+    });
+  }
+
+  /**
+   * Makes `team` the active team (L2-054 AC3): the session is replaced, the current screen is built again for the
+   * new team (a person page gives way to the calendar) and a toast says so. A failure changes nothing and says so
+   * with "Try again" (AC9).
+   */
+  switchTo(team: ManagedTeam): void {
+    if (this.busy() !== null || team.active) return;
+    const before = this.active();
+    this.busy.set({ teamId: team.id, action: 'switch' });
+    this.teamService.switchTo(team.id).subscribe(async (result) => {
+      if (!result.ok) {
+        this.busy.set(null);
+        this.toasts.show({
+          tone: 'danger',
+          title: 'We couldn’t switch teams',
+          body: before
+            ? `You’re still on ${before.name}. Check your connection and try again.`
+            : 'Nothing was changed. Check your connection and try again.',
+          action: { label: 'Try again', run: () => this.switchTo(team) },
+        });
+        return;
+      }
+      this.markActive(team.id);
+      const url = this.router.url;
+      this.reuse.remountNext();
+      try {
+        await this.router.navigateByUrl(PER_PERSON.test(url) ? '/' : url, {
+          onSameUrlNavigation: 'reload',
+        });
+      } finally {
+        this.reuse.done();
+        this.busy.set(null);
+      }
+      this.refresh(true);
+      this.toasts.show({
+        tone: 'success',
+        title: `Switched to ${team.name}`,
+        body: `The calendar, year, requests and settings now show ${team.name}.`,
+      });
+    });
+  }
+
+  /** Shows `teamId` as the active team at once, before the list is read again. */
+  private markActive(teamId: string): void {
+    const load = this.load();
+    if (load.state !== 'ready') return;
+    this.load.set({
+      state: 'ready',
+      teams: load.teams.map((t) => ({ ...t, active: t.id === teamId })),
     });
   }
 }

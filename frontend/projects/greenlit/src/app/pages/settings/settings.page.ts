@@ -344,7 +344,12 @@ type HolidaysLoad =
         }
         @if (isManager()) {
           <section id="teams" class="settings-section" aria-labelledby="teams-title">
-            <app-your-teams-section [load]="managedTeams.load()" (retry)="managedTeams.refresh()" />
+            <app-your-teams-section
+              [load]="managedTeams.load()"
+              [busy]="managedTeams.busy()"
+              (retry)="managedTeams.refresh()"
+              (switchTo)="managedTeams.switchTo($event)"
+            />
           </section>
         }
       </div>

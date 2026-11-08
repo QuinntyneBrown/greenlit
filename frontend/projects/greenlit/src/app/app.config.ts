@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import { RouteReuseStrategy, provideRouter, withInMemoryScrolling } from '@angular/router';
 
 import {
   ACCOUNT_SERVICE,
@@ -45,6 +45,7 @@ import {
 
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
+import { TeamSwitchReuseStrategy } from './teams/team-switch-reuse-strategy';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -64,6 +65,8 @@ export const appConfig: ApplicationConfig = {
     ),
     { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
     { provide: GOOGLE_CLIENT_ID, useValue: environment.googleClientId },
+    // A team switch builds the current screen again for the new team (teams/switch-team).
+    { provide: RouteReuseStrategy, useExisting: TeamSwitchReuseStrategy },
 
     // Composition root: pages depend on service tokens from `api`; the
     // production host binds each token to its real implementation here.

@@ -90,3 +90,65 @@ test.describe("Your teams", () => {
     await expect(pages.settings.teamNames()).toHaveText(["Design team", "Product team"]);
   });
 });
+
+test.describe("Switching teams from Your teams", () => {
+  test.beforeEach(async ({ goto, pages, request }, testInfo) => {
+    const juggler = jugglerFor(testInfo.project.name);
+    await resetTeams(request, juggler);
+    await goto("settings", { as: juggler });
+    await pages.settings.waitForTeams();
+  });
+
+  test("Switch to this team makes it active, says so, and every screen shows that team only (AC3)", async ({
+    pages,
+    teamsApi,
+  }) => {
+    await expect(pages.settings.teamNameField()).toHaveValue("Design team");
+    const release = await teamsApi.holdSwitch();
+
+    await pages.settings.switchToTeamButton("Product team").click();
+
+    await expect(pages.settings.switchToTeamButton("Product team")).toHaveText("Switching…");
+    await expect(pages.settings.makeDefaultButton("Product team")).toBeDisabled();
+    release();
+    await expect(pages.settings.toast("Switched to Product team")).toBeVisible();
+    await expect(pages.settings.toastText("Switched to Product team")).toHaveText(
+      "The calendar, year, requests and settings now show Product team.",
+    );
+    await expect(pages.settings.teamNameField()).toHaveValue("Product team");
+    await expect(pages.settings.memberNames()).toContainText(["Raj Mehta"]);
+    await expect(pages.settings.memberNames()).not.toContainText(["Kit Brown"]);
+    await expect(pages.settings.teamMarks("Product team")).toHaveText(["Active"]);
+    await expect(pages.settings.teamMarks("Design team")).toHaveText(["Default"]);
+
+    await pages.settings.openFromMainNav("Calendar");
+    await pages.calendar.waitForReady();
+    await expect(pages.calendar.memberNames()).toContainText(["Raj Mehta"]);
+    await expect(pages.calendar.memberNames()).not.toContainText(["Kit Brown"]);
+    await pages.calendar.openFromMainNav("Year");
+    await pages.year.waitForReady();
+    await expect(pages.year.memberNames()).toContainText(["Raj Mehta"]);
+    await expect(pages.year.memberNames()).not.toContainText(["Kit Brown"]);
+  });
+
+  test("a failed switch says so, keeps the team, and Try again switches (AC9)", async ({ pages, teamsApi }) => {
+    await teamsApi.failSwitch();
+
+    await pages.settings.switchToTeamButton("Product team").click();
+
+    const title = "We couldn’t switch teams";
+    await expect(pages.settings.toast(title)).toBeVisible();
+    await expect(pages.settings.toastText(title)).toHaveText(
+      "You’re still on Design team. Check your connection and try again.",
+    );
+    await expect(pages.settings.teamNameField()).toHaveValue("Design team");
+    await expect(pages.settings.teamMarks("Design team")).toHaveText(["Active", "Default"]);
+    await expect(pages.settings.switchToTeamButton("Product team")).toBeEnabled();
+
+    await teamsApi.recoverSwitch();
+    await pages.settings.toastAction(title, "Try again").click();
+
+    await expect(pages.settings.toast("Switched to Product team")).toBeVisible();
+    await expect(pages.settings.teamNameField()).toHaveValue("Product team");
+  });
+});
