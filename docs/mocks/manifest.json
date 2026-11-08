@@ -97,7 +97,9 @@
       "kind": "page",
       "title": "Create team",
       "requirements": [
-        "L1-001"
+        "L1-001",
+        "L2-008",
+        "L2-054"
       ],
       "states": [
         "default",
@@ -106,7 +108,8 @@
         "invalid",
         "submitting",
         "success",
-        "success-no-invites"
+        "success-no-invites",
+        "another"
       ],
       "route": "/create-team",
       "not_applicable": {
@@ -121,7 +124,8 @@
         "L1-002",
         "L1-003",
         "L1-004",
-        "L1-007"
+        "L1-007",
+        "L2-054"
       ],
       "states": [
         "default",
@@ -134,7 +138,8 @@
         "over-allowance",
         "coverage-short",
         "other-month",
-        "offline"
+        "offline",
+        "several-teams"
       ],
       "route": "/"
     },
@@ -143,7 +148,8 @@
       "kind": "page",
       "title": "Year",
       "requirements": [
-        "L1-002"
+        "L1-002",
+        "L2-054"
       ],
       "states": [
         "default",
@@ -151,7 +157,8 @@
         "empty",
         "error",
         "member",
-        "sorted"
+        "sorted",
+        "several-teams"
       ],
       "route": "/year"
     },
@@ -161,7 +168,8 @@
       "title": "Requests",
       "requirements": [
         "L1-003",
-        "L1-004"
+        "L1-004",
+        "L2-054"
       ],
       "states": [
         "default",
@@ -174,7 +182,8 @@
         "bulk",
         "member",
         "member-empty",
-        "long"
+        "long",
+        "several-teams"
       ],
       "route": "/requests"
     },
@@ -209,7 +218,8 @@
       "requirements": [
         "L1-001",
         "L1-005",
-        "L1-006"
+        "L1-006",
+        "L2-054"
       ],
       "states": [
         "default",
@@ -219,7 +229,12 @@
         "invalid",
         "submitting",
         "success",
-        "holidays-empty"
+        "holidays-empty",
+        "your-teams",
+        "your-teams-single",
+        "your-teams-loading",
+        "your-teams-switching",
+        "your-teams-error"
       ],
       "route": "/settings",
       "not_applicable": {
@@ -530,6 +545,26 @@
       }
     },
     {
+      "id": "team-switcher",
+      "kind": "dialog",
+      "title": "Team switcher",
+      "requirements": [
+        "L2-054",
+        "L2-049"
+      ],
+      "states": [
+        "default",
+        "closed",
+        "busy",
+        "failed",
+        "absent"
+      ],
+      "opens_from": "calendar",
+      "not_applicable": {
+        "invalid": "A menu has no inputs."
+      }
+    },
+    {
       "id": "sign-out",
       "kind": "dialog",
       "title": "Sign out",
@@ -595,6 +630,24 @@
         "with-action"
       ],
       "opens_from": "settings"
+    },
+    {
+      "id": "team-toast",
+      "kind": "notification",
+      "title": "Team toast",
+      "requirements": [
+        "L2-054"
+      ],
+      "states": [
+        "success",
+        "info",
+        "danger",
+        "danger-default"
+      ],
+      "opens_from": "settings",
+      "not_applicable": {
+        "warning": "Switching teams and changing the default have no warning outcome: they go through or nothing changes."
+      }
     },
     {
       "id": "offline-banner",

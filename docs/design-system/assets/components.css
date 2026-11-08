@@ -439,6 +439,30 @@ main.shell { padding-block: var(--space-8); }
 .user-menu__who { padding: var(--space-2) var(--space-3); }
 .user-menu__who strong { display: block; font: var(--text-label); }
 .user-menu__who span { font: var(--text-caption); color: var(--color-fg-muted); }
+/* Team switcher (components/team-switcher.html): the active team's name as a menu button, for a manager of two or more teams (L2-054 AC11). */
+.team-switch { position: relative; min-width: 0; }
+.team-switch__btn { display: inline-flex; align-items: center; gap: var(--space-2); max-width: 11rem; min-height: var(--control-height-sm); padding: 0 var(--space-2) 0 var(--space-3); border: 1px solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-bg-surface); color: var(--color-fg-default); font: var(--text-label); cursor: pointer; }
+@media (min-width: 40rem) { .team-switch__btn { max-width: 16rem; } }
+.team-switch__btn:hover, .team-switch__btn[aria-expanded="true"] { background: var(--color-bg-subtle); }
+.team-switch__btn:focus-visible { outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset, 2px); }
+.team-switch__btn[aria-busy="true"] { cursor: progress; }
+.team-switch__name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.team-switch__btn .spinner { width: 1rem; height: 1rem; flex: none; }
+.team-switch .menu { right: 0; top: 100%; min-width: 16rem; transform-origin: top right; }
+.menu__label { padding: var(--space-2) var(--space-3) var(--space-1); font: var(--text-overline); letter-spacing: var(--letter-spacing-wide); text-transform: uppercase; color: var(--color-fg-muted); }
+.menu__check { flex: none; visibility: hidden; color: var(--color-success-fg); }
+.menu__item[aria-checked="true"] { font-weight: var(--font-weight-semibold); }
+.menu__item[aria-checked="true"] .menu__check { visibility: visible; }
+.menu__meta { margin-left: auto; font: var(--text-caption); color: var(--color-fg-muted); }
+/* Your teams (L2-054): one row per team the manager manages, with Active and Default marks in text and icon. */
+.team-list { list-style: none; margin: var(--space-6) 0 0; padding: 0; border: 1px solid var(--color-border-default); border-radius: var(--radius-lg); background: var(--color-bg-surface); }
+.team-list__item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); padding: var(--space-3) var(--space-4); }
+.team-list__item + .team-list__item { border-top: 1px solid var(--color-border-default); }
+.team-list__name { font: var(--text-label); color: var(--color-fg-default); }
+.team-list__marks { display: inline-flex; flex-wrap: wrap; gap: var(--space-2); }
+.team-list__actions { display: inline-flex; flex-wrap: wrap; gap: var(--space-2); margin-left: auto; }
+.badge--icon::before { display: none; }
+.badge--icon .icon { width: 0.75rem; height: 0.75rem; }
 
 /* ---------- Page furniture ------------------------------------------------------- */
 .page-title-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); }
