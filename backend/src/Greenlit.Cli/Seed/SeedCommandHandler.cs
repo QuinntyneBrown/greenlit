@@ -62,6 +62,21 @@ public sealed class SeedCommandHandler
         ("Zoe Lind", "zoe@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000110")),
     ];
 
+    /// <summary>
+    /// Managers of two teams each (L2-054, docs/detailed-designs/teams/switch-team): Design team, created first and
+    /// their default, and Product team. One per e2e viewport, because "Make default" changes stored data; Maya Chen
+    /// and the demo team stay as the mocks show them.
+    /// </summary>
+    private static readonly (string Name, string Email, Guid UserId)[] MultiTeamManagers =
+    [
+        ("Hana Ito", "hana@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000201")),
+        ("Iris Novak", "iris@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000202")),
+        ("Jude Owens", "jude@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000203")),
+    ];
+
+    /// <summary>Each multi-team manager's teams, oldest first, with the one name-only member that tells them apart on the sheet.</summary>
+    private static readonly (string Team, string Member)[] MultiTeams = [("Design team", "Kit Brown"), ("Product team", "Raj Mehta")];
+
     /// <summary>The mocks' job titles and join dates (docs/mocks/README.md); the person page shows them.</summary>
     private static readonly (string Member, string JobTitle, DateOnly JoinedOn)[] Details =
     [
@@ -138,7 +153,7 @@ public sealed class SeedCommandHandler
     {
         var now = DateTimeOffset.UtcNow;
 
-        foreach (var (name, email, userId) in Cast.Concat(Newcomers))
+        foreach (var (name, email, userId) in Cast.Concat(Newcomers).Concat(MultiTeamManagers))
         {
             var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId, ct);
             if (user is null)
@@ -148,7 +163,7 @@ public sealed class SeedCommandHandler
                     Id = userId,
                     Email = email,
                     DisplayName = name,
-                    Role = userId == MayaUserId ? UserRole.Manager : UserRole.Member,
+                    Role = userId == MayaUserId || MultiTeamManagers.Any(m => m.UserId == userId) ? UserRole.Manager : UserRole.Member,
                     CreatedUtc = now,
                 };
                 _db.Users.Add(user);
@@ -177,6 +192,8 @@ public sealed class SeedCommandHandler
         }
 
         team.HolidayCountry ??= "GB";
+        var maya = await _db.Users.FindAsync([MayaUserId], ct);
+        maya!.DefaultTeamId ??= team.Id;
 
         for (var order = 0; order < Cast.Length; order++)
         {
@@ -217,9 +234,41 @@ public sealed class SeedCommandHandler
         await SeedRequestsAsync(team, ct);
         await SeedHistoryAsync(team, now, ct);
 
+        await SeedMultiTeamManagersAsync(now, ct);
+
         var written = await _db.SaveChangesAsync(ct);
         _logger.LogInformation("Seed complete ({Rows} rows written).", written);
         return 0;
+    }
+
+    /// <summary>Each multi-team manager's two teams, looked up by manager and name, and their default (Design team) when unset.</summary>
+    private async Task SeedMultiTeamManagersAsync(DateTimeOffset now, CancellationToken ct)
+    {
+        foreach (var (name, email, userId) in MultiTeamManagers)
+        {
+            var user = await _db.Users.FindAsync([userId], ct);
+            for (var i = 0; i < MultiTeams.Length; i++)
+            {
+                var (teamName, memberName) = MultiTeams[i];
+                var team = await _db.Teams.Include(t => t.Members)
+                    .SingleOrDefaultAsync(t => t.ManagerUserId == userId && t.Name == teamName, ct);
+                if (team is null)
+                {
+                    team = new Team
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = teamName,
+                        ManagerUserId = userId,
+                        TimeZone = "Europe/London",
+                        CreatedUtc = now.AddMinutes(i),
+                    };
+                    team.Members.Add(new TeamMember { Id = Guid.NewGuid(), Name = name, Email = email, UserId = userId, SortOrder = 0 });
+                    team.Members.Add(new TeamMember { Id = Guid.NewGuid(), Name = memberName, SortOrder = 1 });
+                    _db.Teams.Add(team);
+                }
+                if (i == 0) user!.DefaultTeamId ??= team.Id;
+            }
+        }
     }
 
     /// <summary>

@@ -22,13 +22,13 @@ public class SeedCommandHandlerTests
         var options = await SeedTwiceAsync();
 
         await using var read = new AppDbContext(options);
-        var team = await read.Teams.Include(t => t.Members).SingleAsync();
+        var team = await read.Teams.Include(t => t.Members).SingleAsync(t => t.ManagerUserId == SeedCommandHandler.MayaUserId);
         team.Name.Should().Be(SeedCommandHandler.DemoTeamName);
         team.TimeZone.Should().Be("Europe/London");
         team.Members.OrderBy(m => m.SortOrder).Select(m => m.Name).Should().Equal(
             "Maya Chen", "Ana Ruiz", "Ben Okafor", "Cleo Park", "Dev Patel", "Elif Yılmaz", "Finn Murphy");
-        (await read.Users.CountAsync()).Should().Be(17);
-        (await read.Holidays.CountAsync()).Should().Be(8);
+        (await read.Users.CountAsync()).Should().Be(20);
+        (await read.Holidays.CountAsync(h => h.TeamId == team.Id)).Should().Be(8);
     }
 
     [Fact]
@@ -38,7 +38,7 @@ public class SeedCommandHandlerTests
         var options = await SeedTwiceAsync();
 
         await using var read = new AppDbContext(options);
-        (await read.Teams.SingleAsync()).CoverageMinimum.Should().Be(4);
+        (await read.Teams.SingleAsync(t => t.Name == SeedCommandHandler.DemoTeamName && t.ManagerUserId == SeedCommandHandler.MayaUserId)).CoverageMinimum.Should().Be(4);
     }
 
     [Fact]
@@ -47,8 +47,8 @@ public class SeedCommandHandlerTests
         var options = await SeedTwiceAsync();
 
         await using var read = new AppDbContext(options);
-        var team = await read.Teams.SingleAsync();
-        team.ManagerUserId.Should().Be(SeedCommandHandler.MayaUserId);
+        var team = await read.Teams.SingleAsync(t => t.ManagerUserId == SeedCommandHandler.MayaUserId);
+        team.Name.Should().Be(SeedCommandHandler.DemoTeamName);
         var ana = await read.TeamMembers.SingleAsync(m => m.Name == "Ana Ruiz");
         ana.UserId.Should().Be(SeedCommandHandler.AnaUserId);
         (await read.Users.SingleAsync(u => u.Id == SeedCommandHandler.MayaUserId)).Email.Should().Be(SeedCommandHandler.DemoManagerEmail);
@@ -61,7 +61,7 @@ public class SeedCommandHandlerTests
         var options = await SeedTwiceAsync();
 
         await using var read = new AppDbContext(options);
-        var members = await read.TeamMembers.ToListAsync();
+        var members = await read.TeamMembers.Where(m => m.Team.ManagerUserId == SeedCommandHandler.MayaUserId).ToListAsync();
         members.Single(m => m.Name == "Maya Chen").JobTitle.Should().Be("Design Lead");
         var ana = members.Single(m => m.Name == "Ana Ruiz");
         ana.JobTitle.Should().Be("Product Designer");
@@ -88,6 +88,29 @@ public class SeedCommandHandlerTests
     }
 
     [Fact]
+    public async Task Three_managers_each_run_design_team_and_product_team_with_design_team_the_default()
+    {
+        // L2-054: the e2e specs switch teams and change the default, one manager per viewport, never Maya.
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        foreach (var email in new[] { "hana@northwind.studio", "iris@northwind.studio", "jude@northwind.studio" })
+        {
+            var user = await read.Users.SingleAsync(u => u.Email == email);
+            var teams = (await read.Teams.Include(t => t.Members).Where(t => t.ManagerUserId == user.Id).ToListAsync())
+                .OrderBy(t => t.CreatedUtc).ToList();
+            teams.Select(t => t.Name).Should().Equal("Design team", "Product team");
+            teams.Should().OnlyContain(t => t.Members.Any(m => m.UserId == user.Id && m.SortOrder == 0));
+            teams[0].Members.Select(m => m.Name).Should().Contain("Kit Brown");
+            teams[1].Members.Select(m => m.Name).Should().Contain("Raj Mehta");
+            user.DefaultTeamId.Should().Be(teams[0].Id);
+            user.Role.Should().Be(UserRole.Manager);
+        }
+        (await read.Users.SingleAsync(u => u.Id == SeedCommandHandler.MayaUserId)).DefaultTeamId
+            .Should().Be((await read.Teams.SingleAsync(t => t.ManagerUserId == SeedCommandHandler.MayaUserId)).Id);
+    }
+
+    [Fact]
     public async Task Every_demo_account_signs_in_with_the_demo_password()
     {
         // Journey 2: the e2e suite signs in through the sign-in page as a seeded person.
@@ -96,7 +119,7 @@ public class SeedCommandHandlerTests
         await using var read = new AppDbContext(options);
         var hasher = new IdentityPasswordHasher();
         var users = await read.Users.ToListAsync();
-        users.Should().HaveCount(17).And.OnlyContain(u => hasher.Verify(u, u.PasswordHash, SeedCommandHandler.DemoPassword));
+        users.Should().HaveCount(20).And.OnlyContain(u => hasher.Verify(u, u.PasswordHash, SeedCommandHandler.DemoPassword));
         users.Select(u => u.PasswordHash).Should().OnlyHaveUniqueItems("each hash has its own salt");
     }
 
@@ -150,7 +173,7 @@ public class SeedCommandHandlerTests
         var options = await SeedTwiceAsync();
 
         await using var read = new AppDbContext(options);
-        var people = await read.TeamMembers.Include(m => m.Adjustments).Where(m => m.Team.Name == SeedCommandHandler.DemoTeamName)
+        var people = await read.TeamMembers.Include(m => m.Adjustments).Where(m => m.Team.Name == SeedCommandHandler.DemoTeamName && m.Team.ManagerUserId == SeedCommandHandler.MayaUserId)
             .ToListAsync();
         people.Select(m => (m.Name, m.YearlyDays, Adjusted: m.Adjustments.Sum(a => a.Days))).Should().BeEquivalentTo(new[]
         {
