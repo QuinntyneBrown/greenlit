@@ -17,13 +17,16 @@ let nextId = 0;
         role="switch"
         [checked]="checked()"
         [disabled]="disabled()"
-        [attr.aria-describedby]="description() ? descriptionId : null"
+        [attr.aria-describedby]="describedBy()"
         (change)="toggle($event)"
       />
       <span class="choice__text">
         <span class="choice__label">{{ label() }}</span>
         @if (description()) {
           <small [id]="descriptionId" class="text-muted">{{ description() }}</small>
+        }
+        @if (note()) {
+          <small [id]="noteId" class="text-muted">{{ note() }}</small>
         }
       </span>
     </label>
@@ -94,10 +97,21 @@ let nextId = 0;
 export class Switch {
   readonly label = input.required<string>();
   readonly description = input<string>('');
+  /** A second line under the description, e.g. what turning it off does (pages/settings/school-calendar). */
+  readonly note = input<string>('');
   readonly checked = model<boolean>(false);
   readonly disabled = input<boolean>(false);
 
-  protected readonly descriptionId = `gl-switch-description-${nextId++}`;
+  protected readonly descriptionId = `gl-switch-description-${nextId}`;
+  protected readonly noteId = `gl-switch-note-${nextId++}`;
+
+  protected describedBy(): string | null {
+    const ids = [
+      this.description() ? this.descriptionId : '',
+      this.note() ? this.noteId : '',
+    ].filter(Boolean);
+    return ids.length ? ids.join(' ') : null;
+  }
 
   protected toggle(event: Event): void {
     this.checked.set((event.target as HTMLInputElement).checked);

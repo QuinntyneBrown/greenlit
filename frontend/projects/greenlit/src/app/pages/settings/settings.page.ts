@@ -55,6 +55,7 @@ import { AllowancesSection } from './allowances-section';
 import { TeamSection } from './team-section';
 import { YourTeamsSection } from './your-teams-section';
 import { ManagedTeamsState } from '../../teams/managed-teams';
+import { SchoolCalendarSection } from './school-calendar-section';
 
 type Load =
   | { readonly state: 'loading' }
@@ -89,6 +90,7 @@ type HolidaysLoad =
     Switch,
     TeamSection,
     YourTeamsSection,
+    SchoolCalendarSection,
   ],
   template: `
     @if (review(); as review) {
@@ -347,6 +349,15 @@ type HolidaysLoad =
             </div>
           </section>
         }
+        @if (team(); as loadedTeam) {
+          <section id="school" class="settings-section" aria-labelledby="school-title">
+            <app-school-calendar-section
+              [on]="schoolCalendarOn()"
+              [canEdit]="loadedTeam.canEdit"
+              (saved)="savedSchoolCalendar.set($event)"
+            />
+          </section>
+        }
         @if (managesATeam()) {
           <section id="teams" class="settings-section" aria-labelledby="teams-title">
             <app-your-teams-section
@@ -523,10 +534,16 @@ export class SettingsPage {
           { id: 'notifications', label: 'Notifications' },
         ]
       : []),
+    { id: 'school', label: 'School calendar' },
     ...(this.managesATeam() ? [{ id: 'teams', label: 'Your teams' }] : []),
   ]);
 
   protected readonly isManager = computed(() => this.ready()?.isManager ?? false);
+  /** The school calendar as last saved here, until the page loads again (L2-059). */
+  protected readonly savedSchoolCalendar = signal<boolean | null>(null);
+  protected readonly schoolCalendarOn = computed(
+    () => this.savedSchoolCalendar() ?? this.team()?.schoolCalendar ?? false,
+  );
   /** "Your teams" is for a person who manages a team, whatever their role on the active one (L2-054 AC7, ADR-015). */
   protected readonly managesATeam = computed(
     () => this.isManager() || this.managedTeams.managed().length > 0,

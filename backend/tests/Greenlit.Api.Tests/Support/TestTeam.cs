@@ -302,6 +302,16 @@ public static class GreenlitApiFactoryExtensions
         await db.SaveChangesAsync();
     }
 
+    /// <summary>GETs <paramref name="path"/> with <paramref name="client"/>, expects 200 and returns the JSON body.</summary>
+    public static async Task<System.Text.Json.JsonElement> GetJsonAsync(this GreenlitApiFactory factory, HttpClient client, string path)
+    {
+        _ = factory;
+        var response = await client.GetAsync(path);
+        if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            throw new InvalidOperationException($"GET {path} answered {(int)response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
+        return await System.Net.Http.Json.HttpContentJsonExtensions.ReadFromJsonAsync<System.Text.Json.JsonElement>(response.Content);
+    }
+
     /// <summary>A client carrying a bearer token signed with the test key for <paramref name="user"/>.</summary>
     public static HttpClient ClientFor(this GreenlitApiFactory factory, User user)
     {

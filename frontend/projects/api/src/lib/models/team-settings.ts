@@ -18,6 +18,8 @@ export interface TeamSettingsTeam {
   readonly managerName: string;
   /** In sheet order. */
   readonly members: readonly TeamSettingsMember[];
+  /** The team's school calendar is on (L2-059): Settings shows children and closures. */
+  readonly schoolCalendar: boolean;
 }
 
 /** What the manager entered in the Team section. */

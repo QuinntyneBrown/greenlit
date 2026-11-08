@@ -43,6 +43,12 @@ public class Team
     /// <summary>The weekdays the team works; the others are red for every row (teams/working-days).</summary>
     public WorkingDays WorkingDays { get; set; } = WorkingDays.MonToFri;
 
+    /// <summary>
+    /// The school calendar (L2-059, ADR-015): off by default; while on, the manager marks children and records school
+    /// closures. Turning it off hides them and keeps them.
+    /// </summary>
+    public bool SchoolCalendar { get; set; }
+
     public ICollection<TeamMember> Members { get; set; } = new List<TeamMember>();
     public ICollection<Holiday> Holidays { get; set; } = new List<Holiday>();
 }
