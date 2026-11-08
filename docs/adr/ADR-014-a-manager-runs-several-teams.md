@@ -1,6 +1,6 @@
 # ADR-014: A manager runs several teams; the session names the active one and the account remembers the default
 
-**Status:** Accepted
+**Status:** Accepted; partly superseded by [ADR-015](ADR-015-a-person-on-several-teams-and-the-school-calendar.md) (a member may be on several teams, anyone may create a team, the list and the switch cover every team a person belongs to)
 **Date:** 2026-11-08
 
 ## Context
@@ -36,7 +36,7 @@ I am on" lookup becomes ambiguous, so the active team has to come from somewhere
   member row's team, else no team. The migration `AddDefaultTeam` back-fills each existing
   manager's earliest team as their default; SQLite (tests and the e2e API) gets the column from the
   model, and the fallback makes the back-fill a convenience rather than a requirement.
-- **Who may create another team.** A person on no team, as before, or a person who manages at
+- **Who may create another team.** *(Superseded by ADR-015: anyone may create a team.)* A person on no team, as before, or a person who manages at
   least one team and has no live row on a team they do not manage. A person who is on a team only
   as a member still gets `409 team_exists`, "You're already on a team." The new team becomes the
   active team (its session is returned) and does not become the default unless it is the first.
@@ -44,6 +44,8 @@ I am on" lookup becomes ambiguous, so the active team has to come from somewhere
   `404` with the code `team_not_found`, the same for another manager's team, a team the caller is
   only a member of, and an id no team has, so the answer reveals nothing about other teams.
   `GET /api/teams/mine` lists only the teams the caller manages and is empty for everyone else.
+  *(Superseded by ADR-015: switching accepts any team the caller has a live row on, and the list
+  holds every such team with a `manages` flag; making a default still needs a managed team.)*
 
 ## Alternatives rejected
 
