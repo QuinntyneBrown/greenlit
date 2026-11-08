@@ -35,6 +35,11 @@ export class CalendarPage extends BasePage {
     return control(this.main, "Today");
   }
 
+  /** The legend list, for the visual comparison. */
+  legend(): Locator {
+    return this.main.getByRole("list", { name: "Legend" });
+  }
+
   legendItems(): Locator {
     return this.main.getByRole("list", { name: "Legend" }).locator(".legend__item");
   }

@@ -43,8 +43,8 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       white-space: nowrap;
     }
     .legend__closure {
-      width: 0.875rem;
-      height: 0.875rem;
+      width: 1rem;
+      height: 1rem;
       flex: none;
       fill: none;
       stroke: currentColor;

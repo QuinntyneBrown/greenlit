@@ -169,6 +169,20 @@ export const ROUTES = {
     guard: "auth",
     page: "settings",
   },
+  /** Settings of Chen family with the school calendar on, for the closure list region (L2-061). */
+  schoolCalendarSettings: {
+    app: "/settings",
+    mock: "/pages/settings/school-calendar.html?chrome=0",
+    guard: "auth",
+    page: "settings",
+  },
+  /** The calendar of Chen family with closures on the children's rows (L2-061). */
+  schoolCalendarSheet: {
+    app: "/",
+    mock: "/pages/calendar/school-calendar.html?chrome=0",
+    guard: "auth",
+    page: "calendar",
+  },
   signIn: {
     app: "/sign-in",
     mock: "/pages/sign-in/default.html",
