@@ -37,6 +37,10 @@ export const PEOPLE = {
   "remover-mobile": { name: "Xavi Moreno", email: "xavi@northwind.studio" },
   "remover-tablet": { name: "Yara Khan", email: "yara@northwind.studio" },
   "remover-desktop": { name: "Zoe Lind", email: "zoe@northwind.studio" },
+  /** Manage Design team (their default) and Product team for the several-teams specs (L2-054), one per viewport (see `jugglerFor`). */
+  "juggler-mobile": { name: "Hana Ito", email: "hana@northwind.studio" },
+  "juggler-tablet": { name: "Iris Novak", email: "iris@northwind.studio" },
+  "juggler-desktop": { name: "Jude Owens", email: "jude@northwind.studio" },
 } as const;
 
 export type Person = keyof typeof PEOPLE;
@@ -68,6 +72,16 @@ export function inviterFor(project: string): Person {
 export function removerFor(project: string): Person {
   const person = `remover-${project}`;
   if (!(person in PEOPLE)) throw new Error(`No seeded remover for the '${project}' project.`);
+  return person as Person;
+}
+
+/**
+ * The manager of two teams in this viewport's project (L2-054). "Make default" changes stored data, so each viewport
+ * has its own; the specs put Design team back as the default and the active team before they start.
+ */
+export function jugglerFor(project: string): Person {
+  const person = `juggler-${project}`;
+  if (!(person in PEOPLE)) throw new Error(`No seeded manager of several teams for the '${project}' project.`);
   return person as Person;
 }
 

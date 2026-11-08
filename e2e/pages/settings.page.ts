@@ -379,4 +379,79 @@ export class SettingsPage extends BasePage {
   emptyText(): Locator {
     return this.workWeekSection().locator('.empty__text');
   }
+
+  // ---- Your teams (L2-054, docs/detailed-designs/teams/switch-team) ----
+
+  /** The "Your teams" section; a manager's only. */
+  yourTeamsSection(): Locator {
+    return this.main.locator("section#teams");
+  }
+
+  /** The "Your teams" link of the settings section nav (the nav shows from 1024px; it is in the page at every width). */
+  yourTeamsNavLink(): Locator {
+    return this.main
+      .getByRole("navigation", { name: "Settings sections", includeHidden: true })
+      .getByRole("link", { name: "Your teams", exact: true, includeHidden: true });
+  }
+
+  /** "The teams you manage. Greenlit opens your default team when you sign in." */
+  yourTeamsIntro(): Locator {
+    return this.yourTeamsSection().locator("p").first();
+  }
+
+  /** The team names in the list, oldest first. */
+  teamNames(): Locator {
+    return this.yourTeamsSection().locator(".team-list__name");
+  }
+
+  /** The row of the team called `name`. */
+  teamRow(name: string): Locator {
+    return this.yourTeamsSection()
+      .locator(".team-list__item")
+      .filter({ has: this.page.locator(".team-list__name", { hasText: new RegExp(`^${name}$`) }) });
+  }
+
+  /** The marks on a team's row, as text: "Active", "Default". */
+  teamMarks(name: string): Locator {
+    return this.teamRow(name).locator(".team-list__marks .badge");
+  }
+
+  /** "Switch to this team" on a team's row (accessible name "Switch to {team}"). */
+  switchToTeamButton(name: string): Locator {
+    return this.yourTeamsSection().getByRole("button", { name: `Switch to ${name}`, exact: true });
+  }
+
+  /** "Make default" on a team's row (accessible name "Make {team} your default"). */
+  makeDefaultButton(name: string): Locator {
+    return this.yourTeamsSection().getByRole("button", { name: `Make ${name} your default`, exact: true });
+  }
+
+  /** Every action button of the section's rows. */
+  teamActionButtons(): Locator {
+    return this.yourTeamsSection().locator(".team-list__actions button");
+  }
+
+  /** "Add another team" */
+  addTeamButton(): Locator {
+    return control(this.yourTeamsSection(), "Add another team");
+  }
+
+  /** The skeleton while the teams load. */
+  yourTeamsLoading(): Locator {
+    return this.yourTeamsSection().locator(".skeleton");
+  }
+
+  /** "We couldn't load your teams" */
+  yourTeamsErrorTitle(): Locator {
+    return this.yourTeamsSection().locator(".alert__title");
+  }
+
+  yourTeamsTryAgain(): Locator {
+    return control(this.yourTeamsSection(), "Try again");
+  }
+
+  /** Waits for "Your teams" to list the manager's teams. */
+  async waitForTeams(): Promise<void> {
+    await this.teamNames().first().waitFor();
+  }
 }

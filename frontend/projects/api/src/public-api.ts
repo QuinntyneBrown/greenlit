@@ -27,6 +27,7 @@ export * from './lib/models/change-set';
 export * from './lib/models/session';
 export * from './lib/models/account';
 export * from './lib/models/new-team';
+export * from './lib/models/managed-team';
 export * from './lib/models/invited-member';
 export * from './lib/models/invitation';
 export * from './lib/models/time-off-request';

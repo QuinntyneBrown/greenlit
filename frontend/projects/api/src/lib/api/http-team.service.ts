@@ -3,13 +3,25 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 
 import { InvitedMember, NewMember } from '../models/invited-member';
+import { ManagedTeam } from '../models/managed-team';
 import { CreatedTeam, NewTeam } from '../models/new-team';
+import { Session } from '../models/session';
 import { API_BASE_URL, apiUrl } from './api-base-url';
 import { problemCode } from './problem';
 import { SESSION_STORE } from './session-store';
-import { CreateTeamResult, InviteResult, RemoveMemberResult, TeamService } from './team.service';
+import {
+  CreateTeamResult,
+  InviteResult,
+  RemoveMemberResult,
+  TeamChangeResult,
+  TeamService,
+} from './team.service';
 
-/** POST /api/teams, POST /api/team/members and DELETE /api/team/members/{id}; creating a team keeps the new manager's session in the session store. */
+/**
+ * POST /api/teams, POST /api/team/members, DELETE /api/team/members/{id} and the several-teams calls
+ * (GET /api/teams/mine, POST /api/teams/{id}/switch, PUT /api/teams/default). Creating a team and switching keep the
+ * new session in the session store.
+ */
 @Injectable({ providedIn: 'root' })
 export class HttpTeamService implements TeamService {
   private readonly http = inject(HttpClient);
@@ -40,5 +52,26 @@ export class HttpTeamService implements TeamService {
         map((): RemoveMemberResult => ({ ok: true })),
         catchError(() => of<RemoveMemberResult>({ ok: false })),
       );
+  }
+
+  mine(): Observable<readonly ManagedTeam[]> {
+    return this.http.get<readonly ManagedTeam[]>(apiUrl(this.baseUrl, 'api/teams/mine'));
+  }
+
+  switchTo(teamId: string): Observable<TeamChangeResult> {
+    return this.http
+      .post<Session>(apiUrl(this.baseUrl, `api/teams/${encodeURIComponent(teamId)}/switch`), null)
+      .pipe(
+        tap((session) => this.store.setToken(session.accessToken)),
+        map((): TeamChangeResult => ({ ok: true })),
+        catchError(() => of<TeamChangeResult>({ ok: false })),
+      );
+  }
+
+  makeDefault(teamId: string): Observable<TeamChangeResult> {
+    return this.http.put(apiUrl(this.baseUrl, 'api/teams/default'), { teamId }).pipe(
+      map((): TeamChangeResult => ({ ok: true })),
+      catchError(() => of<TeamChangeResult>({ ok: false })),
+    );
   }
 }

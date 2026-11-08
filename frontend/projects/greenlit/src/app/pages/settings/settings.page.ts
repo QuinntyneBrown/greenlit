@@ -48,6 +48,8 @@ import { RemoveHolidayDialog } from '../../dialogs/remove-holiday/remove-holiday
 import { ToastService } from '../../toasts/toast.service';
 import { AllowancesSection } from './allowances-section';
 import { TeamSection } from './team-section';
+import { YourTeamsSection } from './your-teams-section';
+import { ManagedTeamsState } from '../../teams/managed-teams';
 
 type Load =
   | { readonly state: 'loading' }
@@ -81,6 +83,7 @@ type HolidaysLoad =
     Skeleton,
     Switch,
     TeamSection,
+    YourTeamsSection,
   ],
   template: `
     @if (review(); as review) {
@@ -339,6 +342,11 @@ type HolidaysLoad =
             </div>
           </section>
         }
+        @if (isManager()) {
+          <section id="teams" class="settings-section" aria-labelledby="teams-title">
+            <app-your-teams-section [load]="managedTeams.load()" (retry)="managedTeams.refresh()" />
+          </section>
+        }
       </div>
     </div>
   `,
@@ -436,6 +444,12 @@ export class SettingsPage {
   private readonly document = inject(DOCUMENT);
   private readonly attempt = signal(0);
   private readonly holidayAttempt = signal(0);
+  /** Your teams (L2-054): read when the page opens. */
+  protected readonly managedTeams = inject(ManagedTeamsState);
+
+  constructor() {
+    this.managedTeams.refresh();
+  }
 
   protected readonly load = toSignal(
     toObservable(this.attempt).pipe(
@@ -473,6 +487,7 @@ export class SettingsPage {
           { id: 'work-week', label: 'Work week & holidays' },
           { id: 'coverage', label: 'Coverage' },
           { id: 'notifications', label: 'Notifications' },
+          { id: 'teams', label: 'Your teams' },
         ]
       : []),
   ]);

@@ -248,6 +248,32 @@ interface TeamApi {
   fail(): Promise<void>;
 }
 
+/**
+ * Steers the several-teams calls (L2-054): reading the teams (GET /api/teams/mine), switching
+ * (POST /api/teams/{id}/switch) and making a team the default (PUT /api/teams/default).
+ */
+interface TeamsApi {
+  /** Holds reading the teams until the returned function is called. */
+  holdMine(): Promise<() => void>;
+  /** Reading the teams fails with a 500 until `recoverMine()`. */
+  failMine(): Promise<void>;
+  recoverMine(): Promise<void>;
+  /** How many switches the page has sent so far. */
+  switches(): number;
+  /** Holds switches until the returned function is called. */
+  holdSwitch(): Promise<() => void>;
+  /** Switches fail with a 500 until `recoverSwitch()`. */
+  failSwitch(): Promise<void>;
+  recoverSwitch(): Promise<void>;
+  /** How many default changes the page has sent so far. */
+  defaults(): number;
+  /** Holds default changes until the returned function is called. */
+  holdDefault(): Promise<() => void>;
+  /** Default changes fail with a 500 until `recoverDefault()`. */
+  failDefault(): Promise<void>;
+  recoverDefault(): Promise<void>;
+}
+
 /** Watches and steers the invite request (POST /api/team/members). */
 interface MembersApi {
   /** How many invite requests the page has sent so far. */
@@ -492,6 +518,7 @@ interface GlFixtures {
   google: GoogleStub;
   membersApi: MembersApi;
   teamApi: TeamApi;
+  teamsApi: TeamsApi;
   sheetApi: SheetApi;
   yearApi: YearApi;
   personApi: PersonApi;
@@ -1226,6 +1253,45 @@ export const test = base.extend<GlFixtures>({
           route.fulfill({ status: 500, body: "" }),
         );
       },
+    });
+  },
+  teamsApi: async ({ page }, use) => {
+    const mine = "**/api/teams/mine";
+    const switchTo = /\/api\/teams\/[^/]+\/switch$/;
+    const defaults = "**/api/teams/default";
+    let switches = 0;
+    let defaultChanges = 0;
+    page.on("request", (request) => {
+      const path = new URL(request.url()).pathname;
+      if (request.method() === "POST" && /^\/api\/teams\/[^/]+\/switch$/.test(path)) switches++;
+      if (request.method() === "PUT" && path === "/api/teams/default") defaultChanges++;
+    });
+    const hold = async (pattern: string | RegExp) => {
+      let release!: () => void;
+      const released = new Promise<void>((resolve) => (release = resolve));
+      await page.route(pattern, async (route) => {
+        if (route.request().method() === "OPTIONS") return route.fallback();
+        await released;
+        await route.continue();
+      });
+      return release;
+    };
+    const fail = (pattern: string | RegExp) =>
+      page.route(pattern, (route) =>
+        route.request().method() === "OPTIONS" ? route.fallback() : route.fulfill({ status: 500, body: "" }),
+      );
+    await use({
+      holdMine: () => hold(mine),
+      failMine: () => fail(mine),
+      recoverMine: () => page.unroute(mine),
+      switches: () => switches,
+      holdSwitch: () => hold(switchTo),
+      failSwitch: () => fail(switchTo),
+      recoverSwitch: () => page.unroute(switchTo),
+      defaults: () => defaultChanges,
+      holdDefault: () => hold(defaults),
+      failDefault: () => fail(defaults),
+      recoverDefault: () => page.unroute(defaults),
     });
   },
   removeMemberApi: async ({ page }, use) => {
