@@ -140,6 +140,13 @@ video {
   height: 1.5rem;
 }
 
+/* An icon inside a button follows the button's type size (components.css: .btn .icon), so a small button's icon is
+   smaller. gl-button projects its icon, so the rule lives here, beside .icon. */
+.btn .icon {
+  width: 1.25em;
+  height: 1.25em;
+}
+
 /* The page column shared by the top bar and <main>. */
 .shell {
   width: 100%;
