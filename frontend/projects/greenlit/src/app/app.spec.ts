@@ -3,7 +3,13 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
-import { AUTH_SERVICE, CONNECTIVITY_SERVICE, REQUEST_SERVICE, SESSION_STORE } from 'api';
+import {
+  AUTH_SERVICE,
+  CONNECTIVITY_SERVICE,
+  REQUEST_SERVICE,
+  SESSION_STORE,
+  TEAM_SERVICE,
+} from 'api';
 import { App } from './app';
 
 describe('App', () => {
@@ -18,6 +24,7 @@ describe('App', () => {
         },
         { provide: AUTH_SERVICE, useValue: { account: () => of(null) } },
         { provide: REQUEST_SERVICE, useValue: {} },
+        { provide: TEAM_SERVICE, useValue: {} },
         {
           provide: CONNECTIVITY_SERVICE,
           useValue: {
