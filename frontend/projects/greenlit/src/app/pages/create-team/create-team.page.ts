@@ -96,11 +96,7 @@ const FIRST_ROWS = 3;
                   [inputId]="rowId(i, 'name')"
                   [value]="row.name"
                   (valueChange)="setRow(i, { name: $event })"
-                  [error]="
-                    shown(rowId(i, 'name')) && rowMissesName(row) ? 'Give this member a name.' : ''
-                  "
                   [readonly]="busy()"
-                  (blurred)="touch(rowId(i, 'name'))"
                 />
                 <gl-text-field
                   [label]="'Member ' + (i + 1) + ' email'"
@@ -208,20 +204,11 @@ export class CreateTeamPage {
   protected readonly summaryItems = computed<FormSummaryItem[]>(() => {
     const items: FormSummaryItem[] = [];
     if (this.nameError()) items.push({ field: NAME_ID, message: 'Give your team a name' });
-    this.rows().forEach((row, i) => {
-      if (this.rowMissesName(row))
-        items.push({ field: this.rowId(i, 'name'), message: 'Give this member a name' });
-    });
     return items;
   });
 
   protected rowId(index: number, part: 'name' | 'email'): string {
     return `ct-m${index + 1}-${part}`;
-  }
-
-  /** A row with an email needs a name; a row with neither is ignored. */
-  protected rowMissesName(row: MemberRow): boolean {
-    return !row.name.trim() && !!row.email.trim();
   }
 
   protected setRow(index: number, change: Partial<Omit<MemberRow, 'key'>>): void {
@@ -260,6 +247,7 @@ export class CreateTeamPage {
     }
     this.failed.set(false);
     this.busy.set(true);
+    // Members are optional: a row without a name is left out, even with an email.
     const members = this.rows()
       .filter((row) => row.name.trim())
       .map((row) => ({ name: row.name.trim(), email: row.email.trim() || null }));

@@ -62,33 +62,54 @@ test.describe("Creating a team, the form", () => {
     await expect(form.memberEmail(4)).toBeVisible();
   });
 
-  test("an empty team name and a row with only an email are named on their fields, and nothing is sent (L2-008 AC4)", async ({
+  test("an empty team name is named on its field, and nothing is sent (L2-008 AC4)", async ({ pages, teamApi }) => {
+    const form = pages.createTeam;
+    await form.fill({ name: "", members: [{ name: "Ana Ruiz", email: "ana@northwind.studio" }] });
+    await form.submit().click();
+
+    await expect(form.summaryTitle()).toHaveText("Fix 1 thing to continue");
+    await expect(form.summaryLinks()).toHaveText(["Give your team a name"]);
+    await expect(form.summary()).toBeFocused();
+    await expect(form.teamName()).toHaveAttribute("aria-invalid", "true");
+    await expect(await form.errorOf(form.teamName())).toHaveText("Give your team a name.");
+    expect(teamApi.requests()).toBe(0);
+
+    await form.summaryLinks().first().click();
+    await expect(form.teamName()).toBeFocused();
+  });
+
+  test("members are optional: with no rows filled in, the team is sent with none (L2-008 AC4)", async ({
     pages,
     teamApi,
   }) => {
     const form = pages.createTeam;
+    await teamApi.hold();
+    await form.fill({ name: "Design team", members: [] });
+    await form.submit().click();
+
+    await expect(form.submit()).toHaveAttribute("aria-busy", "true");
+    await expect(form.summary()).toHaveCount(0);
+    expect(teamApi.requests()).toBe(1);
+    expect(teamApi.sentMembers()).toEqual([]);
+  });
+
+  test("a row with only an email is not an error and is left out of the team (L2-008 AC4)", async ({
+    pages,
+    teamApi,
+  }) => {
+    const form = pages.createTeam;
+    await teamApi.hold();
     await form.fill({
-      name: "",
-      members: [
-        { name: "Ana Ruiz", email: "ana@northwind.studio" },
-        { name: "Ben Okafor" },
-        { name: "", email: "cleo@northwind.studio" },
-      ],
+      name: "Design team",
+      members: [{ name: "Ana Ruiz" }, { name: "", email: "cleo@northwind.studio" }],
     });
     await form.submit().click();
 
-    await expect(form.summaryTitle()).toHaveText("Fix 2 things to continue");
-    await expect(form.summaryLinks()).toHaveText(["Give your team a name", "Give this member a name"]);
-    await expect(form.summary()).toBeFocused();
-    await expect(form.teamName()).toHaveAttribute("aria-invalid", "true");
-    await expect(await form.errorOf(form.teamName())).toHaveText("Give your team a name.");
-    await expect(form.memberName(3)).toHaveAttribute("aria-invalid", "true");
-    await expect(await form.errorOf(form.memberName(3))).toHaveText("Give this member a name.");
+    await expect(form.submit()).toHaveAttribute("aria-busy", "true");
+    await expect(form.summary()).toHaveCount(0);
     await expect(form.memberName(2)).not.toHaveAttribute("aria-invalid", /.*/);
-    expect(teamApi.requests()).toBe(0);
-
-    await form.summaryLinks().last().click();
-    await expect(form.memberName(3)).toBeFocused();
+    expect(teamApi.requests()).toBe(1);
+    expect(teamApi.sentMembers()).toEqual([{ name: "Ana Ruiz", email: null }]);
   });
 
   test("the button is busy and the fields read-only while the team is created", async ({ pages, teamApi }) => {

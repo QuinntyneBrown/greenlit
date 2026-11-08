@@ -240,6 +240,8 @@ interface AccountApi {
 interface TeamApi {
   /** How many create-team requests the page has sent so far. */
   requests(): number;
+  /** The member rows of the last create-team request the page sent. */
+  sentMembers(): { name: string; email: string | null }[] | undefined;
   /** Holds create-team requests; none reaches the API. */
   hold(): Promise<void>;
   /** Every create-team request fails with a 500. */
@@ -1203,15 +1205,19 @@ export const test = base.extend<GlFixtures>({
   teamApi: async ({ page }, use) => {
     const pattern = "**/api/teams";
     let count = 0;
+    let sentMembers: { name: string; email: string | null }[] | undefined;
     page.on("request", (request) => {
       if (
         request.method() === "POST" &&
         new URL(request.url()).pathname === "/api/teams"
-      )
+      ) {
         count++;
+        sentMembers = request.postDataJSON()?.members;
+      }
     });
     await use({
       requests: () => count,
+      sentMembers: () => sentMembers,
       hold: async () => {
         await page.route(pattern, () => new Promise<void>(() => {}));
       },
