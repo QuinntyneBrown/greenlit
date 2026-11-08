@@ -46,6 +46,27 @@ public class SaveTeamSectionTests : IClassFixture<GreenlitApiFactory>
     }
 
     [Theory]
+    [InlineData("Europe/Rome")]
+    [InlineData("America/Toronto")]
+    public async Task The_manager_moves_the_team_to_rome_or_toronto(string timeZone)
+    {
+        // L2-009 AC2 with the options of L2-008 AC2.
+        var team = await TestTeam.CreateAsync(_factory);
+        var maya = team.ClientFor("Maya Chen");
+
+        var saved = await maya.PutAsJsonAsync("/api/team/settings/team", new
+        {
+            name = "Design team",
+            timeZone,
+            members = new[] { new { id = team.ManagerRow.Id, role = "Manager", yearlyDays = (int?)25 } },
+        });
+
+        saved.StatusCode.Should().Be(HttpStatusCode.OK, await saved.Content.ReadAsStringAsync());
+        var section = await maya.GetFromJsonAsync<JsonElement>("/api/team/settings/team");
+        section.GetProperty("timeZone").GetString().Should().Be(timeZone);
+    }
+
+    [Theory]
     [InlineData("", "Europe/London", "Name")]
     [InlineData("   ", "Europe/London", "Name")]
     [InlineData("Design team", "Mars/Olympus", "TimeZone")]

@@ -19,9 +19,9 @@ public sealed record CreatedTeamDto(Guid TeamId, string Name, int Invited, Sessi
 /// <summary>The choices the create-team page offers (L2-008 AC2).</summary>
 public static class TeamOptions
 {
-    /// <summary>London, Dublin, "Paris, Berlin (CET)" and New York.</summary>
+    /// <summary>London, Dublin, "Paris, Berlin (CET)", Rome, New York and Toronto.</summary>
     public static readonly IReadOnlyList<string> TimeZones =
-        ["Europe/London", "Europe/Dublin", "Europe/Paris", "America/New_York"];
+        ["Europe/London", "Europe/Dublin", "Europe/Paris", "Europe/Rome", "America/New_York", "America/Toronto"];
 
     public const string NoHolidays = "none";
 
