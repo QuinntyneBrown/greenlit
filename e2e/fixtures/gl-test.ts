@@ -17,6 +17,7 @@ import { guardFor, isBaseline, pathFor, RouteKey } from "./routes.js";
 import { personIdOf } from "./people.js";
 import { Person, SESSION_KEY, expiredToken, signIn } from "./session.js";
 import { AccountMenu } from "../pages/account-menu.js";
+import { TeamSwitcher } from "../pages/team-switcher.js";
 import { AccountPage } from "../pages/account.page.js";
 import { ConnectionBanner } from "../pages/connection-banner.js";
 import { SessionExpiredPage } from "../pages/session-expired.page.js";
@@ -54,6 +55,7 @@ interface Pages {
   sessionExpired: SessionExpiredPage;
   signOutDialog: SignOutDialog;
   accountMenu: AccountMenu;
+  teamSwitcher: TeamSwitcher;
   adjustAllowance: AdjustAllowanceDialog;
   removeMember: RemoveMemberDialog;
   editWorkingDays: EditWorkingDaysDialog;
@@ -1522,6 +1524,7 @@ export const test = base.extend<GlFixtures>({
     await use({
       account: new AccountPage(page),
       accountMenu: new AccountMenu(page),
+      teamSwitcher: new TeamSwitcher(page),
       connection: new ConnectionBanner(page),
       acceptInvite: new AcceptInvitePage(page),
       forgotPassword: new ForgotPasswordPage(page),

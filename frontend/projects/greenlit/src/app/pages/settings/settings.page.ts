@@ -450,12 +450,8 @@ export class SettingsPage {
   private readonly document = inject(DOCUMENT);
   private readonly attempt = signal(0);
   private readonly holidayAttempt = signal(0);
-  /** Your teams (L2-054): read when the page opens. */
+  /** Your teams (L2-054): the app shell reads them after every navigation. */
   protected readonly managedTeams = inject(ManagedTeamsState);
-
-  constructor() {
-    this.managedTeams.refresh();
-  }
 
   protected readonly load = toSignal(
     toObservable(this.attempt).pipe(

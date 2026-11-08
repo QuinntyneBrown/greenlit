@@ -11,7 +11,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 
-import { AppNav, AppNavItem, SkipLink, TopBar, UserMenu } from 'components';
+import { AppNav, AppNavItem, SkipLink, TeamSwitcher, TopBar, UserMenu } from 'components';
 
 import { AccountState } from './account/account-state';
 import { AppDialogs } from './dialogs/app-dialogs';
@@ -20,6 +20,7 @@ import { SignOutDialog } from './dialogs/sign-out/sign-out.dialog';
 import { ConnectionBanner } from './connection/connection-banner';
 import { RequestCountsState } from './requests/request-counts';
 import { ToastOutlet } from './toasts/toast-outlet';
+import { ManagedTeamsState } from './teams/managed-teams';
 
 /**
  * Application shell.
@@ -54,7 +55,16 @@ export const MAIN_NAV: readonly AppNavItem[] = [
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SkipLink, ConnectionBanner, TopBar, AppNav, UserMenu, ToastOutlet],
+  imports: [
+    RouterOutlet,
+    SkipLink,
+    ConnectionBanner,
+    TopBar,
+    AppNav,
+    TeamSwitcher,
+    UserMenu,
+    ToastOutlet,
+  ],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -75,6 +85,9 @@ export class App {
   protected readonly shell = computed(() => this.shellData().shell);
   private readonly requestCounts = inject(RequestCountsState);
   protected readonly accountState = inject(AccountState);
+  /** The header team switcher, for a manager of two or more teams (L2-054 AC11). */
+  protected readonly managedTeams = inject(ManagedTeamsState);
+  protected readonly switching = computed(() => this.managedTeams.busy()?.action === 'switch');
   private readonly dialogs = inject(AppDialogs);
 
   /** The main navigation; Requests carries the manager's pending count (L2-022 AC8). */
@@ -98,6 +111,7 @@ export class App {
         untracked(() => {
           this.requestCounts.refresh();
           this.accountState.refresh();
+          this.managedTeams.refresh(true);
         });
       }
     });

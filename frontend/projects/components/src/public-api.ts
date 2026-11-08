@@ -14,6 +14,7 @@ export * from './lib/logo-lockup/logo-lockup';
 export * from './lib/app-nav/app-nav';
 export * from './lib/top-bar/top-bar';
 export * from './lib/user-menu/user-menu';
+export * from './lib/team-switcher/team-switcher';
 
 // actions
 export * from './lib/button/button';
