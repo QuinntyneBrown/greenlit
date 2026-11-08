@@ -401,28 +401,54 @@ public class CreateTeamTests : IClassFixture<FrozenClockApiFactory>
     }
 
     [Fact]
-    public async Task A_member_with_a_row_on_a_team_cannot_create_one()
+    public async Task A_member_of_another_team_creates_a_team_and_becomes_its_manager()
     {
-        // L2-008 AC8: a person who is on a team only as a member is refused.
-        var team = await TestTeam.CreateAsync(_factory, "Maya Chen");
-        await team.AddMemberAsync("Ana Ruiz");
+        // L2-008 AC8, L2-055 AC1 (ADR-015). Given Ana, a member of Maya's Design team who manages nothing, when she
+        // creates Ruiz family, then it exists with her as its manager, her session names it, it is her default (the
+        // first team she manages), and she is still a member of Design team, which is unchanged.
+        var design = await TestTeam.CreateAsync(_factory, "Maya Chen");
+        var anaRow = await design.AddMemberAsync("Ana Ruiz");
 
-        var response = await CreateAsync(team.ClientFor("Ana Ruiz"), Request(name: "Ana's team"));
+        var created = await CreatedAsync(design.ClientFor("Ana Ruiz"), Request(name: "Ruiz family"));
 
-        await ShouldBeTeamExistsAsync(response);
+        var familyId = created.GetProperty("teamId").GetGuid();
+        created.GetProperty("session").GetProperty("teamId").GetGuid().Should().Be(familyId);
+        var month = await MonthAsync(SessionClient(created), "2026-11");
+        month.GetProperty("isManager").GetBoolean().Should().BeTrue();
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<Greenlit.Infrastructure.Persistence.AppDbContext>();
+        var ana = db.Users.Single(u => u.Id == anaRow.UserId);
+        db.Teams.Single(t => t.Id == familyId).ManagerUserId.Should().Be(ana.Id);
+        ana.DefaultTeamId.Should().Be(familyId);
+        db.TeamMembers.Single(m => m.Id == anaRow.Id).RemovedUtc.Should().BeNull();
+        db.Teams.Single(t => t.Id == design.Team.Id).ManagerUserId.Should().Be(design.Manager.Id);
     }
 
     [Fact]
-    public async Task A_member_whose_row_says_manager_on_someone_elses_team_cannot_create_one()
+    public async Task A_member_whose_row_says_manager_on_someone_elses_team_may_create_one_too()
     {
-        // L2-008 AC8, L2-054 AC7: the Manager role on another manager's team is not managing a team.
+        // L2-008 AC8 (ADR-015): no one is refused because they are already on a team.
         var team = await TestTeam.CreateAsync(_factory, "Maya Chen");
         var ana = await team.AddMemberAsync("Ana Ruiz");
         await _factory.WriteAsync(db => db.TeamMembers.Single(m => m.Id == ana.Id).Role = Greenlit.Domain.Enums.UserRole.Manager);
 
         var response = await CreateAsync(team.ClientFor("Ana Ruiz"), Request(name: "Ana's team"));
 
-        await ShouldBeTeamExistsAsync(response);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+    }
+
+    [Fact]
+    public async Task A_person_on_five_teams_may_create_a_sixth()
+    {
+        // L2-055 AC6: there is no cap on teams.
+        var noor = await TestAccount.CreateAsync(_factory);
+        var client = _factory.ClientFor(noor);
+        for (var i = 0; i < 5; i++) await CreatedAsync(client, Request(name: $"Team {i}"));
+
+        var response = await CreateAsync(client, Request(name: "Team 6"));
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     [Fact]
@@ -503,13 +529,5 @@ public class CreateTeamTests : IClassFixture<FrozenClockApiFactory>
         await using var scope = _factory.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<Greenlit.Infrastructure.Persistence.AppDbContext>();
         db.Teams.Any(t => t.ManagerUserId == user.Id).Should().BeFalse();
-    }
-
-    private static async Task ShouldBeTeamExistsAsync(HttpResponseMessage response)
-    {
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
-        problem.GetProperty("code").GetString().Should().Be("team_exists");
-        problem.GetProperty("detail").GetString().Should().Be("You're already on a team.");
     }
 }

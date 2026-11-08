@@ -1,9 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateChildFn, CanActivateFn, CanMatchFn, Router } from '@angular/router';
 
-import { map, of, catchError } from 'rxjs';
-
-import { CONNECTIVITY_SERVICE, SESSION_STORE, TEAM_SERVICE } from 'api';
+import { CONNECTIVITY_SERVICE, SESSION_STORE } from 'api';
 
 /**
  * Guarded screens need a session (identity-and-access/sign-in). A visitor
@@ -28,23 +26,6 @@ export const signedOutGuard: CanActivateFn = () =>
  */
 export const teamGuard: CanActivateFn = () =>
   inject(SESSION_STORE).teamId() ? true : inject(Router).createUrlTree(['/create-team']);
-
-/**
- * Create-team is for people on no team, and for a manager adding another (teams/switch-team, L2-054 AC5): a session
- * that names a team opens it only when its person manages at least one team. Anyone else goes to the calendar.
- */
-export const noTeamGuard: CanActivateFn = () => {
-  const session = inject(SESSION_STORE);
-  const calendar = inject(Router).createUrlTree(['/']);
-  if (!session.teamId()) return true;
-  if (!session.isManager()) return calendar;
-  return inject(TEAM_SERVICE)
-    .mine()
-    .pipe(
-      map((teams) => (teams.length > 0 ? true : calendar)),
-      catchError(() => of(calendar)),
-    );
-};
 
 /**
  * A route only a manager's session matches: the next route with the same path then serves everyone else
