@@ -220,5 +220,4 @@ account menu, and the pending count arrive with the journeys that need them.
 - Journey 28 is built (L2-046): `ExceptionHandlingMiddleware` adds a `reference` (`7F3A-91C2`) to the 500 ProblemDetails and logs it;
   `serverErrorInterceptor` (in `api`) opens `/server-error?reference=...&returnUrl=...` when a read fails with a 500 that carries
   one; the Requests page opens `/forbidden` when the API answers its ledger with 403; `onlineGuard` opens `/offline` for a screen
-  opened while offline. Left alone: the `/brand` link in the account menu still shows not found (no Brand guide screen is in any
-  requirement), and a signed-out visitor sees the not-found page in the app shell without an account menu.
+  opened while offline. Left alone: a signed-out visitor sees the not-found page in the app shell without an account menu.

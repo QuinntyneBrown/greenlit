@@ -60,15 +60,6 @@ import { Avatar } from '../avatar/avatar';
             Account
           </a>
         </li>
-        <li role="none">
-          <a class="menu__item" cdkMenuItem routerLink="/brand">
-            <svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 11v5M12 8h.01" />
-            </svg>
-            Brand guide
-          </a>
-        </li>
         <li role="none"><hr class="menu__divider" /></li>
         <li role="none">
           <button

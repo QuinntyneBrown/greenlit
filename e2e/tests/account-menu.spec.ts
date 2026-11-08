@@ -26,7 +26,7 @@ test.describe("The account menu", () => {
     await expect(menu.menu()).toBeVisible();
     await expect(menu.name()).toHaveText("Maya Chen");
     await expect(menu.roleAndEmail()).toHaveText(`Manager · ${PEOPLE.manager.email}`);
-    await expect(menu.items()).toHaveText(["My time off", "Account", "Brand guide", "Sign out"]);
+    await expect(menu.items()).toHaveText(["My time off", "Account", "Sign out"]);
   });
 
   test("a member is named as a Member (AC1)", async ({ goto, pages }) => {
@@ -101,6 +101,6 @@ test.describe("The account menu", () => {
     await pages.accountMenu.open();
 
     await expect(pages.accountMenu.menu()).toBeVisible();
-    await expect(pages.accountMenu.items()).toHaveText(["My time off", "Account", "Brand guide", "Sign out"]);
+    await expect(pages.accountMenu.items()).toHaveText(["My time off", "Account", "Sign out"]);
   });
 });

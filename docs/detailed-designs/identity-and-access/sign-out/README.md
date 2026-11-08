@@ -2,7 +2,7 @@
 
 ## Overview
 
-The avatar at the right of the header opens the account menu. The menu names the signed-in person and their role, and links to their own person page, the Account page, the brand guide and sign-out.
+The avatar at the right of the header opens the account menu. The menu names the signed-in person and their role, and links to their own person page, the Account page and sign-out.
 
 Signing out asks for confirmation in a dialog. Greenlit also ends a session that has expired and sends the person to a page that offers to sign in again and return to where they were.
 
@@ -16,7 +16,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Frontend**
 
-- **`UserMenu`** — `gl-user-menu` in `frontend/projects/components`, built on the CDK Menu: the avatar button (`aria-haspopup="menu"`, `aria-expanded`, `aria-label="Account menu for {name}"`) and the `.menu` panel in a CDK overlay. "My time off", "Account" and "Brand guide" lead to `/person`, `/account` and `/brand`; those screens arrive with their own journeys (until then they show not found). Enter, Space or ArrowDown on the button opens it and focuses the first item; arrow keys, Home and End move between items; Escape and Tab close it, and Escape returns focus to the avatar. The panel names the person ("Maya Chen", "Manager · maya@northwind.studio") and lists "My time off", "Account", "Brand guide" and "Sign out". The shell reads who is signed in from `AUTH_SERVICE.account()` and places the menu in the top bar's `[slot=end]`.
+- **`UserMenu`** — `gl-user-menu` in `frontend/projects/components`, built on the CDK Menu: the avatar button (`aria-haspopup="menu"`, `aria-expanded`, `aria-label="Account menu for {name}"`) and the `.menu` panel in a CDK overlay. "My time off" and "Account" lead to `/person` and `/account`; those screens arrive with their own journeys (until then they show not found). Enter, Space or ArrowDown on the button opens it and focuses the first item; arrow keys, Home and End move between items; Escape and Tab close it, and Escape returns focus to the avatar. The panel names the person ("Maya Chen", "Manager · maya@northwind.studio") and lists "My time off", "Account" and "Sign out". The shell reads who is signed in from `AUTH_SERVICE.account()` and places the menu in the top bar's `[slot=end]`.
 - **`SignOutDialog`** — CDK Dialog in `app/dialogs/sign-out`. "Stay signed in" closes it. "Sign out" shows "Signing out…" (`aria-busy`, every way out off) while `AUTH_SERVICE.signOut()` runs, then the session is cleared and the app navigates to sign-in.
 - **`HttpAuthService`** — `signOut()` calls `POST /api/auth/sign-out` and clears the stored token whether or not the call succeeds: the person asked to leave, so a failed call never keeps them signed in.
 - **Session expiry** — Two paths lead to the session-expired page. `authGuard` finds a stored token that is no longer live; the `sessionExpiredInterceptor` in `api` sees a `401` with code `session_expired` on a call to the Greenlit API. Both clear the token and navigate to `/session-expired?returnUrl={current url}`.
