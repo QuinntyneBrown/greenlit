@@ -3,6 +3,14 @@
 @if (shell() === 'app') {
   <gl-top-bar>
     <gl-app-nav [items]="mainNav()" />
+    @if (accountState.signedIn() && managedTeams.teams().length > 1) {
+      <gl-team-switcher
+        slot="end"
+        [teams]="managedTeams.teams()"
+        [busy]="switching()"
+        (chosen)="managedTeams.switchTo($event)"
+      />
+    }
     @if (accountState.signedIn()) {
       <gl-user-menu
         slot="end"
