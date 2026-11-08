@@ -24,6 +24,10 @@ import {
   SchoolClosureDialog,
   SchoolClosureOutcome,
 } from '../../dialogs/school-closure/school-closure.dialog';
+import {
+  ImportCalendarData,
+  ImportCalendarDialog,
+} from '../../dialogs/school-closure/import-calendar.dialog';
 import { ToastService } from '../../toasts/toast.service';
 import { closureDates } from './closure-dates';
 
@@ -96,7 +100,7 @@ const SCHOOL_ICON = 'M2 9.5 12 5l10 4.5L12 14zM6 11.5V16c3.5 2.5 8.5 2.5 12 0v-4
                   <gl-button slot="actions" size="sm" (click)="add()">Add a closure</gl-button>
                 }
                 @if (canEdit()) {
-                  <gl-button slot="actions" size="sm" (click)="importCalendar.emit()">
+                  <gl-button slot="actions" size="sm" (click)="importFile()">
                     Import a calendar
                   </gl-button>
                 }
@@ -140,7 +144,7 @@ const SCHOOL_ICON = 'M2 9.5 12 5l10 4.5L12 14zM6 11.5V16c3.5 2.5 8.5 2.5 12 0v-4
               @if (canEdit()) {
                 <div class="settings-actions">
                   <gl-button size="sm" (click)="add()">Add a closure</gl-button>
-                  <gl-button size="sm" (click)="importCalendar.emit()">Import a calendar</gl-button>
+                  <gl-button size="sm" (click)="importFile()">Import a calendar</gl-button>
                 </div>
               }
             }
@@ -250,8 +254,6 @@ export class SchoolCalendarSection {
   readonly saved = output<boolean>();
   /** The team's children, in sheet order (L2-060); closures go on their rows. */
   readonly children = input<readonly ClosureChild[]>([]);
-  /** "Import a calendar" was pressed (L2-062); the page opens the dialog. */
-  readonly importCalendar = output<void>();
 
   private readonly dialogs = inject(AppDialogs);
   protected readonly schoolIcon = SCHOOL_ICON;
@@ -308,6 +310,16 @@ export class SchoolCalendarSection {
           title: 'Closure deleted',
           body: `${closure.label} is off the children’s rows.`,
         });
+      });
+  }
+
+  /** "Import a calendar" (L2-062): the dialog, then the list again. */
+  protected importFile(): void {
+    const data: ImportCalendarData = { children: this.children(), closures: this.closures() };
+    this.dialogs
+      .open<boolean>(ImportCalendarDialog, '#ic-child', data)
+      .closed.subscribe((imported) => {
+        if (imported) this.reload();
       });
   }
 

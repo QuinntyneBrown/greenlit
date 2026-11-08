@@ -24,6 +24,13 @@ export type AddChildResult =
 export type SaveClosureResult =
   { readonly outcome: 'saved'; readonly closure: SchoolClosure } | { readonly outcome: 'failed' };
 
+/** What importing a calendar file came to (L2-062). */
+export type ImportCalendarResult =
+  | { readonly outcome: 'imported'; readonly imported: number }
+  /** Not a calendar, too big, too many events or no all-day event (code `calendar_unreadable`). */
+  | { readonly outcome: 'unreadable' }
+  | { readonly outcome: 'failed' };
+
 /**
  * The team's school calendar (docs/detailed-designs/teams/school-calendar, L2-059 to L2-062): the setting, children,
  * closures and calendar imports. Writes are the manager's.
@@ -38,6 +45,8 @@ export interface SchoolCalendarService {
   addClosure(input: SchoolClosureInput): Observable<SaveClosureResult>;
   updateClosure(id: string, input: SchoolClosureInput): Observable<SaveClosureResult>;
   deleteClosure(id: string): Observable<SchoolCalendarSaveResult>;
+  /** Imports a school's .ics file for one child; a re-import replaces that child's earlier import (L2-062). */
+  importCalendar(memberId: string, file: Blob, fileName: string): Observable<ImportCalendarResult>;
 }
 
 export const SCHOOL_CALENDAR_SERVICE = new InjectionToken<SchoolCalendarService>(
