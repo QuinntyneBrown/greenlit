@@ -15,7 +15,8 @@ public class EmailSenderConfigurationTests
 
         var act = async () => { await factory.InitializeAsync(); _ = factory.Services; };
 
-        await act.Should().ThrowAsync<Exception>().Where(e => (e.Message + e.InnerException?.Message).Contains("Greenlit:Email:Endpoint"));
+        var thrown = await act.Should().ThrowAsync<Exception>();
+        (thrown.Which.Message + thrown.Which.InnerException?.Message).Should().Contain("Greenlit:Email:Endpoint");
     }
 
     private sealed class MisconfiguredFactory : GreenlitApiFactory
