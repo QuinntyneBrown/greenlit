@@ -3,13 +3,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { ManagedTeam } from 'api';
 import { Alert, Badge, Button, Skeleton } from 'components';
 
-import { ManagedTeamsLoad } from '../../teams/managed-teams';
-
-/** What is in flight in the section: a switch or a default change for one team. */
-export interface TeamsBusy {
-  readonly teamId: string;
-  readonly action: 'switch' | 'default';
-}
+import { ManagedTeamsLoad, TeamsBusy } from '../../teams/managed-teams';
 
 /**
  * Settings → Your teams (pages/settings/your-teams*, L2-054 AC2–AC6): the teams the manager manages, oldest first,
