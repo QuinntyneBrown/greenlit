@@ -2,10 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   DOCUMENT,
+  Injector,
+  afterNextRender,
   computed,
+  effect,
   inject,
   signal,
+  untracked,
 } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, forkJoin, map, of, startWith, switchMap } from 'rxjs';
 
@@ -452,6 +457,33 @@ export class SettingsPage {
   private readonly holidayAttempt = signal(0);
   /** Your teams (L2-054): the app shell reads them after every navigation. */
   protected readonly managedTeams = inject(ManagedTeamsState);
+  private readonly injector = inject(Injector);
+  private scrolledToTeams = false;
+
+  constructor() {
+    // "Manage your teams" and "Back to Settings" open /settings#teams; the section only exists once the teams have
+    // loaded, after the router's own anchor scroll, so the page scrolls to it then.
+    const fragment = inject(ActivatedRoute).snapshot.fragment;
+    effect(() => {
+      if (fragment !== 'teams' || this.scrolledToTeams || !this.isManager()) return;
+      // Every section above has its final height once its data is in, so the scroll lands where it stays.
+      const settled =
+        this.managedTeams.load().state !== 'loading' &&
+        this.allowances() !== null &&
+        this.holidaysLoad().state !== 'loading' &&
+        this.savedWeek() !== null &&
+        this.coverageSettings() !== null &&
+        this.notificationSettings() !== null;
+      if (!settled) return;
+      this.scrolledToTeams = true;
+      untracked(() =>
+        afterNextRender(
+          () => this.document.getElementById('teams')?.scrollIntoView({ block: 'start' }),
+          { injector: this.injector },
+        ),
+      );
+    });
+  }
 
   protected readonly load = toSignal(
     toObservable(this.attempt).pipe(

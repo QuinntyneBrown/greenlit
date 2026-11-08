@@ -90,3 +90,124 @@ test.describe("The team switcher", () => {
     await expect(pages.teamSwitcher.button()).toHaveCount(0);
   });
 });
+
+test.describe("Switching from the header", () => {
+  test.beforeEach(async ({ request }, testInfo) => {
+    await resetTeams(request, jugglerFor(testInfo.project.name));
+  });
+
+  test("choosing another team switches, says so, and stays on the year (AC11, AC3)", async ({
+    goto,
+    pages,
+    teamsApi,
+  }, testInfo) => {
+    await goto("year", { as: jugglerFor(testInfo.project.name) });
+    await pages.year.waitForReady();
+    await expect(pages.year.memberNames()).toContainText(["Kit Brown"]);
+    const release = await teamsApi.holdSwitch();
+
+    await pages.teamSwitcher.choose("Product team");
+
+    await expect(pages.teamSwitcher.button()).toHaveAttribute("aria-busy", "true");
+    release();
+    await expect(pages.year.toast("Switched to Product team")).toBeVisible();
+    await expect(pages.teamSwitcher.buttonName()).toHaveText("Product team");
+    await pages.year.waitForReady();
+    await expect(pages.year.memberNames()).toContainText(["Raj Mehta"]);
+    await expect(pages.year.memberNames()).not.toContainText(["Kit Brown"]);
+  });
+
+  test("by keyboard from the calendar it switches and stays on the calendar (AC11)", async ({
+    goto,
+    page,
+    pages,
+  }, testInfo) => {
+    await goto("calendar", { as: jugglerFor(testInfo.project.name) });
+    await pages.calendar.waitForReady();
+    await pages.teamSwitcher.button().focus();
+
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+
+    await expect(pages.calendar.toast("Switched to Product team")).toBeVisible();
+    await pages.calendar.waitForReady();
+    await expect(pages.calendar.memberNames()).toContainText(["Raj Mehta"]);
+    await expect(pages.calendar.memberNames()).not.toContainText(["Kit Brown"]);
+  });
+
+  test("by touch on Requests it switches and stays on Requests (AC11)", async ({ goto, pages }, testInfo) => {
+    test.skip(!isPhone(testInfo), "touch on the phone viewport");
+    await goto("requests", { as: jugglerFor(testInfo.project.name) });
+    await pages.requests.waitForReady();
+
+    await pages.teamSwitcher.button().tap();
+    await pages.teamSwitcher.team("Product team").tap();
+
+    await expect(pages.requests.toast("Switched to Product team")).toBeVisible();
+    await pages.requests.waitForReady();
+    await expect(pages.teamSwitcher.buttonName()).toHaveText("Product team");
+  });
+
+  test("a person page belongs to one team, so a switch from it opens the calendar (AC11)", async ({
+    goto,
+    pages,
+  }, testInfo) => {
+    const juggler = jugglerFor(testInfo.project.name);
+    await goto("person", { as: juggler, person: "Kit Brown" });
+    await pages.person.waitForReady();
+
+    await pages.teamSwitcher.choose("Product team");
+
+    await pages.calendar.waitForReady();
+    await expect(pages.calendar.toast("Switched to Product team")).toBeVisible();
+    await expect(pages.calendar.memberNames()).toContainText(["Raj Mehta"]);
+  });
+
+  test("choosing the active team only closes the menu (AC11)", async ({ goto, pages, teamsApi }, testInfo) => {
+    await goto("calendar", { as: jugglerFor(testInfo.project.name) });
+
+    await pages.teamSwitcher.choose("Design team");
+
+    await expect(pages.teamSwitcher.menu()).toBeHidden();
+    expect(teamsApi.switches()).toBe(0);
+    await expect(pages.teamSwitcher.buttonName()).toHaveText("Design team");
+  });
+
+  test("a failed switch says so and keeps the team (AC9)", async ({ goto, pages, teamsApi }, testInfo) => {
+    await goto("calendar", { as: jugglerFor(testInfo.project.name) });
+    await pages.calendar.waitForReady();
+    await teamsApi.failSwitch();
+
+    await pages.teamSwitcher.choose("Product team");
+
+    const title = "We couldn’t switch teams";
+    await expect(pages.calendar.toast(title)).toBeVisible();
+    await expect(pages.calendar.toastText(title)).toHaveText(
+      "You’re still on Design team. Check your connection and try again.",
+    );
+    await expect(pages.teamSwitcher.buttonName()).toHaveText("Design team");
+    await expect(pages.calendar.memberNames()).toContainText(["Kit Brown"]);
+  });
+
+  test("Add another team opens Set up another team, and Manage your teams opens Your teams (AC11)", async ({
+    goto,
+    pages,
+  }, testInfo) => {
+    await goto("calendar", { as: jugglerFor(testInfo.project.name) });
+
+    await pages.teamSwitcher.open();
+    await pages.teamSwitcher.item("Add another team").click();
+    await pages.createTeam.waitForReady();
+    await expect(pages.createTeam.heading()).toHaveText("Set up another team");
+
+    await pages.createTeam.backToSettings().click();
+    await pages.settings.waitForTeams();
+    await pages.settings.openFromMainNav("Calendar");
+    await pages.calendar.waitForReady();
+    await pages.teamSwitcher.open();
+    await pages.teamSwitcher.item("Manage your teams").click();
+    await pages.settings.waitForTeams();
+    await expect(pages.settings.yourTeamsSection()).toBeInViewport();
+  });
+});
