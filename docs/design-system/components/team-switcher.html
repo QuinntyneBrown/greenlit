@@ -38,6 +38,7 @@
     </ul></details>
     <details><summary>Components · Inputs</summary><ul>
       <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/file-field.html">File field</a></li>
       <li><a href="../components/counter.html">Counter</a></li>
       <li><a href="../components/form-field.html">Form field</a></li>
       <li><a href="../components/form-layout.html">Form layout</a></li>
@@ -69,6 +70,7 @@
       <li><a href="../components/avatar.html">Avatar</a></li>
       <li><a href="../components/badge.html">Badge and status</a></li>
       <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/closure-list.html">Closure list</a></li>
       <li><a href="../components/description-list.html">Description list</a></li>
       <li><a href="../components/list.html">List</a></li>
       <li><a href="../components/member-list.html">Member list</a></li>
@@ -111,16 +113,16 @@
     <header class="ds-header">
       <p class="ds-kicker">Component · Actions</p>
       <h1>Team switcher</h1>
-      <p class="ds-lead">The team switcher is the menu button in the top bar that names the active team and switches a manager of several teams to another one (L2-054 AC11).</p>
+      <p class="ds-lead">The team switcher is the menu button in the top bar that names the active team and switches a person on several teams to another one (L2-054 AC11, L2-056).</p>
       <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span><span class="ds-pill">Since v1.1</span></div>
       <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li></ul>
     </header>
     <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
-<p>Show the switcher only to a manager of <b>two or more</b> teams, at the end of the top bar before the account menu. It is a <a href="menu.html">menu</a> whose team items are <code>menuitemradio</code>: exactly one is checked, the active team. It never sets the default team; that is "Make default" in Settings → Your teams, which uses the <code>.team-list</code> rows (an Active and a Default <a href="badge.html">badge</a> with an icon, never colour alone).</p>
+<p>Show the switcher to anyone who belongs to <b>two or more</b> teams, in any role, at the end of the top bar before the account menu. It is a <a href="menu.html">menu</a> whose team items are <code>menuitemradio</code>: exactly one is checked, the active team. It never sets the default team; that is "Make default" in Settings → Your teams, which uses the <code>.team-list</code> rows (an Active and a Default <a href="badge.html">badge</a> with an icon, never colour alone).</p>
 <div class="ds-demo" style="min-height: 18rem; display:flex; justify-content:flex-end;"><div class="team-switch"><button class="team-switch__btn" type="button" aria-haspopup="menu" aria-expanded="true" aria-label="Switch team, current team Design team"><span class="team-switch__name">Design team</span><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><ul class="menu" role="menu" aria-label="Your teams"><li role="none"><div class="menu__label" aria-hidden="true">Your teams</div></li><li role="none"><button class="menu__item" role="menuitemradio" type="button" aria-checked="true"><svg class="icon icon--sm menu__check" aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Design team<span class="menu__meta">Default</span></button></li><li role="none"><button class="menu__item" role="menuitemradio" type="button" aria-checked="false"><svg class="icon icon--sm menu__check" aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>Product team</button></li><li role="none"><hr class="menu__divider"></li><li role="none"><a class="menu__item" role="menuitem" href="#">Add another team</a></li><li role="none"><a class="menu__item" role="menuitem" href="#">Manage your teams</a></li></ul></div></div>
     </section>
     <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
-<ol><li><code>.team-switch</code>: relative wrapper that right-aligns the panel.</li><li><code>.team-switch__btn</code>: the trigger, an outlined button with <code>.team-switch__name</code> (ellipsis) and a chevron.</li><li><code>.menu__label</code>: "Your teams", decorative (the menu's accessible name says it).</li><li>Team items: <code>.menu__item[role=menuitemradio]</code> with <code>.menu__check</code> (shown when <code>aria-checked="true"</code>) and <code>.menu__meta</code> "Default".</li><li>Divider, then "Add another team" and "Manage your teams" links.</li></ol>
+<ol><li><code>.team-switch</code>: relative wrapper that right-aligns the panel.</li><li><code>.team-switch__btn</code>: the trigger, an outlined button with <code>.team-switch__name</code> (ellipsis) and a chevron.</li><li><code>.menu__label</code>: "Your teams", decorative (the menu's accessible name says it).</li><li>Team items: <code>.menu__item[role=menuitemradio]</code> with <code>.menu__check</code> (shown when <code>aria-checked="true"</code>) and <code>.menu__meta</code> "Default".</li><li>Divider, then "Add another team" and "Manage your teams" links, only when the person manages at least one of the teams (<a href="../../mocks/dialogs/team-switcher/member.html">member</a> state has neither).</li></ol>
     </section>
     <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
 <p>Closed, open (<code>aria-expanded="true"</code>), hover and focus as the menu, and busy while a switch runs: <code>aria-busy="true"</code> on the button, a spinner in place of the chevron and "Switching…" for assistive technology. A failed switch shows the error toast and the button returns to closed.</p>

@@ -72,7 +72,8 @@
       "title": "Accept invitation",
       "requirements": [
         "L1-006",
-        "L1-001"
+        "L1-001",
+        "L2-058"
       ],
       "states": [
         "default",
@@ -85,7 +86,15 @@
         "unavailable",
         "google-busy",
         "google-mismatch",
-        "google-error"
+        "google-error",
+        "account",
+        "account-busy",
+        "account-wrong",
+        "signed-in",
+        "signed-in-busy",
+        "other-account",
+        "account-failed",
+        "account-success"
       ],
       "route": "/accept-invite/:token",
       "not_applicable": {
@@ -99,7 +108,9 @@
       "requirements": [
         "L1-001",
         "L2-008",
-        "L2-054"
+        "L2-054",
+        "L2-055",
+        "L2-057"
       ],
       "states": [
         "default",
@@ -125,7 +136,13 @@
         "L1-003",
         "L1-004",
         "L1-007",
-        "L2-054"
+        "L2-054",
+        "L2-055",
+        "L2-056",
+        "L2-057",
+        "L2-059",
+        "L2-060",
+        "L2-061"
       ],
       "states": [
         "default",
@@ -139,7 +156,11 @@
         "coverage-short",
         "other-month",
         "offline",
-        "several-teams"
+        "several-teams",
+        "team-of-one",
+        "member-several-teams",
+        "school-calendar",
+        "school-calendar-member"
       ],
       "route": "/"
     },
@@ -149,7 +170,9 @@
       "title": "Year",
       "requirements": [
         "L1-002",
-        "L2-054"
+        "L2-054",
+        "L2-057",
+        "L2-060"
       ],
       "states": [
         "default",
@@ -158,7 +181,9 @@
         "error",
         "member",
         "sorted",
-        "several-teams"
+        "several-teams",
+        "team-of-one",
+        "school-calendar"
       ],
       "route": "/year"
     },
@@ -169,7 +194,8 @@
       "requirements": [
         "L1-003",
         "L1-004",
-        "L2-054"
+        "L2-054",
+        "L2-057"
       ],
       "states": [
         "default",
@@ -183,7 +209,8 @@
         "member",
         "member-empty",
         "long",
-        "several-teams"
+        "several-teams",
+        "team-of-one"
       ],
       "route": "/requests"
     },
@@ -194,7 +221,9 @@
       "requirements": [
         "L1-001",
         "L1-003",
-        "L1-004"
+        "L1-004",
+        "L2-057",
+        "L2-060"
       ],
       "states": [
         "default",
@@ -204,7 +233,9 @@
         "forbidden",
         "not-found",
         "over-allowance",
-        "edge"
+        "edge",
+        "team-of-one",
+        "child"
       ],
       "route": "/people/:id",
       "not_applicable": {
@@ -219,7 +250,10 @@
         "L1-001",
         "L1-005",
         "L1-006",
-        "L2-054"
+        "L2-054",
+        "L2-059",
+        "L2-060",
+        "L2-061"
       ],
       "states": [
         "default",
@@ -234,7 +268,14 @@
         "your-teams-single",
         "your-teams-loading",
         "your-teams-switching",
-        "your-teams-error"
+        "your-teams-error",
+        "school-calendar-off",
+        "school-calendar",
+        "school-calendar-saving",
+        "school-calendar-error",
+        "school-calendar-empty",
+        "school-calendar-no-children",
+        "school-calendar-read-only"
       ],
       "route": "/settings",
       "not_applicable": {
@@ -467,6 +508,77 @@
       "opens_from": "settings"
     },
     {
+      "id": "add-child",
+      "kind": "dialog",
+      "title": "Add a child",
+      "requirements": [
+        "L2-060",
+        "L2-059"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "invalid",
+        "failed",
+        "success",
+        "success-invited"
+      ],
+      "opens_from": "settings"
+    },
+    {
+      "id": "school-closure",
+      "kind": "dialog",
+      "title": "School closure",
+      "requirements": [
+        "L2-061"
+      ],
+      "states": [
+        "default",
+        "edit",
+        "busy",
+        "invalid",
+        "failed"
+      ],
+      "opens_from": "settings"
+    },
+    {
+      "id": "delete-closure",
+      "kind": "dialog",
+      "title": "Delete closure",
+      "requirements": [
+        "L2-061"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "failed"
+      ],
+      "opens_from": "settings",
+      "not_applicable": {
+        "invalid": "A confirmation has no input to validate."
+      }
+    },
+    {
+      "id": "import-calendar",
+      "kind": "dialog",
+      "title": "Import a school calendar",
+      "requirements": [
+        "L2-062"
+      ],
+      "states": [
+        "default",
+        "replace",
+        "busy",
+        "success",
+        "unreadable",
+        "failed"
+      ],
+      "opens_from": "settings",
+      "not_applicable": {
+        "invalid": "An unreadable file is the only invalid input; it is the unreadable state."
+      }
+    },
+    {
       "id": "add-holiday",
       "kind": "dialog",
       "title": "Add a day off",
@@ -550,14 +662,17 @@
       "title": "Team switcher",
       "requirements": [
         "L2-054",
-        "L2-049"
+        "L2-049",
+        "L2-056",
+        "L2-055"
       ],
       "states": [
         "default",
         "closed",
         "busy",
         "failed",
-        "absent"
+        "absent",
+        "member"
       ],
       "opens_from": "calendar",
       "not_applicable": {

@@ -37,6 +37,7 @@
     </ul></details>
     <details><summary>Components · Inputs</summary><ul>
       <li><a href="../components/checkbox.html">Checkbox</a></li>
+      <li><a href="../components/file-field.html">File field</a></li>
       <li><a href="../components/counter.html">Counter</a></li>
       <li><a href="../components/form-field.html">Form field</a></li>
       <li><a href="../components/form-layout.html">Form layout</a></li>
@@ -68,6 +69,7 @@
       <li><a href="../components/avatar.html">Avatar</a></li>
       <li><a href="../components/badge.html">Badge and status</a></li>
       <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/closure-list.html">Closure list</a></li>
       <li><a href="../components/description-list.html">Description list</a></li>
       <li><a href="../components/list.html">List</a></li>
       <li><a href="../components/member-list.html">Member list</a></li>
@@ -219,6 +221,10 @@
 [data-status="confirmed"] { --status-bg: var(--color-status-confirmed); }
 /* dark theme only swaps the status tokens: green-500 -> green-400, blue-500 -> blue-400, coral-500 -> coral-400 */</code></pre>
 <p>Re-skin the sheet by changing the five <code>--color-status-*</code> tokens in one place; keep every pair at 4.5:1 against <code>--color-on-status</code> (see Accessibility).</p>
+    </section>
+    <section class="ds-section" id="closure"><h2><a href="#closure">School closure</a></h2>
+<p>A child's cell inside a school closure (L2-061) keeps its status and colour and gains <code>data-closure</code> and the school icon <code>.cell__closure</code>: in the corner when the cell has a status glyph, centred when it has none. Its accessible name ends with ", school closed: {label}". A closure is never red and never the only carrier of anything: the icon and the name say it. The legend adds "School closed" with the same icon.</p>
+<div class="ds-demo" style="display:flex; gap: var(--space-2); max-width: 12rem;"><button type="button" class="cell" data-status="empty" data-closure="true" aria-label="Leo Chen, Fri 20 Nov: Working, school closed: PA day"><svg class="icon cell__closure" aria-hidden="true" viewBox="0 0 24 24"><path d="M2 9.5 12 5l10 4.5L12 14z"/><path d="M6 11.5V16c3.5 2.5 8.5 2.5 12 0v-4.5"/></svg></button><button type="button" class="cell" data-status="confirmed" data-closure="true" aria-label="Leo Chen, Mon 23 Nov: Confirmed, school closed: Winter break"><svg class="icon cell__closure" aria-hidden="true" viewBox="0 0 24 24"><path d="M2 9.5 12 5l10 4.5L12 14z"/><path d="M6 11.5V16c3.5 2.5 8.5 2.5 12 0v-4.5"/></svg></button></div>
     </section>
     <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
 <h3>Role and pattern</h3>
