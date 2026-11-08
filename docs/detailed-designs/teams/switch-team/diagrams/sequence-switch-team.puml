@@ -1,0 +1,41 @@
+@startuml
+title UML sequence behaviour — Switch the active team
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "YourTeamsSection / TeamSwitcher" as ui
+  participant "ManagedTeamsState" as state
+  participant "HttpTeamService" as client
+  participant "Router" as router
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "TeamsController" as ctrl
+end box
+box "Backend — Greenlit.Application" #ECFDF3
+  participant "SwitchTeamCommandHandler" as handler
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> ui : "Switch to this team" / chooses Product team
+ui -> state : switchTo(team)
+state -> ui : busy ("Switching…")
+state -> client : switchTo(id)
+client -> ctrl : POST /api/teams/{id}/switch
+ctrl -> handler : SwitchTeamCommand
+handler -> db : Team where Id = id and ManagerUserId = caller; caller's live row
+alt caller manages the team
+  handler --> ctrl : SessionDto (team_id, team_member_id)
+  ctrl --> client : 200
+  client -> client : SESSION_STORE.setToken
+  state -> router : remount the same screen (person page: calendar)
+  state --> actor : Toast "Switched to Product team" (L2-054 AC3)
+else not managed, or the call fails
+  ctrl --> client : 404 team_not_found / 5xx
+  state --> actor : Error toast "We couldn't switch teams", nothing changes (AC8, AC9)
+end
+@enduml

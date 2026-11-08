@@ -1,0 +1,54 @@
+@startuml
+title Class structure — Run several teams
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+class User {
+  Id : Guid
+  DisplayName : string
+  Role : UserRole
+  DefaultTeamId : Guid?
+}
+class Team {
+  Id : Guid
+  Name : string
+  ManagerUserId : Guid
+  CreatedUtc : DateTimeOffset
+}
+class TeamMember {
+  Id : Guid
+  TeamId : Guid
+  UserId : Guid?
+  RemovedUtc : DateTimeOffset?
+}
+class SessionDto {
+  AccessToken : string
+  TeamId : Guid?
+}
+class MyTeamDto {
+  Id : Guid
+  Name : string
+  Active : bool
+  IsDefault : bool
+}
+class TeamChoice <<static>> {
+  ForSignInAsync(db, userId) : TeamMember?
+}
+class ActiveTeam <<static>> {
+  IdAsync(db, currentUser) : Guid?
+}
+interface ICurrentUser {
+  UserId : Guid?
+  TeamId : Guid?
+}
+User "1" --> "0..*" Team : manages >
+User ..> Team : DefaultTeamId
+Team "1" *-- "1..*" TeamMember
+TeamMember "0..*" --> "0..1" User
+TeamChoice ..> User
+ActiveTeam ..> ICurrentUser
+ActiveTeam ..> TeamChoice
+SessionDto ..> Team : names the active team
+@enduml

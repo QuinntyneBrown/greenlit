@@ -1,0 +1,12 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System context — Run several teams
+
+Person(manager, "Manager", "Runs one or more teams; confirms requests")
+Person(member, "Member", "A row on one team's sheet")
+System(greenlit, "Greenlit", "Team time off, one month at a time")
+
+Rel(manager, greenlit, "Signs in to the default team, switches teams, sets the default")
+Rel(member, greenlit, "Sees their one team")
+@enduml

@@ -25,6 +25,7 @@ Team setup, settings, membership, holidays, working days, coverage and email swi
 |---|---|---|
 | [Create a team](teams/create-team/README.md) | Team name, time zone, public holidays and the first rows in one form. | L2-008 |
 | [Edit team settings](teams/team-settings/README.md) | Settings page: sections saved separately, read-only for members. | L2-009 |
+| [Run several teams](teams/switch-team/README.md) | Default team on sign-in, "Your teams" in Settings and the header team switcher. | L2-054, L2-008, L2-049 |
 | [Invite a member](teams/invite-member/README.md) | Adds a row at once and emails a seven-day invitation. | L2-010 |
 | [Remove a member](teams/remove-member/README.md) | Soft removal that keeps history and blocks sign-in. | L2-011 |
 | [Manage team holidays](teams/manage-holidays/README.md) | Holiday list, add with duplicate and weekend checks, remove with undo. | L2-036, L2-037, L2-038 |

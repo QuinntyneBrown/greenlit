@@ -1,0 +1,16 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Run several teams
+
+Person(manager, "Manager", "Runs several teams")
+System_Boundary(g, "Greenlit") {
+  Container(spa, "Greenlit web application", "Angular", "Settings 'Your teams', header team switcher; keeps the session token")
+  Container(api, "Greenlit API", "ASP.NET Core", "Lists managed teams, re-issues the session, stores the default")
+  ContainerDb(db, "Greenlit database", "SQL Server / SQLite", "Users.DefaultTeamId, Teams, TeamMembers")
+}
+
+Rel(manager, spa, "Uses", "HTTPS")
+Rel(spa, api, "GET /api/teams/mine, POST /api/teams/{id}/switch, PUT /api/teams/default", "JSON/HTTPS")
+Rel(api, db, "Reads and writes", "EF Core")
+@enduml
