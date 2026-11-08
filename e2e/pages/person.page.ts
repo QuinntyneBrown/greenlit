@@ -41,6 +41,11 @@ export class PersonPage extends BasePage {
   }
 
   /** Under the figure: "days left in 2026" and, when over, how far. */
+  /** "Children have no yearly allowance." in place of the allowance facts (L2-060 AC3). */
+  noAllowanceNote(): Locator {
+    return this.main.locator(".facts-bar > p");
+  }
+
   daysLeftCaption(): Locator {
     return this.main.locator(".big-number + p");
   }

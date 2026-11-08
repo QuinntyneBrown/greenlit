@@ -71,13 +71,22 @@ function stateOf(error: unknown): 'forbidden' | 'notfound' | 'error' {
           </div>
         </div>
         <div>
-          <p class="big-number" [attr.data-over]="p.daysOver > 0 ? '' : null">
-            {{ p.allowance.left }}
-          </p>
+          @if (p.allowance; as allowance) {
+            <p class="big-number" [attr.data-over]="p.daysOver > 0 ? '' : null">
+              {{ allowance.left }}
+            </p>
+          } @else {
+            <p class="big-number" aria-hidden="true">—</p>
+          }
           <p class="text-muted text-sm caption">{{ caption() }}</p>
         </div>
       </header>
-      <gl-stat class="person-facts" [facts]="facts()">
+      @if (!p.allowance) {
+        <div class="facts-bar person-facts">
+          <p class="text-muted">Children have no yearly allowance.</p>
+        </div>
+      }
+      <gl-stat class="person-facts" [hidden]="!p.allowance" [facts]="facts()">
         @if (p.isYou && !p.canManage) {
           <gl-button slot="action" variant="primary" (click)="requestTimeOff(p)">
             <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
@@ -437,7 +446,7 @@ export class PersonPage {
     const own = person.allowance;
     const data: NewRequestData = {
       managerName: person.managerName,
-      daysToRequest: Math.max(0, own.left - own.requested),
+      daysToRequest: own ? Math.max(0, own.left - own.requested) : null,
     };
     this.dialogs
       .open<SentRequest>(NewRequestDialog, '#nr-start', data)

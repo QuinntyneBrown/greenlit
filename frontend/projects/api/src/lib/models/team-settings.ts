@@ -6,6 +6,10 @@ export interface TeamSettingsMember {
   readonly role: 'Member' | 'Manager';
   /** The member's own yearly days; null when the team's default applies. */
   readonly yearlyDays: number | null;
+  /** The stored Child mark (L2-060); it counts only while the school calendar is on. */
+  readonly isChild: boolean;
+  /** The team's manager's own row, which is never a child. */
+  readonly isTeamManager: boolean;
 }
 
 /** The Team section of Settings (docs/detailed-designs/teams/team-settings). */
@@ -30,6 +34,7 @@ export interface SaveTeamSettingsInput {
     readonly id: string;
     readonly role: 'Member' | 'Manager';
     readonly yearlyDays: number | null;
+    readonly isChild: boolean;
   }[];
 }
 

@@ -64,6 +64,7 @@ export function subtitle(person: Person): string {
 
 /** "days left in 2026", and how far over the requests would take them (ADR-007). */
 export function caption(person: Person): string {
+  if (person.allowance === null) return 'No allowance';
   const left = `days left in ${person.year}`;
   if (person.daysOver <= 0) return left;
   const days = person.daysOver === 1 ? '1 day' : `${person.daysOver} days`;
@@ -73,6 +74,7 @@ export function caption(person: Person): string {
 /** The figures of L2-033 AC1; the allowance says how much of it is adjustment. */
 export function facts(person: Person): StatFact[] {
   const a = person.allowance;
+  if (a === null) return [];
   const adjustment = a.adjustments > 0 ? `+${a.adjustments}` : `${a.adjustments}`;
   return [
     {

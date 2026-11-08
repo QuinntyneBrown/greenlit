@@ -73,3 +73,22 @@ export async function freshMemberOf(request: APIRequestContext, manager: FreshPe
   if (!response.ok()) throw new Error(`${email} could not join with ${response.status()}.`);
   return { name, email, token: ((await response.json()) as { accessToken: string }).accessToken };
 }
+
+/** Turns the school calendar of `manager`'s active team on (PUT /api/team/settings/school-calendar). */
+export async function turnOnSchoolCalendar(request: APIRequestContext, manager: FreshPerson): Promise<void> {
+  const response = await request.put(`${API_BASE_URL}/api/team/settings/school-calendar`, {
+    headers: { Authorization: `Bearer ${manager.token}` },
+    data: { schoolCalendar: true },
+  });
+  if (!response.ok()) throw new Error(`Turning the school calendar on failed with ${response.status()}.`);
+}
+
+/** Adds a child called `name` to `manager`'s active team (POST /api/team/children); returns the row's id. */
+export async function addChild(request: APIRequestContext, manager: FreshPerson, name: string, email?: string): Promise<string> {
+  const response = await request.post(`${API_BASE_URL}/api/team/children`, {
+    headers: { Authorization: `Bearer ${manager.token}` },
+    data: { name, email },
+  });
+  if (!response.ok()) throw new Error(`Adding ${name} failed with ${response.status()}.`);
+  return ((await response.json()) as { id: string }).id;
+}

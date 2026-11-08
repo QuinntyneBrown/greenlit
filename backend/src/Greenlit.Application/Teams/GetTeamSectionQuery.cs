@@ -11,8 +11,11 @@ public sealed record GetTeamSectionQuery : IRequest<TeamSectionDto>;
 /// </summary>
 public sealed record TeamSectionDto(string Name, string TimeZone, bool CanEdit, string ManagerName, IReadOnlyList<TeamSectionMemberDto> Members, bool SchoolCalendar);
 
-/// <summary><c>IsChild</c> is the stored mark (L2-060); it counts only while the school calendar is on.</summary>
-public sealed record TeamSectionMemberDto(Guid Id, string Name, string? Email, string Role, int? YearlyDays, bool IsChild);
+/// <summary>
+/// <c>IsChild</c> is the stored mark (L2-060); it counts only while the school calendar is on. <c>IsTeamManager</c> marks
+/// the team's manager's own row, which can never be a child.
+/// </summary>
+public sealed record TeamSectionMemberDto(Guid Id, string Name, string? Email, string Role, int? YearlyDays, bool IsChild, bool IsTeamManager);
 
 /// <summary>
 /// Saves the Team section as one request (L2-009 AC2): the name, the time zone, and the role and yearly days of
