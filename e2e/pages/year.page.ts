@@ -156,4 +156,9 @@ export class YearPage extends BasePage {
   tryAgain(): Locator {
     return control(this.notice(), "Try again");
   }
+
+  /** The toast whose title is `title`, e.g. "Switched to Product team" (L2-054). */
+  toast(title: string): Locator {
+    return this.page.locator(".toast").filter({ has: this.page.locator(".toast__title", { hasText: title }) });
+  }
 }

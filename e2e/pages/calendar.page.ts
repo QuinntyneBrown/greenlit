@@ -293,6 +293,11 @@ export class CalendarPage extends BasePage {
     return this.toasts().filter({ has: this.page.locator(".toast__title", { hasText: title }) });
   }
 
+  /** The body text of the toast whose title is `title`. */
+  toastText(title: string): Locator {
+    return this.toast(title).locator(".toast__text");
+  }
+
   /** The toast's action button ("Undo", "Try again") or its Dismiss button. */
   toastAction(title: string, name: string): Locator {
     return this.toast(title).getByRole("button", { name, exact: true });
