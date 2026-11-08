@@ -91,6 +91,8 @@ public sealed class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand
         }
 
         if (user.Role == UserRole.Member) user.Role = UserRole.Manager;
+        // The first team a person creates is their default (L2-054 AC1, ADR-014); a later one becomes active only.
+        user.DefaultTeamId ??= team.Id;
         _db.Teams.Add(team);
         await _db.SaveChangesAsync(ct);
 

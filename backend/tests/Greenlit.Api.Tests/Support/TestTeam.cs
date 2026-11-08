@@ -63,6 +63,33 @@ public sealed class TestTeam
         return new TestTeam(factory, team, manager, row);
     }
 
+    /// <summary>
+    /// Another team managed by the same manager (L2-054), created <paramref name="minutesLater"/> minutes after this one,
+    /// with the manager's own row first. The returned team shares this one's manager account.
+    /// </summary>
+    public async Task<TestTeam> AddTeamAsync(string teamName, int minutesLater = 1)
+    {
+        var team = new Team
+        {
+            Id = Guid.NewGuid(),
+            Name = teamName,
+            ManagerUserId = Manager.Id,
+            TimeZone = Team.TimeZone,
+            CreatedUtc = Team.CreatedUtc.AddMinutes(minutesLater),
+        };
+        var row = new TeamMember { Id = Guid.NewGuid(), TeamId = team.Id, Name = ManagerRow.Name, UserId = Manager.Id, SortOrder = 0 };
+        await _factory.WriteAsync(db =>
+        {
+            db.Teams.Add(team);
+            db.TeamMembers.Add(row);
+        });
+        return new TestTeam(_factory, team, Manager, row);
+    }
+
+    /// <summary>Stores <paramref name="team"/> as the manager's default team, as "Make default" would.</summary>
+    public Task SetDefaultTeamAsync(Guid? team) =>
+        _factory.WriteAsync(db => db.Users.Single(u => u.Id == Manager.Id).DefaultTeamId = team);
+
     /// <summary>Adds a row at the end of the sheet; with <paramref name="withAccount"/> it can sign in.</summary>
     public async Task<TeamMember> AddMemberAsync(string name, bool withAccount = true)
     {

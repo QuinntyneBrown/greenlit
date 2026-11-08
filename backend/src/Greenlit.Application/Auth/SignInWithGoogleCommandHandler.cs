@@ -1,5 +1,6 @@
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Exceptions;
+using Greenlit.Application.Teams;
 using Greenlit.Domain.Entities;
 using Greenlit.Domain.Enums;
 using MediatR;
@@ -66,7 +67,7 @@ public sealed class SignInWithGoogleCommandHandler : IRequestHandler<SignInWithG
         if (await RemovedMembers.IsRemovedAsync(_db, user.Id, ct))
             throw new UnauthorizedException(RemovedMembers.Code, RemovedMembers.Detail);
 
-        var member = await _db.TeamMembers.AsNoTracking().FirstOrDefaultAsync(m => m.UserId == user.Id, ct);
+        var member = await TeamChoice.ForSignInAsync(_db, user.Id, ct);
         return GoogleSessionDto.From(_tokens.Issue(user, member), newAccount);
     }
 }

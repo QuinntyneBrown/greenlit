@@ -16,5 +16,7 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         b.Property(x => x.GoogleSubject).HasMaxLength(255);
         b.HasIndex(x => x.GoogleSubject).IsUnique().HasFilter("[GoogleSubject] IS NOT NULL");
         b.Property(x => x.Role).HasConversion<string>().HasMaxLength(32);
+        // A plain nullable column, no foreign key: TeamChoice never trusts a stale value (ADR-014).
+        b.Property(x => x.DefaultTeamId);
     }
 }

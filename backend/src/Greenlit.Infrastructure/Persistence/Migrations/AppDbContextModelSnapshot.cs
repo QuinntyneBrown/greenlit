@@ -349,6 +349,9 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedUtc")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<Guid?>("DefaultTeamId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasMaxLength(120)
