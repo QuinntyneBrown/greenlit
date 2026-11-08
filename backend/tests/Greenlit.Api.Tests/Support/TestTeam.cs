@@ -126,6 +126,10 @@ public sealed class TestTeam
         return row;
     }
 
+    /// <summary>Remembers a row the API made (for example by inviting someone), so the helpers can find it by name.</summary>
+    public void TrackRow(string name, Guid id) =>
+        _rows[name] = new TeamMember { Id = id, TeamId = Team.Id, Name = name };
+
     /// <summary>The account behind the named row.</summary>
     public User UserOf(string name) => _users[name];
 

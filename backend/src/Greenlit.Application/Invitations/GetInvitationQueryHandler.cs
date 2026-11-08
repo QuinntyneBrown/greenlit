@@ -1,5 +1,6 @@
 using Greenlit.Application.Abstractions;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Greenlit.Application.Invitations;
 
@@ -18,6 +19,8 @@ public sealed class GetInvitationQueryHandler : IRequestHandler<GetInvitationQue
     public async Task<InvitationSummaryDto> Handle(GetInvitationQuery request, CancellationToken ct)
     {
         var open = await InvitationLookup.FindOpenAsync(_db, _time, request.Token, ct);
-        return new InvitationSummaryDto(open.Team.Name, open.ManagerName, open.Member.Name, open.Invitation.Email);
+        var lower = open.Invitation.Email.Trim().ToLowerInvariant();
+        var accountExists = await _db.Users.AnyAsync(u => u.Email.ToLower() == lower, ct);
+        return new InvitationSummaryDto(open.Team.Name, open.ManagerName, open.Member.Name, open.Invitation.Email, accountExists);
     }
 }

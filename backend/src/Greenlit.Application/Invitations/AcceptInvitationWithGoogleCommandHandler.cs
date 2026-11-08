@@ -43,7 +43,17 @@ public sealed class AcceptInvitationWithGoogleCommandHandler : IRequestHandler<A
         if (GoogleSignIns.EmailOf(account).ToLowerInvariant() != lower)
             throw new ConflictException(EmailMismatch, "That Google account doesn't match this invitation.");
 
-        if (await _db.Users.AnyAsync(u => u.Email.ToLower() == lower || u.GoogleSubject == account.Subject, ct))
+        // An address that already has an account joins with it (L2-052 AC6, L2-058 AC3, ADR-015), and the Google account
+        // is linked to it as Continue with Google would; a Google account linked to a different address is refused.
+        var existing = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == lower, ct);
+        if (existing is not null)
+        {
+            if (existing.GoogleSubject is not null && existing.GoogleSubject != account.Subject)
+                throw new ConflictException(AcceptInvitationCommandHandler.AccountExists, "An account with this email already exists.");
+            existing.GoogleSubject ??= account.Subject;
+            return await InvitationMembership.AttachAsync(_db, _tokens, _time, open, existing, ct);
+        }
+        if (await _db.Users.AnyAsync(u => u.GoogleSubject == account.Subject, ct))
             throw new ConflictException(AcceptInvitationCommandHandler.AccountExists, "An account with this email already exists.");
 
         var now = _time.GetUtcNow();

@@ -130,24 +130,29 @@ public class JoinWithGoogleTests : IClassFixture<FrozenClockApiFactory>
     }
 
     [Fact]
-    public async Task An_address_that_already_has_an_account_is_refused_with_a_code()
+    public async Task An_address_that_already_has_an_account_joins_with_that_account()
     {
-        // L2-052 AC6.
+        // L2-052 AC6, L2-058 AC3 (ADR-015): no second account; the invitation adds a membership to the existing one and
+        // links the Google account to it.
         var email = Email("exists");
         var invite = await InviteAsync("Finn Murphy", email);
-        await _factory.WriteAsync(db => db.Users.Add(new Greenlit.Domain.Entities.User
+        var existing = new Greenlit.Domain.Entities.User
         {
             Id = Guid.NewGuid(), Email = email, DisplayName = "Finn Murphy", PasswordHash = "x", Role = UserRole.Member, CreatedUtc = FrozenClockApiFactory.Now,
-        }));
+        };
+        await _factory.WriteAsync(db => db.Users.Add(existing));
+        var subject = NewSubject();
 
-        var response = await JoinAsync(invite.Token, FakeGoogle.Token(NewSubject(), email, "Finn Murphy"));
+        var response = await JoinAsync(invite.Token, FakeGoogle.Token(subject, email, "Finn Murphy"));
 
-        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("code").GetString().Should().Be("account_exists");
+        response.StatusCode.Should().Be(HttpStatusCode.OK, await response.Content.ReadAsStringAsync());
+        (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("userId").GetGuid().Should().Be(existing.Id);
         await using var scope = _factory.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         (await db.Users.CountAsync(u => u.Email == email)).Should().Be(1);
-        (await db.Invitations.SingleAsync(i => i.Email == email)).AcceptedUtc.Should().BeNull();
+        (await db.Users.SingleAsync(u => u.Id == existing.Id)).GoogleSubject.Should().Be(subject);
+        (await db.Invitations.SingleAsync(i => i.Email == email)).AcceptedUtc.Should().NotBeNull();
+        (await db.TeamMembers.SingleAsync(m => m.Id == invite.MemberId)).UserId.Should().Be(existing.Id);
     }
 
     [Fact]
