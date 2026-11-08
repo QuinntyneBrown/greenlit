@@ -10,7 +10,15 @@ import {
   viewChild,
 } from '@angular/core';
 
-import { CreatedTeam, HOLIDAY_CALENDAR_OPTIONS, TEAM_SERVICE, TIME_ZONE_OPTIONS } from 'api';
+import { RouterLink } from '@angular/router';
+
+import {
+  CreatedTeam,
+  HOLIDAY_CALENDAR_OPTIONS,
+  SESSION_STORE,
+  TEAM_SERVICE,
+  TIME_ZONE_OPTIONS,
+} from 'api';
 import {
   Alert,
   AuthCard,
@@ -39,7 +47,7 @@ const FIRST_ROWS = 3;
  */
 @Component({
   selector: 'app-create-team-page',
-  imports: [AuthCard, TextField, SelectField, FormSummary, Button, Alert],
+  imports: [AuthCard, TextField, SelectField, FormSummary, Button, Alert, RouterLink],
   template: `
     @if (created(); as team) {
       <gl-auth-card title="You’re all set" lead="Your sheet is ready." [wide]="true">
@@ -48,10 +56,22 @@ const FIRST_ROWS = 3;
       </gl-auth-card>
     } @else {
       <gl-auth-card
-        title="Set up your team"
-        lead="Name it, pick a time zone and add the people who’ll share the sheet."
+        [title]="another ? 'Set up another team' : 'Set up your team'"
+        [lead]="
+          another
+            ? 'Name it, pick a time zone and add the people who’ll share the sheet. Your other teams stay as they are.'
+            : 'Name it, pick a time zone and add the people who’ll share the sheet.'
+        "
         [wide]="true"
       >
+        @if (another) {
+          <a slot="back" class="back-link" routerLink="/settings" fragment="teams">
+            <svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M19 12H5m6-6-6 6 6 6" />
+            </svg>
+            Back to Settings
+          </a>
+        }
         <form class="stack" novalidate (submit)="submit($event)">
           @if (submitted() && summaryItems().length) {
             <gl-form-summary [items]="summaryItems()" />
@@ -164,6 +184,19 @@ const FIRST_ROWS = 3;
     .text-sm {
       font: var(--text-body-sm);
     }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      min-height: var(--target-min);
+      margin-bottom: var(--space-2);
+      color: var(--color-fg-muted);
+      font: var(--text-body-sm);
+      text-decoration: none;
+    }
+    .back-link:hover {
+      color: var(--color-fg-default);
+    }
     .text-muted {
       color: var(--color-fg-muted);
     }
@@ -172,6 +205,8 @@ const FIRST_ROWS = 3;
 })
 export class CreateTeamPage {
   private readonly teams = inject(TEAM_SERVICE);
+  /** A manager adding another team (L2-054 AC5): the session already names a team when the page opens. */
+  protected readonly another = inject(SESSION_STORE).teamId() !== null;
   private readonly injector = inject(Injector);
   private readonly document = inject(DOCUMENT);
   private readonly summary = viewChild(FormSummary);

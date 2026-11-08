@@ -112,6 +112,41 @@ export class ManagedTeamsState {
     });
   }
 
+  /**
+   * Makes `team` the one sign-in opens (L2-054 AC4): the Default mark moves and a toast says so; the active team does
+   * not change. A failure keeps the mark where it was and says so with "Try again" (AC9).
+   */
+  makeDefault(team: ManagedTeam): void {
+    if (this.busy() !== null || team.isDefault) return;
+    const before = this.teams().find((t) => t.isDefault) ?? null;
+    this.busy.set({ teamId: team.id, action: 'default' });
+    this.teamService.makeDefault(team.id).subscribe((result) => {
+      this.busy.set(null);
+      if (!result.ok) {
+        this.toasts.show({
+          tone: 'danger',
+          title: 'We couldn’t change your default',
+          body: before
+            ? `${before.name} is still your default. Check your connection and try again.`
+            : 'Nothing was changed. Check your connection and try again.',
+          action: { label: 'Try again', run: () => this.makeDefault(team) },
+        });
+        return;
+      }
+      const load = this.load();
+      if (load.state === 'ready')
+        this.load.set({
+          state: 'ready',
+          teams: load.teams.map((t) => ({ ...t, isDefault: t.id === team.id })),
+        });
+      this.toasts.show({
+        tone: 'info',
+        title: `${team.name} is now your default`,
+        body: 'Greenlit opens it when you sign in.',
+      });
+    });
+  }
+
   /** Shows `teamId` as the active team at once, before the list is read again. */
   private markActive(teamId: string): void {
     const load = this.load();
