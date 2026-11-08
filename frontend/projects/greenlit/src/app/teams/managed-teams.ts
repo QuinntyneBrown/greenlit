@@ -21,8 +21,9 @@ export type ManagedTeamsLoad =
   | { readonly state: 'error' };
 
 /**
- * The teams the signed-in manager manages (docs/detailed-designs/teams/switch-team, L2-054), shared by Settings →
- * Your teams and the header team switcher. Read again on demand; a member's session never asks.
+ * The teams the signed-in person belongs to (docs/detailed-designs/teams/switch-team, L2-054, L2-056, ADR-015), shared
+ * by Settings → Your teams (the managed ones) and the header team switcher (all of them). Read again on demand by any
+ * session that names a team.
  */
 @Injectable({ providedIn: 'root' })
 export class ManagedTeamsState {
@@ -36,13 +37,24 @@ export class ManagedTeamsState {
   /** The switch or default change in flight; null when none. */
   readonly busy = signal<TeamsBusy | null>(null);
 
-  /** The teams once read; empty while loading, after a failure and for anyone who manages none. */
+  /** The teams once read; empty while loading, after a failure and for a person on no team. */
   readonly teams = computed(() => {
     const load = this.load();
     return load.state === 'ready' ? load.teams : [];
   });
 
   readonly active = computed(() => this.teams().find((t) => t.active) ?? null);
+
+  /** The teams the person manages: what "Your teams" lists, and whether the switcher offers to add and manage teams. */
+  readonly managed = computed(() => this.teams().filter((t) => t.manages));
+
+  /** "Your teams" as a load of the managed teams only (L2-054 AC7). */
+  readonly managedLoad = computed<ManagedTeamsLoad>(() => {
+    const load = this.load();
+    return load.state === 'ready'
+      ? { state: 'ready', teams: load.teams.filter((t) => t.manages) }
+      : load;
+  });
 
   private loadedFor: string | null = null;
 
@@ -51,8 +63,7 @@ export class ManagedTeamsState {
    * it the reader sees the loading state, as on a first visit or after "Try again".
    */
   refresh(quiet = false): void {
-    const token =
-      this.session.isSignedIn() && this.session.isManager() ? this.session.token() : null;
+    const token = this.session.isSignedIn() && this.session.teamId() ? this.session.token() : null;
     if (token === null) {
       this.loadedFor = null;
       this.load.set({ state: 'ready', teams: [] });
@@ -75,7 +86,7 @@ export class ManagedTeamsState {
    * new team (a person page gives way to the calendar) and a toast says so. A failure changes nothing and says so
    * with "Try again" (AC9).
    */
-  switchTo(team: ManagedTeam): void {
+  switchTo(team: Pick<ManagedTeam, 'id' | 'name' | 'active'>): void {
     if (this.busy() !== null || team.active) return;
     const before = this.active();
     this.busy.set({ teamId: team.id, action: 'switch' });

@@ -7,6 +7,7 @@
       <gl-team-switcher
         slot="end"
         [teams]="managedTeams.teams()"
+        [canManage]="managedTeams.managed().length > 0"
         [busy]="switching()"
         (chosen)="managedTeams.switchTo($event)"
       />

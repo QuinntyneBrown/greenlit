@@ -39,7 +39,7 @@ export interface TeamService {
   invite(member: NewMember): Observable<InviteResult>;
   /** Removes the member from the team, keeping their history (teams/remove-member, L2-011). Manager only. */
   remove(memberId: string): Observable<RemoveMemberResult>;
-  /** The teams the caller manages, oldest first; empty for anyone who manages none. Errors reach the caller. */
+  /** The teams the caller belongs to, oldest first, each saying whether they manage it; empty on no team. Errors reach the caller. */
   mine(): Observable<readonly ManagedTeam[]>;
   /** Makes the team the active one: the session is replaced by one that names it (L2-054 AC3). */
   switchTo(teamId: string): Observable<TeamChangeResult>;
