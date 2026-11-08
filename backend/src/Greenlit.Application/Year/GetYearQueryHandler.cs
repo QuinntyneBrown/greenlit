@@ -1,3 +1,4 @@
+using Greenlit.Application.SchoolCalendar;
 using System.Globalization;
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Teams;
@@ -71,7 +72,9 @@ public sealed class GetYearQueryHandler : IRequestHandler<GetYearQuery, YearDto>
                 GetMonthQueryHandler.Initials(m.Name),
                 m.UserId == userId,
                 Enumerable.Range(1, 12).Select(month => MonthOf(year, month, m.Id, WorkingDayRule.For(team, m), holidays, statusOf)).ToList(),
-                figures[m.Id]))
+                // A child has no allowance (L2-060 AC3).
+                SchoolCalendarRules.IsChild(team, m) ? null : figures[m.Id],
+                SchoolCalendarRules.IsChild(team, m)))
             .ToList();
 
         return new YearDto(year, team.ManagerUserId == userId, members);

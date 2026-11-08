@@ -13,7 +13,8 @@ public sealed record MonthDto(
     string ManagerName,
     int? CoverageMinimum,
     IReadOnlyList<MemberRowDto> Members,
-    IReadOnlyList<CoverageDto> Coverage);
+    IReadOnlyList<CoverageDto> Coverage,
+    bool SchoolCalendar);
 
 public sealed record MemberRowDto(
     Guid Id,
@@ -23,7 +24,8 @@ public sealed record MemberRowDto(
     int? DaysLeft,
     AllowanceFigures? Allowance,
     IReadOnlyList<CellDto> Cells,
-    IReadOnlyList<string> WorkingDays);
+    IReadOnlyList<string> WorkingDays,
+    bool IsChild);
 
 /// <summary>One member's day. <c>HolidayName</c> is set when <c>Kind</c> is <see cref="CellKind.Holiday"/>.</summary>
 public sealed record CellDto(string Date, CellKind Kind, string? HolidayName);
