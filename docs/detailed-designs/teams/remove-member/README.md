@@ -35,6 +35,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | L2 ID | Refines (L1) | Requirement |
 |-------|--------------|-------------|
 | `L2-011` | `L1-002` | **Remove a member.** The manager removes a member from the team; their history is kept. |
+| `L2-058` | `L1-015` | **Invite a person who already has an account.** Accepting attaches a membership to the existing account (signed out with the password or Google, or signed in); a different account is refused. |
 
 ## Diagrams
 
@@ -67,3 +68,9 @@ Removal changes one field, `TeamMember.RemovedUtc`; the member's `TimeOffDay` ro
 Nothing changes when the request fails (`L2-011` AC3); a removed member's page shows "Person not found" (`L2-011` AC4).
 
 ![Sequence diagram: remove a member](diagrams/sequence-remove.png)
+
+## Open questions answered (ADR-015, 8 Nov 2026)
+
+- **A person on several teams.** Removal soft-removes the row on this team only (`L2-058` AC9). Sign-in still works while the person has a live row elsewhere (`RemovedMembers.IsRemovedAsync` already requires every row to be removed); a session that names the removed team gets 404s from every team-scoped call, and the client signs the person in again onto a team they still belong to.
+- **The removed team's history** stays, as before (`IgnoreQueryFilters` readers).
+- **A child's closures** stay with the removed row; they are no longer shown because the row is off the sheet.

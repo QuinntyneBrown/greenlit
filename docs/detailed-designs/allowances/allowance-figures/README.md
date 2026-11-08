@@ -73,6 +73,8 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | `L2-027` | `L1-006` | **Allowance defaults.** Settings sets the defaults for new people. |
 | `L2-029` | `L1-006` | **Allowance figures.** Greenlit computes each member's allowance for the leave year. |
 | `L2-030` | `L1-006` | **Over-allowance warnings.** Greenlit flags when requests would take a member below zero days left. |
+| `L2-060` | `L1-016` | **Child members.** A manager-set member attribute: no allowance, no days left; a login-less child's days are saved as Confirmed. |
+| `L2-061` | `L1-016` | **School closures.** Labelled date ranges on one child's or all children's rows, shown with an icon and text, never red, counted nowhere. |
 
 ## Diagrams
 
@@ -105,3 +107,9 @@ An `Allowance` is computed, never stored, from `Team` defaults, `TeamMember.Year
 The steps match the figures table: Left excludes requested days, and Left after requests decides the over-allowance warning (`L2-029` AC4, `L2-030`).
 
 ![Sequence diagram: compute a member's allowance](diagrams/sequence-compute.png)
+
+## Open questions answered (ADR-015, 8 Nov 2026)
+
+- **Children have no allowance** (`L2-060` AC3). `AllowanceCalculator` is not asked for a child: every DTO that carries figures (month, year, person, request quote) carries `null` and the client shows "No allowance". The calculation for everyone else is unchanged.
+- **Closures count nowhere** (`L2-061` AC5): they are a separate table and no allowance query reads it.
+- **School calendar off.** A child counts as an ordinary member again (`L2-059` AC1); nothing stored changes.

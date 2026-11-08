@@ -48,6 +48,8 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | L2 ID | Refines (L1) | Requirement |
 |-------|--------------|-------------|
 | `L2-008` | `L1-002` | **Create a team.** A manager sets up a team and its rows in one form. |
+| `L2-055` | `L1-015` | **Several teams per person.** A person may manage some teams and be a member of others; any signed-in person may create a team; each team stays its own sheet. |
+| `L2-057` | `L1-015` | **A team of one.** A team whose only member is its manager is complete and usable on every screen. |
 
 ## Diagrams
 
@@ -107,3 +109,11 @@ Validation failures stop the request before any write (`L2-008` AC4). The single
 - **Team scoping.** The handler resolves the caller from `sub` only. The new team, its rows and its holidays belong to that caller; nothing in the request names an existing team or member.
 - **What an error reveals.** `team_exists` says only that the caller is already on a team, which they know. Validation errors name only the request's own fields. A server failure says nothing about the cause.
 - **Personal data.** Member names and emails are stored on the team's rows and shown only to that team. No email is sent in this journey, and emails are not logged (the logging behaviour logs request type names only).
+
+## Open questions answered (ADR-015, 8 Nov 2026)
+
+- **Who may create a team?** Any signed-in person (`L2-008` AC8, `L2-055` AC1). `CreateTeamCommandHandler` no longer answers `409 team_exists`; a person who is a member elsewhere becomes the new team's manager and keeps their other rows.
+- **Which page opens?** A session that names any team opens `/create-team` as "Set up another team" (`pages/create-team/another`); `noTeamGuard` no longer asks `GET /api/teams/mine` and lets every signed-in person through.
+- **Default.** The new team becomes the default when it is the first team the person manages; a person who only had member rows now opens it on sign-in (`TeamChoice`, ADR-015).
+- **A team of one** (`L2-057`). No member row is required: the manager's own row is the team. The success state is `pages/create-team/success-no-invites`; every screen renders with that one row (`pages/calendar/team-of-one`, `pages/year/team-of-one`, `pages/requests/team-of-one`, `pages/person/team-of-one`).
+- **No team type.** The form has no workplace or household field (`L2-057` AC4); the school calendar is turned on later in Settings (`teams/school-calendar`).

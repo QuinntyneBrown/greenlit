@@ -38,6 +38,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | L2 ID | Refines (L1) | Requirement |
 |-------|--------------|-------------|
 | `L2-010` | `L1-002` | **Invite a member.** The manager adds a person to the team by name and email; the person appears on the calendar at once and receives an email link to set a password. |
+| `L2-058` | `L1-015` | **Invite a person who already has an account.** Accepting attaches a membership to the existing account (signed out with the password or Google, or signed in); a different account is refused. |
 
 ## Diagrams
 
@@ -81,3 +82,9 @@ The new row appears on the calendar as soon as the request succeeds (`L2-010` AC
 - **Already on the team.** The dialog shows "Someone on the team already uses this email." under Email and in the summary ("Use a different email") when the API answers `member_exists`; no mock shows this, and it uses the invalid state's pattern.
 - **Seed.** `greenlit seed` adds three more accounts on no team (Uma, Vic, Wren) for the e2e spec, which gives each viewport a team of its own: the demo team already holds Finn Murphy and a person cannot be removed until `teams/remove-member`.
 - **Migrations.** The Invitation table and `TeamMember.Role` are added to the SQL Server migrations (ADR-006).
+
+## Open questions answered (ADR-015, 8 Nov 2026)
+
+- **An email with an account.** Inviting it is unchanged (`L2-058` AC1): a row, an invitation, an email. The account is matched by email only when the invitation is accepted (`identity-and-access/accept-invitation`).
+- **Already on this team.** An email that belongs to a live row on the inviting team that has joined is still `409 member_exists` (`L2-058` AC8).
+- **Children.** "Add a child" (`POST /api/team/children`) shares the issuer: a child with an email gets the same invitation; a child without one gets a row only (`teams/school-calendar`).

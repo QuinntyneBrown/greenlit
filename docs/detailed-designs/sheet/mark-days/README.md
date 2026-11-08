@@ -59,6 +59,8 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | `L2-015` | `L1-004` | **Paint mode.** With a paint colour chosen, clicking or dragging across cells applies that status. |
 | `L2-017` | `L1-004` | **Who can change which days.** A member edits only their own row and cannot change confirmed days; non-working days never change. |
 | `L2-018` | `L1-004` | **Undo and failed saves on the calendar.** Every change made on the calendar can be undone, and a failed save keeps the selection. |
+| `L2-055` | `L1-015` | **Several teams per person.** A person may manage some teams and be a member of others; any signed-in person may create a team; each team stays its own sheet. |
+| `L2-060` | `L1-016` | **Child members.** A manager-set member attribute: no allowance, no days left; a login-less child's days are saved as Confirmed. |
 
 ## Diagrams
 
@@ -97,3 +99,8 @@ The stroke previews during the drag and saves on release (`L2-015` AC3). The pol
 Undo stays available for the toast's whole lifetime (`L2-018` AC1, `L2-044` AC3) and passes the same policy as the original change.
 
 ![Sequence diagram: undo a change](diagrams/sequence-undo.png)
+
+## Open questions answered (ADR-015, 8 Nov 2026)
+
+- **A login-less child** (`L2-060` AC4): when the manager sets days on a child's row with no email, `DayChanger` stores them as Confirmed whatever was painted, so no request step exists for that row. A child with an email follows `L2-017` unchanged.
+- **Several teams** (`L2-055` AC3, AC4): `DayChanger` is scoped to the active team; a person's rows on other teams are never touched and their role is read from this team's `ManagerUserId`.

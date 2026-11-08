@@ -1,0 +1,33 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — School calendar
+
+Person(manager, "Manager", "Runs a household team")
+Container_Boundary(spa_b, "Greenlit web application") {
+  Component(section, "SchoolCalendarSection", "Angular component", "Settings section#school: switch, closure list")
+  Component(dialogs, "AddChild / SchoolClosure / DeleteClosure / ImportCalendar dialogs", "CDK Dialog", "Every edit happens in a dialog")
+  Component(grid, "gl-team-grid", "components", "Closure icon and accessible name on child cells")
+  Component(client, "HttpSchoolCalendarService", "SCHOOL_CALENDAR_SERVICE", "setting, children, closures, import")
+}
+Container_Boundary(api_b, "Greenlit API") {
+  Component(ctrl, "SchoolCalendarController", "ASP.NET Core controller", "/api/team/settings/school-calendar, /api/team/closures, /api/team/children")
+  Component(handlers, "Closure and child handlers", "MediatR handlers", "Manager only, scoped to the active team")
+  Component(ics, "IcsCalendar", "Application parser", "All-day VEVENTs, 1 MB, 500 events")
+  Component(month, "GetMonthQueryHandler", "MediatR handler", "isChild, closures for the month")
+  Component(days, "DayChanger", "Application service", "Login-less child: Confirmed")
+  ComponentDb(db, "Greenlit database", "SQL Server", "Teams, TeamMembers, SchoolClosures")
+}
+
+Rel(manager, section, "Turns on, edits closures")
+Rel(section, dialogs, "Opens")
+Rel(section, client, "Calls")
+Rel(dialogs, client, "Calls")
+Rel(client, ctrl, "JSON/HTTPS")
+Rel(ctrl, handlers, "Sends")
+Rel(handlers, ics, "Parses uploads with")
+Rel(handlers, db, "Reads and writes", "EF Core")
+Rel(month, db, "Reads", "EF Core")
+Rel(days, db, "Writes", "EF Core")
+Rel(grid, month, "Renders the month from", "GET /api/sheet")
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+title UML sequence behaviour — Show closures on the month
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Anyone on the team" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "CalendarPage / gl-team-grid" as ui
+  participant "HttpSheetService" as client
+end box
+box "Backend — Greenlit.Application" #ECFDF3
+  participant "GetMonthQueryHandler" as handler
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> ui : opens November
+ui -> client : month(2026, 11)
+client -> handler : GET /api/sheet?year=2026&month=11
+handler -> db : team, rows, days, holidays
+alt SchoolCalendar on
+  handler -> db : SchoolClosures overlapping the month
+  handler --> client : members[isChild], closures[{label, firstDay, lastDay, memberId?}], child figures null
+else off
+  handler --> client : no closures, every isChild false
+end
+ui -> ui : each child cell in a closure: school icon,\n"…, school closed: PA day"; status and colour unchanged
+ui --> actor : Out row and Left column ignore closures (L2-061 AC5)
+@enduml

@@ -1,0 +1,16 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — School calendar
+
+Person(manager, "Manager", "Runs a household team")
+System_Boundary(g, "Greenlit") {
+  Container(spa, "Greenlit web application", "Angular", "Settings School calendar section, Add a child, closure and import dialogs, closure cells on the sheet")
+  Container(api, "Greenlit API", "ASP.NET Core", "Setting, child mark, closures, .ics import; month DTO with closures")
+  ContainerDb(db, "Greenlit database", "SQL Server / SQLite", "Teams.SchoolCalendar, TeamMembers.IsChild, SchoolClosures")
+}
+
+Rel(manager, spa, "Uses", "HTTPS")
+Rel(spa, api, "PUT /api/team/settings/school-calendar, /api/team/closures, POST /api/team/children, POST .../calendar", "JSON or multipart/HTTPS")
+Rel(api, db, "Reads and writes", "EF Core")
+@enduml

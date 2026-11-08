@@ -38,6 +38,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | L2 ID | Refines (L1) | Requirement |
 |-------|--------------|-------------|
 | `L2-004` | `L1-001` | **Accept an invitation.** An invited person joins the team by setting their name and password. Invitations work for seven days. |
+| `L2-058` | `L1-015` | **Invite a person who already has an account.** Accepting attaches a membership to the existing account (signed out with the password or Google, or signed in); a different account is refused. |
 
 ## Diagrams
 
@@ -83,3 +84,16 @@ An invitation older than seven days shows "This invitation has expired" (`L2-004
 - **After joining.** The page shows the `success` state ("Welcome, Finn", "You're in") for 1.5 seconds with an "Open the calendar" button, then opens the calendar, as sign-in does. The session is stored like a sign-in; a signed-in visitor who opens the link is not redirected, and accepting replaces their session.
 - **Route.** `/accept-invite/:token` (the link of `teams/invite-member`, `{Greenlit:App:Origin}/accept-invite/{token}`), bare shell, `data-page="accept-invite"`.
 - **E2E.** The token exists only in the email, which the e2e API writes to its log (ADR-006); the Playwright fixture reads the link for an address from `.run/logs/e2e-api.out.log`.
+
+### Behaviour — accept with an existing account (ADR-015)
+
+An email that already has an account joins with that account, signed out with its password or Google, or signed in; another account is refused (`L2-058`).
+
+![Sequence diagram: accept an invitation with an existing account](diagrams/sequence-join-existing-account.png)
+
+## Open questions answered (ADR-015, 8 Nov 2026)
+
+- **The email already has an account.** `GET /api/invitations/{token}` returns `accountExists`. The page then shows the existing-account card instead of the name and password form: signed out, "Sign in and join" with the account's password (`POST /api/invitations/{token}/sign-in`) or "Join with Google"; signed in as that address, "Join the team" (`POST /api/invitations/{token}/join`); signed in as another address, "This invitation is for someone else" and nothing is attached (`403 invitation_other_account`). Mocks: `pages/accept-invite/account`, `account-busy`, `account-wrong`, `signed-in`, `signed-in-busy`, `other-account`, `account-failed`, `account-success`.
+- **One attach step.** `InvitationMembership.AttachAsync` claims the invitation with the existing conditional update, sets the row's `UserId` and name, sets `User.DefaultTeamId` when the person had no team, and issues a session for the inviting team. A wrong password leaves the invitation open.
+- **How does the page know who is signed in?** It reads `GET /api/account` when a session exists and compares the email with the invitation's, ignoring case; the API enforces the same check.
+- **`account_exists` on the create form** remains for a race (an account appearing between load and submit); the client then reloads the invitation and shows the existing-account card.

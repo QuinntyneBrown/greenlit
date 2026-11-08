@@ -1,0 +1,18 @@
+@startuml
+title UML sequence behaviour — Mark a login-less child's days
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Manager" as actor
+participant "CalendarPage" as ui
+participant "SetDaysCommandHandler / DayChanger" as handler
+database "Greenlit database" as db
+actor -> ui : paints Leo's 23-24 Nov with Tentative
+ui -> handler : PUT /api/sheet/days { memberId: Leo, status: Tentative }
+handler -> db : active team managed by caller; Leo is a child with no email; SchoolCalendar on
+handler -> db : store days as Confirmed (L2-060 AC4)
+handler --> ui : 200, cells Confirmed
+ui --> actor : green cells, "Confirmed"
+@enduml

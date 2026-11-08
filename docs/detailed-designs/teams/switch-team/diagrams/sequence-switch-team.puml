@@ -5,7 +5,7 @@ skinparam shadowing false
 skinparam roundcorner 12
 skinparam defaultFontName Arial
 skinparam ArrowColor #344054
-actor "Manager" as actor
+actor "Person on several teams" as actor
 box "Frontend — Greenlit web application (Angular)" #E0F2FE
   participant "YourTeamsSection / TeamSwitcher" as ui
   participant "ManagedTeamsState" as state
@@ -27,14 +27,14 @@ state -> ui : busy ("Switching…")
 state -> client : switchTo(id)
 client -> ctrl : POST /api/teams/{id}/switch
 ctrl -> handler : SwitchTeamCommand
-handler -> db : Team where Id = id and ManagerUserId = caller; caller's live row
-alt caller manages the team
+handler -> db : caller's live row on team id; Team.ManagerUserId for the role claim
+alt caller belongs to the team (manager or member)
   handler --> ctrl : SessionDto (team_id, team_member_id)
-  ctrl --> client : 200
+  ctrl --> client : 200 (role = Manager or Member on that team)
   client -> client : SESSION_STORE.setToken
   state -> router : remount the same screen (person page: calendar)
   state --> actor : Toast "Switched to Product team" (L2-054 AC3)
-else not managed, or the call fails
+else no live row on it, or the call fails
   ctrl --> client : 404 team_not_found / 5xx
   state --> actor : Error toast "We couldn't switch teams", nothing changes (AC8, AC9)
 end

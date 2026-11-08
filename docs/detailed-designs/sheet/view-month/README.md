@@ -49,6 +49,9 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | `L2-014` | `L1-003` | **Days left and the Out row.** The calendar shows each member's days left and a daily count of who is out. |
 | `L2-042` | `L1-010` | **Coverage flags.** Days below the minimum are flagged. |
 | `L2-048` | `L1-013` | **State carried by more than colour.** A cell's state is always in text, glyph or accessible name too. |
+| `L2-057` | `L1-015` | **A team of one.** A team whose only member is its manager is complete and usable on every screen. |
+| `L2-060` | `L1-016` | **Child members.** A manager-set member attribute: no allowance, no days left; a login-less child's days are saved as Confirmed. |
+| `L2-061` | `L1-016` | **School closures.** Labelled date ranges on one child's or all children's rows, shown with an icon and text, never red, counted nowhere. |
 
 ## Diagrams
 
@@ -96,3 +99,10 @@ Journey 1 builds this design before sign-in, allowances, coverage settings and p
 | Member working days | Only weekends and holidays are non-working until `teams/working-days` (journey 15); L2-013 AC2's part-time case and L2-014 AC3 are delivered there. The query resolves non-working days in one place (`WorkingDayRule`) so that journey only extends it. |
 | Read-only cells | Cells render as `role="gridcell"` elements with the mock's classes, not buttons, until `sheet/mark-days` makes them editable; names link to the person page once `allowances/person-page` exists. |
 | Seed data | The demo seed is the mocks' cast: "Design team" in Europe/London with the UK holidays and the November days of `pages/calendar/default`, and stable user ids for Maya Chen (manager) and Ana Ruiz (member). |
+
+## Open questions answered (ADR-015, 8 Nov 2026)
+
+- **A team of one** renders the manager's row, the Out row and the legend; nothing asks for more people (`L2-057` AC2, `pages/calendar/team-of-one`).
+- **Children.** `MonthMemberDto` gains `isChild` (true only while the school calendar is on); a child's allowance fields are null and the Left column shows "—" with the accessible name "No allowance".
+- **Closures.** `MonthDto` gains `schoolCalendar` and `closures` (`{ id, label, firstDay, lastDay, memberId? }`, null member = all children) for the shown month. `gl-team-grid` marks each covered child cell with the school icon (`.cell__closure`) and appends ", school closed: {label}" to its accessible name; the cell keeps its day status and colour, never red. The legend adds "School closed" while the setting is on. Closures never enter the Out row or coverage (`L2-061` AC5).
+- **Role on the screen.** `isManager` is per team (ADR-015), so a manager of another team sees the member's sheet here.

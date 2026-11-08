@@ -53,6 +53,8 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 |-------|--------------|-------------|
 | `L2-051` | `L1-001` | **Continue with Google.** A person signs in, or starts a manager account, with their Google account instead of a password. |
 | `L2-052` | `L1-001` | **Join with Google.** An invited person joins the team with their Google account instead of choosing a password. |
+| `L2-058` | `L1-015` | **Invite a person who already has an account.** Accepting attaches a membership to the existing account (signed out with the password or Google, or signed in); a different account is refused. |
+| `L2-056` | `L1-015` | **Switch between teams.** The header switcher, the switch and the list of teams cover every team a person belongs to; a person who manages none opens the team they joined first. |
 
 ## Diagrams
 
@@ -118,3 +120,8 @@ The Google email must be the invited address (`L2-052` AC4, AC5); otherwise the 
 - **Tokens.** The Google access token is sent once over HTTPS, used for two calls to Google and discarded; it is never logged (the logging behaviour logs request type names only) or stored. Greenlit stores the Google subject, email and name, nothing else from Google.
 - **Team scoping.** Unchanged: the session names the caller's own team and row, and handlers resolve the team from `sub`.
 - **Fake accounts.** `FakeGoogleAccounts` is refused when the environment is Production, so a misconfiguration cannot let anyone mint accounts with a hand-made token.
+
+## Open questions answered (ADR-015, 8 Nov 2026)
+
+- **Join with Google for an email that has an account** (`L2-052` AC6, `L2-058` AC3). `AcceptInvitationWithGoogleCommandHandler` attaches the existing account through `InvitationMembership` and links the Google subject when the account has none, instead of `409 account_exists`. A Google email that is not the invitation's is refused as before.
+- **Which team does Continue with Google open?** The one `TeamChoice` picks (ADR-015): a person who manages nothing opens the team they joined first.

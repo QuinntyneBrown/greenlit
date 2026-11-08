@@ -1,0 +1,54 @@
+@startuml
+title Class structure — School calendar
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+class Team {
+  Id : Guid
+  ManagerUserId : Guid
+  SchoolCalendar : bool
+}
+class TeamMember {
+  Id : Guid
+  TeamId : Guid
+  Email : string?
+  UserId : Guid?
+  IsChild : bool
+  RemovedUtc : DateTimeOffset?
+}
+class SchoolClosure {
+  Id : Guid
+  TeamId : Guid
+  TeamMemberId : Guid?
+  Label : string
+  FirstDay : DateOnly
+  LastDay : DateOnly
+  Imported : bool
+}
+class Holiday {
+  Date : DateOnly
+}
+class TimeOffDay {
+  Date : DateOnly
+  Status : DayStatus
+}
+class IcsCalendar <<static>> {
+  MaxBytes = 1 048 576
+  MaxEvents = 500
+  Parse(text) : IReadOnlyList<IcsEvent>
+}
+class SchoolCalendarRules <<static>> {
+  IsChild(team, member) : bool
+  ConfirmsDirectly(team, member) : bool
+}
+Team "1" *-- "0..*" TeamMember
+Team "1" *-- "0..*" SchoolClosure
+SchoolClosure "0..*" --> "0..1" TeamMember : null = all children
+Team "1" *-- "0..*" Holiday
+TeamMember "1" *-- "0..*" TimeOffDay
+SchoolCalendarRules ..> Team
+SchoolCalendarRules ..> TeamMember
+note bottom of SchoolClosure : Neither a Holiday nor a Day:\nno status, never red, counted nowhere (ADR-015)
+@enduml
