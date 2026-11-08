@@ -254,10 +254,4 @@ test.describe("Adding another team", () => {
     const signedInAgain = await managedTeams(request, founder);
     expect(signedInAgain.filter((t) => t.active).map((t) => t.name)).toEqual(["Studio team"]);
   });
-
-  test("a member is sent from create-team to the calendar (L2-008 AC8)", async ({ goto, pages }) => {
-    await goto("createTeam", { as: "member" });
-
-    await pages.calendar.waitForReady();
-  });
 });

@@ -19,8 +19,6 @@ namespace Greenlit.Application.Teams;
 /// </summary>
 public sealed class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, CreatedTeamDto>
 {
-    public const string TeamExists = "team_exists";
-
     private readonly IAppDbContext _db;
     private readonly ICurrentUser _currentUser;
     private readonly IPublicHolidayProvider _holidays;
@@ -50,10 +48,8 @@ public sealed class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand
         var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId, ct)
             ?? throw new UnauthorizedException("unauthorized", "Sign in to create a team.");
 
-        // L2-008 AC8, ADR-014: a person on no team, or a manager, may create a team; a person who is on a team
-        // they do not manage (a member) may not.
-        var memberElsewhere = await _db.TeamMembers.AnyAsync(m => m.UserId == userId && m.Team.ManagerUserId != userId, ct);
-        if (memberElsewhere) throw new ConflictException(TeamExists, "You're already on a team.");
+        // L2-008 AC8, L2-055 AC1 (ADR-015): any signed-in person may create a team, whatever teams they are on.
+        var managesAnother = await _db.Teams.AnyAsync(t => t.ManagerUserId == userId, ct);
 
         var now = _time.GetUtcNow();
         var team = new Team
@@ -92,8 +88,9 @@ public sealed class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand
         }
 
         if (user.Role == UserRole.Member) user.Role = UserRole.Manager;
-        // The first team a person creates is their default (L2-054 AC1, ADR-014); a later one becomes active only.
-        user.DefaultTeamId ??= team.Id;
+        // The first team a person manages is their default (L2-054 AC1, ADR-015), even when they were a member
+        // elsewhere first; a later one becomes active only.
+        if (!managesAnother) user.DefaultTeamId = team.Id;
         _db.Teams.Add(team);
         await _db.SaveChangesAsync(ct);
 

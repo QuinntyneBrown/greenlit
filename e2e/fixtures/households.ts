@@ -56,3 +56,20 @@ export async function inviteTo(request: APIRequestContext, manager: FreshPerson,
   if (!response.ok()) throw new Error(`Inviting ${email} failed with ${response.status()}.`);
   return invitationToken(email);
 }
+
+/** The password fresh members choose when they accept an invitation. */
+export const MEMBER_PASSWORD = "household-pass-1";
+
+/**
+ * A new person called `name` who is a member of `manager`'s active team and manages nothing: invited, then joined
+ * with a password through the real API (L2-004).
+ */
+export async function freshMemberOf(request: APIRequestContext, manager: FreshPerson, name: string): Promise<FreshPerson> {
+  const email = freshEmail(name.split(" ")[0].toLowerCase());
+  const token = await inviteTo(request, manager, name, email);
+  const response = await request.post(`${API_BASE_URL}/api/invitations/${token}/accept`, {
+    data: { name, password: MEMBER_PASSWORD },
+  });
+  if (!response.ok()) throw new Error(`${email} could not join with ${response.status()}.`);
+  return { name, email, token: ((await response.json()) as { accessToken: string }).accessToken };
+}

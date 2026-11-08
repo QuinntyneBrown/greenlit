@@ -169,15 +169,16 @@ test.describe("Creating a team, getting there", () => {
     expect(new URL(page.url()).pathname).toBe("/create-team");
   });
 
-  test("someone already on a team who opens create-team goes to the calendar (L2-008 AC8)", async ({
+  test("someone already on a team as a member opens create-team as Set up another team (L2-008 AC8, L2-055)", async ({
     goto,
     page,
     pages,
   }) => {
     await goto("createTeam", { as: "member" });
 
-    await pages.calendar.waitForReady();
-    expect(new URL(page.url()).pathname).toBe("/");
+    await pages.createTeam.waitForReady();
+    expect(new URL(page.url()).pathname).toBe("/create-team");
+    await expect(pages.createTeam.heading()).toHaveText("Set up another team");
   });
 });
 

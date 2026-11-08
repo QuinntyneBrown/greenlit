@@ -9,7 +9,9 @@ import { API_BASE_URL, Person, forgetSignIn, signIn } from "./session.js";
 
 export async function ensureOwnTeam(request: APIRequestContext, person: Person, name: string): Promise<void> {
   const token = await signIn(request, person);
-  // 201 creates the team; 409 `team_exists` means an earlier run did.
+  // Anyone may create any number of teams (ADR-015), so ask first: an earlier run may have made it.
+  const mine = await request.get(`${API_BASE_URL}/api/teams/mine`, { headers: { Authorization: `Bearer ${token}` } });
+  if (mine.ok() && ((await mine.json()) as { name: string }[]).some((t) => t.name === name)) return;
   await request.post(`${API_BASE_URL}/api/teams`, {
     headers: { Authorization: `Bearer ${token}` },
     data: { name, timeZone: "Europe/London", holidayCountry: "GB", members: [] },

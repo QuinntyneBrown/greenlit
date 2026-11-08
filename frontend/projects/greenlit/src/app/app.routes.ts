@@ -4,7 +4,6 @@ import { OfflinePage } from './pages/offline/offline.page';
 import {
   authGuard,
   managerMatch,
-  noTeamGuard,
   onlineGuard,
   signedOutGuard,
   teamGuard,
@@ -83,7 +82,8 @@ export const routes: Routes = [
   {
     path: 'create-team',
     data: { shell: 'bare', page: 'create-team' },
-    canActivate: [authGuard, noTeamGuard],
+    // Anyone signed in may set up a team (L2-008 AC8, L2-055 AC1, ADR-015).
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/create-team/create-team.page').then((m) => m.CreateTeamPage),
   },
