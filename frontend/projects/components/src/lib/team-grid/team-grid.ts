@@ -560,7 +560,7 @@ export class TeamGrid {
   });
 
   constructor() {
-    effect(() => this.selectionChange.emit(this.selection()));
+    effect(() => this.emitSelection(this.selection()));
     // Leaving Select mode, or another month, drops the range.
     effect(() => {
       this.selecting();
@@ -673,6 +673,23 @@ export class TeamGrid {
 
   /** The keyboard model (APG grid): arrows, Home, End, PageUp, PageDown; Enter or Space on a cell. */
   protected onKey(event: KeyboardEvent): void {
+    this.handleKey(event);
+    // Tell the page at once, inside the key event, so the selection bar is there for the very next Tab (L2-047)
+    // rather than one change detection later.
+    this.emitSelection(untracked(() => this.selection()));
+  }
+
+  /** The last selection told to the page, so a change is emitted once whichever path notices it first. */
+  private emitted: string | undefined;
+
+  private emitSelection(selection: TeamGridSelection | null): void {
+    const key = selection ? `${selection.memberId}|${selection.dates.join(',')}` : '';
+    if (key === this.emitted) return;
+    this.emitted = key;
+    this.selectionChange.emit(selection);
+  }
+
+  private handleKey(event: KeyboardEvent): void {
     const here = this.cellAt(event.target as Element | null);
     if (!here) return;
     let target: { row: number; col: number } | null;
