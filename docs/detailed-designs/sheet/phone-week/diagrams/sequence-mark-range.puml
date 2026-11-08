@@ -1,0 +1,39 @@
+@startuml
+title UML sequence behaviour — Mark a range on a phone
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Member" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "CalendarWeek" as week
+  participant "MarkSheet" as sheet
+  participant "CalendarPage" as page
+  participant "HttpSheetService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "SheetController" as ctrl
+end box
+actor -> week : Tap own cell Mon 23 Nov
+week -> sheet : "From Mon 23 Nov", "Now tap the last day…" (L2-063 AC7)
+opt the last day is in another week
+  actor -> week : Tap week tab "30"
+end
+actor -> week : Tap own cell Thu 26 Nov
+week -> sheet : "Mon 23 – Thu 26 Nov", "4 working days", clash, over (AC8, AC9)
+alt choose "Request these days"
+  actor -> sheet : Request these days
+  sheet -> week : action Requested
+  week -> page : mark(Ana, 23–26 Nov, Requested)
+  page -> client : setDays(...)
+  client -> ctrl : PUT /api/sheet/days
+  ctrl --> client : 200 ChangeSet
+  page --> actor : Toast "Requested 4 days" with Undo (AC10)
+  page -> week : clear()
+else "Cancel" or Escape
+  actor -> sheet : Cancel
+  week -> page : cleared
+  page --> actor : "Selection cleared" (AC11)
+end
+@enduml

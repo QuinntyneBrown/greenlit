@@ -44,6 +44,7 @@ The month view and every way of changing a day on it.
 | [View the team's month](sheet/view-month/README.md) | Month grid, cell states, Left column and the Out row with coverage flags. | L2-012, L2-013, L2-014, L2-042, L2-048 |
 | [Mark days on the calendar](sheet/mark-days/README.md) | Paint mode, the permission rules for each day, and undo. | L2-015, L2-017, L2-018 |
 | [Select days and use the keyboard](sheet/select-days/README.md) | Select mode, the selection bar and the keyboard model of the grid. | L2-016, L2-047 |
+| [The calendar on a phone](sheet/phone-week/README.md) | One week of the team below 48rem: short days first, tap a first and last day to mark. | L2-063 |
 
 ## requests
 

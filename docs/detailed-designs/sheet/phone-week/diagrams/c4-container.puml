@@ -1,0 +1,18 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — The calendar on a phone
+
+Person(manager, "Manager", "Confirms requests; owns holidays, settings and membership")
+Person(member, "Member", "A row on the sheet; colours and requests their own days")
+System_Boundary(greenlit, "Greenlit") {
+  Container(spa, "Greenlit web application", "Angular", "Below 48rem renders the week layout instead of the month grid")
+  Container(api, "Greenlit API", "ASP.NET Core (Greenlit.Api)", "Unchanged: GET /api/sheet, PUT /api/sheet/days")
+  ContainerDb(db, "Greenlit database", "SQL Server; SQLite in tests", "Teams, members, days, requests")
+}
+
+Rel(manager, spa, "Taps weeks, dates and cells", "HTTPS")
+Rel(member, spa, "Taps weeks, dates and own cells", "HTTPS")
+Rel(spa, api, "Reads the month and saves marked days through", "JSON/HTTPS")
+Rel(api, db, "Reads and writes", "EF Core")
+@enduml
