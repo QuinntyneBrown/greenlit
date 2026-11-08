@@ -20,6 +20,7 @@ or infrastructure choice is made or revisited.
 | [ADR-012](ADR-012-google-sign-in.md) | Google sign-in exchanges a Google access token for the Greenlit session |
 | [ADR-013](ADR-013-branded-email-through-azure-communication-services.md) | Branded HTML email, delivered through Azure Communication Services |
 | [ADR-014](ADR-014-a-manager-runs-several-teams.md) | A manager runs several teams; the session names the active one and the account remembers the default |
+| [ADR-015](ADR-015-a-person-on-several-teams-and-the-school-calendar.md) | A person belongs to several teams in any role; a school calendar is a team setting with its own closures |
 
 ## Template
 
