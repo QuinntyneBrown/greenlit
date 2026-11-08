@@ -245,6 +245,15 @@ public sealed class TestTeam
     /// <summary>An HTTP client signed in as the named person.</summary>
     public HttpClient ClientFor(string name) => _factory.ClientFor(_users[name]);
 
+    /// <summary>An HTTP client signed in as the named person with a session that names this team and their row on it, as sign-in issues.</summary>
+    public HttpClient SessionFor(string name)
+    {
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer", GreenlitApiFactoryExtensions.TokenFor(_users[name], DateTime.UtcNow.AddMinutes(15), Team.Id, _rows[name].Id));
+        return client;
+    }
+
     private static User NewUser(string name, UserRole role) => new()
     {
         Id = Guid.NewGuid(),
@@ -280,13 +289,19 @@ public static class GreenlitApiFactoryExtensions
     public static string TokenFor(User user) => TokenFor(user, DateTime.UtcNow.AddMinutes(15));
 
     /// <summary>A token signed with the test key that stops working at <paramref name="expires"/> (an hour after it began when that is already past).</summary>
-    public static string TokenFor(User user, DateTime expires)
+    public static string TokenFor(User user, DateTime expires) => TokenFor(user, expires, null, null);
+
+    /// <summary>A token like <see cref="TokenFor(User, DateTime)"/> that also names a team and the person's row on it (ADR-004).</summary>
+    public static string TokenFor(User user, DateTime expires, Guid? teamId, Guid? memberId)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GreenlitApiFactory.SigningKey));
+        List<Claim> claims = [new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), new Claim(ClaimTypes.Role, user.Role.ToString())];
+        if (teamId is { } team) claims.Add(new Claim("team_id", team.ToString()));
+        if (memberId is { } member) claims.Add(new Claim("team_member_id", member.ToString()));
         var token = new JwtSecurityToken(
             issuer: GreenlitApiFactory.Issuer,
             audience: GreenlitApiFactory.Audience,
-            claims: [new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), new Claim(ClaimTypes.Role, user.Role.ToString())],
+            claims: claims,
             notBefore: expires < DateTime.UtcNow ? expires.AddHours(-1) : null,
             expires: expires,
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
