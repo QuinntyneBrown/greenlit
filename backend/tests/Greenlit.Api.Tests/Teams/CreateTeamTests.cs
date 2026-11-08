@@ -270,23 +270,52 @@ public class CreateTeamTests : IClassFixture<FrozenClockApiFactory>
     }
 
     [Fact]
-    public async Task An_empty_name_and_a_row_with_an_email_but_no_name_are_refused_naming_each_field()
+    public async Task An_empty_team_name_is_refused_and_nothing_is_created()
     {
-        // L2-008 AC4: "Give your team a name" and "Give this member a name", and nothing is created.
+        // L2-008 AC4: "Give your team a name", and nothing is created.
         var noor = await TestAccount.CreateAsync(_factory);
 
         var response = await CreateAsync(_factory.ClientFor(noor), Request(name: " ", members:
         [
             new { name = "Ana Ruiz", email = "ana@northwind.studio" },
-            new { name = "", email = "cleo@northwind.studio" },
         ]));
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var errors = (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("errors");
         errors.GetProperty("Name")[0].GetString().Should().Be("Give your team a name.");
-        errors.GetProperty("Members[1].Name")[0].GetString().Should().Be("Give this member a name.");
-        errors.EnumerateObject().Should().HaveCount(2);
+        errors.EnumerateObject().Should().HaveCount(1);
         await ShouldHaveNoTeamAsync(noor);
+    }
+
+    [Fact]
+    public async Task A_row_with_an_email_but_no_name_is_left_out_and_not_invited()
+    {
+        // L2-008 AC4: members are optional; a row without a name never blocks the team.
+        var noor = await TestAccount.CreateAsync(_factory);
+
+        var created = await CreatedAsync(_factory.ClientFor(noor), Request(members:
+        [
+            new { name = "Ana Ruiz", email = (string?)null },
+            new { name = "", email = (string?)"cleo@northwind.studio" },
+        ]));
+
+        created.GetProperty("invited").GetInt32().Should().Be(0);
+        var month = await MonthAsync(SessionClient(created), "2026-11");
+        month.GetProperty("members").EnumerateArray().Select(m => m.GetProperty("name").GetString())
+            .Should().Equal("Noor Haddad", "Ana Ruiz");
+    }
+
+    [Fact]
+    public async Task A_team_needs_no_members_besides_its_manager()
+    {
+        // L2-008 AC4, AC5: adding members is optional.
+        var noor = await TestAccount.CreateAsync(_factory);
+
+        var created = await CreatedAsync(_factory.ClientFor(noor), Request(members: []));
+
+        var month = await MonthAsync(SessionClient(created), "2026-11");
+        month.GetProperty("members").EnumerateArray().Select(m => m.GetProperty("name").GetString())
+            .Should().Equal("Noor Haddad");
     }
 
     [Theory]
