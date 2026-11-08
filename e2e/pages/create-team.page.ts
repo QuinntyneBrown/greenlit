@@ -26,6 +26,11 @@ export class CreateTeamPage extends BasePage {
     return this.main.locator(".card .lead");
   }
 
+  /** "Back to Settings", above the heading when a manager adds another team (L2-054 AC5). */
+  backToSettings(): Locator {
+    return this.main.getByRole("link", { name: "Back to Settings", exact: true });
+  }
+
   teamName(): Locator {
     return this.main.getByLabel("Team name", { exact: true });
   }

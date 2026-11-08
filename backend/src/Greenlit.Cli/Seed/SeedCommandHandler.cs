@@ -74,6 +74,17 @@ public sealed class SeedCommandHandler
         ("Jude Owens", "jude@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000203")),
     ];
 
+    /// <summary>
+    /// Managers of one team each, "Studio team", for the spec that adds another team from Your teams (L2-054 AC5), one per
+    /// e2e viewport. Adding a team cannot be undone, so a run that adds teams needs a fresh e2e database, as create-team does.
+    /// </summary>
+    private static readonly (string Name, string Email, Guid UserId)[] Founders =
+    [
+        ("Leo Grant", "leo@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000301")),
+        ("Mia Rossi", "mia@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000302")),
+        ("Ned Shaw", "ned@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000303")),
+    ];
+
     /// <summary>Each multi-team manager's teams, oldest first, with the one name-only member that tells them apart on the sheet.</summary>
     private static readonly (string Team, string Member)[] MultiTeams = [("Design team", "Kit Brown"), ("Product team", "Raj Mehta")];
 
@@ -153,7 +164,7 @@ public sealed class SeedCommandHandler
     {
         var now = DateTimeOffset.UtcNow;
 
-        foreach (var (name, email, userId) in Cast.Concat(Newcomers).Concat(MultiTeamManagers))
+        foreach (var (name, email, userId) in Cast.Concat(Newcomers).Concat(MultiTeamManagers).Concat(Founders))
         {
             var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId, ct);
             if (user is null)
@@ -163,7 +174,7 @@ public sealed class SeedCommandHandler
                     Id = userId,
                     Email = email,
                     DisplayName = name,
-                    Role = userId == MayaUserId || MultiTeamManagers.Any(m => m.UserId == userId) ? UserRole.Manager : UserRole.Member,
+                    Role = userId == MayaUserId || MultiTeamManagers.Concat(Founders).Any(m => m.UserId == userId) ? UserRole.Manager : UserRole.Member,
                     CreatedUtc = now,
                 };
                 _db.Users.Add(user);
@@ -241,7 +252,10 @@ public sealed class SeedCommandHandler
         return 0;
     }
 
-    /// <summary>Each multi-team manager's two teams, looked up by manager and name, and their default (Design team) when unset.</summary>
+    /// <summary>
+    /// Each multi-team manager's two teams and each founder's one, looked up by manager and name, and their default
+    /// (the first team) when unset.
+    /// </summary>
     private async Task SeedMultiTeamManagersAsync(DateTimeOffset now, CancellationToken ct)
     {
         foreach (var (name, email, userId) in MultiTeamManagers)
@@ -268,6 +282,19 @@ public sealed class SeedCommandHandler
                 }
                 if (i == 0) user!.DefaultTeamId ??= team.Id;
             }
+        }
+
+        foreach (var (name, email, userId) in Founders)
+        {
+            var user = await _db.Users.FindAsync([userId], ct);
+            var team = await _db.Teams.SingleOrDefaultAsync(t => t.ManagerUserId == userId && t.Name == "Studio team", ct);
+            if (team is null)
+            {
+                team = new Team { Id = Guid.NewGuid(), Name = "Studio team", ManagerUserId = userId, TimeZone = "Europe/London", CreatedUtc = now };
+                team.Members.Add(new TeamMember { Id = Guid.NewGuid(), Name = name, Email = email, UserId = userId, SortOrder = 0 });
+                _db.Teams.Add(team);
+            }
+            user!.DefaultTeamId ??= team.Id;
         }
     }
 

@@ -41,6 +41,10 @@ export const PEOPLE = {
   "juggler-mobile": { name: "Hana Ito", email: "hana@northwind.studio" },
   "juggler-tablet": { name: "Iris Novak", email: "iris@northwind.studio" },
   "juggler-desktop": { name: "Jude Owens", email: "jude@northwind.studio" },
+  /** Manage Studio team and add another team from Your teams (L2-054 AC5), one per viewport (see `founderFor`). */
+  "founder-mobile": { name: "Leo Grant", email: "leo@northwind.studio" },
+  "founder-tablet": { name: "Mia Rossi", email: "mia@northwind.studio" },
+  "founder-desktop": { name: "Ned Shaw", email: "ned@northwind.studio" },
 } as const;
 
 export type Person = keyof typeof PEOPLE;
@@ -82,6 +86,16 @@ export function removerFor(project: string): Person {
 export function jugglerFor(project: string): Person {
   const person = `juggler-${project}`;
   if (!(person in PEOPLE)) throw new Error(`No seeded manager of several teams for the '${project}' project.`);
+  return person as Person;
+}
+
+/**
+ * The manager of one team who adds another in this viewport's project (L2-054 AC5). Each adds one team per e2e
+ * database, so a second run needs a fresh one (eng/Start-E2eApi.ps1), as for `creatorFor`.
+ */
+export function founderFor(project: string): Person {
+  const person = `founder-${project}`;
+  if (!(person in PEOPLE)) throw new Error(`No seeded founder for the '${project}' project.`);
   return person as Person;
 }
 

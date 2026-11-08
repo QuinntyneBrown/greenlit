@@ -6,7 +6,7 @@ import { LogoLockup } from '../logo-lockup/logo-lockup';
  * Auth card (docs/design-system/patterns/forms.html, "Auth card"): the
  * bare-shell layout of sign-in and the other account pages. The logo links to
  * sign-in; the card carries the heading, the lead and the projected body; an
- * optional `[slot=note]` sits centred under the card. `wide` gives forms with
+ * optional `[slot=note]` sits centred under the card and an optional `[slot=back]` link above the heading. `wide` gives forms with
  * two columns, such as create-team, the `auth-card--wide` width.
  */
 @Component({
@@ -20,6 +20,7 @@ import { LogoLockup } from '../logo-lockup/logo-lockup';
       </div>
       <div class="card stack">
         <div>
+          <ng-content select="[slot=back]" />
           <h1>{{ title() }}</h1>
           <p class="lead">{{ lead() }}</p>
         </div>

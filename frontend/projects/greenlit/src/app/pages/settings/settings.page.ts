@@ -349,6 +349,7 @@ type HolidaysLoad =
               [busy]="managedTeams.busy()"
               (retry)="managedTeams.refresh()"
               (switchTo)="managedTeams.switchTo($event)"
+              (makeDefault)="managedTeams.makeDefault($event)"
             />
           </section>
         }

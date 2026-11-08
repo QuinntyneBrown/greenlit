@@ -27,7 +27,7 @@ public class SeedCommandHandlerTests
         team.TimeZone.Should().Be("Europe/London");
         team.Members.OrderBy(m => m.SortOrder).Select(m => m.Name).Should().Equal(
             "Maya Chen", "Ana Ruiz", "Ben Okafor", "Cleo Park", "Dev Patel", "Elif Yılmaz", "Finn Murphy");
-        (await read.Users.CountAsync()).Should().Be(20);
+        (await read.Users.CountAsync()).Should().Be(23);
         (await read.Holidays.CountAsync(h => h.TeamId == team.Id)).Should().Be(8);
     }
 
@@ -111,6 +111,23 @@ public class SeedCommandHandlerTests
     }
 
     [Fact]
+    public async Task Three_founders_each_manage_one_team_to_add_another_to()
+    {
+        // L2-054 AC5: "Add another team" creates a team, so each e2e viewport has a manager of its own for it.
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        foreach (var email in new[] { "leo@northwind.studio", "mia@northwind.studio", "ned@northwind.studio" })
+        {
+            var user = await read.Users.SingleAsync(u => u.Email == email);
+            var team = await read.Teams.Include(t => t.Members).SingleAsync(t => t.ManagerUserId == user.Id);
+            team.Name.Should().Be("Studio team");
+            team.Members.Should().ContainSingle(m => m.UserId == user.Id);
+            user.DefaultTeamId.Should().Be(team.Id);
+        }
+    }
+
+    [Fact]
     public async Task Every_demo_account_signs_in_with_the_demo_password()
     {
         // Journey 2: the e2e suite signs in through the sign-in page as a seeded person.
@@ -119,7 +136,7 @@ public class SeedCommandHandlerTests
         await using var read = new AppDbContext(options);
         var hasher = new IdentityPasswordHasher();
         var users = await read.Users.ToListAsync();
-        users.Should().HaveCount(20).And.OnlyContain(u => hasher.Verify(u, u.PasswordHash, SeedCommandHandler.DemoPassword));
+        users.Should().HaveCount(23).And.OnlyContain(u => hasher.Verify(u, u.PasswordHash, SeedCommandHandler.DemoPassword));
         users.Select(u => u.PasswordHash).Should().OnlyHaveUniqueItems("each hash has its own salt");
     }
 
