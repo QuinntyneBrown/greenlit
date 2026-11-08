@@ -47,8 +47,12 @@ everyone sees the same month.
 - **Allowances.** Yearly days per member, adjustments, and a Left column that never blocks.
 - **Holidays.** Public holidays for GB, IE and US on team creation, plus the team's own.
 - **Teams and invitations.** Create a team, invite members by email, accept with a link.
-- **Several teams.** A manager can run more than one team: sign-in opens their default team, and
-  they switch from Settings or the header and choose the default in Settings.
+- **Several teams.** A person can manage some teams and be a member of others, and anyone can set up
+  a team (a team of one works too): sign-in opens their default team, the header switches between
+  their teams, and a manager chooses the default in Settings. Inviting an address that already has
+  an account adds the team to that account.
+- **School calendar.** A team setting for families: mark children (no allowance), record PA days and
+  school vacations on their rows by hand or from a school's `.ics` file.
 - **Sign-in and password reset.** Eight-hour sessions with email-based password recovery.
 - **Sign in with Google.** Continue with Google to sign in or to start a manager account; join an
   invitation with Google instead of a password.
