@@ -29,6 +29,7 @@ Greenlit replaces the Google Sheet managers of small teams keep for vacation. Th
 | [Segmented control](components/segmented-control.html) | Actions | Segment, Button group (toggle) | Default (unchecked), Hover, Focus, Checked, Disabled | `pages/calendar/default`, `pages/calendar/painting`, `pages/year/default` |
 | [Link](components/link.html) | Actions | Inline link, Back link, Current page | Default, Hover, Focus | `pages/sign-in/default`, `pages/forgot-password/default`, `dialogs/adjust-allowance/default` +1 |
 | [Menu](components/menu.html) | Actions | Item, Danger item | Default, Hover, Focus, Disabled | `dialogs/user-menu/default` |
+| [Team switcher](components/team-switcher.html) | Actions | Menu button with radio items; team list rows | Closed, Open, Hover, Focus, Busy | `dialogs/team-switcher/*`, `pages/settings/your-teams` |
 | [Text field](components/text-field.html) | Inputs | Medium, Small, Empty, placeholder | Default, Hover, Focus, Disabled, Invalid, Read-only | `pages/sign-in/default`, `pages/sign-in/invalid`, `dialogs/invite-member/invalid` +2 |
 | [Textarea](components/textarea.html) | Inputs | Textarea | Default, Hover, Focus, Disabled, Invalid, Read-only | `dialogs/decline-request/default`, `dialogs/decline-request/busy`, `dialogs/decline-request/failed` |
 | [Select](components/select.html) | Inputs | Medium, Small | Default, Hover, Focus, Disabled, Invalid | `pages/settings/default`, `dialogs/invite-member/invalid` |
