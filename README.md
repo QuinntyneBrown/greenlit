@@ -47,6 +47,8 @@ everyone sees the same month.
 - **Allowances.** Yearly days per member, adjustments, and a Left column that never blocks.
 - **Holidays.** Public holidays for GB, IE and US on team creation, plus the team's own.
 - **Teams and invitations.** Create a team, invite members by email, accept with a link.
+- **Several teams.** A manager can run more than one team: sign-in opens their default team, and
+  they switch from Settings or the header and choose the default in Settings.
 - **Sign-in and password reset.** Eight-hour sessions with email-based password recovery.
 - **Sign in with Google.** Continue with Google to sign in or to start a manager account; join an
   invitation with Google instead of a password.
@@ -102,7 +104,9 @@ npm run start:marketing               # marketing site on http://localhost:4300
 ```
 
 Sign in as `maya@northwind.studio` with the password `greenlit-demo` to act as the manager, or as
-`noor@northwind.studio` to walk through creating a team.
+`noor@northwind.studio` to walk through creating a team. `hana@northwind.studio` (also `iris@` and
+`jude@`) manages two teams, Design team and Product team, to try the team switcher and "Your teams" in
+Settings.
 
 To run against SQL Server LocalDB instead, `pwsh eng/Start-FreshStack.ps1` resets and seeds the
 database and then starts both the API and the dev server. Pass `-Sqlite` to use SQLite.
