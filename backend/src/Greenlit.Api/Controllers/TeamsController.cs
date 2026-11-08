@@ -1,3 +1,4 @@
+using Greenlit.Application.Auth;
 using Greenlit.Application.Teams;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,11 @@ public sealed class TeamsController : ControllerBase
     [HttpGet("mine")]
     public async Task<ActionResult<IReadOnlyList<MyTeamDto>>> Mine(CancellationToken ct) =>
         Ok(await _sender.Send(new GetMyTeamsQuery(), ct));
+
+    /// <summary>A new session that names team <paramref name="id"/>; 404 <c>team_not_found</c> unless the caller manages it.</summary>
+    [HttpPost("{id:guid}/switch")]
+    public async Task<ActionResult<SessionDto>> Switch(Guid id, CancellationToken ct) =>
+        Ok(await _sender.Send(new SwitchTeamCommand(id), ct));
 }
 
 public sealed record CreateTeamRequest(string? Name, string? TimeZone, string? HolidayCountry, IReadOnlyList<CreateTeamMemberRequest>? Members);
