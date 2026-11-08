@@ -45,6 +45,7 @@ export * from './lib/api/sheet.service';
 export * from './lib/api/team.service';
 export * from './lib/api/invitation.service';
 export * from './lib/api/school-calendar.service';
+export * from './lib/models/school-closure';
 export * from './lib/api/request.service';
 export * from './lib/api/holiday.service';
 export * from './lib/api/working-days.service';

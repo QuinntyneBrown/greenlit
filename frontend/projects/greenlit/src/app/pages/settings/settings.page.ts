@@ -357,6 +357,7 @@ type HolidaysLoad =
             <app-school-calendar-section
               [on]="schoolCalendarOn()"
               [canEdit]="loadedTeam.canEdit"
+              [children]="children()"
               (saved)="savedSchoolCalendar.set($event)"
             />
           </section>
@@ -544,6 +545,10 @@ export class SettingsPage {
   protected readonly isManager = computed(() => this.ready()?.isManager ?? false);
   /** The school calendar as last saved here, until the page loads again (L2-059). */
   protected readonly savedSchoolCalendar = signal<boolean | null>(null);
+  /** The team's children, for the closures (L2-060, L2-061). */
+  protected readonly children = computed(() =>
+    (this.team()?.members ?? []).filter((m) => m.isChild).map((m) => ({ id: m.id, name: m.name })),
+  );
   protected readonly schoolCalendarOn = computed(
     () => this.savedSchoolCalendar() ?? this.team()?.schoolCalendar ?? false,
   );

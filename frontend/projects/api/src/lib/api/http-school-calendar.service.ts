@@ -2,10 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 
+import { SchoolClosure, SchoolClosureInput } from '../models/school-closure';
 import { API_BASE_URL, apiUrl } from './api-base-url';
 import {
   AddChildResult,
   AddedChild,
+  SaveClosureResult,
   SchoolCalendarSaveResult,
   SchoolCalendarService,
 } from './school-calendar.service';
@@ -23,6 +25,41 @@ export class HttpSchoolCalendarService implements SchoolCalendarService {
         map((): SchoolCalendarSaveResult => ({ ok: true })),
         catchError(() => of<SchoolCalendarSaveResult>({ ok: false })),
       );
+  }
+
+  closures(): Observable<readonly SchoolClosure[]> {
+    return this.http.get<readonly SchoolClosure[]>(apiUrl(this.baseUrl, 'api/team/closures'));
+  }
+
+  addClosure(input: SchoolClosureInput): Observable<SaveClosureResult> {
+    return this.saved(
+      this.http.post<SchoolClosure>(apiUrl(this.baseUrl, 'api/team/closures'), input),
+    );
+  }
+
+  updateClosure(id: string, input: SchoolClosureInput): Observable<SaveClosureResult> {
+    return this.saved(
+      this.http.put<SchoolClosure>(
+        apiUrl(this.baseUrl, `api/team/closures/${encodeURIComponent(id)}`),
+        input,
+      ),
+    );
+  }
+
+  deleteClosure(id: string): Observable<SchoolCalendarSaveResult> {
+    return this.http
+      .delete(apiUrl(this.baseUrl, `api/team/closures/${encodeURIComponent(id)}`))
+      .pipe(
+        map((): SchoolCalendarSaveResult => ({ ok: true })),
+        catchError(() => of<SchoolCalendarSaveResult>({ ok: false })),
+      );
+  }
+
+  private saved(request: Observable<SchoolClosure>): Observable<SaveClosureResult> {
+    return request.pipe(
+      map((closure): SaveClosureResult => ({ outcome: 'saved', closure })),
+      catchError(() => of<SaveClosureResult>({ outcome: 'failed' })),
+    );
   }
 
   addChild(name: string, email: string | null): Observable<AddChildResult> {
