@@ -37,5 +37,7 @@ export const HOLIDAY_CALENDAR_OPTIONS: readonly TeamOption[] = [
   { value: 'GB', label: 'United Kingdom' },
   { value: 'IE', label: 'Ireland' },
   { value: 'US', label: 'United States' },
+  { value: 'CA', label: 'Canada' },
+  { value: 'IT', label: 'Italy' },
   { value: 'none', label: 'None, I’ll add my own' },
 ];

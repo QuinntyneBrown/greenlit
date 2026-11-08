@@ -44,6 +44,8 @@ test.describe("Creating a team, the form", () => {
       "United Kingdom",
       "Ireland",
       "United States",
+      "Canada",
+      "Italy",
       "None, I’ll add my own",
     ]);
     await expect(form.publicHolidays()).toHaveValue("GB");
