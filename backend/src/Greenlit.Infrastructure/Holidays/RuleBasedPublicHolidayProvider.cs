@@ -4,7 +4,8 @@ namespace Greenlit.Infrastructure.Holidays;
 
 /// <summary>
 /// Public holidays worked out offline from each country's rules (ADR-005):
-/// GB is England and Wales, IE Ireland, US the federal holidays. One-off
+/// GB is England and Wales, IE Ireland, US the federal holidays, CA the statutory
+/// holidays of Ontario and IT Italy's national holidays. One-off
 /// holidays a government declares are not in the rules; the manager adds them.
 /// </summary>
 public sealed class RuleBasedPublicHolidayProvider : IPublicHolidayProvider
@@ -36,12 +37,25 @@ public sealed class RuleBasedPublicHolidayProvider : IPublicHolidayProvider
             new(new DateOnly(year, 12, 26), "St Stephen's Day"),
         ]),
         "US" => UnitedStates(year),
+        "CA" => Substituted(
+        [
+            new(new DateOnly(year, 1, 1), "New Year's Day"),
+            new(Nth(year, 2, DayOfWeek.Monday, 3), "Family Day"),
+            new(Easter(year).AddDays(-2), "Good Friday"),
+            new(VictoriaDay(year), "Victoria Day"),
+            new(new DateOnly(year, 7, 1), "Canada Day"),
+            new(Nth(year, 9, DayOfWeek.Monday, 1), "Labour Day"),
+            new(Nth(year, 10, DayOfWeek.Monday, 2), "Thanksgiving"),
+            new(new DateOnly(year, 12, 25), "Christmas Day"),
+            new(new DateOnly(year, 12, 26), "Boxing Day"),
+        ]),
+        "IT" => Italy(year),
         _ => throw new ArgumentOutOfRangeException(nameof(country), country, "No public-holiday rules for this country."),
     };
 
     /// <summary>
     /// A holiday on a weekend moves to the next weekday that is not already a
-    /// holiday (GB and IE), and is named "… (substitute)".
+    /// holiday (GB, IE and CA), and is named "… (substitute)".
     /// </summary>
     private static List<PublicHoliday> Substituted(PublicHoliday[] holidays)
     {
@@ -84,6 +98,38 @@ public sealed class RuleBasedPublicHolidayProvider : IPublicHolidayProvider
             .Where(h => h.Date.Year == year)
             .OrderBy(h => h.Date)
             .ToList();
+    }
+
+    /// <summary>
+    /// Italy's national holidays. Italy has no substitute days: a holiday on a weekend is lost, and the weekend is
+    /// red by rule, so it is not stored. St Francis of Assisi's Day is a national holiday again from 2026.
+    /// </summary>
+    private static List<PublicHoliday> Italy(int year)
+    {
+        List<PublicHoliday> holidays =
+        [
+            new(new DateOnly(year, 1, 1), "New Year's Day"),
+            new(new DateOnly(year, 1, 6), "Epiphany"),
+            new(Easter(year).AddDays(1), "Easter Monday"),
+            new(new DateOnly(year, 4, 25), "Liberation Day"),
+            new(new DateOnly(year, 5, 1), "Labour Day"),
+            new(new DateOnly(year, 6, 2), "Republic Day"),
+            new(new DateOnly(year, 8, 15), "Ferragosto"),
+            new(new DateOnly(year, 11, 1), "All Saints' Day"),
+            new(new DateOnly(year, 12, 8), "Immaculate Conception"),
+            new(new DateOnly(year, 12, 25), "Christmas Day"),
+            new(new DateOnly(year, 12, 26), "St Stephen's Day"),
+        ];
+        if (year >= 2026) holidays.Add(new(new DateOnly(year, 10, 4), "St Francis of Assisi's Day"));
+        return holidays.Where(h => !IsWeekend(h.Date)).OrderBy(h => h.Date).ToList();
+    }
+
+    /// <summary>The Monday before 25 May.</summary>
+    private static DateOnly VictoriaDay(int year)
+    {
+        var date = new DateOnly(year, 5, 24);
+        while (date.DayOfWeek != DayOfWeek.Monday) date = date.AddDays(-1);
+        return date;
     }
 
     /// <summary>The first Monday in February, or 1 February when that is a Friday.</summary>

@@ -25,6 +25,6 @@ public static class TeamOptions
 
     public const string NoHolidays = "none";
 
-    /// <summary>United Kingdom, Ireland, United States, and none.</summary>
-    public static readonly IReadOnlyList<string> HolidayCountries = ["GB", "IE", "US", NoHolidays];
+    /// <summary>United Kingdom, Ireland, United States, Canada, Italy, and none.</summary>
+    public static readonly IReadOnlyList<string> HolidayCountries = ["GB", "IE", "US", "CA", "IT", NoHolidays];
 }

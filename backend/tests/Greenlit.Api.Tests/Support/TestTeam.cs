@@ -172,7 +172,7 @@ public sealed class TestTeam
             team.LeaveYearStartMonth = leaveYearStartMonth;
         });
 
-    /// <summary>Sets the public-holiday calendar the team was created with (<c>GB</c>, <c>IE</c> or <c>US</c>).</summary>
+    /// <summary>Sets the public-holiday calendar the team was created with (<c>GB</c>, <c>IE</c>, <c>US</c>, <c>CA</c> or <c>IT</c>).</summary>
     public Task SetHolidayCountryAsync(string country) =>
         _factory.WriteAsync(db => db.Teams.Single(t => t.Id == Team.Id).HolidayCountry = country);
 

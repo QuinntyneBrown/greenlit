@@ -52,6 +52,8 @@ public sealed class GetTeamHolidaysQueryHandler : IRequestHandler<GetTeamHoliday
     {
         "IE" => "Irish public holidays",
         "US" => "US federal holidays",
+        "CA" => "Canadian public holidays",
+        "IT" => "Italian public holidays",
         _ => "UK bank holidays",
     };
 
@@ -60,6 +62,8 @@ public sealed class GetTeamHolidaysQueryHandler : IRequestHandler<GetTeamHoliday
         "GB" => "Public holidays: United Kingdom",
         "IE" => "Public holidays: Ireland",
         "US" => "Public holidays: United States",
+        "CA" => "Public holidays: Canada",
+        "IT" => "Public holidays: Italy",
         _ => null,
     };
 }
