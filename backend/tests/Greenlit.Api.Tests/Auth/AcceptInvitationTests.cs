@@ -145,6 +145,21 @@ public class AcceptInvitationTests : IClassFixture<FrozenClockApiFactory>
     }
 
     [Fact]
+    public async Task The_team_a_person_joins_first_is_their_default()
+    {
+        // L2-056 AC4 (ADR-015): a person who manages nothing opens the team they joined first.
+        var invite = await InviteAsync("Gus Lee", "first.gus@northwind.studio");
+
+        var response = await AcceptAsync(invite.Token, "Gus Lee", Password);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK, await response.Content.ReadAsStringAsync());
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var teamId = db.TeamMembers.Single(m => m.Id == invite.MemberId).TeamId;
+        db.Users.Single(u => u.Email == "first.gus@northwind.studio").DefaultTeamId.Should().Be(teamId);
+    }
+
+    [Fact]
     public async Task The_account_takes_the_role_the_manager_chose_and_the_name_the_person_gave()
     {
         var invite = await InviteAsync("Finn M", "role.finn@northwind.studio", role: "Manager");
@@ -152,7 +167,9 @@ public class AcceptInvitationTests : IClassFixture<FrozenClockApiFactory>
         var response = await AcceptAsync(invite.Token, "  Finn Murphy ", Password);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK, await response.Content.ReadAsStringAsync());
-        (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("role").GetString().Should().Be("Manager");
+        // The row and the account keep the role chosen (L2-004 AC9); the session carries the role on the team, and the
+        // team's manager is still Maya, so Finn's session is a member's (L2-054 AC7, ADR-015).
+        (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("role").GetString().Should().Be("Member");
         await using var scope = _factory.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var user = db.Users.Single(u => u.Email == "role.finn@northwind.studio");

@@ -62,6 +62,8 @@ public sealed class AcceptInvitationWithGoogleCommandHandler : IRequestHandler<A
             GoogleSubject = account.Subject,
             Role = open.Member.Role,
             CreatedUtc = now,
+            // The team a person joins first is the one sign-in opens while they manage none (L2-056 AC4, ADR-015).
+            DefaultTeamId = open.Team.Id,
         };
         _db.Users.Add(user);
         open.Member.UserId = user.Id;
@@ -81,6 +83,6 @@ public sealed class AcceptInvitationWithGoogleCommandHandler : IRequestHandler<A
             }
             throw;
         }
-        return _tokens.Issue(user, open.Member);
+        return await Sessions.IssueAsync(_db, _tokens, user, open.Member, ct);
     }
 }

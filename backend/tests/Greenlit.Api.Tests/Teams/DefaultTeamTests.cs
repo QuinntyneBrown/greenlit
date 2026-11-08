@@ -98,6 +98,74 @@ public class DefaultTeamTests : IClassFixture<FrozenClockApiFactory>
         session.GetProperty("teamId").GetGuid().Should().Be(design.Team.Id);
     }
 
+    [Fact]
+    public async Task A_member_of_two_teams_signs_in_to_the_team_they_joined_first()
+    {
+        // L2-056 AC4 (ADR-015). Given Sam, a member of Product team and of Chen family who joined Chen family first
+        // (his stored default), when he signs in, then Chen family opens, with his row on it.
+        var product = await TestTeam.CreateAsync(_factory, "Omar Diaz", teamName: "Product team");
+        await product.AddMemberAsync("Sam Chen");
+        await product.SetPasswordAsync("Sam Chen", Password);
+        var family = await TestTeam.CreateAsync(_factory, "Maya Chen", teamName: "Chen family");
+        var row = await family.AddExistingMemberAsync(product, "Sam Chen");
+        await _factory.WriteAsync(db => db.Users.Single(u => u.Id == row.UserId).DefaultTeamId = family.Team.Id);
+
+        var session = await SignInAsync(product.EmailOf("Sam Chen"));
+
+        session.GetProperty("teamId").GetGuid().Should().Be(family.Team.Id);
+        session.GetProperty("role").GetString().Should().Be("Member");
+    }
+
+    [Fact]
+    public async Task Without_a_stored_default_a_member_of_two_teams_opens_the_earliest_created()
+    {
+        // L2-056 AC4: the fallback for data with no stored default.
+        var product = await TestTeam.CreateAsync(_factory, "Omar Diaz", teamName: "Product team");
+        await product.AddMemberAsync("Sam Chen");
+        await product.SetPasswordAsync("Sam Chen", Password);
+        var family = await TestTeam.CreateAsync(_factory, "Maya Chen", teamName: "Chen family");
+        await _factory.WriteAsync(db => db.Teams.Single(t => t.Id == family.Team.Id).CreatedUtc = product.Team.CreatedUtc.AddMinutes(5));
+        await family.AddExistingMemberAsync(product, "Sam Chen");
+
+        var session = await SignInAsync(product.EmailOf("Sam Chen"));
+
+        session.GetProperty("teamId").GetGuid().Should().Be(product.Team.Id);
+    }
+
+    [Fact]
+    public async Task A_person_removed_from_their_default_team_still_signs_in_to_the_other()
+    {
+        // L2-058 AC9, L2-011 AC2: the account and the other membership stay.
+        var product = await TestTeam.CreateAsync(_factory, "Omar Diaz", teamName: "Product team");
+        await product.AddMemberAsync("Sam Chen");
+        await product.SetPasswordAsync("Sam Chen", Password);
+        var family = await TestTeam.CreateAsync(_factory, "Maya Chen", teamName: "Chen family");
+        var row = await family.AddExistingMemberAsync(product, "Sam Chen");
+        await _factory.WriteAsync(db => db.Users.Single(u => u.Id == row.UserId).DefaultTeamId = family.Team.Id);
+        var removal = await family.ClientFor("Maya Chen").DeleteAsync($"/api/team/members/{row.Id}");
+        removal.IsSuccessStatusCode.Should().BeTrue(await removal.Content.ReadAsStringAsync());
+
+        var session = await SignInAsync(product.EmailOf("Sam Chen"));
+
+        session.GetProperty("teamId").GetGuid().Should().Be(product.Team.Id);
+    }
+
+    [Fact]
+    public async Task A_manager_who_is_also_a_member_elsewhere_signs_in_to_the_team_they_manage_as_manager()
+    {
+        // L2-054 AC1, L2-055 AC4: a managed team wins over a member team, and the role is Manager there.
+        var design = await TestTeam.CreateAsync(_factory, "Maya Chen");
+        await design.SetPasswordAsync("Maya Chen", Password);
+        var earlier = await TestTeam.CreateAsync(_factory, "Omar Diaz", teamName: "Old team");
+        await _factory.WriteAsync(db => db.Teams.Single(t => t.Id == earlier.Team.Id).CreatedUtc = design.Team.CreatedUtc.AddMinutes(-5));
+        await earlier.AddExistingMemberAsync(design, "Maya Chen");
+
+        var session = await SignInAsync(design.EmailOf("Maya Chen"));
+
+        session.GetProperty("teamId").GetGuid().Should().Be(design.Team.Id);
+        session.GetProperty("role").GetString().Should().Be("Manager");
+    }
+
     private async Task<JsonElement> SignInAsync(string email)
     {
         var response = await _factory.CreateClient().PostAsJsonAsync("/api/auth/sign-in", new { email, password = Password });
