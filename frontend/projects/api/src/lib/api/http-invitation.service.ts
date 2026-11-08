@@ -10,11 +10,15 @@ import {
   AcceptWithGoogleResult,
   GetInvitationResult,
   InvitationService,
+  JoinWithAccountResult,
 } from './invitation.service';
 import { problemCode } from './problem';
 import { SESSION_STORE } from './session-store';
 
-/** GET /api/invitations/{token} and POST .../accept; joining keeps the new session in the session store. */
+/**
+ * GET /api/invitations/{token}, POST .../accept, .../accept-google, .../sign-in and .../join; joining keeps the new
+ * session in the session store.
+ */
 @Injectable({ providedIn: 'root' })
 export class HttpInvitationService implements InvitationService {
   private readonly http = inject(HttpClient);
@@ -61,6 +65,33 @@ export class HttpInvitationService implements InvitationService {
             return of<AcceptWithGoogleResult>({ outcome: 'exists' });
           default:
             return of<AcceptWithGoogleResult>({ outcome: 'failed' });
+        }
+      }),
+    );
+  }
+
+  signInAndJoin(token: string, password: string): Observable<JoinWithAccountResult> {
+    return this.joining(this.http.post<Session>(`${this.url(token)}/sign-in`, { password }));
+  }
+
+  join(token: string): Observable<JoinWithAccountResult> {
+    return this.joining(this.http.post<Session>(`${this.url(token)}/join`, null));
+  }
+
+  private joining(request: Observable<Session>): Observable<JoinWithAccountResult> {
+    return request.pipe(
+      tap((session) => this.store.setToken(session.accessToken)),
+      map((session): JoinWithAccountResult => ({ outcome: 'joined', session })),
+      catchError((error: unknown) => {
+        const expired = expiredOutcome(error);
+        if (expired) return of<JoinWithAccountResult>(expired);
+        switch (problemCode(error)) {
+          case 'invalid_credentials':
+            return of<JoinWithAccountResult>({ outcome: 'wrong' });
+          case 'invitation_other_account':
+            return of<JoinWithAccountResult>({ outcome: 'other' });
+          default:
+            return of<JoinWithAccountResult>({ outcome: 'failed' });
         }
       }),
     );

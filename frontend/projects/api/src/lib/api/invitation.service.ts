@@ -34,12 +34,27 @@ export type AcceptWithGoogleResult =
   /** Nothing was created: the API failed, could not be reached, or refused the token. */
   | { readonly outcome: 'failed' };
 
+/** What joining with an account one already has came to (L2-058). A successful join stores the session. */
+export type JoinWithAccountResult =
+  | { readonly outcome: 'joined'; readonly session: Session }
+  | { readonly outcome: 'expired'; readonly managerName: string | null }
+  /** The password does not match the account (code `invalid_credentials`). */
+  | { readonly outcome: 'wrong' }
+  /** The signed-in account is not the invited address (code `invitation_other_account`). */
+  | { readonly outcome: 'other' }
+  /** Nothing was attached: the API failed or could not be reached. */
+  | { readonly outcome: 'failed' };
+
 /** The invitee's side of an invitation (identity-and-access/accept-invitation, and sign-in-with-google). */
 export interface InvitationService {
   get(token: string): Observable<GetInvitationResult>;
   accept(token: string, name: string, password: string): Observable<AcceptInvitationResult>;
   /** Joins with the Google account behind the access token, which must carry the invited address. */
   acceptWithGoogle(token: string, accessToken: string): Observable<AcceptWithGoogleResult>;
+  /** Signed out: joins with the password of the account the invited address already has (L2-058 AC2). */
+  signInAndJoin(token: string, password: string): Observable<JoinWithAccountResult>;
+  /** Signed in as the invited address: joins with that account (L2-058 AC4). */
+  join(token: string): Observable<JoinWithAccountResult>;
 }
 
 export const INVITATION_SERVICE = new InjectionToken<InvitationService>('INVITATION_SERVICE');

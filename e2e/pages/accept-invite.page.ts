@@ -127,6 +127,39 @@ export class AcceptInvitePage extends BasePage {
     return control(this.main, "Open the calendar");
   }
 
+  // ---- an address that already has an account (L2-058, pages/accept-invite/account*) ----
+
+  /** The note "{email} already has a Greenlit account. Sign in to add {team} to your teams." */
+  accountNote(): Locator {
+    return this.main.locator(".alert:not(.alert--danger):not(.alert--success)");
+  }
+
+  /** The existing account's password. */
+  accountPassword(): Locator {
+    return this.main.getByLabel("Password", { exact: true });
+  }
+
+  signInAndJoin(): Locator {
+    return this.main.getByRole("button", { name: /^(Sign in and join|Joining…)$/ });
+  }
+
+  forgotPassword(): Locator {
+    return this.main.getByRole("link", { name: "Forgot your password?", exact: true });
+  }
+
+  /** "You’re signed in as {email}." on the signed-in card. */
+  signedInAs(): Locator {
+    return this.main.locator(".card p:not(.lead)");
+  }
+
+  signOut(): Locator {
+    return control(this.main, "Sign out");
+  }
+
+  goToCalendar(): Locator {
+    return control(this.main, "Go to the calendar");
+  }
+
   async fill(fields: { name?: string; password?: string; confirm?: string }): Promise<void> {
     if (fields.name !== undefined) await this.name().fill(fields.name);
     if (fields.password !== undefined) await this.password().fill(fields.password);

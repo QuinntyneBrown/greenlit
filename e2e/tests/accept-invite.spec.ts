@@ -1,10 +1,11 @@
 // Acceptance Test
-// Traces to: L2-004
+// Traces to: L2-004, L2-058
 // Description: A person opens their invitation link, sets a name and password, and lands signed in on the team's calendar.
 // Data: every test invites a fresh address through the real API as the viewport's inviter (Uma, Vic or Wren, who each
 //       manage a team of their own, see teams/invite-member), so a second run on the same database passes too. The
 //       link is read from the e2e API's log (fixtures/invitation.ts, ADR-006).
 
+import { createTeam, freshMemberOf, freshPerson, inviteTo } from "../fixtures/households.js";
 import { test, expect } from "../fixtures/gl-test.js";
 import { freshEmail, invite, paintDays } from "../fixtures/invitation.js";
 import { API_BASE_URL, PEOPLE, SESSION_KEY, inviterFor } from "../fixtures/session.js";
@@ -262,18 +263,23 @@ test.describe("Accepting an invitation", () => {
     await expect(pages.acceptInvite.join()).toBeEnabled();
   });
 
-  test("an address that already has an account is sent to sign in (L2-004 AC8)", async ({ goto, pages, request }, testInfo) => {
-    // Ana already has an account on the demo team; the inviter's own team can still invite her address.
-    const invitation = await invite(request, inviterFor(testInfo.project.name), "Ana R.", PEOPLE.member.email);
-    await goto("acceptInvite", { token: invitation.token });
+  test("an address that already has an account is asked to sign in and join, not to choose a password (L2-004 AC8, L2-058)", async ({
+    goto,
+    page,
+    pages,
+  }) => {
+    const omar = await freshPerson(page.request, "Omar Haddad");
+    await createTeam(page.request, omar, "Product team");
+    const sam = await freshMemberOf(page.request, omar, "Sam Chen");
+    const maya = await freshPerson(page.request, "Maya Chen");
+    await createTeam(page.request, maya, "Chen family");
+    const invitation = await inviteTo(page.request, maya, "Sam Chen", sam.email);
+    await goto("acceptInvite", { token: invitation });
     await pages.acceptInvite.waitForReady();
-    await pages.acceptInvite.fill({ password: PASSWORD, confirm: PASSWORD });
 
-    await pages.acceptInvite.join().click();
-
-    await expect(pages.acceptInvite.failureTitle()).toHaveText("You already have a Greenlit account");
-    await expect(pages.acceptInvite.failureText()).toHaveText("Sign in with this email to continue.");
-    await expect(pages.acceptInvite.goToSignIn()).toBeVisible();
+    await expect(pages.acceptInvite.signInAndJoin()).toBeVisible();
+    await expect(pages.acceptInvite.password()).toHaveCount(0);
+    await expect(pages.acceptInvite.confirm()).toHaveCount(0);
   });
 });
 

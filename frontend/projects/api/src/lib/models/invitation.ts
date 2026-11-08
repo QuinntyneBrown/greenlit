@@ -7,4 +7,6 @@ export interface Invitation {
   readonly memberName: string;
   /** Where the invitation was sent; fixed. */
   readonly email: string;
+  /** That address already has an account: the page signs in and joins instead of creating one (L2-058). */
+  readonly accountExists: boolean;
 }
