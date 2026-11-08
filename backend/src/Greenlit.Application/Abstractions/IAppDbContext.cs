@@ -14,6 +14,7 @@ public interface IAppDbContext
     DbSet<AllowanceAdjustment> AllowanceAdjustments { get; }
     DbSet<Invitation> Invitations { get; }
     DbSet<PasswordResetToken> PasswordResetTokens { get; }
+    DbSet<SchoolClosure> SchoolClosures { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 

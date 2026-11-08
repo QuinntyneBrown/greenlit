@@ -17,6 +17,7 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<AllowanceAdjustment> AllowanceAdjustments => Set<AllowanceAdjustment>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+    public DbSet<SchoolClosure> SchoolClosures => Set<SchoolClosure>();
 
     public void DiscardChanges() => ChangeTracker.Clear();
 

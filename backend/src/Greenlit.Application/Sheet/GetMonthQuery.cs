@@ -1,4 +1,5 @@
 using Greenlit.Application.Allowances;
+using Greenlit.Application.SchoolCalendar;
 using MediatR;
 
 namespace Greenlit.Application.Sheet;
@@ -14,7 +15,8 @@ public sealed record MonthDto(
     int? CoverageMinimum,
     IReadOnlyList<MemberRowDto> Members,
     IReadOnlyList<CoverageDto> Coverage,
-    bool SchoolCalendar);
+    bool SchoolCalendar,
+    IReadOnlyList<ClosureDto> Closures);
 
 public sealed record MemberRowDto(
     Guid Id,
