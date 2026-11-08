@@ -51,6 +51,21 @@ public class AccountProfileTests : IClassFixture<GreenlitApiFactory>
     }
 
     [Fact]
+    public async Task A_manager_of_several_teams_is_renamed_on_every_team()
+    {
+        // L2-054: a manager has a row on each team they manage; their name is the same on all of them.
+        var design = await TestTeam.CreateAsync(_factory, "Maya Chen");
+        var product = await design.AddTeamAsync("Product team");
+
+        var response = await design.SessionFor("Maya Chen").PutAsJsonAsync("/api/account/profile",
+            new { displayName = "Maya Chen-Ito", email = design.EmailOf("Maya Chen") });
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK, await response.Content.ReadAsStringAsync());
+        (await RowNameAsync(design.ManagerRow.Id)).Should().Be("Maya Chen-Ito");
+        (await RowNameAsync(product.ManagerRow.Id)).Should().Be("Maya Chen-Ito");
+    }
+
+    [Fact]
     public async Task A_new_email_is_the_one_to_sign_in_with()
     {
         var team = await TestTeam.CreateAsync(_factory, "Maya Chen");

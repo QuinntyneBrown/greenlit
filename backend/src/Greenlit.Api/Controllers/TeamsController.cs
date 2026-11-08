@@ -40,7 +40,17 @@ public sealed class TeamsController : ControllerBase
     [HttpPost("{id:guid}/switch")]
     public async Task<ActionResult<SessionDto>> Switch(Guid id, CancellationToken ct) =>
         Ok(await _sender.Send(new SwitchTeamCommand(id), ct));
+
+    /// <summary>Makes a team the caller manages their default; 404 <c>team_not_found</c> for any other team.</summary>
+    [HttpPut("default")]
+    public async Task<IActionResult> SetDefault([FromBody] SetDefaultTeamRequest request, CancellationToken ct)
+    {
+        await _sender.Send(new SetDefaultTeamCommand(request.TeamId), ct);
+        return NoContent();
+    }
 }
+
+public sealed record SetDefaultTeamRequest(Guid? TeamId);
 
 public sealed record CreateTeamRequest(string? Name, string? TimeZone, string? HolidayCountry, IReadOnlyList<CreateTeamMemberRequest>? Members);
 

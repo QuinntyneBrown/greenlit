@@ -37,8 +37,8 @@ public sealed class UpdateProfileCommandHandler : IRequestHandler<UpdateProfileC
 
         user.DisplayName = name;
         user.Email = email;
-        var member = await _db.TeamMembers.FirstOrDefaultAsync(m => m.UserId == id, ct);
-        if (member is not null)
+        // A manager of several teams has a row on each (L2-054); every one carries the new name.
+        foreach (var member in await _db.TeamMembers.Where(m => m.UserId == id).ToListAsync(ct))
         {
             member.Name = name;
             member.Email = email;
