@@ -39,7 +39,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Time-zone options.** The mocks offer four options: London (GMT+0 / BST), Dublin, "Paris, Berlin (CET)" and New York (ET). They map to `Europe/London`, `Europe/Dublin`, `Europe/Paris` and `America/New_York`.
 
-**Public-holiday calendars.** United Kingdom (`GB`, the bank holidays of England and Wales), Ireland (`IE`), United States (`US`, federal holidays) and "None, I'll add my own" (`none`).
+**Public-holiday calendars.** United Kingdom (`GB`, the bank holidays of England and Wales), Ireland (`IE`), United States (`US`, federal holidays), Canada (`CA`, the statutory holidays of Ontario), Italy (`IT`, national holidays) and "None, I'll add my own" (`none`).
 
 ## Requirements
 
@@ -87,7 +87,7 @@ Validation failures stop the request before any write (`L2-008` AC4). The single
 |---|---|
 | Entry point | `teamGuard` runs after `authGuard` on every app screen and sends a session without a `team_id` claim to `/create-team`. `/create-team` (`authGuard`, `noTeamGuard`) sends a session that names a team to `/`. The session is read locally from the token, as `authGuard` does (ADR-004). |
 | New manager accounts | Sign-in stays invite-only and there is no self sign-up (`L1-006`). An account without a team comes from the operator; `greenlit seed` creates four for the demo and the e2e suite: Noor Haddad (`noor@northwind.studio`), who only opens the page, and Priya Shah, Sam Lee and Tomás Silva (`priya@`, `sam@`, `tomas@northwind.studio`), one per Playwright viewport, who each create a team. A run that creates teams needs a fresh e2e database (`eng/Start-E2eApi.ps1` starts one). |
-| Endpoint and response | `POST /api/teams`, authenticated by the fallback policy. Body: `name`, `timeZone`, `holidayCountry` (`GB`, `IE`, `US` or `none`), `members` (`name`, `email`). Success is `201` with `CreatedTeamDto` (`teamId`, `name`, `invited`, `session`). `invited` counts the invitations sent, `0` until journey 5. |
+| Endpoint and response | `POST /api/teams`, authenticated by the fallback policy. Body: `name`, `timeZone`, `holidayCountry` (`GB`, `IE`, `US`, `CA`, `IT` or `none`), `members` (`name`, `email`). Success is `201` with `CreatedTeamDto` (`teamId`, `name`, `invited`, `session`). `invited` counts the invitations sent, `0` until journey 5. |
 | Member rows | Names and emails are trimmed. A row with neither is ignored; a row with an email and no name fails validation as `Members[i].Name` with "Give this member a name." Emails are stored on the row so journey 5 can invite them; this journey sends nothing. The creator's own row comes first (`SortOrder` 0) with their display name and email, then the rows in the order entered. A row is removed by clearing it: the mocks show no Remove control. |
 | Manager | `Team.ManagerUserId` is the caller, and the caller's `User.Role` becomes Manager. The `MemberRole` on `TeamMember` in the class diagram arrives with journey 18 (roles in Settings), so the schema does not change in this journey and needs no migration. The other new fields in the class diagram arrive with their journeys: working days (15), yearly days (11), coverage (17), notifications (25), removal (24) and the holiday country (14, 18). |
 | One team per person | A caller who already manages a team or has a row on one gets `409` ProblemDetails with code `team_exists` and the detail "You're already on a team." Nothing is written. |
