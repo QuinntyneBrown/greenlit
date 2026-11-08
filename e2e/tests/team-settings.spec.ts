@@ -42,7 +42,9 @@ test.describe("The Team section", () => {
       "London (GMT+0 / BST)",
       "Dublin",
       "Paris, Berlin (CET)",
+      "Rome (CET)",
       "New York (ET)",
+      "Toronto (ET)",
     ]);
     await expect(settings.roleField(manager)).toHaveValue("Manager");
     await expect(settings.roleField("Teammate Holiday")).toHaveValue("Member");
