@@ -347,10 +347,10 @@ type HolidaysLoad =
             </div>
           </section>
         }
-        @if (isManager()) {
+        @if (managesATeam()) {
           <section id="teams" class="settings-section" aria-labelledby="teams-title">
             <app-your-teams-section
-              [load]="managedTeams.load()"
+              [load]="managedTeams.managedLoad()"
               [busy]="managedTeams.busy()"
               (retry)="managedTeams.refresh()"
               (switchTo)="managedTeams.switchTo($event)"
@@ -465,7 +465,7 @@ export class SettingsPage {
     // loaded, after the router's own anchor scroll, so the page scrolls to it then.
     const fragment = inject(ActivatedRoute).snapshot.fragment;
     effect(() => {
-      if (fragment !== 'teams' || this.scrolledToTeams || !this.isManager()) return;
+      if (fragment !== 'teams' || this.scrolledToTeams || !this.managesATeam()) return;
       // Every section above has its final height once its data is in, so the scroll lands where it stays.
       const settled =
         this.managedTeams.load().state !== 'loading' &&
@@ -521,12 +521,16 @@ export class SettingsPage {
           { id: 'work-week', label: 'Work week & holidays' },
           { id: 'coverage', label: 'Coverage' },
           { id: 'notifications', label: 'Notifications' },
-          { id: 'teams', label: 'Your teams' },
         ]
       : []),
+    ...(this.managesATeam() ? [{ id: 'teams', label: 'Your teams' }] : []),
   ]);
 
   protected readonly isManager = computed(() => this.ready()?.isManager ?? false);
+  /** "Your teams" is for a person who manages a team, whatever their role on the active one (L2-054 AC7, ADR-015). */
+  protected readonly managesATeam = computed(
+    () => this.isManager() || this.managedTeams.managed().length > 0,
+  );
   protected readonly managerName = computed(() => this.ready()?.managerName ?? '');
 
   /** The allowance defaults, the manager's to read; null until they have loaded. */

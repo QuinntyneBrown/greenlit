@@ -12,10 +12,11 @@ export interface TeamSwitcherTeam {
 }
 
 /**
- * The team switcher (docs/design-system/components/team-switcher.html, L2-054 AC11): for a manager of two or more
- * teams, a button in the top bar that shows the active team's name and opens a CDK Menu labelled "Your teams". Each
+ * The team switcher (docs/design-system/components/team-switcher.html, L2-054 AC11, L2-056): for a person on two or
+ * more teams, a button in the top bar that shows the active team's name and opens a CDK Menu labelled "Your teams". Each
  * team is a `menuitemradio`, the active one checked with a check icon and the default one marked "Default" in text;
- * then "Add another team" and "Manage your teams". Enter, Space or ArrowDown opens it on the first item; the arrow
+ * then, for a person who manages at least one team (`canManage`), "Add another team" and "Manage your teams" (L2-056
+ * AC2). Enter, Space or ArrowDown opens it on the first item; the arrow
  * keys, Home and End move; Escape closes it and focus returns to the button. Choosing another team emits `chosen`;
  * choosing the active one only closes the menu. It never sets the default team.
  */
@@ -64,26 +65,28 @@ export interface TeamSwitcherTeam {
             </button>
           </li>
         }
-        <li role="none"><hr class="menu__divider" /></li>
-        <li role="none">
-          <a class="menu__item" cdkMenuItem routerLink="/create-team">
-            <svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Add another team
-          </a>
-        </li>
-        <li role="none">
-          <a class="menu__item" cdkMenuItem routerLink="/settings" fragment="teams">
-            <svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="3" />
-              <path
-                d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"
-              />
-            </svg>
-            Manage your teams
-          </a>
-        </li>
+        @if (canManage()) {
+          <li role="none"><hr class="menu__divider" /></li>
+          <li role="none">
+            <a class="menu__item" cdkMenuItem routerLink="/create-team">
+              <svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Add another team
+            </a>
+          </li>
+          <li role="none">
+            <a class="menu__item" cdkMenuItem routerLink="/settings" fragment="teams">
+              <svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"
+                />
+              </svg>
+              Manage your teams
+            </a>
+          </li>
+        }
       </ul>
     </ng-template>
   `,
@@ -214,6 +217,8 @@ export class TeamSwitcher {
   readonly teams = input.required<readonly TeamSwitcherTeam[]>();
   /** True while a switch runs: the button shows a spinner and says "Switching…". */
   readonly busy = input<boolean>(false);
+  /** Whether the person manages any of the teams: only then are "Add another team" and "Manage your teams" offered. */
+  readonly canManage = input<boolean>(true);
   /** The person chose another team. */
   readonly chosen = output<TeamSwitcherTeam>();
 
