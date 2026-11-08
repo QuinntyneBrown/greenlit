@@ -30,6 +30,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **`styles/_foundations.scss`** — Base type, colour scheme, `.shell` width and `.visually-hidden`, from `docs/design-system/assets/components.css`.
 - **`SkipLink`** — Existing `gl-skip-link`, restyled from the tokens.
 - **`TopBar`** — `gl-top-bar`: `header.topbar.topbar--app` with `.topbar__inner.shell`, the brand and navigation content, and an end slot.
+- **End slot** — The account menu (`gl-user-menu`) and, before it, for a manager of two or more teams, the team switcher (`gl-team-switcher`, `teams/switch-team`, `L2-054` AC11). At 390 px the switcher shows the active team's name shortened with an ellipsis, so the header never scrolls sideways (`L2-049` AC6).
 - **`LogoLockup`** — `gl-logo-lockup`: the mark and wordmark, a link labelled "Greenlit, team calendar".
 - **`AppNav`** — `gl-app-nav`: `nav.app-nav` labelled "Main"; each item is a router link whose `routerLinkActive` state sets `aria-current="page"`.
 - **`Button`** — `gl-button`: `.btn` with variants from `components/button.html`, rendered as `<a>` or `<button>` by input with one `ng-content` template.
@@ -44,7 +45,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 | L2 ID | Refines (L1) | Requirement |
 |-------|--------------|-------------|
-| `L2-049` | `L1-013` | **App shell and main navigation.** Every signed-in screen sits in the same chrome: a skip link, the Greenlit logo and the main navigation. The calendar is the home screen. |
+| `L2-049` | `L1-013` | **App shell and main navigation.** Every signed-in screen sits in the same chrome: a skip link, the Greenlit logo, the main navigation, the account menu and, for a manager of several teams, the team switcher. The calendar is the home screen. |
 | `L2-046` | `L1-012` | **Error pages.** Full-page states for missing, forbidden, failed and offline. |
 | `L2-047` | `L1-013` | **Keyboard on the sheet.** Every sheet interaction works from the keyboard. |
 

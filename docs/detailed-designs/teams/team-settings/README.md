@@ -4,6 +4,8 @@
 
 Settings holds everything the manager decides about the team, split into five sections: Team, Allowances, Work week & holidays, Coverage and Notifications. Each section saves on its own, so a change in one section never saves or discards another.
 
+A manager also sees a last section, "Your teams", designed in `teams/switch-team` (`L2-054`): it lists the teams they manage and switches the active team. Every other section always shows the active team.
+
 This feature covers the page and the Team section: the team name, the time zone, and each member's role and yearly days. The other sections have their own designs (`allowances/allowance-defaults`, `teams/manage-holidays`, `teams/working-days`, `teams/coverage-minimum`, `teams/notification-settings`).
 
 Members can open Settings but see every section read-only, with a note naming the manager to ask.
@@ -25,7 +27,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **`TeamSectionController`** — `GET /api/team/settings/team` returns the Team section (name, time zone, `CanEdit`, the manager's name and one row per member) to every member of the caller's team; `PUT /api/team/settings/team` saves it and carries the `Manager` policy. The other sections keep the manager-only `GET /api/team/settings` of their own designs (`TeamSettingsController`); that read stays manager-only, so a member sees the Team section read-only and the other sections are not shown to them.
 - **`GetTeamSectionQueryHandler`** — Returns the caller's own team's section with `CanEdit` true for the team's manager. A row shows `Manager` when it is the team's owning manager or its stored role says so.
 - **`SaveTeamSectionCommandHandler`** — Updates `Team.Name`, `Team.TimeZone`, and each listed member's `Role` and `YearlyDays` (null: the team default applies). A member id outside the caller's team is a 404 and nothing is saved; the validator refuses an empty name, a time zone outside the L2-008 options, negative yearly days and an unknown role (400 with `errors`); the handler refuses to make the team's owning manager a Member.
-- **`ICurrentUser`** — Greenlit.Application abstraction (exists). The handlers resolve the caller's team from `UserId` (`RequestCaller`), so every query is scoped to the caller's team.
+- **`ICurrentUser`** — Greenlit.Application abstraction (exists). The handlers resolve the caller's active team through `ActiveTeam` (the session's `team_id`, ADR-014), so every query is scoped to that one team.
 
 **Shared plumbing (exists today)**
 

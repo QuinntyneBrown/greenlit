@@ -10,7 +10,7 @@ The manager names the team, picks a time zone and a public-holiday calendar, and
 
 **public-holiday calendar** — country whose public holidays Greenlit copies into the team's holidays, or none
 
-A person reaches this page by signing in with an account that is not on a team yet: every app screen sends them here, and the page sends anyone already on a team to the calendar (`L2-008` AC8). Sign-in stays invite-only (`L2-001`, `L1-006`); there is no self sign-up, so the account of a new manager is created by the operator (the demo seed creates some, see Decisions).
+A person reaches this page by signing in with an account that is not on a team yet: every app screen sends them here, and the page sends anyone who is on a team only as a member to the calendar (`L2-008` AC8). A manager may open it again from "Add another team" to create another team (`L2-054` AC5, `teams/switch-team`). Sign-in stays invite-only (`L2-001`, `L1-006`); there is no self sign-up, so the account of a new manager is created by the operator (the demo seed creates some, see Decisions).
 
 ## Description
 
@@ -20,7 +20,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 - **`CreateTeamPage`** — Bare-shell page at `/create-team` (`page: 'create-team'`). It holds a growing list of member rows ("Add another member") and shows "Give your team a name" beside the team name when it is empty. Member rows are optional and never block the form: a row without a name is left out.
 - **`TeamService / TEAM_SERVICE`** — `create(request)` returns the new team and a session for its manager, and stores the session.
-- **`teamGuard` / `noTeamGuard`** — Route guards. `teamGuard` sends a signed-in person whose session names no team to `/create-team`; `noTeamGuard` sends one whose session names a team from `/create-team` to the calendar.
+- **`teamGuard` / `noTeamGuard`** — Route guards. `teamGuard` sends a signed-in person whose session names no team to `/create-team`; `noTeamGuard` sends one whose session names a team from `/create-team` to the calendar, unless the caller manages a team (`TEAM_SERVICE.mine()` is not empty): a manager may add another team.
 
 **Backend**
 
@@ -85,12 +85,13 @@ Validation failures stop the request before any write (`L2-008` AC4). The single
 
 | Topic | Decision |
 |---|---|
-| Entry point | `teamGuard` runs after `authGuard` on every app screen and sends a session without a `team_id` claim to `/create-team`. `/create-team` (`authGuard`, `noTeamGuard`) sends a session that names a team to `/`. The session is read locally from the token, as `authGuard` does (ADR-004). |
+| Entry point | `teamGuard` runs after `authGuard` on every app screen and sends a session without a `team_id` claim to `/create-team`. `/create-team` (`authGuard`, `noTeamGuard`) sends a session that names a team to `/`, except a manager's (changed 8 Nov 2026, `L2-054`). The session is read locally from the token, as `authGuard` does (ADR-004). |
 | New manager accounts | Sign-in stays invite-only and there is no self sign-up (`L1-006`). An account without a team comes from the operator; `greenlit seed` creates four for the demo and the e2e suite: Noor Haddad (`noor@northwind.studio`), who only opens the page, and Priya Shah, Sam Lee and Tomás Silva (`priya@`, `sam@`, `tomas@northwind.studio`), one per Playwright viewport, who each create a team. A run that creates teams needs a fresh e2e database (`eng/Start-E2eApi.ps1` starts one). |
 | Endpoint and response | `POST /api/teams`, authenticated by the fallback policy. Body: `name`, `timeZone`, `holidayCountry` (`GB`, `IE`, `US`, `CA`, `IT` or `none`), `members` (`name`, `email`). Success is `201` with `CreatedTeamDto` (`teamId`, `name`, `invited`, `session`). `invited` counts the invitations sent, `0` until journey 5. |
 | Member rows | Names and emails are trimmed. Members are optional (a team may start with only its manager), and a row without a name is ignored, even when it has an email (changed 8 Nov 2026: a stray email must not stop the manager creating the team). Emails are stored on the row so journey 5 can invite them; this journey sends nothing. The creator's own row comes first (`SortOrder` 0) with their display name and email, then the rows in the order entered. A row is removed by clearing it: the mocks show no Remove control. |
 | Manager | `Team.ManagerUserId` is the caller, and the caller's `User.Role` becomes Manager. The `MemberRole` on `TeamMember` in the class diagram arrives with journey 18 (roles in Settings), so the schema does not change in this journey and needs no migration. The other new fields in the class diagram arrive with their journeys: working days (15), yearly days (11), coverage (17), notifications (25), removal (24) and the holiday country (14, 18). |
-| One team per person | A caller who already manages a team or has a row on one gets `409` ProblemDetails with code `team_exists` and the detail "You're already on a team." Nothing is written. |
+| Who may create a team | A caller on no team, or a caller who manages at least one team (changed 8 Nov 2026, `L2-054`, ADR-014). A caller with a live row on a team they do not manage (a member) gets `409` ProblemDetails with code `team_exists` and the detail "You're already on a team." Nothing is written. The first team a person creates becomes their default (`User.DefaultTeamId`); a later one becomes the active team only, through the returned session. |
+| Another team | When the session already names a team, the page opens as "Set up another team" with the lead "Name it, pick a time zone and add the people who'll share the sheet. Your other teams stay as they are." and a "Back to Settings" link (`pages/create-team/another`). |
 | Validation | `400` validation ProblemDetails: `Name` "Give your team a name." (empty) or "Use 120 characters or fewer." (too long), `TimeZone` "Choose a time zone from the list.", `HolidayCountry` "Choose a public-holiday calendar from the list.", `Members[i].Name` "Use 120 characters or fewer." (too long). The page checks the name rules before sending, so the API rules are the backstop; the selects can only hold offered values. |
 | Holidays | `RuleBasedPublicHolidayProvider` (ADR-005) gives the chosen country's holidays for the current and the next year in the team's time zone, stored as team `Holiday` rows. `none` stores no holidays. |
 | Session after creating | The response carries a new session (ADR-004) whose token names the team and the creator's row; the page stores it, so `teamGuard` lets the calendar open. |

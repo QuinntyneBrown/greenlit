@@ -19,6 +19,7 @@ or infrastructure choice is made or revisited.
 | [ADR-011](ADR-011-api-hosting.md) | Host the API on a Free Linux App Service with a Basic Azure SQL database |
 | [ADR-012](ADR-012-google-sign-in.md) | Google sign-in exchanges a Google access token for the Greenlit session |
 | [ADR-013](ADR-013-branded-email-through-azure-communication-services.md) | Branded HTML email, delivered through Azure Communication Services |
+| [ADR-014](ADR-014-a-manager-runs-several-teams.md) | A manager runs several teams; the session names the active one and the account remembers the default |
 
 ## Template
 

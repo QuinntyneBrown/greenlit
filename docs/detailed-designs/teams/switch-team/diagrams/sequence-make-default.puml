@@ -1,0 +1,38 @@
+@startuml
+title UML sequence behaviour — Make a team the default
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "YourTeamsSection" as ui
+  participant "ManagedTeamsState" as state
+  participant "HttpTeamService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "TeamsController" as ctrl
+end box
+box "Backend — Greenlit.Application" #ECFDF3
+  participant "SetDefaultTeamCommandHandler" as handler
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> ui : "Make default" on Product team
+ui -> state : makeDefault(team)
+state -> ui : busy ("Saving…")
+state -> client : makeDefault(id)
+client -> ctrl : PUT /api/teams/default
+ctrl -> handler : SetDefaultTeamCommand
+alt caller manages the team
+  handler -> db : Users.DefaultTeamId = id
+  ctrl --> client : 204
+  state -> client : mine()
+  state --> actor : "Default" moves; toast "Product team is now your default" (L2-054 AC4)
+else not managed, or the call fails
+  ctrl --> client : 404 team_not_found / 5xx
+  state --> actor : Error toast "We couldn't change your default", mark stays (AC9)
+end
+@enduml

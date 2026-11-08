@@ -1,0 +1,35 @@
+@startuml
+title UML sequence behaviour — Sign in to the default team
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Manager" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "SignInPage" as page
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "AuthController" as ctrl
+end box
+box "Backend — Greenlit.Application" #ECFDF3
+  participant "SignInCommandHandler" as handler
+  participant "TeamChoice" as choice
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> page : Email, password, "Sign in"
+page -> ctrl : POST /api/auth/sign-in
+ctrl -> handler : SignInCommand
+handler -> choice : ForSignInAsync(user)
+choice -> db : DefaultTeamId, teams the user manages, live rows
+alt default team still managed
+  choice --> handler : row on the default team
+else default missing or not managed
+  choice --> handler : row on the earliest created managed team, else the member row
+end
+handler --> ctrl : SessionDto (team_id = chosen team)
+ctrl --> page : 200
+page --> actor : Calendar of the default team (L2-054 AC1, AC12)
+@enduml
