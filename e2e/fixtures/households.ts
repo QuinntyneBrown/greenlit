@@ -109,3 +109,29 @@ export async function addClosure(
   if (!response.ok()) throw new Error(`Adding the closure ${label} failed with ${response.status()}.`);
   return ((await response.json()) as { id: string }).id;
 }
+
+/** A school calendar file with one all-day event per `[summary, yyyy-MM-dd]` (RFC 5545, CRLF line ends). */
+export function icsFile(events: [string, string][]): string {
+  const day = (iso: string) => iso.replaceAll("-", "");
+  const next = (iso: string) => {
+    const d = new Date(`${iso}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().slice(0, 10);
+  };
+  const body = events
+    .map(
+      ([summary, date]) =>
+        `BEGIN:VEVENT\r\nSUMMARY:${summary}\r\nDTSTART;VALUE=DATE:${day(date)}\r\nDTEND;VALUE=DATE:${day(next(date))}\r\nEND:VEVENT\r\n`,
+    )
+    .join("");
+  return `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Maple Grove PS//EN\r\n${body}END:VCALENDAR\r\n`;
+}
+
+/** Imports `text` as `memberId`'s school calendar on `manager`'s active team (L2-062). */
+export async function importCalendar(request: APIRequestContext, manager: FreshPerson, memberId: string, text: string): Promise<void> {
+  const response = await request.post(`${API_BASE_URL}/api/team/children/${memberId}/calendar`, {
+    headers: { Authorization: `Bearer ${manager.token}` },
+    multipart: { file: { name: "maple-grove.ics", mimeType: "text/calendar", buffer: Buffer.from(text, "utf8") } },
+  });
+  if (!response.ok()) throw new Error(`Importing the calendar failed with ${response.status()}.`);
+}

@@ -4,9 +4,11 @@ import { Observable, catchError, map, of } from 'rxjs';
 
 import { SchoolClosure, SchoolClosureInput } from '../models/school-closure';
 import { API_BASE_URL, apiUrl } from './api-base-url';
+import { problemCode } from './problem';
 import {
   AddChildResult,
   AddedChild,
+  ImportCalendarResult,
   SaveClosureResult,
   SchoolCalendarSaveResult,
   SchoolCalendarService,
@@ -52,6 +54,24 @@ export class HttpSchoolCalendarService implements SchoolCalendarService {
       .pipe(
         map((): SchoolCalendarSaveResult => ({ ok: true })),
         catchError(() => of<SchoolCalendarSaveResult>({ ok: false })),
+      );
+  }
+
+  importCalendar(memberId: string, file: Blob, fileName: string): Observable<ImportCalendarResult> {
+    const body = new FormData();
+    body.append('file', file, fileName);
+    return this.http
+      .post<{ imported: number }>(
+        apiUrl(this.baseUrl, `api/team/children/${encodeURIComponent(memberId)}/calendar`),
+        body,
+      )
+      .pipe(
+        map((r): ImportCalendarResult => ({ outcome: 'imported', imported: r.imported })),
+        catchError((error: unknown) =>
+          of<ImportCalendarResult>({
+            outcome: problemCode(error) === 'calendar_unreadable' ? 'unreadable' : 'failed',
+          }),
+        ),
       );
   }
 
