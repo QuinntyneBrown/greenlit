@@ -332,21 +332,6 @@
       }
     },
     {
-      "id": "brand",
-      "kind": "page",
-      "title": "Brand guide",
-      "requirements": [],
-      "states": [
-        "default"
-      ],
-      "route": "/brand",
-      "not_applicable": {
-        "loading": "Static content with nothing to load.",
-        "empty": "Static content with no collection.",
-        "error": "Static content cannot fail to load."
-      }
-    },
-    {
       "id": "marketing",
       "kind": "page",
       "title": "Marketing page",

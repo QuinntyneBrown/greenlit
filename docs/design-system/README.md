@@ -46,7 +46,7 @@ Greenlit replaces the Google Sheet managers of small teams keep for vacation. Th
 | [Skip link](components/skip-link.html) | Navigation | Skip link | Hidden (resting), Focused, Hover | `pages/calendar/default`, `pages/sign-in/default`, `dialogs/add-holiday/default` |
 | [Settings navigation](components/settings-nav.html) | Navigation | Link | Default, Hover (real :hover), Focus | `pages/settings/default`, `dialogs/add-holiday/default`, `pages/settings/read-only` |
 | [Period navigation](components/period-nav.html) | Navigation | Previous month | Default, Hover, Focus, Active, Disabled | `pages/calendar/default`, `pages/year/default`, `pages/calendar/other-month` |
-| [Card](components/card.html) | Containers and overlays | Interactive card | Default, Hover, Selected, Focus (inner link) | `pages/sign-in/default`, `pages/brand/default`, `pages/calendar/default` +1 |
+| [Card](components/card.html) | Containers and overlays | Interactive card | Default, Hover, Selected, Focus (inner link) | `pages/sign-in/default`, `pages/calendar/default` +1 |
 | [Dialog](components/dialog.html) | Containers and overlays | Default (information or confirmation), Destructive, Form, Busy, Failed | see page | `dialogs/sign-out/default`, `dialogs/remove-member/default`, `dialogs/remove-member/busy` +5 |
 | [Drawer](components/drawer.html) | Containers and overlays | Wide (request detail), Standard width, From the left, Content states | see page | `dialogs/request-detail/default`, `dialogs/request-detail/approved`, `dialogs/request-detail/busy` +3 |
 | [Tooltip](components/tooltip.html) | Containers and overlays | Tooltip | Hidden (default), Hover, Keyboard focus | `pages/calendar/default`, `pages/year/default` |
@@ -69,7 +69,7 @@ Greenlit replaces the Google Sheet managers of small teams keep for vacation. Th
 | [Skeleton](components/skeleton.html) | Feedback | Member row | Loading, Loaded, Reduced motion | `pages/calendar/loading`, `pages/settings/loading`, `pages/sign-in/loading` +3 |
 | [Empty state](components/empty-state.html) | Feedback | Reason | Nothing yet, Nothing to do, Load failed | `pages/calendar/empty`, `pages/requests/empty`, `pages/settings/holidays-empty` +4 |
 | [Error page](components/error-page.html) | Feedback | Not found, Forbidden, Server error, Offline, Session expired | Status, Tone, Primary action, Secondary | `pages/not-found/default`, `pages/forbidden/default`, `pages/server-error/default` +4 |
-| [Logo lockup](components/logo-lockup.html) | Sheet and brand | Home link, Plain image | Default, Hover, Focus | `pages/brand/default`, `pages/calendar/default`, `pages/sign-in/default` |
+| [Logo lockup](components/logo-lockup.html) | Sheet and brand | Home link, Plain image | Default, Hover, Focus | `pages/calendar/default`, `pages/sign-in/default` |
 | [Sheet cell](components/sheet-cell.html) | Sheet and brand | Confirmed (confirmed), Requested (requested), Tentative (tentative), Working (empty), Not working (off) | Default, Hover, Focus, Selected, Read-only | `pages/calendar/default`, `pages/calendar/selected`, `pages/calendar/over-allowance` +2 |
 | [Team grid](components/team-grid.html) | Sheet and brand | Default, Loading (aria-busy), Selected cells | Rendering | `pages/calendar/default`, `pages/calendar/member`, `pages/calendar/selected` +4 |
 | [Year grid](components/year-grid.html) | Sheet and brand | Month cell | Default, Hover, Focus | `pages/year/default`, `pages/year/sorted`, `pages/year/member` +2 |
