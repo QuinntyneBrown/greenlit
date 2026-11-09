@@ -71,6 +71,7 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
             .Where(h => h.TeamId == team.Id && h.Date >= month && h.Date <= last)
             .ToDictionaryAsync(h => h.Date, h => h.Name, ct);
         var statusOf = stored.ToDictionary(d => (d.TeamMemberId, d.Date), d => d.Status);
+        var synced = stored.Where(d => d.IsSynced).Select(d => (d.TeamMemberId, d.Date)).ToHashSet();
 
         var figures = await _allowances.ComputeAsync(team, ordered, ct);
         var dates = Enumerable.Range(0, last.Day).Select(month.AddDays).ToList();
@@ -81,7 +82,7 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
                 m.Id, m.Name, Initials(m.Name), m.UserId == userId,
                 SchoolCalendarRules.IsChild(team, m) ? null : figures[m.Id].Left,
                 SchoolCalendarRules.IsChild(team, m) ? null : figures[m.Id],
-                dates.Select(date => CellFor(m.Id, date, holidays, statusOf, WorkingDayRule.For(team, m))).ToList(),
+                dates.Select(date => CellFor(m.Id, date, holidays, statusOf, WorkingDayRule.For(team, m), synced)).ToList(),
                 WorkingDaysNames.ToNames(WorkingDayRule.For(team, m)),
                 SchoolCalendarRules.IsChild(team, m)))
             .ToList();
@@ -121,7 +122,8 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
         DateOnly date,
         IReadOnlyDictionary<DateOnly, string> holidays,
         IReadOnlyDictionary<(Guid, DateOnly), DayStatus> statusOf,
-        WorkingDays workingDays)
+        WorkingDays workingDays,
+        IReadOnlySet<(Guid, DateOnly)>? synced = null)
     {
         if (holidays.TryGetValue(date, out var holiday)) return new CellDto(Iso(date), CellKind.Holiday, holiday);
         if (WorkingDayRule.IsOffDay(date, workingDays)) return new CellDto(Iso(date), CellKind.NotWorking, null);
@@ -133,7 +135,7 @@ public sealed class GetMonthQueryHandler : IRequestHandler<GetMonthQuery, MonthD
             DayStatus.Confirmed => CellKind.Confirmed,
             _ => throw new ArgumentOutOfRangeException(nameof(statusOf), status, "Unknown day status."),
         };
-        return new CellDto(Iso(date), kind, null);
+        return new CellDto(Iso(date), kind, null, synced?.Contains((memberId, date)) ?? false);
     }
 
     private static string Iso(DateOnly date) => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);

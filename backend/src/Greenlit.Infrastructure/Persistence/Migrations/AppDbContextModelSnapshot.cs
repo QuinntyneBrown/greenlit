@@ -311,6 +311,9 @@ namespace Greenlit.Infrastructure.Persistence.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
+                    b.Property<bool>("IsSynced")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
