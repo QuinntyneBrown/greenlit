@@ -1,7 +1,7 @@
 import { SheetMonth } from 'api';
 import { WeekStripColumn, WeekStripRow, WeekTab } from 'components';
 
-import { calendarView, datesOf, dayLabel, monthTitle } from './calendar-view';
+import { calendarView, datesOf, dayLabel, monthTitle, SYNCED_WORDS } from './calendar-view';
 
 /**
  * Turns the API's month into what the calendar shows on a phone
@@ -199,6 +199,8 @@ export interface DayPanelRow {
   readonly initials: string;
   readonly name: string;
   readonly status: 'confirmed' | 'requested' | 'tentative' | 'empty' | 'off';
+  /** A day booked in another of the person's teams (L2-064 AC11): its swatch is striped. */
+  readonly synced?: boolean;
   /** "Confirmed", "Requested", "Tentative", "Working" or "Not working". */
   readonly word: string;
 }
@@ -245,7 +247,9 @@ export function dayPanelView(
           return {
             initials: member.initials,
             name: member.name,
-            ...DAY_STATE[cell?.kind ?? 'Working'],
+            ...(cell?.synced
+              ? { status: 'tentative' as const, word: SYNCED_WORDS, synced: true }
+              : DAY_STATE[cell?.kind ?? 'Working']),
           };
         });
   return {

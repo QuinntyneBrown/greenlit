@@ -122,7 +122,12 @@ export interface PhoneMark {
                 <span class="day-panel__name">{{ row.name }}</span>
                 <span class="day-panel__state" [attr.data-status]="row.status">
                   @if (row.status !== 'empty' && row.status !== 'off') {
-                    <span class="swatch" [attr.data-status]="row.status" aria-hidden="true"></span>
+                    <span
+                      class="swatch"
+                      [attr.data-status]="row.status"
+                      [attr.data-synced]="row.synced ? '' : null"
+                      aria-hidden="true"
+                    ></span>
                   }
                   {{ row.word }}
                 </span>
@@ -133,7 +138,7 @@ export interface PhoneMark {
       </section>
     }
     <div class="phone-legend">
-      <gl-legend [band]="true" />
+      <gl-legend [band]="true" [synced]="synced()" />
       @if (note(); as note) {
         <p class="phone-legend__note">{{ note }}</p>
       }
@@ -354,6 +359,13 @@ export interface PhoneMark {
     .swatch[data-status='tentative'] {
       --status-bg: var(--color-status-tentative);
     }
+    .swatch[data-synced] {
+      background-image: repeating-linear-gradient(
+        135deg,
+        transparent 0 3px,
+        color-mix(in srgb, var(--color-bg-surface) 45%, transparent) 3px 5px
+      );
+    }
   `,
   host: {
     '[attr.data-sheet]': "range() ? '' : null",
@@ -377,6 +389,10 @@ export class CalendarWeek {
   private readonly month = computed(() => this.sheet().month);
   private readonly weeks = computed(() => weeksOf(this.month()));
   private readonly short = computed(() => shortDates(this.sheet()));
+  /** The month holds a synced day: the legend says what it is (L2-064 AC2, AC11). */
+  protected readonly synced = computed(() =>
+    this.sheet().members.some((m) => m.cells.some((c) => c.synced)),
+  );
 
   /** The week shown: reset to today's week (or the first) whenever the month changes. */
   protected readonly week = linkedSignal({
