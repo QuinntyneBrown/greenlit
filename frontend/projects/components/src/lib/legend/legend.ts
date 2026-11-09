@@ -14,6 +14,12 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
           <span class="swatch" [attr.data-status]="item.status" aria-hidden="true"></span
           >{{ item.label }}
         </li>
+        @if (item.status === 'tentative' && synced()) {
+          <li class="legend__item">
+            <span class="swatch" data-status="tentative" data-synced aria-hidden="true"></span
+            >Booked in another team
+          </li>
+        }
       }
       @if (schoolClosed()) {
         <li class="legend__item">
@@ -66,6 +72,13 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       flex: none;
       background: var(--status-bg);
     }
+    .swatch[data-synced] {
+      background-image: repeating-linear-gradient(
+        135deg,
+        transparent 0 3px,
+        color-mix(in srgb, var(--color-bg-surface) 45%, transparent) 3px 5px
+      );
+    }
     .swatch--band {
       width: 1rem;
       background: color-mix(in srgb, var(--color-fg-default) 7%, transparent);
@@ -89,6 +102,9 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 export class Legend {
   /** The school calendar is on (L2-061 AC3): the legend adds "School closed" with the closure icon. */
   readonly schoolClosed = input<boolean>(false);
+
+  /** The month holds a day synced from another of the person's teams (L2-064 AC2): adds "Booked in another team". */
+  readonly synced = input<boolean>(false);
 
   /** Adds "Short of people" for the band of a short day. */
   readonly band = input<boolean>(false);

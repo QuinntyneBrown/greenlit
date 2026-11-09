@@ -41,6 +41,8 @@ export interface TeamGridCell {
   readonly label: string;
   /** A school closure on a child's row (L2-061): drawn as an icon, never as a colour; the label says it too. */
   readonly closure?: string;
+  /** A day booked in another of the person's teams (L2-064): striped, "⇄", never painted over here. */
+  readonly synced?: boolean;
 }
 
 export interface TeamGridRow {
@@ -169,6 +171,7 @@ export interface TeamGridSelection {
                   [attr.aria-label]="cell.label"
                   [attr.title]="cell.label"
                   [attr.data-closure]="cell.closure ? 'true' : null"
+                  [attr.data-synced]="cell.synced ? '' : null"
                 >
                   @if (cell.closure) {
                     <svg class="icon cell__closure" aria-hidden="true" viewBox="0 0 24 24">
@@ -390,6 +393,17 @@ export interface TeamGridSelection {
     .cell[data-status='tentative']::after {
       content: '?';
     }
+    /* A day synced from another of the person's teams (L2-064): tentative's blue, striped, with its own glyph. */
+    .cell[data-synced]::after {
+      content: '⇄';
+    }
+    .cell[data-synced] {
+      background-image: repeating-linear-gradient(
+        135deg,
+        transparent 0 3px,
+        color-mix(in srgb, var(--color-bg-surface) 45%, transparent) 3px 5px
+      );
+    }
     /* A school closure on a child's row (L2-061): an icon in the corner, centred on a day with no glyph; never red. */
     .cell[data-closure] {
       position: relative;
@@ -594,6 +608,8 @@ export class TeamGrid {
     const drag = this.drag();
     const paint = this.paint();
     if (!drag || !paint || status === 'off' || drag.row !== row) return status;
+    // A synced day changes only in the team where it was booked (L2-064 AC3): it never previews a colour.
+    if (this.rows()[row]?.cells[col]?.synced) return status;
     return col >= Math.min(drag.from, drag.to) && col <= Math.max(drag.from, drag.to)
       ? paint
       : status;

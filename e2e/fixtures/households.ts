@@ -135,3 +135,44 @@ export async function importCalendar(request: APIRequestContext, manager: FreshP
   });
   if (!response.ok()) throw new Error(`Importing the calendar failed with ${response.status()}.`);
 }
+
+/** `person` joins with the account they have through an invitation token (POST /api/invitations/{token}/join, L2-058); their token then names the new team. */
+export async function joinWithAccount(request: APIRequestContext, person: FreshPerson, invitation: string): Promise<void> {
+  const response = await request.post(`${API_BASE_URL}/api/invitations/${invitation}/join`, {
+    headers: { Authorization: `Bearer ${person.token}` },
+  });
+  if (!response.ok()) throw new Error(`${person.email} could not join with ${response.status()}.`);
+  person.token = ((await response.json()) as { accessToken: string }).accessToken;
+}
+
+/** The row the session `token` names (its `team_member_id` claim). */
+function rowOf(token: string): string {
+  const claims = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString("utf8")) as { team_member_id: string };
+  return claims.team_member_id;
+}
+
+/** Marks `dates` (yyyy-MM-dd) on the person's own row of the team `token` names (PUT /api/sheet/days). */
+export async function markOwnDays(request: APIRequestContext, token: string, dates: string[], status: string | null): Promise<void> {
+  const response = await request.put(`${API_BASE_URL}/api/sheet/days`, {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { memberId: rowOf(token), dates, status },
+  });
+  if (!response.ok()) throw new Error(`Marking ${dates.join(", ")} failed with ${response.status()}.`);
+}
+
+/**
+ * Sam Chen on two teams as L2-064's examples have him (ADR-016): a member of Omar Diaz's Product team, then invited by
+ * Maya Chen to Chen family and joined with the same account. Returns Sam's session on each team and Maya's.
+ */
+export async function samOnTwoTeams(
+  request: APIRequestContext,
+): Promise<{ productToken: string; familyToken: string; maya: FreshPerson }> {
+  const omar = await freshPerson(request, "Omar Diaz");
+  await createTeam(request, omar, "Product team");
+  const sam = await freshMemberOf(request, omar, "Sam Chen");
+  const productToken = sam.token;
+  const maya = await freshPerson(request, "Maya Chen");
+  await createTeam(request, maya, "Chen family");
+  await joinWithAccount(request, sam, await inviteTo(request, maya, "Sam Chen", sam.email));
+  return { productToken, familyToken: sam.token, maya };
+}

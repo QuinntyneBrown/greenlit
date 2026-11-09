@@ -12,6 +12,8 @@ export interface SheetCell {
   readonly kind: CellKind;
   /** The holiday's name when `kind` is `Holiday`, e.g. "Christmas Day". */
   readonly holidayName: string | null;
+  /** A Tentative day booked on the person's row in another of their teams (L2-064, ADR-016); read-only here. */
+  readonly synced?: boolean;
 }
 
 export interface SheetMember {
