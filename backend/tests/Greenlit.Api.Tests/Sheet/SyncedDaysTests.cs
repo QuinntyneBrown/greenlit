@@ -174,6 +174,67 @@ public class SyncedDaysTests : IClassFixture<GreenlitApiFactory>
         cell.GetProperty("synced").GetBoolean().Should().BeTrue();
     }
 
+    [Fact]
+    public async Task No_synced_day_is_stored_on_a_date_that_is_red_in_the_other_team()
+    {
+        // L2-064 AC5. Given Tue 17 Nov is a holiday in Chen family and Sam does not work Wednesdays there, when he marks
+        // Tue 17 to Thu 19 in Product team, then the change succeeds there and Chen family holds a synced day on Thu 19 only.
+        var (product, family) = await SamOnTwoTeamsAsync();
+        await family.AddHolidayAsync(new DateOnly(2026, 11, 17), "Family day");
+        await _factory.WriteAsync(db => db.TeamMembers.Single(m => m.Id == family.MemberIdOf("Sam Chen")).WorkingDays =
+            Domain.Enums.WorkingDays.Mon | Domain.Enums.WorkingDays.Tue | Domain.Enums.WorkingDays.Thu | Domain.Enums.WorkingDays.Fri);
+
+        var response = await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-17", "2026-11-18", "2026-11-19"], "Tentative");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await StoredDaysAsync(family.MemberIdOf("Sam Chen"))).Should().Equal(new DateOnly(2026, 11, 19));
+    }
+
+    [Fact]
+    public async Task A_holiday_removed_later_does_not_bring_the_synced_day_back_until_the_next_change()
+    {
+        // L2-064 AC5 (ADR-016): no back-fill on holiday changes; the next change on that date reconciles it.
+        var (product, family) = await SamOnTwoTeamsAsync();
+        await family.AddHolidayAsync(new DateOnly(2026, 11, 17), "Family day");
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-17"], "Tentative")).StatusCode.Should().Be(HttpStatusCode.OK);
+        var holidayId = await _factory.ReadAsync(db => db.Holidays.Single(h => h.TeamId == family.Team.Id).Id);
+
+        (await family.SessionFor("Maya Chen").DeleteAsync($"/api/team/holidays/{holidayId}")).StatusCode.Should().Be(HttpStatusCode.NoContent);
+        CellOf(await MonthAsync(family, "Sam Chen"), "Sam Chen", "2026-11-17").GetProperty("kind").GetString().Should().Be("Working");
+
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-17"], "Requested")).StatusCode.Should().Be(HttpStatusCode.OK);
+        CellOf(await MonthAsync(family, "Sam Chen"), "Sam Chen", "2026-11-17").GetProperty("synced").GetBoolean().Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task A_holiday_that_clears_the_day_clears_its_synced_day()
+    {
+        // L2-064 AC6. Given Sam's day on Tue 17 Nov in Product team, when Omar adds a holiday there that day (L2-037),
+        // then the synced day goes from Chen family too.
+        var (product, family) = await SamOnTwoTeamsAsync();
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-17"], "Tentative")).StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var added = await product.SessionFor("Omar Diaz").PostAsJsonAsync("/api/team/holidays", new { date = "2026-11-17", name = "Offsite" });
+
+        added.StatusCode.Should().Be(HttpStatusCode.Created, await added.Content.ReadAsStringAsync());
+        (await StoredDaysAsync(family.MemberIdOf("Sam Chen"))).Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task A_row_with_no_account_is_never_synced()
+    {
+        // L2-064 AC7. Given Leo Chen, a child on Chen family with no account, and Sam on two teams, when Maya marks days
+        // on Leo's row and on her own, then no synced day is stored anywhere.
+        var (product, family) = await SamOnTwoTeamsAsync();
+        await family.AddMemberAsync("Leo Chen", withAccount: false);
+
+        (await SetAsync(family, "Maya Chen", "Leo Chen", ["2026-11-17"], "Confirmed")).StatusCode.Should().Be(HttpStatusCode.OK);
+        (await SetAsync(family, "Maya Chen", "Maya Chen", ["2026-11-18"], "Confirmed")).StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var rows = new[] { product.MemberIdOf("Sam Chen"), product.MemberIdOf("Omar Diaz"), family.MemberIdOf("Sam Chen"), family.MemberIdOf("Leo Chen"), family.MemberIdOf("Maya Chen") };
+        (await _factory.ReadAsync(db => db.TimeOffDays.Count(d => rows.Contains(d.TeamMemberId) && d.IsSynced))).Should().Be(0);
+    }
+
     /// <summary>Sam Chen is a member of Product team (manager Omar Diaz) and of Chen family (manager Maya Chen).</summary>
     private async Task<(TestTeam Product, TestTeam Family)> SamOnTwoTeamsAsync()
     {
@@ -189,6 +250,9 @@ public class SyncedDaysTests : IClassFixture<GreenlitApiFactory>
 
     private static Task<JsonElement> MonthAsync(TestTeam team, string caller, string month = "2026-11") =>
         MonthMembersTests.GetMonthAsync(team.SessionFor(caller), month);
+
+    private Task<List<DateOnly>> StoredDaysAsync(Guid memberId) =>
+        _factory.ReadAsync(db => db.TimeOffDays.Where(d => d.TeamMemberId == memberId).Select(d => d.Date).OrderBy(d => d).ToList());
 
     private static async Task AssertProblem(HttpResponseMessage response, HttpStatusCode status, string code)
     {

@@ -35,6 +35,9 @@ internal static class DaySync
                 .ToListAsync(ct))
             .Select(h => (h.TeamId, h.Date))
             .ToHashSet();
+        // A holiday the caller is adding or restoring in this unit of work is red already (L2-064 AC6).
+        foreach (var h in db.Holidays.Local.Where(h => h.RemovedUtc == null && teamIds.Contains(h.TeamId) && dateList.Contains(h.Date)))
+            holidays.Add((h.TeamId, h.Date));
 
         // Loads the days into the tracker; rows already tracked keep their unsaved values, deleted ones stay out of Local.
         await db.TimeOffDays.Where(d => rowIds.Contains(d.TeamMemberId) && dateList.Contains(d.Date)).LoadAsync(ct);

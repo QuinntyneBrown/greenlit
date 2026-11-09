@@ -23,9 +23,11 @@ public sealed class AddHolidayCommandHandler : IRequestHandler<AddHolidayCommand
 
     private readonly IAppDbContext _db;
     private readonly ICurrentUser _currentUser;
+    private readonly TimeProvider _time;
 
-    public AddHolidayCommandHandler(IAppDbContext db, ICurrentUser currentUser)
+    public AddHolidayCommandHandler(IAppDbContext db, ICurrentUser currentUser, TimeProvider time)
     {
+        _time = time;
         _db = db;
         _currentUser = currentUser;
     }
@@ -49,7 +51,7 @@ public sealed class AddHolidayCommandHandler : IRequestHandler<AddHolidayCommand
         }
         holiday.Name = name;
         holiday.RemovedUtc = null;
-        await HolidayCalendar.ClearDaysAsync(_db, team.Id, date, ct);
+        await HolidayCalendar.ClearDaysAsync(_db, team.Id, date, _time.GetUtcNow(), ct);
         await _db.SaveChangesAsync(ct);
         return HolidayCalendar.ToDto(holiday);
     }

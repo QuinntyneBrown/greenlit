@@ -1,5 +1,6 @@
 using System.Globalization;
 using Greenlit.Application.Abstractions;
+using Greenlit.Application.Sheet;
 using Greenlit.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,10 +16,17 @@ internal static class HolidayCalendar
 
     /// <summary>
     /// Deletes the days every member of <paramref name="teamId"/> holds on <paramref name="date"/>, in any
-    /// status: a holiday never holds time off (ADR-003, ADR-008). The caller saves.
+    /// status: a holiday never holds time off (ADR-003, ADR-008). A person whose own day it cleared loses the synced
+    /// days it gave their other teams (L2-064 AC6, ADR-016). The caller saves.
     /// </summary>
-    public static async Task ClearDaysAsync(IAppDbContext db, Guid teamId, DateOnly date, CancellationToken ct) =>
-        db.TimeOffDays.RemoveRange(await db.TimeOffDays
+    public static async Task ClearDaysAsync(IAppDbContext db, Guid teamId, DateOnly date, DateTimeOffset now, CancellationToken ct)
+    {
+        var cleared = await db.TimeOffDays
+            .Include(d => d.TeamMember)
             .Where(d => d.Date == date && d.TeamMember.TeamId == teamId)
-            .ToListAsync(ct));
+            .ToListAsync(ct);
+        db.TimeOffDays.RemoveRange(cleared);
+        foreach (var userId in cleared.Where(d => !d.IsSynced).Select(d => d.TeamMember.UserId).Distinct())
+            await DaySync.ReconcileAsync(db, userId, [date], now, ct);
+    }
 }
