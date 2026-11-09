@@ -51,6 +51,7 @@ everyone sees the same month.
   a team (a team of one works too): sign-in opens their default team, the header switches between
   their teams, and a manager chooses the default in Settings. Inviting an address that already has
   an account adds the team to that account.
+- **Synced days.** A day you mark in one of your teams shows, read-only, on your row in your other teams.
 - **School calendar.** A team setting for families: mark children (no allowance), record PA days and
   school vacations on their rows by hand or from a school's `.ics` file.
 - **Sign-in and password reset.** Eight-hour sessions with email-based password recovery.
