@@ -302,6 +302,13 @@ public static class GreenlitApiFactoryExtensions
         await db.SaveChangesAsync();
     }
 
+    /// <summary>Reads what the tests assert on straight from the database.</summary>
+    public static async Task<T> ReadAsync<T>(this GreenlitApiFactory factory, Func<AppDbContext, T> read)
+    {
+        await using var scope = factory.Services.CreateAsyncScope();
+        return read(scope.ServiceProvider.GetRequiredService<AppDbContext>());
+    }
+
     /// <summary>GETs <paramref name="path"/> with <paramref name="client"/>, expects 200 and returns the JSON body.</summary>
     public static async Task<System.Text.Json.JsonElement> GetJsonAsync(this GreenlitApiFactory factory, HttpClient client, string path)
     {
