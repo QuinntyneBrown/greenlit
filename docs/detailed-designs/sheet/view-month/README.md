@@ -52,6 +52,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | `L2-057` | `L1-015` | **A team of one.** A team whose only member is its manager is complete and usable on every screen. |
 | `L2-060` | `L1-016` | **Child members.** A manager-set member attribute: no allowance, no days left; a login-less child's days are saved as Confirmed. |
 | `L2-061` | `L1-016` | **School closures.** Labelled date ranges on one child's or all children's rows, shown with an icon and text, never red, counted nowhere. |
+| `L2-064` | `L1-015` | **Days synced across a person's teams.** A day marked on a person's own row shows on their row in each of their other teams as a read-only synced day. |
 
 ## Diagrams
 
@@ -106,3 +107,11 @@ Journey 1 builds this design before sign-in, allowances, coverage settings and p
 - **Children.** `MonthMemberDto` gains `isChild` (true only while the school calendar is on); a child's allowance fields are null and the Left column shows "—" with the accessible name "No allowance".
 - **Closures.** `MonthDto` gains `schoolCalendar` and `closures` (`{ id, label, firstDay, lastDay, memberId? }`, null member = all children) for the shown month. `gl-team-grid` marks each covered child cell with the school icon (`.cell__closure`) and appends ", school closed: {label}" to its accessible name; the cell keeps its day status and colour, never red. The legend adds "School closed" while the setting is on. Closures never enter the Out row or coverage (`L2-061` AC5).
 - **Role on the screen.** `isManager` is per team (ADR-015), so a manager of another team sees the member's sheet here.
+
+## Synced days (ADR-016, `L2-064`, 9 Nov 2026)
+
+- **The cell.** `CellDto` gains `synced` (true only for a stored `TimeOffDay` with `IsSynced`); its `kind` stays `Tentative`. `GetMonthQueryHandler.CellFor` reads it from the same round trip as the statuses, so no other team is queried: the synced rows were written onto this team's row by `DaySync` (`sheet/mark-days`). Nothing in the DTO names the team, request, note or status the day came from (`L2-064` AC9).
+- **Rendering.** `gl-team-grid` sets `data-synced` on the cell, which keeps tentative's blue under diagonal stripes and shows the glyph "⇄" instead of "?"; the accessible name and title end "Booked in another team" instead of "Tentative" (`L2-064` AC2). The legend adds "Booked in another team" (a striped swatch) after "Tentative" when the month holds a synced day. The design-system rule lives in `docs/design-system/assets/components.css` and in `gl-team-grid`, `gl-week-strip` and `gl-legend`.
+- **The phone week.** `gl-week-strip` renders a synced cell as a non-interactive cell with the same glyph and accessible name, and the day panel says "Booked in another team" for that member (`L2-064` AC11).
+- **Counting.** A synced day is a Tentative day for the Out row and coverage (the person is in) and counts in no allowance figure: `AllowanceCalculator` leaves `IsSynced` rows out of every figure, including the Tentative count (`L2-064` AC10, ADR-007).
+- **Open question.** The year overview and the person page show synced days as tentative cells without the marker; adding the marker there is left for when someone asks.

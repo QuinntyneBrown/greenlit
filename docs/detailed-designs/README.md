@@ -12,7 +12,7 @@ Sign-in, password reset, invitations, account and session.
 |---|---|---|
 | [Sign in](identity-and-access/sign-in/README.md) | Email and password sign-in that issues the session token. | L2-001 |
 | [Reset a forgotten password](identity-and-access/reset-password/README.md) | Reset link by email, valid for one hour and one use. | L2-002, L2-003 |
-| [Accept an invitation](identity-and-access/accept-invitation/README.md) | Invitee sets name and password, or joins with the account they already have; the invitation lasts seven days. | L2-004, L2-058 |
+| [Accept an invitation](identity-and-access/accept-invitation/README.md) | Invitee sets name and password, or joins with the account they already have; the invitation lasts seven days; joining back-fills synced days. | L2-004, L2-058, L2-064 |
 | [Sign in with Google](identity-and-access/sign-in-with-google/README.md) | Continue with Google on sign-in (existing account, or a new manager account) and Join with Google on an invitation. | L2-051, L2-052 |
 | [Manage the account](identity-and-access/manage-account/README.md) | Display name, email and password change on the Account page. | L2-005 |
 | [Use the account menu and sign out](identity-and-access/sign-out/README.md) | Account menu, confirmed sign-out and session expiry. | L2-006, L2-007 |
@@ -41,8 +41,8 @@ The month view and every way of changing a day on it.
 
 | Feature | Summary | L2 requirements |
 |---|---|---|
-| [View the team's month](sheet/view-month/README.md) | Month grid, cell states, Left column and the Out row with coverage flags. | L2-012, L2-013, L2-014, L2-042, L2-048 |
-| [Mark days on the calendar](sheet/mark-days/README.md) | Paint mode, the permission rules for each day, and undo. | L2-015, L2-017, L2-018 |
+| [View the team's month](sheet/view-month/README.md) | Month grid, cell states, Left column and the Out row with coverage flags; synced days from the person's other teams. | L2-012, L2-013, L2-014, L2-042, L2-048, L2-064 |
+| [Mark days on the calendar](sheet/mark-days/README.md) | Paint mode, the permission rules for each day, undo, and syncing a person's days to their other teams. | L2-015, L2-017, L2-018, L2-064 |
 | [Select days and use the keyboard](sheet/select-days/README.md) | Select mode, the selection bar and the keyboard model of the grid. | L2-016, L2-047 |
 | [The calendar on a phone](sheet/phone-week/README.md) | One week of the team below 48rem: short days first, tap a first and last day to mark. | L2-063 |
 

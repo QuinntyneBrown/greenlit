@@ -1,0 +1,57 @@
+@startuml
+title UML sequence behaviour — Sync a stroke to the person's other teams
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Member (Sam, on Product team and Chen family)" as actor
+box "Frontend — Greenlit web application (Angular)" #E0F2FE
+  participant "CalendarPage" as page
+  participant "ToastService" as toast
+  participant "HttpSheetService" as client
+end box
+box "Backend — Greenlit.Api application" #D1FADF
+  participant "SheetController" as ctrl
+end box
+box "Backend — Greenlit.Application and Greenlit.Domain" #ECFDF3
+  participant "DayChanger" as handler
+  participant "DayChangePolicy" as policy
+  participant "DaySync" as sync
+end box
+box "Backend — Greenlit.Infrastructure" #FFF4E5
+  database "Greenlit database" as db
+end box
+actor -> page : Paint "Tentative" on 17 Nov in Product team
+page -> page : Leave synced cells out of the stroke (L2-064 AC3)
+alt only synced cells
+  page -> toast : "That day was booked in another team" (L2-064 AC3, AC12)
+else some days to change
+  page -> client : setDays(Sam, [17 Nov], Tentative)
+  client -> ctrl : PUT /api/sheet/days
+  ctrl -> handler : Send SetDaysCommand
+  handler -> db : Load row, days, holidays (active team only)
+  loop each working date
+    handler -> policy : MayChange(caller, current, target)
+    handler -> handler : Skip a synced day (synced_day_locked when nothing else)
+  end
+  handler -> handler : Write Sam's own day (unsaved)
+  handler -> sync : ReconcileAsync(Sam's account, [17 Nov])
+  sync -> db : Load Sam's live rows, their days and holidays on 17 Nov
+  sync -> sync : Chen family row: no own day, a working day, an own day elsewhere
+  sync -> handler : Add synced Tentative day on Chen family row (L2-064 AC1, AC5)
+  handler -> db : Save once (one unit of work)
+  handler --> ctrl : ChangeSet (Product team only)
+  ctrl --> client : 200 ChangeSet
+  page -> toast : "Marked 1 day tentative" with Undo
+end
+@enduml

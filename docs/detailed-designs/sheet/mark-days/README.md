@@ -28,6 +28,7 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 - **`DayChangePolicy`** — Domain service holding the rules of ADR-003 and `L2-017`: a member edits only their own row (`ForbiddenException`, code `not_your_row`); a member cannot set Confirmed or change a Confirmed day (code `confirmed_locked`); the manager may set any status on any row.
 - **`RequestLedger`** — Application service shared with `requests/send-request`. Requested days set by a member join a pending `TimeOffRequest` for that run of days, or start one; cleared days leave it.
 - **`RestoreDaysCommandHandler`** — Writes a `ChangeSet`'s previous statuses back, for Undo, under the same policy.
+- **`DaySync`** — Application service (ADR-016, `L2-064`). After a change on one of a person's rows it keeps the synced days on their other live rows in step for the dates it touched, inside the same unit of work: `ReconcileAsync(userId, dates)`.
 - **`ICurrentUser`** — Greenlit.Application abstraction introduced by this design. It exposes the caller's `UserId`, `TeamId`, `TeamMemberId` and `IsManager` from the JWT claims, so every handler scopes data to the caller's team.
 
 **Shared plumbing (exists today)**
@@ -61,6 +62,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | `L2-018` | `L1-004` | **Undo and failed saves on the calendar.** Every change made on the calendar can be undone, and a failed save keeps the selection. |
 | `L2-055` | `L1-015` | **Several teams per person.** A person may manage some teams and be a member of others; any signed-in person may create a team; each team stays its own sheet. |
 | `L2-060` | `L1-016` | **Child members.** A manager-set member attribute: no allowance, no days left; a login-less child's days are saved as Confirmed. |
+| `L2-064` | `L1-015` | **Days synced across a person's teams.** A day marked on a person's own row shows on their row in each of their other teams as a read-only synced day. |
 
 ## Diagrams
 
@@ -94,6 +96,12 @@ The stroke previews during the drag and saves on release (`L2-015` AC3). The pol
 
 ![Sequence diagram: paint a stroke](diagrams/sequence-paint.png)
 
+### Behaviour — a day synced to the person's other teams
+
+After the stroke's days are written (still unsaved), `DaySync` reconciles the person's other live rows for the same dates and the handler saves once (`L2-064` AC1, AC4, AC5). Undo goes through the same `DayChanger`, so the synced days follow it.
+
+![Sequence diagram: sync a stroke to the person's other teams](diagrams/sequence-sync.png)
+
 ### Behaviour — undo a change
 
 Undo stays available for the toast's whole lifetime (`L2-018` AC1, `L2-044` AC3) and passes the same policy as the original change.
@@ -103,4 +111,14 @@ Undo stays available for the toast's whole lifetime (`L2-018` AC1, `L2-044` AC3)
 ## Open questions answered (ADR-015, 8 Nov 2026)
 
 - **A login-less child** (`L2-060` AC4): when the manager sets days on a child's row with no email, `DayChanger` stores them as Confirmed whatever was painted, so no request step exists for that row. A child with an email follows `L2-017` unchanged.
-- **Several teams** (`L2-055` AC3, AC4): `DayChanger` is scoped to the active team; a person's rows on other teams are never touched and their role is read from this team's `ManagerUserId`.
+- **Several teams** (`L2-055` AC3, AC4): `DayChanger` is scoped to the active team and the caller's role is read from this team's `ManagerUserId`. Since ADR-016 the person's rows on their other teams receive synced days through `DaySync` (below); nothing else of those teams is read or written.
+
+## Synced days (ADR-016, `L2-064`, 9 Nov 2026)
+
+- **What is stored.** A synced day is a `TimeOffDay` with `IsSynced = true`, always `Tentative`, with no `TimeOffRequestId` and no `ConfirmedUtc`. No origin link is stored: `DaySync` derives the synced days from the person's own days each time it runs.
+- **The invariant `DaySync.ReconcileAsync(userId, dates)` applies.** For each date, each live row of the person (same `UserId`, `RemovedUtc` null) holds a synced day exactly when it holds no day of its own there, the date is a working day for that row (`WorkingDayRule.For(team, member)` and the team's holidays), and another live row of the person holds a day of its own on that date. It reads the tracked rows (`TimeOffDays.Local` after loading the dates), so it sees the caller's unsaved changes; the caller saves once. A null `UserId` or a person with one live row is a no-op, so login-less rows and children without an account are never synced (`L2-064` AC7).
+- **Who calls it.** `DayChanger` (stroke and Undo) with the dates it changed; `SendRequestCommandHandler` with the dates it marked; `HolidayCalendar.ClearDaysAsync` for each person whose day it cleared (`L2-064` AC6); `InvitationMembership.AttachAsync` with the person's own future days on every live row (`L2-064` AC8, `identity-and-access/accept-invitation`). Approving, declining, cancelling and reopening only change a day's status, so they do not call it.
+- **The lock.** `DayChanger` treats an existing synced day like a locked day: a stroke that meets only synced days answers `403 synced_day_locked` ("That day was booked in another team. Change it in the team where it was booked."); in a mixed stroke the synced days are skipped and left out of `changes`. This holds for the manager too (`L2-017` AC6, `L2-064` AC3). `SendRequestCommandHandler` skips synced dates like holidays, and a range of only synced days is the same `403 synced_day_locked`.
+- **Undo.** Undo of a stroke in the origin team is a `RestoreDaysCommand` through the same `DayChanger`, so the synced days come back or go in the same unit of work (`L2-064` AC4). Undo never writes over a synced day in the team it was copied into: that is the lock above.
+- **Client.** `CalendarPage` leaves synced cells out of a stroke and a selection before it calls `setDays`, so their colour never flickers; a stroke or a keyboard press made only of synced cells shows the toast "That day was booked in another team" with "Change it in the team where it was booked." without calling the API. `refusedToast` maps `synced_day_locked` to the same toast for any answer from the API. On the phone week a synced cell is not a button and takes no tap (`L2-064` AC11, AC12).
+- **Open questions.** A holiday removed later does not bring a synced day back until the next change on that date (ADR-016); a person who wants a sync switch is deferred.
