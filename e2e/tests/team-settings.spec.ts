@@ -4,10 +4,10 @@
 //              and saves it on its own; a member sees the page read-only.
 // Data: each viewport's inviter (Uma, Vic, Wren) manages a team of their own with a teammate; every test puts the
 //       Team section back as it found it, so the demo team and the other specs never see a change. The member
-//       tests read the demo team as Ana and change nothing.
+//       tests read the demo team as Ana; the allowance test restores her yearly days afterward.
 
 import { test, expect } from "../fixtures/gl-test.js";
-import { PEOPLE, inviterFor } from "../fixtures/session.js";
+import { API_BASE_URL, PEOPLE, inviterFor, signIn } from "../fixtures/session.js";
 import { ensureMember, ensureOwnTeam } from "../fixtures/team.js";
 import { readTeamSection, resetTeamSection } from "../fixtures/team-settings.js";
 
@@ -170,6 +170,43 @@ test.describe("The Team section", () => {
 });
 
 test.describe("The Team section for a member", () => {
+  test("shows default and personal yearly days in the read-only boxes (L2-009 AC9)", async ({
+    goto,
+    pages,
+    request,
+  }) => {
+    const original = await readTeamSection(request, "manager");
+    const token = await signIn(request, "manager");
+    const saveAnaDays = async (days: number | null) => {
+      const response = await request.put(`${API_BASE_URL}/api/team/settings/team`, {
+        headers: { Authorization: `Bearer ${token}` },
+        data: {
+          name: original.name,
+          timeZone: original.timeZone,
+          members: original.members.map((member) => ({
+            id: member.id,
+            role: member.role,
+            yearlyDays: member.name === "Ana Ruiz" ? days : member.yearlyDays,
+          })),
+        },
+      });
+      expect(response.ok()).toBeTruthy();
+    };
+
+    await saveAnaDays(null);
+    try {
+      await goto("settings", { as: "member" });
+      await pages.settings.waitForReady();
+
+      await expect(pages.settings.yearlyDaysField("Ana Ruiz")).toHaveValue("25");
+      await expect(pages.settings.yearlyDaysField("Ben Okafor")).toHaveValue("27");
+      await expect(pages.settings.yearlyDaysField("Dev Patel")).toHaveValue("20");
+      await expect(pages.settings.yearlyDaysField("Ana Ruiz")).toBeDisabled();
+    } finally {
+      await saveAnaDays(original.members.find((member) => member.name === "Ana Ruiz")?.yearlyDays ?? null);
+    }
+  });
+
   test("is read-only, names the manager to ask and has no Save button (L2-009 AC3)", async ({ goto, pages }) => {
     const settings = pages.settings;
     await goto("settings", { as: "member" });

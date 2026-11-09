@@ -41,6 +41,8 @@ The feature is a vertical slice from the Greenlit web application to the Greenli
 
 **Members' view.** A member sees the Team section read-only (fields disabled, no Save, no Invite) with the note "Only managers can change team settings." and "Ask {manager} if something needs updating.". The other sections read manager-only endpoints, so they are not shown to a member yet; showing them read-only needs a member-readable read of each (deferred, with Notifications).
 
+For a read-only member, `GET /api/team/settings/team` resolves a null row `YearlyDays` to the team's `DefaultYearlyDays`, so every "days / yr" box shows the person's effective yearly days. The manager's editable response keeps null to preserve the distinction between a personal value and the team default when saving.
+
 **Page behaviour.** Settings shows the section nav from 1024px wide. After a section saves, the page shows the banner "Team settings saved" with "Everyone sees the new settings straight away." (L2-009 AC7) beside the section's own "Saved" status. The Team section's "Save changes" stays enabled so pressing it with no edits can say "No changes to save" (`L2-009` AC4); the other sections enable theirs when an edit makes them differ from what is saved. Each section's draft is independent; saving one leaves the others' unsaved edits alone.
 
 ## Requirements
