@@ -15,6 +15,11 @@ export class TeamSwitchReuseStrategy extends BaseRouteReuseStrategy {
     this.remount = true;
   }
 
+  /** True during the navigation that follows a team switch, while the screen is built again. */
+  get remounting(): boolean {
+    return this.remount;
+  }
+
   done(): void {
     this.remount = false;
   }

@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
+  inject,
   input,
   linkedSignal,
   output,
@@ -34,6 +36,7 @@ import {
   weekTabs,
   weeksOf,
 } from './week-view';
+import { PhoneWeekPlace, WeekPlace } from './phone-week-place';
 
 /** An action chosen on the mark sheet for one member's days. */
 export interface PhoneMark {
@@ -45,7 +48,8 @@ export interface PhoneMark {
 /**
  * The calendar on a phone (docs/detailed-designs/sheet/phone-week, L2-063): one Monday-to-Sunday week of
  * the team at full width, with the month's short days first. Owns the week shown and the open date;
- * changing month opens the week that holds today, else the first week, with no date open.
+ * changing month opens the week that holds today, else the first week, with no date open. Built again by a team
+ * switch, it opens the week it showed before when the month is the same (L2-063 AC16).
  */
 @Component({
   selector: 'app-calendar-week',
@@ -379,6 +383,8 @@ export class CalendarWeek {
   readonly readOnly = input<boolean>(false);
   /** An action on the range is being saved. */
   readonly busy = input<boolean>(false);
+  /** The week shown before a team switch: opened first when its month is the one shown (L2-063 AC16). */
+  readonly resume = input<WeekPlace | null>(null);
 
   /** An action was chosen for the range: the page saves it, then calls `clearRange` once it is saved. */
   readonly mark = output<PhoneMark>();
@@ -394,11 +400,27 @@ export class CalendarWeek {
     this.sheet().members.some((m) => m.cells.some((c) => c.synced)),
   );
 
-  /** The week shown: reset to today's week (or the first) whenever the month changes. */
-  protected readonly week = linkedSignal({
+  /**
+   * The week shown: reset to today's week (or the first) whenever the month changes; on first showing, the week of
+   * `resume` when it is in this month.
+   */
+  protected readonly week = linkedSignal<string, number>({
     source: this.month,
-    computation: () => untracked(() => weekHolding(this.weeks(), this.sheet().today)),
+    computation: (month, previous) =>
+      untracked(() => {
+        const resume = this.resume();
+        if (!previous && resume?.month === month && resume.week < this.weeks().length) {
+          return resume.week;
+        }
+        return weekHolding(this.weeks(), this.sheet().today);
+      }),
   });
+
+  /** Remembers the week shown, for the calendar a team switch builds next (L2-063 AC16). */
+  private readonly place = inject(PhoneWeekPlace);
+  private readonly rememberWeek = effect(() =>
+    this.place.remember({ month: this.month(), week: this.week() }),
+  );
 
   /** The date whose panel is open; none after a change of month. */
   protected readonly openDate = linkedSignal<string, string | null>({

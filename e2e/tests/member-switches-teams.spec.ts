@@ -1,5 +1,5 @@
 // Acceptance Test
-// Traces to: L2-056 AC1, AC2, AC3, AC6; L2-055 AC2, AC4; L2-054 AC7
+// Traces to: L2-056 AC1, AC2, AC3, AC6; L2-055 AC2, AC4; L2-054 AC7; L2-063 AC16
 // Description: A person on two teams in different roles sees the header switcher on every screen, moves between the
 //              teams, and sees each team as their role there allows: the manager's screens on the team they manage,
 //              a member's screens on the team where they are a member. "Your teams" lists only the teams they manage.
@@ -56,6 +56,22 @@ test.describe("A person on two teams in different roles", () => {
 
     await pages.calendar.mainNavLink("Requests").click();
     await expect(pages.requests.mineHeading()).toBeVisible();
+  });
+
+  test("on a phone, switching team keeps the week shown (L2-063 AC16)", async ({ goto, page, pages }, testInfo) => {
+    test.skip(!isPhone(testInfo), "The week layout is the phone's (L2-063); wider screens keep the grid.");
+    const sam = await samOnTwoTeams(page.request);
+    await goto("calendar", { session: sam.token, month: "2026-11" });
+    await pages.calendar.waitForReady();
+    await pages.calendar.showWeek("23–29");
+
+    await pages.teamSwitcher.choose("Product team");
+
+    await expect(pages.calendar.toast("Switched to Product team")).toBeVisible();
+    await expect(pages.teamSwitcher.buttonName()).toHaveText("Product team");
+    await expect(pages.calendar.weekMemberNames()).toHaveText(["Sam Chen", "Omar Haddad"]);
+    await expect(pages.calendar.selectedWeekTab()).toHaveText(/23–29/);
+    await expect(pages.calendar.weekCard()).toHaveAccessibleName("Week of 23–29 Nov");
   });
 
   test("on the team where he is a member, Settings is read-only and Your teams lists only Chen family (L2-054 AC7, L2-055 AC4)", async ({

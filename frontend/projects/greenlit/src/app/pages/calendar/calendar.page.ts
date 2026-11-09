@@ -42,9 +42,11 @@ import {
 
 import { AppDialogs } from '../../dialogs/app-dialogs';
 import { NewRequestData, NewRequestDialog } from '../../dialogs/new-request/new-request.dialog';
+import { TeamSwitchReuseStrategy } from '../../teams/team-switch-reuse-strategy';
 import { ToastService } from '../../toasts/toast.service';
 import { addMonths, calendarView, columnsFor, monthTitle } from './calendar-view';
 import { CalendarWeek, PhoneMark } from './calendar-week';
+import { PhoneWeekPlace } from './phone-week-place';
 import { selectionBarView } from './selection-view';
 import { FAILED_SAVE, PaintContext, refusedToast, savedToast, SYNCED_LOCKED } from './paint-toasts';
 import { requestSentToast } from './request-toasts';
@@ -185,6 +187,7 @@ function localMonth(): string {
           @if (loaded(); as sheet) {
             <app-calendar-week
               [sheet]="sheet"
+              [resume]="resumeWeek"
               [busy]="saving()"
               [readOnly]="connectivity.readOnly()"
               (mark)="markOnPhone($event)"
@@ -275,6 +278,14 @@ export class CalendarPage {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly attempt = signal(0);
+
+  /**
+   * Built by a team switch: the phone opens the week it showed for the previous team (L2-063 AC16). Read here, while
+   * the switch's navigation builds the page, because the week itself renders only once the sheet has loaded.
+   */
+  protected readonly resumeWeek = inject(TeamSwitchReuseStrategy).remounting
+    ? inject(PhoneWeekPlace).last()
+    : null;
 
   /** Narrower than 48rem the month grid does not fit: the calendar shows one week instead (L2-063). */
   protected readonly phone = toSignal(
