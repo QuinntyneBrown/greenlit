@@ -140,6 +140,8 @@ internal sealed class DayChanger
             throw new ForbiddenException("confirmed_locked", "Confirmed days can only be changed by the manager.");
 
         await _ledger.ReconcileAsync(team.Id, member.Id, joining, leaving, ct);
+        // The same dates on the person's rows in their other teams follow in this unit of work (L2-064, ADR-016).
+        await DaySync.ReconcileAsync(_db, member.UserId, changes.Select(c => DateOnly.Parse(c.Date, CultureInfo.InvariantCulture)).ToList(), now, ct);
         await _db.SaveChangesAsync(ct);
         var figures = (await _allowances.ComputeAsync(team, [member], ct))[member.Id];
         return new ChangeSetDto(member.Id, member.Name, status, changes, figures.DaysOver());

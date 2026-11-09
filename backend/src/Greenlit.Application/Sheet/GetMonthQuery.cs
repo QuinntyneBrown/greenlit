@@ -29,8 +29,11 @@ public sealed record MemberRowDto(
     IReadOnlyList<string> WorkingDays,
     bool IsChild);
 
-/// <summary>One member's day. <c>HolidayName</c> is set when <c>Kind</c> is <see cref="CellKind.Holiday"/>.</summary>
-public sealed record CellDto(string Date, CellKind Kind, string? HolidayName);
+/// <summary>
+/// One member's day. <c>HolidayName</c> is set when <c>Kind</c> is <see cref="CellKind.Holiday"/>; <c>Synced</c> marks a
+/// Tentative day booked on the person's row in another of their teams (L2-064), and says nothing more about it.
+/// </summary>
+public sealed record CellDto(string Date, CellKind Kind, string? HolidayName, bool Synced = false);
 
 /// <summary>
 /// Red days are separate from time off, so a cell never needs a stored row to be red.

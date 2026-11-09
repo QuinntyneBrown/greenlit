@@ -23,4 +23,10 @@ public class TimeOffDay
 
     /// <summary>Set when the manager confirms the day.</summary>
     public DateTimeOffset? ConfirmedUtc { get; set; }
+
+    /// <summary>
+    /// A synced day (L2-064, ADR-016): a copy of a day the same person holds on their row in another team, kept in step by
+    /// <c>DaySync</c>. Always Tentative, never part of a request, read-only here, and counted in no allowance figure.
+    /// </summary>
+    public bool IsSynced { get; set; }
 }
