@@ -362,6 +362,8 @@ export interface PhoneMark {
 })
 export class CalendarWeek {
   readonly sheet = input.required<SheetMonth>();
+  /** Offline: no cell takes a tap, and a selection is dropped (L2-063 AC14, L2-045 AC1). */
+  readonly readOnly = input<boolean>(false);
   /** An action on the range is being saved. */
   readonly busy = input<boolean>(false);
 
@@ -390,9 +392,16 @@ export class CalendarWeek {
   protected readonly runs = computed(() => shortRuns(this.sheet(), this.short()));
   protected readonly heading = computed(() => shortDaysHeading(this.sheet(), this.runs().length));
   protected readonly tabs = computed(() => weekTabs(this.weeks(), this.short()));
-  protected readonly strip = computed(() =>
-    weekStripView(this.sheet(), this.weeks()[this.week()] ?? this.weeks()[0], this.short()),
-  );
+  protected readonly strip = computed(() => {
+    const view = weekStripView(
+      this.sheet(),
+      this.weeks()[this.week()] ?? this.weeks()[0],
+      this.short(),
+    );
+    return this.readOnly()
+      ? { ...view, rows: view.rows.map((row) => ({ ...row, editable: false })) }
+      : view;
+  });
 
   /** Names the holidays of the week shown (L2-063 AC13). */
   protected readonly note = computed(() =>
@@ -406,9 +415,12 @@ export class CalendarWeek {
   });
 
   /** The first day, and once tapped the last day, being marked; none after a change of month. */
-  protected readonly range = linkedSignal<string, PhoneRange | null>({
-    source: this.month,
-    computation: () => null,
+  protected readonly range = linkedSignal<{ month: string; readOnly: boolean }, PhoneRange | null>({
+    source: () => ({ month: this.month(), readOnly: this.readOnly() }),
+    computation: (source, previous) =>
+      source.readOnly || !previous || previous.source.month !== source.month
+        ? null
+        : previous.value,
   });
 
   protected readonly selection = computed((): WeekStripSelection | null => {

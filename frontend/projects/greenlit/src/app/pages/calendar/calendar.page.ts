@@ -186,6 +186,7 @@ function localMonth(): string {
             <app-calendar-week
               [sheet]="sheet"
               [busy]="saving()"
+              [readOnly]="connectivity.readOnly()"
               (mark)="markOnPhone($event)"
               (cleared)="selectionCleared()"
             />
@@ -268,7 +269,7 @@ function localMonth(): string {
 })
 export class CalendarPage {
   private readonly sheetApi = inject(SHEET_SERVICE);
-  private readonly connectivity = inject(CONNECTIVITY_SERVICE);
+  protected readonly connectivity = inject(CONNECTIVITY_SERVICE);
   private readonly toasts = inject(ToastService);
   private readonly dialogs = inject(AppDialogs);
   private readonly router = inject(Router);
