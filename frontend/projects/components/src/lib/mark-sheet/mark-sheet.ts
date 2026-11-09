@@ -108,7 +108,7 @@ function days(n: number): string {
       z-index: var(--z-dropdown);
     }
     .mark-sheet {
-      padding: var(--space-4) 0 var(--space-6);
+      padding: var(--space-4) var(--space-4) var(--space-6);
       border-top: 1px solid var(--color-border-default);
       border-radius: var(--radius-xl) var(--radius-xl) 0 0;
       background: var(--color-bg-surface);

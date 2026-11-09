@@ -60,6 +60,31 @@ export const ROUTES = {
     guard: "auth",
     page: "calendar",
   },
+  /** The calendar on a phone (L2-063): the same route; the mock files are its states. */
+  calendarPhone: {
+    app: "/",
+    mock: "/pages/calendar/phone.html?chrome=0",
+    guard: "auth",
+    page: "calendar",
+  },
+  calendarPhonePicking: {
+    app: "/",
+    mock: "/pages/calendar/phone-picking.html?chrome=0",
+    guard: "auth",
+    page: "calendar",
+  },
+  calendarPhoneRange: {
+    app: "/",
+    mock: "/pages/calendar/phone-range.html?chrome=0",
+    guard: "auth",
+    page: "calendar",
+  },
+  calendarPhoneDay: {
+    app: "/",
+    mock: "/pages/calendar/phone-day.html?chrome=0",
+    guard: "auth",
+    page: "calendar",
+  },
   createTeam: {
     app: "/create-team",
     mock: "/pages/create-team/default.html",

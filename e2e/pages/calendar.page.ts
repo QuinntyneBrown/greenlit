@@ -525,6 +525,53 @@ export class CalendarPage extends BasePage {
     return false;
   }
 
+  /** Waits for the week's rows: the mocks stamp no `data-page`, so a capture of either waits on content. */
+  async waitForWeek(): Promise<void> {
+    await this.weekCard().locator(".week-strip__cells").first().waitFor();
+  }
+
+  /** The legend under the week, with its holiday line (L2-063 AC13). */
+  phoneLegend(): Locator {
+    return this.main.locator(".phone-legend");
+  }
+
+  /**
+   * Hides the days-left figure of every row on the week, keeping its place: the mocks' figures are illustrative
+   * (docs/mocks/README.md, note 11), and a mask would follow each figure's width, which differs.
+   */
+  async hideLeftFigures(): Promise<void> {
+    await this.weekCard()
+      .locator(".week-strip__left")
+      .evaluateAll((els) => els.forEach((el) => ((el as HTMLElement).style.visibility = "hidden")));
+  }
+
+  /** Hides the fixed foot hint, which covers the foot of the week in a capture of the whole card. */
+  async hidePhoneHint(): Promise<void> {
+    await this.phoneHint().evaluate((el: HTMLElement) => (el.style.visibility = "hidden"));
+  }
+
+  /** Back to the top of the page, so the sticky header covers nothing being captured. */
+  async scrollToTop(): Promise<void> {
+    await this.page.evaluate(() => window.scrollTo(0, 0));
+  }
+
+  /** The mark sheet's panel itself, without the fixed region around it. */
+  markSheetPanel(): Locator {
+    return this.page.locator(".mark-sheet");
+  }
+
+  /** Moves `region` onto whole pixels, so a capture of the mock and of the app line up. */
+  async alignToPixelGrid(region: Locator): Promise<void> {
+    await region.evaluate((el: HTMLElement) => {
+      const box = el.getBoundingClientRect();
+      const top = box.top + window.scrollY;
+      const left = box.left + window.scrollX;
+      el.style.position = el.style.position || "relative";
+      el.style.top = `${Math.ceil(top) - top}px`;
+      el.style.left = `${Math.ceil(left) - left}px`;
+    });
+  }
+
   /** Whether the page scrolls sideways. */
   async scrollsSideways(): Promise<boolean> {
     return this.page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
