@@ -208,6 +208,20 @@ export const ROUTES = {
     guard: "auth",
     page: "calendar",
   },
+  /** Sam's sheet on Product team with days booked in another of his teams (L2-064). */
+  syncedSheet: {
+    app: "/",
+    mock: "/pages/calendar/member-synced.html?chrome=0",
+    guard: "auth",
+    page: "calendar",
+  },
+  /** The phone's week with a day booked in another of the person's teams (L2-064 AC11). */
+  syncedPhone: {
+    app: "/",
+    mock: "/pages/calendar/phone-synced.html?chrome=0",
+    guard: "auth",
+    page: "calendar",
+  },
   signIn: {
     app: "/sign-in",
     mock: "/pages/sign-in/default.html",
