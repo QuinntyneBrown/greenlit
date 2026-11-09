@@ -171,7 +171,8 @@
         "phone-day",
         "member-synced",
         "manager-synced",
-        "phone-synced"
+        "phone-synced",
+        "phone-switched"
       ],
       "route": "/"
     },
