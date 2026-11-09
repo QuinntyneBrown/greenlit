@@ -46,7 +46,7 @@ import { ToastService } from '../../toasts/toast.service';
 import { addMonths, calendarView, columnsFor, monthTitle } from './calendar-view';
 import { CalendarWeek, PhoneMark } from './calendar-week';
 import { selectionBarView } from './selection-view';
-import { FAILED_SAVE, PaintContext, refusedToast, savedToast } from './paint-toasts';
+import { FAILED_SAVE, PaintContext, refusedToast, savedToast, SYNCED_LOCKED } from './paint-toasts';
 import { requestSentToast } from './request-toasts';
 
 type Load =
@@ -144,7 +144,7 @@ function localMonth(): string {
     </div>
     @if (!phone()) {
       <div class="toolbar-row">
-        <gl-legend [schoolClosed]="schoolCalendar()" />
+        <gl-legend [schoolClosed]="schoolCalendar()" [synced]="hasSynced()" />
         @if (showPicker()) {
           <p class="text-caption">{{ hint() }}</p>
         }
@@ -363,6 +363,11 @@ export class CalendarPage {
   protected readonly isManager = computed(() => this.loaded()?.isManager ?? false);
   /** The school calendar is on: the legend says what the closure icon means (L2-061 AC3). */
   protected readonly schoolCalendar = computed(() => this.loaded()?.schoolCalendar ?? false);
+
+  /** The month holds a day synced from another of someone's teams: the legend says what it is (L2-064 AC2). */
+  protected readonly hasSynced = computed(
+    () => this.loaded()?.members.some((m) => m.cells.some((c) => c.synced)) ?? false,
+  );
   protected readonly choice = signal<PaintChoice>('select');
   protected readonly paintChoice = this.choice.asReadonly();
 
@@ -513,6 +518,15 @@ export class CalendarPage {
 
   /** Shows the stroke at once, saves it, and puts the cells back if the save fails (L2-018 AC2). */
   private save(stroke: DayStroke, settled?: (saved: boolean) => void): void {
+    // Synced days change only in the team where they were booked (L2-064 AC3): they are left out of every change,
+    // and a change of nothing else says so without calling the API.
+    const { kept, onlySynced } = this.withoutSynced(stroke);
+    if (onlySynced) {
+      settled?.(false);
+      this.toasts.show(SYNCED_LOCKED);
+      return;
+    }
+    stroke = kept;
     const before = this.applyKinds(stroke.memberId, stroke.dates, stroke.status);
     this.sheetApi.setDays(stroke).subscribe({
       next: (set) => {
@@ -525,6 +539,20 @@ export class CalendarPage {
         this.refused(error, () => this.actOnRetry(stroke, settled));
       },
     });
+  }
+
+  private withoutSynced(stroke: DayStroke): { kept: DayStroke; onlySynced: boolean } {
+    const member = this.current()?.members.find((m) => m.id === stroke.memberId);
+    const cells = new Map((member?.cells ?? []).map((c) => [c.date, c]));
+    const dates = stroke.dates.filter((d) => !cells.get(d)?.synced);
+    const working = dates.some((d) => {
+      const kind = cells.get(d)?.kind;
+      return kind !== 'NotWorking' && kind !== 'Holiday';
+    });
+    return {
+      kept: { ...stroke, dates },
+      onlySynced: dates.length < stroke.dates.length && !working,
+    };
   }
 
   /** "Try again" on the failed-save toast repeats the same stroke, with the same follow-up. */

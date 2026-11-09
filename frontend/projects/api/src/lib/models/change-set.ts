@@ -27,4 +27,4 @@ export interface ChangeSet {
 
 /** The `code` a refused change answers with (docs/detailed-designs/sheet/mark-days). */
 export type DayChangeRefusal =
-  'not_your_row' | 'confirmed_locked' | 'all_non_working' | 'day_is_holiday';
+  'not_your_row' | 'confirmed_locked' | 'all_non_working' | 'day_is_holiday' | 'synced_day_locked';

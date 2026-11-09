@@ -102,14 +102,22 @@ const STATE_WORDS: Record<Exclude<CellKind, 'Holiday'>, string> = {
 
 /** One cell, named so that its state travels in words too (L2-013, L2-048). */
 export function cellFor(memberName: string, cell: SheetCell): TeamGridCell {
+  // A day booked in another of the person's teams says so, and nothing more about it (L2-064 AC2, AC9).
+  const state = cell.synced
+    ? SYNCED_WORDS
+    : cell.kind === 'Holiday'
+      ? (cell.holidayName ?? 'Holiday')
+      : STATE_WORDS[cell.kind];
   return {
     date: cell.date,
     status: STATUS[cell.kind],
-    label: `${memberName}, ${dayLabel(cell.date)}: ${
-      cell.kind === 'Holiday' ? (cell.holidayName ?? 'Holiday') : STATE_WORDS[cell.kind]
-    }`,
+    label: `${memberName}, ${dayLabel(cell.date)}: ${state}`,
+    ...(cell.synced ? { synced: true } : {}),
   };
 }
+
+/** What a synced day says wherever it is named (L2-064 AC2, AC11). */
+export const SYNCED_WORDS = 'Booked in another team';
 
 /**
  * A child's cell inside a school closure (L2-061 AC3): the closure's label joins the accessible name and the cell

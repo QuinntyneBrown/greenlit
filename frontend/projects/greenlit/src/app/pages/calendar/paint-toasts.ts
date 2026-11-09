@@ -74,6 +74,8 @@ export function refusedToast(
         title: `Confirmed days can only be changed by ${firstName(managerName)}`,
         body: `Ask ${managerName} if one of these needs to move.`,
       };
+    case 'synced_day_locked':
+      return SYNCED_LOCKED;
     case 'all_non_working':
     case 'day_is_holiday':
       return {
@@ -91,4 +93,11 @@ export const FAILED_SAVE = {
   tone: 'danger',
   title: 'We couldn’t save those days',
   body: 'Your selection is still there. Check your connection and try again.',
+} as const satisfies Pick<ToastRequest, 'tone' | 'title' | 'body'>;
+
+/** A change of only synced days (L2-064 AC3, AC12): they change in the team where they were booked. */
+export const SYNCED_LOCKED = {
+  tone: 'info',
+  title: 'That day was booked in another team',
+  body: 'Change it in the team where it was booked.',
 } as const satisfies Pick<ToastRequest, 'tone' | 'title' | 'body'>;
