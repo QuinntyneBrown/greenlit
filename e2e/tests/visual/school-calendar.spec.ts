@@ -7,7 +7,7 @@
 //       Leo and Ivy; "PA day" on 20 Nov for all children, "Parent-teacher day" on 26 Nov and "Winter break"
 //       (imported) for Leo.
 
-import { test, expect } from "../../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../../fixtures/gl-test.js";
 import {
   addChild,
   addClosure,
@@ -47,7 +47,8 @@ test("the closure list matches pages/settings/school-calendar", async ({ goto, p
   await expect(pages.settings.closureList()).toHaveScreenshot("school-calendar-closures.png");
 });
 
-test("a closure cell and the legend match pages/calendar/school-calendar", async ({ goto, page, pages, settle }) => {
+test("a closure cell and the legend match pages/calendar/school-calendar", async ({ goto, page, pages, settle, isMobile }) => {
+  test.skip(isMobile, GRID_ONLY);
   const maya = isBaseline ? null : await chenFamilyAsInTheMocks(page.request);
   await goto("schoolCalendarSheet", maya ? { session: maya.token, month: "2026-11" } : {});
   const cell = pages.calendar.cell("Leo Chen", "Fri 20 Nov");
