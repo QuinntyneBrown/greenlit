@@ -77,7 +77,8 @@ public sealed class AllowanceCalculator
                 .ToListAsync(ct))
             .ToHashSet();
         var days = await _db.TimeOffDays.AsNoTracking()
-            .Where(d => ids.Contains(d.TeamMemberId) && d.Date >= first && d.Date <= last)
+            // A synced day was booked in another team and counts in no figure here (L2-064 AC10, ADR-016).
+            .Where(d => ids.Contains(d.TeamMemberId) && d.Date >= first && d.Date <= last && !d.IsSynced)
             .Select(d => new { d.TeamMemberId, d.Date, d.Status })
             .ToListAsync(ct);
         var adjustments = (await _db.AllowanceAdjustments.AsNoTracking()

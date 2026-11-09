@@ -84,6 +84,8 @@ public sealed class SendRequestCommandHandler : IRequestHandler<SendRequestComma
             }
         }
 
+        // The request's days show on the person's rows in their other teams (L2-064 AC1, ADR-016).
+        await DaySync.ReconcileAsync(_db, member.UserId, working, now, ct);
         await _db.SaveChangesAsync(ct);
         await _notifier.NewRequestAsync(team, member, request, working.Count, ct);
         return new RequestDto(

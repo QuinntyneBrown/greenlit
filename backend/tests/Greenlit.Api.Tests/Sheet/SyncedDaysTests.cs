@@ -39,6 +39,63 @@ public class SyncedDaysTests : IClassFixture<GreenlitApiFactory>
         CellOf(productMonth, "Sam Chen", "2026-11-17").GetProperty("synced").GetBoolean().Should().BeFalse();
     }
 
+    [Fact]
+    public async Task Requested_and_confirmed_days_show_as_tentative_synced_days_and_ask_nothing_of_the_other_team()
+    {
+        // L2-064 AC1. Given Sam marks Mon 16 and Tue 17 Nov requested in Product team and Omar confirms Mon 16, then Chen
+        // family shows both as Tentative synced days, and Chen family has no request and nothing for Maya to confirm.
+        var (product, family) = await SamOnTwoTeamsAsync();
+
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-16", "2026-11-17"], "Requested")).StatusCode.Should().Be(HttpStatusCode.OK);
+        (await SetAsync(product, "Omar Diaz", "Sam Chen", ["2026-11-16"], "Confirmed")).StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var month = await MonthAsync(family, "Maya Chen");
+        foreach (var date in new[] { "2026-11-16", "2026-11-17" })
+        {
+            CellOf(month, "Sam Chen", date).GetProperty("kind").GetString().Should().Be("Tentative");
+            CellOf(month, "Sam Chen", date).GetProperty("synced").GetBoolean().Should().BeTrue();
+        }
+        (await family.RequestsOfAsync("Sam Chen")).Should().BeEmpty();
+        (await product.RequestsOfAsync("Sam Chen")).Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task A_request_sent_in_one_team_shows_as_synced_days_in_the_other()
+    {
+        // L2-064 AC1 through "Request time off" (L2-019): the request's days are synced too, and no request is made in
+        // Chen family.
+        var (product, family) = await SamOnTwoTeamsAsync();
+
+        var response = await product.SessionFor("Sam Chen").PostAsJsonAsync("/api/requests",
+            new { firstDay = "2026-11-19", lastDay = "2026-11-20", note = "Dentist" });
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created, await response.Content.ReadAsStringAsync());
+        var month = await MonthAsync(family, "Sam Chen");
+        CellOf(month, "Sam Chen", "2026-11-19").GetProperty("synced").GetBoolean().Should().BeTrue();
+        CellOf(month, "Sam Chen", "2026-11-20").GetProperty("synced").GetBoolean().Should().BeTrue();
+        (await family.RequestsOfAsync("Sam Chen")).Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task A_synced_day_counts_in_none_of_the_persons_figures_in_the_other_team()
+    {
+        // L2-064 AC10 (ADR-007): Chen family's figures for Sam ignore his synced days, and its Out row counts him in.
+        var (product, family) = await SamOnTwoTeamsAsync();
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-16"], "Requested")).StatusCode.Should().Be(HttpStatusCode.OK);
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-17"], "Tentative")).StatusCode.Should().Be(HttpStatusCode.OK);
+        (await SetAsync(product, "Omar Diaz", "Sam Chen", ["2026-11-18"], "Confirmed")).StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var month = await MonthAsync(family, "Maya Chen");
+
+        var allowance = RowOf(month, "Sam Chen").GetProperty("allowance");
+        foreach (var figure in new[] { "used", "booked", "requested", "tentative" })
+            allowance.GetProperty(figure).GetInt32().Should().Be(0, figure);
+        RowOf(month, "Sam Chen").GetProperty("daysLeft").GetInt32().Should().Be(allowance.GetProperty("allowance").GetInt32());
+        var out16 = month.GetProperty("coverage").EnumerateArray().Single(c => c.GetProperty("date").GetString() == "2026-11-16");
+        out16.GetProperty("out").GetInt32().Should().Be(0);
+        out16.GetProperty("in").GetInt32().Should().Be(2);
+    }
+
     /// <summary>Sam Chen is a member of Product team (manager Omar Diaz) and of Chen family (manager Maya Chen).</summary>
     private async Task<(TestTeam Product, TestTeam Family)> SamOnTwoTeamsAsync()
     {
@@ -54,6 +111,9 @@ public class SyncedDaysTests : IClassFixture<GreenlitApiFactory>
 
     private static Task<JsonElement> MonthAsync(TestTeam team, string caller, string month = "2026-11") =>
         MonthMembersTests.GetMonthAsync(team.SessionFor(caller), month);
+
+    private static JsonElement RowOf(JsonElement month, string member) =>
+        month.GetProperty("members").EnumerateArray().Single(m => m.GetProperty("name").GetString() == member);
 
     private static JsonElement CellOf(JsonElement month, string member, string date) =>
         month.GetProperty("members").EnumerateArray()
