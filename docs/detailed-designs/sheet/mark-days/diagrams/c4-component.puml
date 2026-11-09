@@ -16,6 +16,7 @@ Container_Boundary(api_b, "Greenlit API") {
   Component(handler, "SetDaysCommandHandler", "MediatR handler", "Applies a stroke")
   Component(policy, "DayChangePolicy", "Domain service", "Who may change which day")
   Component(ledger, "RequestLedger", "Application service", "Keeps requests in step")
+  Component(sync, "DaySync", "Application service", "Synced days on the person's other teams (ADR-016)")
   ComponentDb(db, "Greenlit database", "SQL Server", "Days, requests")
 }
 
@@ -28,5 +29,7 @@ Rel(paint, toast, "Reports")
 Rel(ctrl, handler, "Sends SetDaysCommand")
 Rel(handler, policy, "Checks each day")
 Rel(handler, ledger, "Syncs requested days")
+Rel(handler, sync, "Reconciles the changed dates")
+Rel(sync, db, "Adds or removes synced days", "EF Core")
 Rel(handler, db, "Writes in one unit of work", "EF Core")
 @enduml

@@ -18,8 +18,9 @@ class TimeOffDay <<exists>> {
   +DayStatus Status
   +DateTimeOffset UpdatedUtc
   +DateTimeOffset? ConfirmedUtc
-  .. new ..
   +Guid? TimeOffRequestId
+  .. new (ADR-016) ..
+  +bool IsSynced
 }
 enum DayStatus <<exists>> {
   Tentative
@@ -62,6 +63,11 @@ class RequestLedger <<new>> {
 SetDaysCommandHandler ..> SetDaysCommand : handles
 SetDaysCommandHandler ..> DayChangePolicy
 SetDaysCommandHandler ..> RequestLedger
+class DaySync <<new>> {
+  +ReconcileAsync(userId: Guid?, dates: DateOnly[]): Task
+}
+SetDaysCommandHandler ..> DaySync : after writing, before saving
+DaySync --> TimeOffDay : adds / removes synced days
 SetDaysCommandHandler --> TimeOffDay : creates / updates / deletes
 SetDaysCommandHandler ..> ChangeSet : returns
 ChangeSet *-- "*" DayChange

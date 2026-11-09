@@ -35,6 +35,8 @@ else signed in as another address
 end
 handler -> attach : AttachAsync(invitation, user)
 attach -> db : claim invitation; row.UserId = user; DefaultTeamId ??= team
+attach -> attach : DaySync.ReconcileAsync(user, own days from today on every live row) (ADR-016, L2-064 AC8)
+attach -> db : save once
 attach --> handler : session naming the inviting team
 handler --> client : 200 SessionDto / 401 invalid_credentials / 403 invitation_other_account
 ui --> actor : "You're in" "Welcome to Chen family." "Open the calendar"

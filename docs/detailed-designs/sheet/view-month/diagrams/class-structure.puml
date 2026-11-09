@@ -18,8 +18,9 @@ class TimeOffDay <<exists>> {
   +DayStatus Status
   +DateTimeOffset UpdatedUtc
   +DateTimeOffset? ConfirmedUtc
-  .. new ..
   +Guid? TimeOffRequestId
+  .. new (ADR-016) ..
+  +bool IsSynced
 }
 enum DayStatus <<exists>> {
   Tentative
@@ -55,6 +56,8 @@ class CellDto <<new>> {
   +CellKind Kind
   +DayStatus? Status
   +string? HolidayName
+  .. new (ADR-016) ..
+  +bool Synced
 }
 enum CellKind <<new>> {
   Working

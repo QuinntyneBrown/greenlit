@@ -39,6 +39,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 |-------|--------------|-------------|
 | `L2-004` | `L1-001` | **Accept an invitation.** An invited person joins the team by setting their name and password. Invitations work for seven days. |
 | `L2-058` | `L1-015` | **Invite a person who already has an account.** Accepting attaches a membership to the existing account (signed out with the password or Google, or signed in); a different account is refused. |
+| `L2-064` | `L1-015` | **Days synced across a person's teams.** Joining another team back-fills the person's future days as synced days on both sides. |
 
 ## Diagrams
 
@@ -97,3 +98,8 @@ An email that already has an account joins with that account, signed out with it
 - **One attach step.** `InvitationMembership.AttachAsync` claims the invitation with the existing conditional update, sets the row's `UserId` and name, sets `User.DefaultTeamId` when the person had no team, and issues a session for the inviting team. A wrong password leaves the invitation open.
 - **How does the page know who is signed in?** It reads `GET /api/account` when a session exists and compares the email with the invitation's, ignoring case; the API enforces the same check.
 - **`account_exists` on the create form** remains for a race (an account appearing between load and submit); the client then reloads the invitation and shows the existing-account card.
+
+## Synced days on joining (ADR-016, `L2-064` AC8, 9 Nov 2026)
+
+- **Back-fill in the attach step.** After `InvitationMembership.AttachAsync` sets the row's `UserId`, it collects the dates from today (in the inviting team's time zone) on which any live row of the person holds a day of its own, and calls `DaySync.ReconcileAsync(userId, dates)` (`sheet/mark-days`) before the single save. The new row gains synced days for the person's booked days elsewhere, and days the manager had marked on the invited row become synced days on the person's other rows. Past days are not copied. The sign-in, join and Google ways in share this step, so all three back-fill.
+- **Accepting with a new account** (`POST /api/invitations/{token}/accept`) creates an account with one row, so there is nothing to sync.
