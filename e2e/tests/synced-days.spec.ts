@@ -3,7 +3,8 @@
 // Description: a day Sam books on his row in Product team shows on his row in Chen family as a synced day: striped
 //              blue with "⇄", named "Booked in another team", for him and for Maya, with nothing else of Product team;
 //              painting or pressing it from the mouse or the keyboard changes nothing and says where to change it.
-// Data: fresh accounts from fixtures/households.ts: Omar manages Product team with Sam; Maya invites Sam to Chen
+// Data: the demo seed's Chen family (Lin Chen, Sam Chen; Sam requested Tue 17 Nov on Product team) for the first test;
+//       fresh accounts from fixtures/households.ts: Omar manages Product team with Sam; Maya invites Sam to Chen
 //       family and he joins with the same account.
 
 import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
@@ -12,6 +13,13 @@ import { markOwnDays, samOnTwoTeams } from "../fixtures/households.js";
 test.skip(({ isMobile }) => isMobile, GRID_ONLY);
 
 test.describe("Days synced across a person's teams", () => {
+  test("the demo's Chen family shows Sam's Product team day as a synced day (L2-064 AC1, AC9)", async ({ goto, pages }) => {
+    await goto("calendar", { as: "household-manager", month: "2026-11" });
+    await pages.calendar.waitForReady();
+
+    await expect(pages.calendar.cell("Sam Chen", "Tue 17 Nov")).toHaveAccessibleName("Sam Chen, Tue 17 Nov: Booked in another team");
+  });
+
   test("a day booked in another team shows on his row with its marker and name (L2-064 AC1, AC2)", async ({ goto, page, pages }) => {
     const sam = await samOnTwoTeams(page.request);
     await markOwnDays(page.request, sam.productToken, ["2026-11-17"], "Requested");

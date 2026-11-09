@@ -85,6 +85,20 @@ public sealed class SeedCommandHandler
         ("Ned Shaw", "ned@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000303")),
     ];
 
+    /// <summary>
+    /// A person on two teams with a day synced between them (L2-064, ADR-016): Sam Chen is a member of Omar Diaz's Product
+    /// team and of Lin Chen's Chen family. Kept apart from the demo team so Maya Chen's sheet stays as the mocks show it.
+    /// </summary>
+    private static readonly (string Name, string Email, Guid UserId)[] Household =
+    [
+        ("Omar Diaz", "omar@northwind.studio", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000401")),
+        ("Lin Chen", "lin@chenhome.net", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000402")),
+        ("Sam Chen", "sam@chenhome.net", Guid.Parse("0d6f1c1e-7a3b-4c51-9a10-000000000403")),
+    ];
+
+    /// <summary>The day Sam requested on Product team, which Chen family shows as a synced day.</summary>
+    private static readonly DateOnly SamsSyncedDay = new(2026, 11, 17);
+
     /// <summary>Each multi-team manager's teams, oldest first, with the one name-only member that tells them apart on the sheet.</summary>
     private static readonly (string Team, string Member)[] MultiTeams = [("Design team", "Kit Brown"), ("Product team", "Raj Mehta")];
 
@@ -164,7 +178,7 @@ public sealed class SeedCommandHandler
     {
         var now = DateTimeOffset.UtcNow;
 
-        foreach (var (name, email, userId) in Cast.Concat(Newcomers).Concat(MultiTeamManagers).Concat(Founders))
+        foreach (var (name, email, userId) in Cast.Concat(Newcomers).Concat(MultiTeamManagers).Concat(Founders).Concat(Household))
         {
             var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == userId, ct);
             if (user is null)
@@ -174,7 +188,7 @@ public sealed class SeedCommandHandler
                     Id = userId,
                     Email = email,
                     DisplayName = name,
-                    Role = userId == MayaUserId || MultiTeamManagers.Concat(Founders).Any(m => m.UserId == userId) ? UserRole.Manager : UserRole.Member,
+                    Role = userId == MayaUserId || MultiTeamManagers.Concat(Founders).Concat(Household.Take(2)).Any(m => m.UserId == userId) ? UserRole.Manager : UserRole.Member,
                     CreatedUtc = now,
                 };
                 _db.Users.Add(user);
@@ -246,6 +260,7 @@ public sealed class SeedCommandHandler
         await SeedHistoryAsync(team, now, ct);
 
         await SeedMultiTeamManagersAsync(now, ct);
+        await SeedHouseholdAsync(now, ct);
 
         var written = await _db.SaveChangesAsync(ct);
         _logger.LogInformation("Seed complete ({Rows} rows written).", written);
@@ -295,6 +310,57 @@ public sealed class SeedCommandHandler
                 _db.Teams.Add(team);
             }
             user!.DefaultTeamId ??= team.Id;
+        }
+    }
+
+    /// <summary>
+    /// Product team (Omar Diaz, Sam Chen) and Chen family (Lin Chen, Sam Chen), each looked up by manager and name; Sam's
+    /// requested day on Product team with its pending request, and its synced copy on Chen family, each added once.
+    /// </summary>
+    private async Task SeedHouseholdAsync(DateTimeOffset now, CancellationToken ct)
+    {
+        var (sam, samEmail, samId) = Household[2];
+        var rows = new List<TeamMember>();
+        for (var i = 0; i < 2; i++)
+        {
+            var (manager, email, managerId) = Household[i];
+            var teamName = i == 0 ? "Product team" : "Chen family";
+            var team = await _db.Teams.Include(t => t.Members)
+                .SingleOrDefaultAsync(t => t.ManagerUserId == managerId && t.Name == teamName, ct);
+            if (team is null)
+            {
+                team = new Team { Id = Guid.NewGuid(), Name = teamName, ManagerUserId = managerId, TimeZone = "Europe/London", CreatedUtc = now.AddMinutes(i) };
+                team.Members.Add(new TeamMember { Id = Guid.NewGuid(), Name = manager, Email = email, UserId = managerId, SortOrder = 0 });
+                team.Members.Add(new TeamMember { Id = Guid.NewGuid(), Name = sam, Email = samEmail, UserId = samId, SortOrder = 1 });
+                _db.Teams.Add(team);
+            }
+            (await _db.Users.FindAsync([managerId], ct))!.DefaultTeamId ??= team.Id;
+            rows.Add(team.Members.Single(m => m.UserId == samId));
+        }
+        (await _db.Users.FindAsync([samId], ct))!.DefaultTeamId ??= rows[0].TeamId;
+
+        var (product, family) = (rows[0], rows[1]);
+        if (!await _db.TimeOffDays.AnyAsync(d => d.TeamMemberId == product.Id && d.Date == SamsSyncedDay, ct))
+        {
+            var request = new TimeOffRequest
+            {
+                Id = Guid.NewGuid(), TeamMemberId = product.Id, FirstDay = SamsSyncedDay, LastDay = SamsSyncedDay,
+                Status = RequestStatus.Pending, CreatedUtc = now,
+            };
+            _db.TimeOffRequests.Add(request);
+            _db.TimeOffDays.Add(new TimeOffDay
+            {
+                Id = Guid.NewGuid(), TeamMemberId = product.Id, Date = SamsSyncedDay, Status = DayStatus.Requested,
+                UpdatedUtc = now, TimeOffRequestId = request.Id,
+            });
+        }
+        if (!await _db.TimeOffDays.AnyAsync(d => d.TeamMemberId == family.Id && d.Date == SamsSyncedDay, ct))
+        {
+            _db.TimeOffDays.Add(new TimeOffDay
+            {
+                Id = Guid.NewGuid(), TeamMemberId = family.Id, Date = SamsSyncedDay, Status = DayStatus.Tentative,
+                IsSynced = true, UpdatedUtc = now,
+            });
         }
     }
 
