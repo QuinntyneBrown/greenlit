@@ -44,7 +44,7 @@ import { AppDialogs } from '../../dialogs/app-dialogs';
 import { NewRequestData, NewRequestDialog } from '../../dialogs/new-request/new-request.dialog';
 import { ToastService } from '../../toasts/toast.service';
 import { addMonths, calendarView, columnsFor, monthTitle } from './calendar-view';
-import { CalendarWeek } from './calendar-week';
+import { CalendarWeek, PhoneMark } from './calendar-week';
 import { selectionBarView } from './selection-view';
 import { FAILED_SAVE, PaintContext, refusedToast, savedToast } from './paint-toasts';
 import { requestSentToast } from './request-toasts';
@@ -183,7 +183,12 @@ function localMonth(): string {
           </div>
         } @else if (phone()) {
           @if (loaded(); as sheet) {
-            <app-calendar-week [sheet]="sheet" />
+            <app-calendar-week
+              [sheet]="sheet"
+              [busy]="saving()"
+              (mark)="markOnPhone($event)"
+              (cleared)="selectionCleared()"
+            />
           }
         } @else {
           <gl-team-grid
@@ -408,6 +413,21 @@ export class CalendarPage {
       title: 'Selection cleared',
       body: 'Pick days to start again.',
     });
+  }
+
+  private readonly week = viewChild(CalendarWeek);
+
+  /** L2-063 AC10: the phone's mark sheet saves its range as the bar does, and spends it once saved. */
+  protected markOnPhone(mark: PhoneMark): void {
+    if (this.saving()) return;
+    this.saving.set(true);
+    this.save(
+      { memberId: mark.memberId, dates: mark.dates, status: ACTION_STATUS[mark.action] },
+      (saved) => {
+        this.saving.set(false);
+        if (saved) this.week()?.clearRange();
+      },
+    );
   }
 
   /** An action from the bar is being saved. */

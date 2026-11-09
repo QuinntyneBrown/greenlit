@@ -1,7 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, input, linkedSignal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+  linkedSignal,
+  output,
+  untracked,
+} from '@angular/core';
 
 import { SheetMonth } from 'api';
-import { MarkSheet, WeekStrip, WeekStripSelection, WeekStripTap, WeekTabs } from 'components';
+import {
+  MarkSheet,
+  SelectionAction,
+  WeekStrip,
+  WeekStripSelection,
+  WeekStripTap,
+  WeekTabs,
+} from 'components';
 
 import {
   PhoneRange,
@@ -17,6 +32,13 @@ import {
   weekTabs,
   weeksOf,
 } from './week-view';
+
+/** An action chosen on the mark sheet for one member's days. */
+export interface PhoneMark {
+  readonly memberId: string;
+  readonly dates: readonly string[];
+  readonly action: SelectionAction;
+}
 
 /**
  * The calendar on a phone (docs/detailed-designs/sheet/phone-week, L2-063): one Monday-to-Sunday week of
@@ -108,7 +130,7 @@ import {
         }
       </section>
     }
-    @if (mark(); as mark) {
+    @if (markView(); as mark) {
       <gl-mark-sheet
         [who]="mark.who"
         [title]="mark.title"
@@ -117,8 +139,10 @@ import {
         [over]="mark.over"
         [clash]="mark.clash"
         [canConfirm]="sheet().isManager"
+        [busy]="busy()"
+        (chosen)="choose($event)"
         (single)="finishRange(null)"
-        (cancelled)="range.set(null)"
+        (cancelled)="cancel()"
       />
     } @else {
       <p class="phone-hint">
@@ -314,24 +338,36 @@ import {
       --status-bg: var(--color-status-tentative);
     }
   `,
-  host: { '[attr.data-sheet]': "range() ? '' : null" },
+  host: {
+    '[attr.data-sheet]': "range() ? '' : null",
+    '(document:keydown.escape)': 'cancel()',
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarWeek {
   readonly sheet = input.required<SheetMonth>();
+  /** An action on the range is being saved. */
+  readonly busy = input<boolean>(false);
 
-  private readonly weeks = computed(() => weeksOf(this.sheet().month));
+  /** An action was chosen for the range: the page saves it, then calls `clearRange` once it is saved. */
+  readonly mark = output<PhoneMark>();
+  /** Cancel or Escape cleared the range (L2-063 AC11). */
+  readonly cleared = output<void>();
+
+  /** A refreshed sheet of the same month leaves this unchanged, so the week, open date and range survive a save. */
+  private readonly month = computed(() => this.sheet().month);
+  private readonly weeks = computed(() => weeksOf(this.month()));
   private readonly short = computed(() => shortDates(this.sheet()));
 
   /** The week shown: reset to today's week (or the first) whenever the month changes. */
   protected readonly week = linkedSignal({
-    source: () => this.sheet().month,
-    computation: () => weekHolding(this.weeks(), this.sheet().today),
+    source: this.month,
+    computation: () => untracked(() => weekHolding(this.weeks(), this.sheet().today)),
   });
 
   /** The date whose panel is open; none after a change of month. */
   protected readonly openDate = linkedSignal<string, string | null>({
-    source: () => this.sheet().month,
+    source: this.month,
     computation: () => null,
   });
 
@@ -350,7 +386,7 @@ export class CalendarWeek {
 
   /** The first day, and once tapped the last day, being marked; none after a change of month. */
   protected readonly range = linkedSignal<string, PhoneRange | null>({
-    source: () => this.sheet().month,
+    source: this.month,
     computation: () => null,
   });
 
@@ -362,7 +398,7 @@ export class CalendarWeek {
   });
 
   /** What the mark sheet shows; null shows the hint instead (L2-063 AC7, AC12). */
-  protected readonly mark = computed(() => {
+  protected readonly markView = computed(() => {
     const range = this.range();
     return range ? markSheetView(this.sheet(), range) : null;
   });
@@ -388,6 +424,26 @@ export class CalendarWeek {
     } else {
       this.range.set({ memberId: tap.memberId, from: tap.date, to: null });
     }
+  }
+
+  /** The range is saved: it is spent (L2-063 AC10). */
+  clearRange(): void {
+    this.range.set(null);
+  }
+
+  /** An action on the sheet marks the range's days; nothing happens while one is being saved. */
+  protected choose(action: SelectionAction): void {
+    const view = this.markView();
+    const range = this.range();
+    if (!view || !range || this.busy()) return;
+    this.mark.emit({ memberId: range.memberId, dates: view.dates, action });
+  }
+
+  /** Cancel or Escape clears a selection and says so; with nothing selected, Escape does nothing. */
+  protected cancel(): void {
+    if (!this.range()) return;
+    this.range.set(null);
+    this.cleared.emit();
   }
 
   /** The second tap on the same row, in either order, ends the range; "Just this day" ends it on the first (AC8). */
