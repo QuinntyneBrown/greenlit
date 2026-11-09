@@ -106,7 +106,7 @@ const WEEKDAY_INITIALS = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su'];
                   <div class="week-strip__slot">
                     @if (!cell) {
                       <span class="week-strip__blank"></span>
-                    } @else if (row.editable) {
+                    } @else if (row.editable && !cell.synced) {
                       <button
                         class="cell"
                         type="button"
@@ -121,6 +121,7 @@ const WEEKDAY_INITIALS = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su'];
                         class="cell"
                         role="img"
                         [attr.data-status]="cell.status"
+                        [attr.data-synced]="cell.synced ? '' : null"
                         [attr.aria-label]="cell.label"
                       ></span>
                     }
@@ -331,6 +332,17 @@ const WEEKDAY_INITIALS = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su'];
     }
     .cell[data-status='tentative']::after {
       content: '?';
+    }
+    /* A day synced from another of the person's teams (L2-064 AC11): striped, its own glyph, and no tap. */
+    .cell[data-synced]::after {
+      content: '⇄';
+    }
+    .cell[data-synced] {
+      background-image: repeating-linear-gradient(
+        135deg,
+        transparent 0 3px,
+        color-mix(in srgb, var(--color-bg-surface) 45%, transparent) 3px 5px
+      );
     }
     button.cell {
       cursor: pointer;
