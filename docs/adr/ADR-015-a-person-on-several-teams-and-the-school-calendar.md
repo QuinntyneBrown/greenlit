@@ -1,7 +1,8 @@
 # ADR-015: A person belongs to several teams in any role; a school calendar is a team setting with its own closures
 
 **Status:** Accepted (extends ADR-014; supersedes ADR-014's "a member stays on one team" and its
-`409 team_exists` rule)
+`409 team_exists` rule); partly superseded by ADR-016 (a person's own days are synced across
+their teams)
 **Date:** 2026-11-08
 
 ## Context
@@ -15,7 +16,8 @@ team, and a person who is only a member gets `409 team_exists` when they try to 
 may be a member of several teams, manage some and be a member of others, accept an invitation with
 the account they already have, and a manager may turn on a school calendar that marks children
 and records the days school is closed. The team stays the unit of scope: Team, Member, Day and
-Holiday never cross teams, and a team keeps exactly one manager (`Team.ManagerUserId`).
+Holiday never cross teams (superseded by ADR-016 for the Day on a person's own rows, which is
+synced to their other teams), and a team keeps exactly one manager (`Team.ManagerUserId`).
 
 Three things in the current code assume one team per member:
 
