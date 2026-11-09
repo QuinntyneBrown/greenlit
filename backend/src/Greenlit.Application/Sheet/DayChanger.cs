@@ -25,6 +25,11 @@ internal sealed class DayChanger
     private readonly RequestLedger _ledger;
     private readonly AllowanceCalculator _allowances;
 
+    /// <summary>The code of a change made only of synced days (L2-064 AC3).</summary>
+    public const string SyncedDayLocked = "synced_day_locked";
+
+    public const string SyncedDayLockedMessage = "That day was booked in another team. Change it in the team where it was booked.";
+
     public DayChanger(IAppDbContext db, ICurrentUser currentUser, TimeProvider time)
     {
         _db = db;
@@ -90,11 +95,18 @@ internal sealed class DayChanger
         var now = _time.GetUtcNow();
         var changes = new List<DayChangeDto>();
         var locked = 0;
+        var synced = 0;
         var joining = new List<TimeOffDay>();
         var leaving = new List<(TimeOffDay Day, Guid RequestId)>();
         foreach (var (date, target) in working.OrderBy(t => t.Date))
         {
             existing.TryGetValue(date, out var row);
+            // A synced day changes only in the team where it was booked, for the manager too (L2-064 AC3, ADR-016).
+            if (row is { IsSynced: true })
+            {
+                synced++;
+                continue;
+            }
             DayStatus? current = row?.Status;
             if (current == target) continue;
             if (!DayChangePolicy.MayChange(isManager, current, target))
@@ -136,6 +148,8 @@ internal sealed class DayChanger
             changes.Add(new DayChangeDto(date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), current, target));
         }
 
+        if (changes.Count == 0 && synced > 0 && locked == 0)
+            throw new ForbiddenException(SyncedDayLocked, SyncedDayLockedMessage);
         if (changes.Count == 0 && locked > 0)
             throw new ForbiddenException("confirmed_locked", "Confirmed days can only be changed by the manager.");
 

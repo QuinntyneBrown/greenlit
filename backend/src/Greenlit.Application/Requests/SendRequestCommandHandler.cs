@@ -46,6 +46,12 @@ public sealed class SendRequestCommandHandler : IRequestHandler<SendRequestComma
         var existing = await _db.TimeOffDays
             .Where(d => d.TeamMemberId == member.Id && working.Contains(d.Date))
             .ToDictionaryAsync(d => d.Date, ct);
+        // Synced days are skipped like holidays; a range of only synced days asks for nothing (L2-064 AC3, ADR-016).
+        if (existing.Values.Any(d => d.IsSynced))
+        {
+            working = working.Where(date => !(existing.TryGetValue(date, out var day) && day.IsSynced)).ToList();
+            if (working.Count == 0) throw new ForbiddenException(DayChanger.SyncedDayLocked, DayChanger.SyncedDayLockedMessage);
+        }
         if (existing.Values.Any(d => d.Status is DayStatus.Requested or DayStatus.Confirmed))
             throw new ConflictException("days_taken", "Some of those days are already requested or confirmed.");
 
