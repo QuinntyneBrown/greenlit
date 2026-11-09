@@ -1,10 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input, linkedSignal } from '@angular/core';
 
 import { SheetMonth } from 'api';
-import { WeekStrip, WeekTabs } from 'components';
+import { MarkSheet, WeekStrip, WeekStripSelection, WeekStripTap, WeekTabs } from 'components';
 
 import {
+  PhoneRange,
   ShortRun,
+  markSheetView,
+  rangeDates,
   dayPanelView,
   shortDates,
   shortDaysHeading,
@@ -22,7 +25,7 @@ import {
  */
 @Component({
   selector: 'app-calendar-week',
-  imports: [WeekTabs, WeekStrip],
+  imports: [WeekTabs, WeekStrip, MarkSheet],
   template: `
     @if (heading(); as heading) {
       <section class="panel short-days" aria-label="Days short of people">
@@ -61,7 +64,9 @@ import {
       [columns]="strip().columns"
       [rows]="strip().rows"
       [openDate]="openDate()"
+      [selection]="selection()"
       (dateTap)="toggleDate($event)"
+      (cellTap)="tapCell($event)"
     />
     @if (day(); as day) {
       <section class="panel day-panel" [attr.aria-label]="day.label">
@@ -103,6 +108,23 @@ import {
         }
       </section>
     }
+    @if (mark(); as mark) {
+      <gl-mark-sheet
+        [who]="mark.who"
+        [title]="mark.title"
+        [picking]="mark.picking"
+        [workingDays]="mark.workingDays"
+        [over]="mark.over"
+        [clash]="mark.clash"
+        [canConfirm]="sheet().isManager"
+        (cancelled)="range.set(null)"
+      />
+    } @else {
+      <p class="phone-hint">
+        <span>{{ hint() }}</span
+        ><span>Tap a date to see who is out.</span>
+      </p>
+    }
   `,
   styles: `
     :host {
@@ -110,8 +132,27 @@ import {
       margin-top: var(--space-4);
       padding-bottom: 9rem;
     }
+    :host([data-sheet]) {
+      padding-bottom: 20rem;
+    }
     :host > * + * {
       margin-top: var(--space-3);
+    }
+    .phone-hint {
+      position: fixed;
+      inset-inline: 0;
+      bottom: 0;
+      z-index: var(--z-sticky);
+      margin: 0;
+      padding: var(--space-3) var(--space-6) var(--space-5);
+      border-top: 1px solid var(--color-border-default);
+      background: var(--color-bg-surface);
+      text-align: center;
+      font: var(--text-caption);
+      color: var(--color-fg-muted);
+    }
+    .phone-hint span {
+      display: block;
     }
     .panel {
       display: block;
@@ -272,6 +313,7 @@ import {
       --status-bg: var(--color-status-tentative);
     }
   `,
+  host: { '[attr.data-sheet]': "range() ? '' : null" },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarWeek {
@@ -305,14 +347,47 @@ export class CalendarWeek {
     return date ? dayPanelView(this.sheet(), date, this.short()) : null;
   });
 
-  /** Pressing a date opens its panel; pressing it again closes it (L2-063 AC6). */
+  /** The first day, and once tapped the last day, being marked; none after a change of month. */
+  protected readonly range = linkedSignal<string, PhoneRange | null>({
+    source: () => this.sheet().month,
+    computation: () => null,
+  });
+
+  protected readonly selection = computed((): WeekStripSelection | null => {
+    const range = this.range();
+    if (!range) return null;
+    const dates = rangeDates(this.sheet().month, range);
+    return { memberId: range.memberId, dates, edges: [dates[0], dates[dates.length - 1]] };
+  });
+
+  /** What the mark sheet shows; null shows the hint instead (L2-063 AC7, AC12). */
+  protected readonly mark = computed(() => {
+    const range = this.range();
+    return range ? markSheetView(this.sheet(), range) : null;
+  });
+
+  protected readonly hint = computed(() =>
+    this.sheet().isManager
+      ? 'Tap a day in someone’s row to mark time off.'
+      : 'Tap a day in your row to mark time off.',
+  );
+
+  /** Pressing a date opens its panel, and clears a selection; pressing it again closes it (L2-063 AC6). */
   protected toggleDate(date: string): void {
+    this.range.set(null);
     this.openDate.update((open) => (open === date ? null : date));
+  }
+
+  /** A tap on a cell the person may change picks it as the first day, and closes an open day (L2-063 AC7). */
+  protected tapCell(tap: WeekStripTap): void {
+    this.openDate.set(null);
+    this.range.set({ memberId: tap.memberId, from: tap.date, to: null });
   }
 
   /** A short-days run shows its week and opens its first day (L2-063 AC4). */
   protected openRun(run: ShortRun): void {
     this.week.set(weekHolding(this.weeks(), run.dates[0]));
+    this.range.set(null);
     this.openDate.set(run.dates[0]);
   }
 }

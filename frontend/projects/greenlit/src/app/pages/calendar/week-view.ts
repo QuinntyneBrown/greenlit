@@ -256,3 +256,87 @@ export function dayPanelView(
     rows,
   };
 }
+
+// ---- a range and the mark sheet (L2-063 AC7–AC9) ----
+
+/** A first day, and once picked a last day, on one member's row. */
+export interface PhoneRange {
+  readonly memberId: string;
+  readonly from: string;
+  readonly to: string | null;
+}
+
+/** Every date of the month from the range's earlier day to its later one. */
+export function rangeDates(month: string, range: PhoneRange): string[] {
+  const end = range.to ?? range.from;
+  const [lo, hi] = range.from <= end ? [range.from, end] : [end, range.from];
+  return datesOf(month).filter((d) => d >= lo && d <= hi);
+}
+
+export interface MarkSheetView {
+  readonly who: string;
+  readonly title: string;
+  readonly picking: boolean;
+  readonly workingDays: number;
+  readonly over: number;
+  readonly clash: string | null;
+  readonly dates: readonly string[];
+}
+
+const OFF_KINDS = new Set(['NotWorking', 'Holiday']);
+
+/** "Ana", "Ana and Ben", "Ana, Cleo, Elif and Finn". */
+function names(list: readonly string[]): string {
+  return list.length === 1
+    ? list[0]
+    : `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}`;
+}
+
+/**
+ * Who else is out (requested or confirmed) on the range's working days, members with the same count named
+ * together, most days first: "Ana is also out 4 of these days. Cleo and Dev are also out 2 of these days."
+ */
+export function clashText(
+  sheet: SheetMonth,
+  memberId: string,
+  workingDates: readonly string[],
+): string | null {
+  const counts = new Map<number, string[]>();
+  for (const member of sheet.members) {
+    if (member.id === memberId) continue;
+    const n = member.cells.filter(
+      (c) => workingDates.includes(c.date) && (c.kind === 'Requested' || c.kind === 'Confirmed'),
+    ).length;
+    if (n > 0) counts.set(n, [...(counts.get(n) ?? []), member.name.split(' ')[0]]);
+  }
+  if (counts.size === 0) return null;
+  return [...counts.entries()]
+    .sort(([a], [b]) => b - a)
+    .map(([n, who]) => {
+      const verb = who.length === 1 ? 'is' : 'are';
+      const howMany = n === workingDates.length ? 'all' : `${n}`;
+      return `${names(who)} ${verb} also out ${howMany} of these days.`;
+    })
+    .join(' ');
+}
+
+export function markSheetView(sheet: SheetMonth, range: PhoneRange): MarkSheetView | null {
+  const member = sheet.members.find((m) => m.id === range.memberId);
+  if (!member) return null;
+  const dates = rangeDates(sheet.month, range);
+  const chosen = member.cells.filter((c) => dates.includes(c.date));
+  const working = chosen.filter((c) => !OFF_KINDS.has(c.kind)).map((c) => c.date);
+  // Same rule as the server's DaysOver: days already requested are in `requested` already.
+  const extra = chosen.filter((c) => !OFF_KINDS.has(c.kind) && c.kind !== 'Requested').length;
+  const figures = member.allowance;
+  const picking = range.to === null;
+  return {
+    who: member.name,
+    title: picking ? `From ${dayLabel(range.from)}` : spanLabel(dates[0], dates[dates.length - 1]),
+    picking,
+    workingDays: working.length,
+    over: figures ? Math.max(0, figures.requested + extra - figures.left) : 0,
+    clash: picking ? null : clashText(sheet, member.id, working),
+    dates,
+  };
+}

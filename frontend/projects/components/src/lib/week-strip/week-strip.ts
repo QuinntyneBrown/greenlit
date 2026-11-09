@@ -28,6 +28,13 @@ export interface WeekStripRow {
   readonly cells: readonly (TeamGridCell | null)[];
 }
 
+/** The days picked on one member's row; the first and last are its edges. */
+export interface WeekStripSelection {
+  readonly memberId: string;
+  readonly dates: readonly string[];
+  readonly edges: readonly string[];
+}
+
 /** A tap on one member's day. */
 export interface WeekStripTap {
   readonly memberId: string;
@@ -105,7 +112,8 @@ const WEEKDAY_INITIALS = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su'];
                         type="button"
                         [attr.data-status]="cell.status"
                         [attr.aria-label]="cell.label"
-                        aria-pressed="false"
+                        [attr.aria-pressed]="picked(row.memberId, cell.date)"
+                        [attr.data-edge]="edge(row.memberId, cell.date) ? '' : null"
                         (click)="cellTap.emit({ memberId: row.memberId, date: cell.date })"
                       ></button>
                     } @else {
@@ -399,6 +407,8 @@ export class WeekStrip {
   readonly rows = input<readonly WeekStripRow[]>([]);
   /** The id the week tabs point at. */
   readonly panelId = input<string>('week-card');
+  /** The days picked on one row, shown as pressed. */
+  readonly selection = input<WeekStripSelection | null>(null);
   /** The date whose panel is open, if any. */
   readonly openDate = input<string | null>(null);
 
@@ -408,4 +418,14 @@ export class WeekStrip {
   readonly cellTap = output<WeekStripTap>();
 
   protected readonly initials = WEEKDAY_INITIALS;
+
+  protected picked(memberId: string, date: string): boolean {
+    const selection = this.selection();
+    return selection !== null && selection.memberId === memberId && selection.dates.includes(date);
+  }
+
+  protected edge(memberId: string, date: string): boolean {
+    const selection = this.selection();
+    return selection !== null && selection.memberId === memberId && selection.edges.includes(date);
+  }
 }
