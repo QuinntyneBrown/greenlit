@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 /**
  * Legend (docs/design-system/components/legend.html): what each colour on the
  * sheet means. The swatches are decorative; the words carry the meaning. With `band` it also explains the
- * shading of a day short of people on the phone's week (L2-063 AC13).
+ * shading of a day short of people on the phone's week (L2-063 AC13). `--gl-legend-row-gap` spaces wrapped rows.
  */
 @Component({
   selector: 'gl-legend',
@@ -35,7 +35,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     .legend {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--space-1) var(--space-4);
+      gap: var(--gl-legend-row-gap, var(--space-1)) var(--space-4);
       list-style: none;
       padding: 0;
       margin: 0;

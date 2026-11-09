@@ -173,6 +173,7 @@ export interface PhoneMark {
     }
     .phone-legend {
       padding-inline: var(--space-1);
+      --gl-legend-row-gap: var(--space-2);
     }
     .phone-legend__note {
       margin: var(--space-3) 0 0;
