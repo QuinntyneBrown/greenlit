@@ -45,6 +45,8 @@ export const PEOPLE = {
   "founder-mobile": { name: "Leo Grant", email: "leo@northwind.studio" },
   "founder-tablet": { name: "Mia Rossi", email: "mia@northwind.studio" },
   "founder-desktop": { name: "Ned Shaw", email: "ned@northwind.studio" },
+  /** Manages Chen family, where Sam Chen's Product team request shows as a synced day (L2-064); read only. */
+  "household-manager": { name: "Lin Chen", email: "lin@chenhome.net" },
 } as const;
 
 export type Person = keyof typeof PEOPLE;

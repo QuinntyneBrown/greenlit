@@ -27,7 +27,7 @@ public class SeedCommandHandlerTests
         team.TimeZone.Should().Be("Europe/London");
         team.Members.OrderBy(m => m.SortOrder).Select(m => m.Name).Should().Equal(
             "Maya Chen", "Ana Ruiz", "Ben Okafor", "Cleo Park", "Dev Patel", "Elif Yılmaz", "Finn Murphy");
-        (await read.Users.CountAsync()).Should().Be(23);
+        (await read.Users.CountAsync()).Should().Be(26);
         (await read.Holidays.CountAsync(h => h.TeamId == team.Id)).Should().Be(8);
     }
 
@@ -128,6 +128,29 @@ public class SeedCommandHandlerTests
     }
 
     [Fact]
+    public async Task Sam_Chen_is_on_product_team_and_chen_family_with_a_day_synced_between_them()
+    {
+        // L2-064, ADR-016: the demo shows a synced day. Sam Chen requested Tue 17 Nov on Product team (Omar Diaz's); his
+        // row on Chen family (Lin Chen's) holds it as a Tentative synced day; seeding twice adds nothing.
+        var options = await SeedTwiceAsync();
+
+        await using var read = new AppDbContext(options);
+        var sam = await read.Users.SingleAsync(u => u.Email == "sam@chenhome.net");
+        var rows = await read.TeamMembers.Include(m => m.Team).Where(m => m.UserId == sam.Id).ToListAsync();
+        rows.Select(r => r.Team.Name).Should().BeEquivalentTo("Product team", "Chen family");
+        var product = rows.Single(r => r.Team.Name == "Product team");
+        var family = rows.Single(r => r.Team.Name == "Chen family");
+        (await read.Users.SingleAsync(u => u.Id == product.Team.ManagerUserId)).Email.Should().Be("omar@northwind.studio");
+        (await read.Users.SingleAsync(u => u.Id == family.Team.ManagerUserId)).Email.Should().Be("lin@chenhome.net");
+        var own = await read.TimeOffDays.SingleAsync(d => d.TeamMemberId == product.Id);
+        (own.Date, own.Status, own.IsSynced).Should().Be((new DateOnly(2026, 11, 17), DayStatus.Requested, false));
+        var synced = await read.TimeOffDays.SingleAsync(d => d.TeamMemberId == family.Id);
+        (synced.Date, synced.Status, synced.IsSynced).Should().Be((new DateOnly(2026, 11, 17), DayStatus.Tentative, true));
+        (await read.TimeOffRequests.CountAsync(r => r.TeamMemberId == product.Id)).Should().Be(1);
+        (await read.TimeOffRequests.CountAsync(r => r.TeamMemberId == family.Id)).Should().Be(0);
+    }
+
+    [Fact]
     public async Task Every_demo_account_signs_in_with_the_demo_password()
     {
         // Journey 2: the e2e suite signs in through the sign-in page as a seeded person.
@@ -136,7 +159,7 @@ public class SeedCommandHandlerTests
         await using var read = new AppDbContext(options);
         var hasher = new IdentityPasswordHasher();
         var users = await read.Users.ToListAsync();
-        users.Should().HaveCount(23).And.OnlyContain(u => hasher.Verify(u, u.PasswordHash, SeedCommandHandler.DemoPassword));
+        users.Should().HaveCount(26).And.OnlyContain(u => hasher.Verify(u, u.PasswordHash, SeedCommandHandler.DemoPassword));
         users.Select(u => u.PasswordHash).Should().OnlyHaveUniqueItems("each hash has its own salt");
     }
 
@@ -169,6 +192,7 @@ public class SeedCommandHandlerTests
 
         await using var read = new AppDbContext(options);
         var days = await read.TimeOffDays.Include(d => d.TeamMember)
+            .Where(d => d.TeamMember.Team.ManagerUserId == SeedCommandHandler.MayaUserId)
             .Select(d => new { d.TeamMember.Name, d.Date, d.Status })
             .ToListAsync();
         days = days.Where(d => d.Date.Year == 2026 && d.Date.Month == 11).ToList();
@@ -220,7 +244,8 @@ public class SeedCommandHandlerTests
         var options = await SeedTwiceAsync();
 
         await using var read = new AppDbContext(options);
-        var requests = (await read.TimeOffRequests.Include(r => r.TeamMember).Include(r => r.Days).ToListAsync())
+        var requests = (await read.TimeOffRequests.Include(r => r.TeamMember).Include(r => r.Days)
+                .Where(r => r.TeamMember.Team.ManagerUserId == SeedCommandHandler.MayaUserId).ToListAsync())
             .OrderBy(r => r.FirstDay)
             .Select(r => new { r.TeamMember.Name, r.FirstDay, r.LastDay, r.Note, r.Status, r.DeclineReason, r.DecidedUtc, Days = r.Days.Count })
             .ToList();
