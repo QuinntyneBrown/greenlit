@@ -52,6 +52,25 @@ public class TeamSectionReadTests : IClassFixture<GreenlitApiFactory>
     }
 
     [Fact]
+    public async Task A_member_reads_effective_yearly_days_while_the_manager_can_still_edit_the_default()
+    {
+        var team = await TestTeam.CreateAsync(_factory);
+        await team.AddMemberAsync("Ana Ruiz");
+        await team.AddMemberAsync("Ben Okafor");
+        await team.SetDefaultsAsync(28);
+        await team.SetYearlyDaysAsync("Ben Okafor", 22);
+
+        var memberSection = await GetAsync(team.ClientFor("Ana Ruiz"));
+        var memberRows = memberSection.GetProperty("members").EnumerateArray().ToList();
+        memberRows.Select(m => m.GetProperty("yearlyDays").GetInt32()).Should().Equal(28, 28, 22);
+
+        var managerSection = await GetAsync(team.ClientFor("Maya Chen"));
+        var managerRows = managerSection.GetProperty("members").EnumerateArray().ToList();
+        managerRows[1].GetProperty("yearlyDays").ValueKind.Should().Be(JsonValueKind.Null);
+        managerRows[2].GetProperty("yearlyDays").GetInt32().Should().Be(22);
+    }
+
+    [Fact]
     public async Task A_caller_sees_only_their_own_team()
     {
         var ours = await TestTeam.CreateAsync(_factory);

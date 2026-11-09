@@ -4,7 +4,7 @@ export interface TeamSettingsMember {
   readonly name: string;
   readonly email: string | null;
   readonly role: 'Member' | 'Manager';
-  /** The member's own yearly days; null when the team's default applies. */
+  /** The manager sees the member's own yearly days (null: team default); a read-only member sees the effective days. */
   readonly yearlyDays: number | null;
   /** The stored Child mark (L2-060); it counts only while the school calendar is on. */
   readonly isChild: boolean;
