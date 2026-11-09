@@ -519,6 +519,9 @@ main.shell { padding-block: var(--space-8); }
 .cell[data-status="confirmed"]::after { content: "✓"; }
 .cell[data-status="requested"]::after { content: "…"; }
 .cell[data-status="tentative"]::after { content: "?"; }
+/* A day synced from another of the person's teams (L2-064, ADR-016): tentative's blue, striped, with its own glyph. */
+.cell[data-synced]::after { content: "⇄"; }
+.cell[data-synced], .swatch[data-synced] { background-image: repeating-linear-gradient(135deg, transparent 0 3px, color-mix(in srgb, var(--color-bg-surface) 45%, transparent) 3px 5px); }
 button.cell { cursor: pointer; transition: filter var(--duration-fast) var(--ease-standard); }
 button.cell:hover, button.cell[data-state="hover"] { filter: brightness(0.9); }
 button.cell:focus-visible, button.cell[data-state="focus"] { outline-offset: -2px; outline-color: var(--color-on-status); }
