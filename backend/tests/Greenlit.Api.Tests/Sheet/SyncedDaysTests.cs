@@ -96,6 +96,84 @@ public class SyncedDaysTests : IClassFixture<GreenlitApiFactory>
         out16.GetProperty("in").GetInt32().Should().Be(2);
     }
 
+    [Theory]
+    [InlineData("Sam Chen", "Requested")]
+    [InlineData("Sam Chen", null)]
+    [InlineData("Maya Chen", "Confirmed")]
+    [InlineData("Maya Chen", null)]
+    public async Task A_synced_day_is_locked_for_the_person_and_the_manager_of_the_other_team(string caller, string? status)
+    {
+        // L2-064 AC3, L2-017 AC6. Given a synced day in Chen family, when Sam or Maya paints or clears only it, then
+        // nothing changes and the answer is 403 synced_day_locked.
+        var (product, family) = await SamOnTwoTeamsAsync();
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-17"], "Tentative")).StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var response = await SetAsync(family, caller, "Sam Chen", ["2026-11-17"], status);
+
+        await AssertProblem(response, HttpStatusCode.Forbidden, "synced_day_locked");
+        CellOf(await MonthAsync(family, "Sam Chen"), "Sam Chen", "2026-11-17").GetProperty("synced").GetBoolean().Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task A_stroke_over_a_synced_day_and_others_changes_the_others_only()
+    {
+        // L2-064 AC3: the stroke changes Wed 18 and leaves the synced Tue 17 as it is.
+        var (product, family) = await SamOnTwoTeamsAsync();
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-17"], "Tentative")).StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var response = await SetAsync(family, "Sam Chen", "Sam Chen", ["2026-11-17", "2026-11-18"], "Requested");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK, await response.Content.ReadAsStringAsync());
+        var set = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+        set.GetProperty("changes").EnumerateArray().Select(c => c.GetProperty("date").GetString()).Should().Equal("2026-11-18");
+        var month = await MonthAsync(family, "Sam Chen");
+        CellOf(month, "Sam Chen", "2026-11-17").GetProperty("synced").GetBoolean().Should().BeTrue();
+        CellOf(month, "Sam Chen", "2026-11-18").GetProperty("kind").GetString().Should().Be("Requested");
+        // Wed 18 is now Sam's own day in Chen family, so Product team shows it as synced in turn.
+        CellOf(await MonthAsync(product, "Sam Chen"), "Sam Chen", "2026-11-18").GetProperty("synced").GetBoolean().Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task A_request_over_only_synced_days_is_refused_and_one_over_some_skips_them()
+    {
+        // L2-064 AC3 through "Request time off": synced dates are skipped like holidays; only synced days is 403.
+        var (product, family) = await SamOnTwoTeamsAsync();
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-17", "2026-11-18"], "Tentative")).StatusCode.Should().Be(HttpStatusCode.OK);
+        var sam = family.SessionFor("Sam Chen");
+
+        await AssertProblem(
+            await sam.PostAsJsonAsync("/api/requests", new { firstDay = "2026-11-17", lastDay = "2026-11-18" }),
+            HttpStatusCode.Forbidden, "synced_day_locked");
+
+        var response = await sam.PostAsJsonAsync("/api/requests", new { firstDay = "2026-11-17", lastDay = "2026-11-19" });
+        response.StatusCode.Should().Be(HttpStatusCode.Created, await response.Content.ReadAsStringAsync());
+        (await family.RequestsOfAsync("Sam Chen")).Should().ContainSingle()
+            .Which.Should().BeEquivalentTo(new { FirstDay = "2026-11-19", LastDay = "2026-11-19", Days = 1 });
+        var month = await MonthAsync(family, "Sam Chen");
+        CellOf(month, "Sam Chen", "2026-11-17").GetProperty("synced").GetBoolean().Should().BeTrue();
+        CellOf(month, "Sam Chen", "2026-11-19").GetProperty("kind").GetString().Should().Be("Requested");
+    }
+
+    [Fact]
+    public async Task Clearing_the_day_clears_its_synced_day_and_undo_brings_both_back()
+    {
+        // L2-064 AC4: clear Tue 17 in Product team, the synced day goes from Chen family; Undo restores both at once.
+        var (product, family) = await SamOnTwoTeamsAsync();
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-17"], "Requested")).StatusCode.Should().Be(HttpStatusCode.OK);
+
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-17"], null)).StatusCode.Should().Be(HttpStatusCode.OK);
+        CellOf(await MonthAsync(family, "Sam Chen"), "Sam Chen", "2026-11-17").GetProperty("kind").GetString().Should().Be("Working");
+
+        var undo = await product.SessionFor("Sam Chen").PostAsJsonAsync("/api/sheet/days/restore",
+            new { memberId = product.MemberIdOf("Sam Chen"), days = new[] { new { date = "2026-11-17", status = "Requested" } } });
+
+        undo.StatusCode.Should().Be(HttpStatusCode.OK, await undo.Content.ReadAsStringAsync());
+        CellOf(await MonthAsync(product, "Sam Chen"), "Sam Chen", "2026-11-17").GetProperty("kind").GetString().Should().Be("Requested");
+        var cell = CellOf(await MonthAsync(family, "Sam Chen"), "Sam Chen", "2026-11-17");
+        cell.GetProperty("kind").GetString().Should().Be("Tentative");
+        cell.GetProperty("synced").GetBoolean().Should().BeTrue();
+    }
+
     /// <summary>Sam Chen is a member of Product team (manager Omar Diaz) and of Chen family (manager Maya Chen).</summary>
     private async Task<(TestTeam Product, TestTeam Family)> SamOnTwoTeamsAsync()
     {
@@ -111,6 +189,12 @@ public class SyncedDaysTests : IClassFixture<GreenlitApiFactory>
 
     private static Task<JsonElement> MonthAsync(TestTeam team, string caller, string month = "2026-11") =>
         MonthMembersTests.GetMonthAsync(team.SessionFor(caller), month);
+
+    private static async Task AssertProblem(HttpResponseMessage response, HttpStatusCode status, string code)
+    {
+        response.StatusCode.Should().Be(status, await response.Content.ReadAsStringAsync());
+        JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("code").GetString().Should().Be(code);
+    }
 
     private static JsonElement RowOf(JsonElement month, string member) =>
         month.GetProperty("members").EnumerateArray().Single(m => m.GetProperty("name").GetString() == member);
