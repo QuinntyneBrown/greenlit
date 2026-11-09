@@ -5,6 +5,7 @@ import { WeekStrip, WeekTabs } from 'components';
 
 import {
   ShortRun,
+  dayPanelView,
   shortDates,
   shortDaysHeading,
   shortRuns,
@@ -60,7 +61,48 @@ import {
       [columns]="strip().columns"
       [rows]="strip().rows"
       [openDate]="openDate()"
+      (dateTap)="toggleDate($event)"
     />
+    @if (day(); as day) {
+      <section class="panel day-panel" [attr.aria-label]="day.label">
+        <div class="panel__head">
+          <h2 class="panel__title">
+            {{ day.heading }}
+            @if (day.short) {
+              <span class="day-panel__short">· short of people</span>
+            }
+          </h2>
+          <button
+            class="panel__close"
+            type="button"
+            aria-label="Close day"
+            (click)="openDate.set(null)"
+          >
+            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        @if (day.note) {
+          <p class="panel__note day-panel__off">{{ day.note }}</p>
+        } @else {
+          <ul class="panel__list">
+            @for (row of day.rows; track row.name) {
+              <li class="day-panel__row">
+                <span class="avatar" aria-hidden="true">{{ row.initials }}</span>
+                <span class="day-panel__name">{{ row.name }}</span>
+                <span class="day-panel__state" [attr.data-status]="row.status">
+                  @if (row.status !== 'empty' && row.status !== 'off') {
+                    <span class="swatch" [attr.data-status]="row.status" aria-hidden="true"></span>
+                  }
+                  {{ row.word }}
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
   `,
   styles: `
     :host {
@@ -81,6 +123,82 @@ import {
     .panel__title {
       margin: 0;
       font: var(--text-label);
+    }
+    .panel__head {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .panel__close {
+      display: inline-grid;
+      place-items: center;
+      flex: none;
+      width: var(--control-height-sm);
+      height: var(--control-height-sm);
+      margin-left: auto;
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--color-fg-default);
+      cursor: pointer;
+    }
+    .panel__close:hover {
+      background: var(--color-bg-subtle);
+    }
+    .panel__close:focus-visible {
+      outline: var(--focus-ring-width) solid var(--color-focus-ring);
+      outline-offset: 2px;
+    }
+    .panel__note {
+      margin: var(--space-1) 0 0;
+      font: var(--text-body-sm);
+      color: var(--color-fg-muted);
+    }
+    .day-panel__short {
+      margin-left: var(--space-2);
+      font: var(--text-caption);
+      color: var(--color-fg-muted);
+    }
+    .day-panel__row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-height: var(--target-comfortable);
+    }
+    .day-panel__row .avatar {
+      display: inline-grid;
+      place-items: center;
+      flex: none;
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: var(--radius-full);
+      background: var(--color-bg-subtle);
+      color: var(--color-fg-muted);
+      font: var(--text-label);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+    }
+    .day-panel__name {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font: var(--text-label);
+    }
+    .day-panel__state {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font: var(--text-body-sm);
+    }
+    .day-panel__state[data-status='empty'] {
+      color: var(--color-fg-muted);
+    }
+    .day-panel__state[data-status='off'],
+    .day-panel__off {
+      color: var(--color-danger-fg);
     }
     .panel__list {
       list-style: none;
@@ -180,6 +298,17 @@ export class CalendarWeek {
   protected readonly strip = computed(() =>
     weekStripView(this.sheet(), this.weeks()[this.week()] ?? this.weeks()[0], this.short()),
   );
+
+  /** The panel of the open date (L2-063 AC6). */
+  protected readonly day = computed(() => {
+    const date = this.openDate();
+    return date ? dayPanelView(this.sheet(), date, this.short()) : null;
+  });
+
+  /** Pressing a date opens its panel; pressing it again closes it (L2-063 AC6). */
+  protected toggleDate(date: string): void {
+    this.openDate.update((open) => (open === date ? null : date));
+  }
 
   /** A short-days run shows its week and opens its first day (L2-063 AC4). */
   protected openRun(run: ShortRun): void {

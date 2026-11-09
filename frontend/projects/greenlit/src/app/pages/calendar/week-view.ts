@@ -191,3 +191,68 @@ export function weekStripView(
   });
   return { label: weekCardLabel(week), columns, rows };
 }
+
+// ---- the day panel (L2-063 AC6) ----
+
+/** One member's line in the day panel. */
+export interface DayPanelRow {
+  readonly initials: string;
+  readonly name: string;
+  readonly status: 'confirmed' | 'requested' | 'tentative' | 'empty' | 'off';
+  /** "Confirmed", "Requested", "Tentative", "Working" or "Not working". */
+  readonly word: string;
+}
+
+export interface DayPanelView {
+  /** "Out on 26 Nov". */
+  readonly label: string;
+  /** "Thu 26 Nov". */
+  readonly heading: string;
+  readonly short: boolean;
+  /** "Weekend · not a working day" or "Christmas Day · not a working day"; null on a working day. */
+  readonly note: string | null;
+  readonly rows: readonly DayPanelRow[];
+}
+
+const DAY_STATE: Record<string, Pick<DayPanelRow, 'status' | 'word'>> = {
+  Confirmed: { status: 'confirmed', word: 'Confirmed' },
+  Requested: { status: 'requested', word: 'Requested' },
+  Tentative: { status: 'tentative', word: 'Tentative' },
+  Working: { status: 'empty', word: 'Working' },
+  NotWorking: { status: 'off', word: 'Not working' },
+};
+
+export function dayPanelView(
+  sheet: SheetMonth,
+  date: string,
+  short: ReadonlySet<string>,
+): DayPanelView {
+  const heading = dayLabel(date);
+  const holiday = sheet.members
+    .flatMap((m) => m.cells)
+    .find((c) => c.date === date && c.kind === 'Holiday');
+  const weekend = weekdayIndex(date) >= 5;
+  const note = holiday
+    ? `${holiday.holidayName ?? 'Holiday'} · not a working day`
+    : weekend
+      ? 'Weekend · not a working day'
+      : null;
+  const rows =
+    note !== null
+      ? []
+      : sheet.members.map((member) => {
+          const cell = member.cells.find((c) => c.date === date);
+          return {
+            initials: member.initials,
+            name: member.name,
+            ...DAY_STATE[cell?.kind ?? 'Working'],
+          };
+        });
+  return {
+    label: `Out on ${heading.split(' ').slice(1).join(' ')}`,
+    heading,
+    short: short.has(date),
+    note,
+    rows,
+  };
+}
