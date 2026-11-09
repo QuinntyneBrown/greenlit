@@ -493,9 +493,9 @@ export class CalendarPage extends BasePage {
     return this.markSheet().getByRole("button", { name, exact: true });
   }
 
-  /** The names of the mark sheet's buttons, in order. */
-  markSheetButtons(): Locator {
-    return this.markSheet().getByRole("button");
+  /** The mark sheet's actions under the range, in order (Cancel, an icon button, is found by name). */
+  markSheetActions(): Locator {
+    return this.markSheet().locator(".mark-sheet__actions").getByRole("button");
   }
 
   /** The hint at the foot of the screen while nothing is selected. */

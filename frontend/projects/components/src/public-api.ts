@@ -56,6 +56,7 @@ export * from './lib/month-mini/month-mini';
 export * from './lib/run-list/run-list';
 export * from './lib/week-tabs/week-tabs';
 export * from './lib/week-strip/week-strip';
+export * from './lib/mark-sheet/mark-sheet';
 
 // identity and status
 export * from './lib/avatar/avatar';
