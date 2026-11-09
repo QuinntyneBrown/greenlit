@@ -6,7 +6,7 @@
 // Data: fresh accounts from fixtures/households.ts: Maya manages Chen family with the school calendar on, Sam is a
 //       member, Leo is a child with no email.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import {
   addChild,
   addClosure,
@@ -76,7 +76,9 @@ test.describe("School closures", () => {
     goto,
     page,
     pages,
+    isMobile,
   }) => {
+    test.skip(isMobile, GRID_ONLY);
     const { maya, leo } = await chenFamily(page.request);
     await addClosure(page.request, maya, "PA day", "2026-11-20", "2026-11-20");
     await addClosure(page.request, maya, "Fall break", "2026-11-23", "2026-11-23", leo);
@@ -122,7 +124,8 @@ test.describe("School closures", () => {
     await expect(pages.settings.closuresNote()).toContainText("No closures yet");
   });
 
-  test("a member sees closures but cannot change them (L2-061 AC5)", async ({ goto, page, pages }) => {
+  test("a member sees closures but cannot change them (L2-061 AC5)", async ({ goto, page, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     const { maya, sam } = await chenFamily(page.request);
     await addClosure(page.request, maya, "PA day", "2026-11-20", "2026-11-20");
     await goto("settings", { session: sam.token });

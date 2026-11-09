@@ -5,7 +5,7 @@
 //              imports Leo's school calendar; Sam joins with his own account, sees the closures and switches teams.
 // Data: fresh accounts from fixtures/households.ts (Sam is a member of Omar's Product team).
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { invitationToken } from "../fixtures/invitation.js";
 import { pathFor } from "../fixtures/routes.js";
 import { AcceptInvitePage } from "../pages/accept-invite.page.js";
@@ -18,7 +18,9 @@ test("a household sets up its sheet and a partner on another team joins it (hous
   goto,
   page,
   pages,
+  isMobile,
 }, testInfo) => {
+  test.skip(isMobile, GRID_ONLY);
   test.setTimeout(90_000);
   const omar = await freshPerson(page.request, "Omar Haddad");
   await createTeam(page.request, omar, "Product team");

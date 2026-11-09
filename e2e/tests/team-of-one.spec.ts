@@ -4,7 +4,7 @@
 //              all work with a single row and nothing asks them to add people first.
 // Data: a fresh account from Continue with Google (fixtures/households.ts), so every run starts on no team.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { createTeam, freshPerson } from "../fixtures/households.js";
 
 test.describe("A team of one", () => {
@@ -12,7 +12,9 @@ test.describe("A team of one", () => {
     goto,
     page,
     pages,
+    isMobile,
   }) => {
+    test.skip(isMobile, GRID_ONLY);
     const rosa = await freshPerson(page.request, "Rosa Marín");
     await goto("createTeam", { session: rosa.token });
     await pages.createTeam.waitForReady();
@@ -55,7 +57,9 @@ test.describe("A team of one", () => {
     goto,
     page,
     pages,
+    isMobile,
   }) => {
+    test.skip(isMobile, GRID_ONLY);
     const rosa = await freshPerson(page.request, "Rosa Marín");
     await createTeam(page.request, rosa, "Marín Design");
 

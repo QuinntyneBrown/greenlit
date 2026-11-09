@@ -6,7 +6,7 @@
 // Data: fresh accounts from fixtures/households.ts: Omar manages Product team; Sam is a member of Product team and
 //       creates Chen family, so he manages it.
 
-import { test, expect, isPhone } from "../fixtures/gl-test.js";
+import { test, expect, isPhone, GRID_ONLY } from "../fixtures/gl-test.js";
 import { createTeam, freshMemberOf, freshPerson, type FreshPerson } from "../fixtures/households.js";
 
 async function samOnTwoTeams(request: Parameters<typeof freshPerson>[0]): Promise<FreshPerson> {
@@ -40,7 +40,9 @@ test.describe("A person on two teams in different roles", () => {
     goto,
     page,
     pages,
+    isMobile,
   }) => {
+    test.skip(isMobile, GRID_ONLY);
     const sam = await samOnTwoTeams(page.request);
     await goto("calendar", { session: sam.token, month: "2026-11" });
     await pages.calendar.waitForReady();
