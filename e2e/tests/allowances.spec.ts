@@ -8,7 +8,7 @@
 //       Cleo 25 less her 5 approved September days, 20; Dev 20 less 4 in October, 16; Finn 22 + 1 less 5 in October, 18.
 //       Specs that add days to Ana or Cleo clear them again.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { clearDays, paintDays, weekdays } from "../fixtures/days.js";
 
 const CLEO_FEB_TO_MARCH = weekdays("2026-02-02", "2026-03-03");
@@ -17,7 +17,8 @@ const ANA_DECEMBER = weekdays("2026-12-07", "2026-12-18");
 const ANA_LATE_NOVEMBER = weekdays("2026-11-23", "2026-11-30");
 
 test.describe("The Left column", () => {
-  test("shows each member's allowance minus their used and booked days (L2-014 AC1, L2-029 AC4)", async ({ goto, pages }) => {
+  test("shows each member's allowance minus their used and booked days (L2-014 AC1, L2-029 AC4)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { month: "2026-11" });
     await pages.calendar.waitForReady();
 
@@ -30,7 +31,8 @@ test.describe("The Left column", () => {
     await expect(pages.calendar.daysLeft("Finn Murphy")).toHaveText("18");
   });
 
-  test("a member sees the same figures as the manager (L2-014 AC1)", async ({ goto, pages }) => {
+  test("a member sees the same figures as the manager (L2-014 AC1)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: "member", month: "2026-11" });
     await pages.calendar.waitForReady();
 
@@ -47,7 +49,8 @@ test.describe("The Left column", () => {
       await clearDays(request, "Cleo Park", CLEO_FEB_TO_MARCH);
     });
 
-    test("a negative figure shows with a minus sign and is marked over (L2-014 AC1)", async ({ goto, pages }) => {
+    test("a negative figure shows with a minus sign and is marked over (L2-014 AC1)", async ({ goto, pages, isMobile }) => {
+      test.skip(isMobile, GRID_ONLY);
       await goto("calendar", { month: "2026-11" });
       await pages.calendar.waitForReady();
 
@@ -91,7 +94,9 @@ test.describe("The request dialog and the allowance", () => {
   test("a request past what is left says how many days over and can still be sent (L2-019 AC3, L2-030 AC3-AC4)", async ({
     goto,
     pages,
+    isMobile,
   }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: "member", month: "2026-12" });
     await pages.calendar.waitForReady();
     await pages.calendar.requestTimeOff().click();
@@ -118,7 +123,8 @@ test.describe("Painting requested days", () => {
     await clearDays(request, "Ana Ruiz", [...ANA_MARCH, ...ANA_LATE_NOVEMBER]);
   });
 
-  test("the toast says how many days over the allowance the request is (L2-030 AC5)", async ({ request, goto, pages }) => {
+  test("the toast says how many days over the allowance the request is (L2-030 AC5)", async ({ request, goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     // Four confirmed days in March leave Ana 7 days; she has 5 requested, so 3 more is 8 against 7.
     await paintDays(request, "Ana Ruiz", ANA_MARCH, "Confirmed");
     await goto("calendar", { as: "member", month: "2026-11" });
@@ -134,7 +140,8 @@ test.describe("Painting requested days", () => {
     await expect(pages.calendar.toastAction("Requested 3 days", "Undo")).toBeVisible();
   });
 
-  test("days within the allowance get the plain toast (L2-030)", async ({ goto, pages }) => {
+  test("days within the allowance get the plain toast (L2-030)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     // Ana has 11 left and 5 requested: 3 more is 8.
     await goto("calendar", { as: "member", month: "2026-11" });
     await pages.calendar.waitForReady();

@@ -5,7 +5,7 @@
 // Data: each viewport's juggler (Hana, Iris, Jude) manages Design team (default) and Product team; every test puts
 //       Design team back as the default and starts signed in on it. Maya (one team) and Ana (a member) are only read.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { forgetSignIn, founderFor, jugglerFor } from "../fixtures/session.js";
 import { managedTeams, resetTeams } from "../fixtures/teams.js";
 
@@ -102,7 +102,9 @@ test.describe("Switching teams from Your teams", () => {
   test("Switch to this team makes it active, says so, and every screen shows that team only (AC3)", async ({
     pages,
     teamsApi,
+    isMobile,
   }) => {
+    test.skip(isMobile, GRID_ONLY);
     await expect(pages.settings.teamNameField()).toHaveValue("Design team");
     const release = await teamsApi.holdSwitch();
 
@@ -220,7 +222,9 @@ test.describe("Adding another team", () => {
     goto,
     pages,
     request,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const founder = founderFor(testInfo.project.name);
     await goto("settings", { as: founder });
     await pages.settings.waitForTeams();

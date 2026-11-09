@@ -9,6 +9,7 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, combineLatest, map, of, startWith, switchMap, tap } from 'rxjs';
@@ -43,6 +44,7 @@ import { AppDialogs } from '../../dialogs/app-dialogs';
 import { NewRequestData, NewRequestDialog } from '../../dialogs/new-request/new-request.dialog';
 import { ToastService } from '../../toasts/toast.service';
 import { addMonths, calendarView, columnsFor, monthTitle } from './calendar-view';
+import { CalendarWeek } from './calendar-week';
 import { selectionBarView } from './selection-view';
 import { FAILED_SAVE, PaintContext, refusedToast, savedToast } from './paint-toasts';
 import { requestSentToast } from './request-toasts';
@@ -53,6 +55,9 @@ type Load =
   | { readonly state: 'error' };
 
 const MONTH_PARAM = /^\d{4}-(0[1-9]|1[0-2])$/;
+
+/** The grid's own breakpoint (docs/detailed-designs/sheet/phone-week). */
+const PHONE = '(max-width: 47.99rem)';
 
 /** The paint picker's choices; `select` is the Select mode of journey 12 (sheet/select-days). */
 type PaintChoice = 'select' | 'confirmed' | 'requested' | 'tentative' | 'clear';
@@ -97,7 +102,16 @@ function localMonth(): string {
  */
 @Component({
   selector: 'app-calendar-page',
-  imports: [PeriodNav, Legend, TeamGrid, SelectionBar, EmptyState, Button, SegmentedControl],
+  imports: [
+    PeriodNav,
+    Legend,
+    TeamGrid,
+    SelectionBar,
+    EmptyState,
+    Button,
+    SegmentedControl,
+    CalendarWeek,
+  ],
   template: `
     <div class="page-title-row">
       <gl-period-nav
@@ -109,12 +123,14 @@ function localMonth(): string {
       />
       @if (showPicker()) {
         <div class="toolbar-end">
-          <gl-segmented-control
-            label="Paint"
-            [options]="paintOptions()"
-            [value]="paintChoice()"
-            (valueChange)="choosePaint($event)"
-          />
+          @if (!phone()) {
+            <gl-segmented-control
+              label="Paint"
+              [options]="paintOptions()"
+              [value]="paintChoice()"
+              (valueChange)="choosePaint($event)"
+            />
+          }
           @if (canRequest()) {
             <gl-button variant="primary" (click)="requestTimeOff()">
               <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
@@ -126,12 +142,14 @@ function localMonth(): string {
         </div>
       }
     </div>
-    <div class="toolbar-row">
-      <gl-legend [schoolClosed]="schoolCalendar()" />
-      @if (showPicker()) {
-        <p class="text-caption">{{ hint() }}</p>
-      }
-    </div>
+    @if (!phone()) {
+      <div class="toolbar-row">
+        <gl-legend [schoolClosed]="schoolCalendar()" />
+        @if (showPicker()) {
+          <p class="text-caption">{{ hint() }}</p>
+        }
+      </div>
+    }
 
     @switch (load().state) {
       @case ('error') {
@@ -163,6 +181,10 @@ function localMonth(): string {
               <gl-button slot="actions" variant="primary" link="/settings">Open settings</gl-button>
             </gl-empty-state>
           </div>
+        } @else if (phone()) {
+          @if (loaded(); as sheet) {
+            <app-calendar-week [sheet]="sheet" />
+          }
         } @else {
           <gl-team-grid
             class="region"
@@ -248,6 +270,14 @@ export class CalendarPage {
   private readonly route = inject(ActivatedRoute);
   private readonly attempt = signal(0);
 
+  /** Narrower than 48rem the month grid does not fit: the calendar shows one week instead (L2-063). */
+  protected readonly phone = toSignal(
+    inject(BreakpointObserver)
+      .observe(PHONE)
+      .pipe(map((state) => state.matches)),
+    { initialValue: false },
+  );
+
   /** The month in the address, when it is a valid `yyyy-MM`. */
   private readonly requested = toSignal(
     this.route.queryParamMap.pipe(
@@ -275,7 +305,9 @@ export class CalendarPage {
     { initialValue: { state: 'loading' } as Load },
   );
 
-  private readonly loaded = computed(() => (this.load().state === 'ready' ? this.current() : null));
+  protected readonly loaded = computed(() =>
+    this.load().state === 'ready' ? this.current() : null,
+  );
 
   /** The connection came back (L2-045 AC3): quietly read the month again so "Everything is up to date" is true. */
   private readonly reloadOnReturn = effect(() => {

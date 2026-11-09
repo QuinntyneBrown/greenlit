@@ -4,9 +4,11 @@
 // Data: the demo seed. Ana has 11 days left and 5 requested (16-20 Nov). Each test first requests her 7-11 Dec
 //       through the API (10 requested), so one more working day fits and the next goes over; 7-18 Dec is cleared after.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { clearDays, paintDays, weekdays } from "../fixtures/days.js";
 
+
+test.skip(({ isMobile }) => isMobile, GRID_ONLY);
 const ANA_DECEMBER = weekdays("2026-12-07", "2026-12-18");
 
 test.describe("The selection bar and the allowance", () => {

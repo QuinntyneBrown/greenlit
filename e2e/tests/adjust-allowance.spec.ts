@@ -5,7 +5,7 @@
 // Data: each viewport's inviter (Uma, Vic, Wren) manages a team of their own with Ben Okafor, made through the API.
 //       Adjustments cannot be taken back, so every test reads days left before it acts and expects the change.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { inviterFor } from "../fixtures/session.js";
 import { ensureMember, ensureOwnTeam } from "../fixtures/team.js";
 
@@ -68,7 +68,9 @@ test.describe("Adjusting a member's allowance", () => {
     goto,
     pages,
     adjustmentsApi,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const manager = inviterFor(testInfo.project.name);
     const before = Number(await pages.person.daysLeft().innerText());
     const rowsBefore = await pages.person.rows("Allowance adjustments").count();

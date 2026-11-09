@@ -2,8 +2,10 @@
 // Traces to: L2-012
 // Description: Moving between months, returning to today, the legend, and the empty, error and loading states.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 
+
+test.skip(({ isMobile }) => isMobile, GRID_ONLY);
 test.describe("Calendar navigation", () => {
   test("Previous and Next month change the month and the title (L2-012 AC3)", async ({ goto, pages }) => {
     await goto("calendar", { month: "2026-11" });

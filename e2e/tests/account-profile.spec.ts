@@ -4,7 +4,7 @@
 //              account menu, the new email is the one to sign in with, and an email another account uses is refused.
 // Data: fresh members of the viewport's inviter team (fixtures/account.ts); a profile change never touches a seeded person.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { freshAccount } from "../fixtures/account.js";
 import { OLD_PASSWORD, signInStatus } from "../fixtures/password-reset.js";
 import { freshEmail } from "../fixtures/invitation.js";
@@ -29,7 +29,8 @@ test.describe("Account: edit the profile", () => {
     await expect(pages.account.saveChanges()).toBeDisabled();
   });
 
-  test("a new display name is saved and appears in the account menu and on the calendar (AC5)", async ({ goto, pages, request }, testInfo) => {
+  test("a new display name is saved and appears in the account menu and on the calendar (AC5)", async ({ goto, pages, request, isMobile }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const tag = Date.now().toString(36);
     const account = await freshAccount(request, inviterFor(testInfo.project.name), `Before ${tag}`);
     await goto("account", { session: account.token });

@@ -54,6 +54,8 @@ export * from './lib/legend/legend';
 export * from './lib/stat/stat';
 export * from './lib/month-mini/month-mini';
 export * from './lib/run-list/run-list';
+export * from './lib/week-tabs/week-tabs';
+export * from './lib/week-strip/week-strip';
 
 // identity and status
 export * from './lib/avatar/avatar';

@@ -1576,3 +1576,11 @@ export const test = base.extend<GlFixtures>({
 });
 
 export { expect };
+
+/**
+ * Why a test of the month grid skips on a phone: narrower than 48rem the calendar shows one week instead of the grid
+ * and the paint picker (L2-063), and the phone's own specs (tests/calendar-phone*.spec.ts) cover it. Use it as
+ * `test.skip(({ isMobile }) => isMobile, GRID_ONLY)` for a whole file or describe, or `test.skip(isMobile, GRID_ONLY)`
+ * inside one test.
+ */
+export const GRID_ONLY = "The month grid is for tablets and desktops; a phone shows the week instead (L2-063).";

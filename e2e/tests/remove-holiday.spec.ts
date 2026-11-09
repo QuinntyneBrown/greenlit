@@ -7,7 +7,7 @@
 //       second run on the same database passes too.
 
 import { APIRequestContext } from "@playwright/test";
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { wednesdayFor } from "../fixtures/dates.js";
 import { ensureDayOff } from "../fixtures/holidays.js";
 import { SettingsPage } from "../pages/settings.page.js";
@@ -61,7 +61,9 @@ test.describe("Removing a holiday", () => {
     holidaysApi,
     pages,
     request,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const project = testInfo.project.name;
     const day = await openSettings({ goto, pages, request }, project, SLOT.confirm, "Confirm day");
     await pages.settings.removeHolidayButton("Confirm day").click();

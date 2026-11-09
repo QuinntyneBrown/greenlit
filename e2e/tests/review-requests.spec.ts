@@ -6,7 +6,7 @@
 //       Dev Patel 18-19 Nov and Elif Yilmaz 29-31 Dec. Approved: Finn, Dev, Cleo. Declined: Ben with a
 //       reason; Ana's cancelled request is listed with them. Specs that approve put everything back.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { clearDays } from "../fixtures/days.js";
 import { confirmDays, memberId, reopenApproved } from "../fixtures/requests.js";
 
@@ -299,7 +299,8 @@ test.describe("Approving several requests at once", () => {
     await expect(pages.requests.selectAll()).toBeChecked();
   });
 
-  test("Approve 3 approves the three together, as one approval each, and says so once (L2-026 AC3)", async ({ goto, pages, requestsApi }) => {
+  test("Approve 3 approves the three together, as one approval each, and says so once (L2-026 AC3)", async ({ goto, pages, requestsApi, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     test.skip(test.info().project.name === "mobile", "The mock shows a tick on each row from tablet width up; on a phone Select all is the way (L2-026 AC2).");
     await goto("requests");
     await pages.requests.waitForReady();

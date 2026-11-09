@@ -6,7 +6,7 @@
 //       link is read from the e2e API's log (fixtures/invitation.ts, ADR-006).
 
 import { createTeam, freshMemberOf, freshPerson, inviteTo } from "../fixtures/households.js";
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { freshEmail, invite, paintDays } from "../fixtures/invitation.js";
 import { API_BASE_URL, PEOPLE, SESSION_KEY, inviterFor } from "../fixtures/session.js";
 import { ensureOwnTeam } from "../fixtures/team.js";
@@ -101,7 +101,9 @@ test.describe("Accepting an invitation", () => {
     page,
     pages,
     request,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const inviter = inviterFor(testInfo.project.name);
     const invitation = await invite(request, inviter, "Finn Murphy", freshEmail("finn"));
     const day = nextWeekday(3);
@@ -145,7 +147,9 @@ test.describe("Accepting an invitation", () => {
     page,
     pages,
     request,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const invitation = await invite(request, inviterFor(testInfo.project.name), "Finn Murphy", freshEmail("finn"));
     await goto("acceptInvite", { token: invitation.token });
     await pages.acceptInvite.waitForReady();

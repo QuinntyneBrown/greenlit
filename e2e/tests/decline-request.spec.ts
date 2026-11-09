@@ -5,7 +5,7 @@
 // Data: the demo seed, November 2026. Ana's 16-20 Nov request is pending (Dev is also out 18-19 Nov).
 //       Every test puts Ana's request back to pending, so the shared database is left as it was found.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { emailsTo, logMark, reopenDeclined } from "../fixtures/requests.js";
 
 const WEEK = ["Mon 16 Nov", "Tue 17 Nov", "Wed 18 Nov", "Thu 19 Nov", "Fri 20 Nov"];
@@ -37,7 +37,8 @@ test.describe("Declining a request", () => {
     await expect(dialog.reason()).toBeFocused();
   });
 
-  test("declining with a reason turns the days blue, emails Ana the reason and offers Undo (L2-025 AC2, AC3)", async ({ goto, pages }) => {
+  test("declining with a reason turns the days blue, emails Ana the reason and offers Undo (L2-025 AC2, AC3)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     const mark = await logMark();
     await goto("requests");
     await pages.requests.waitForReady();
@@ -135,7 +136,8 @@ test.describe("Declining a request", () => {
     await expect(pages.requests.row("Ana Ruiz")).toHaveCount(0);
   });
 
-  test("Undo puts the request back to pending and its days back to yellow (L2-025 AC3)", async ({ goto, pages }) => {
+  test("Undo puts the request back to pending and its days back to yellow (L2-025 AC3)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("requests");
     await pages.requests.waitForReady();
     await pages.requests.decline("Ana Ruiz").click();

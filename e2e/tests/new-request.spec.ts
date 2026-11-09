@@ -5,7 +5,7 @@
 // Data: the demo seed, December 2026. Ana's 7-11 Dec is blank and cleared after each test; Christmas Day
 //       (Fri 25) and Boxing Day (Mon 28) are holidays; Ana has requested 16-20 Nov.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { clearDays } from "../fixtures/days.js";
 
 const ANA_REQUESTED = ["2026-12-07", "2026-12-08", "2026-12-09", "2026-12-10", "2026-12-11", "2026-12-14"];
@@ -59,7 +59,8 @@ test.describe("Requesting time off", () => {
     await expect(pages.calendar.requestTimeOff()).toBeFocused();
   });
 
-  test("Cancel closes the dialog and sends nothing", async ({ goto, pages, requestsApi }) => {
+  test("Cancel closes the dialog and sends nothing", async ({ goto, pages, requestsApi, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: "member", month: "2026-12" });
     await pages.calendar.waitForReady();
     await pages.calendar.requestTimeOff().click();
@@ -137,7 +138,9 @@ test.describe("Requesting time off", () => {
     goto,
     pages,
     requestsApi,
+    isMobile,
   }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: "member", month: "2026-12" });
     await pages.calendar.waitForReady();
     await pages.calendar.requestTimeOff().click();
@@ -169,7 +172,8 @@ test.describe("Requesting time off", () => {
     expect(requestsApi.sends()).toBe(1);
   });
 
-  test("Enter in the note sends the request from the keyboard", async ({ goto, page, pages }) => {
+  test("Enter in the note sends the request from the keyboard", async ({ goto, page, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: "member", month: "2026-12" });
     await pages.calendar.waitForReady();
     await pages.calendar.requestTimeOff().click();
@@ -183,7 +187,8 @@ test.describe("Requesting time off", () => {
     await expect(pages.calendar.cell("Ana Ruiz", "Mon 7 Dec")).toHaveAttribute("data-status", "requested");
   });
 
-  test("a failed send keeps the dates and offers Try again (L2-019 AC6)", async ({ goto, pages, requestsApi }) => {
+  test("a failed send keeps the dates and offers Try again (L2-019 AC6)", async ({ goto, pages, requestsApi, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: "member", month: "2026-12" });
     await pages.calendar.waitForReady();
     await pages.calendar.requestTimeOff().click();

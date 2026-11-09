@@ -5,7 +5,7 @@
 // Data: the demo seed, November 2026, minimum 4 of 7. Ana is out 16-20 Nov (requested), Dev 18-19 Nov; the
 //       tests confirm Ben and Cleo on 18 Nov (4 out, 3 in) and clear them afterwards.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { clearDays } from "../fixtures/days.js";
 import { confirmDays, memberId } from "../fixtures/requests.js";
 
@@ -19,7 +19,8 @@ test.describe("Coverage flags", () => {
     await clearDays(request, "Cleo Park", ["2026-11-18"]);
   });
 
-  test("a day with fewer people in than the minimum is outlined and says so; a day with enough is not (L2-042 AC1)", async ({ goto, pages }) => {
+  test("a day with fewer people in than the minimum is outlined and says so; a day with enough is not (L2-042 AC1)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { month: "2026-11" });
     await pages.calendar.waitForReady();
 

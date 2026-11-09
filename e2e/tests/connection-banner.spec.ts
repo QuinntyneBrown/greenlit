@@ -3,14 +3,16 @@
 // Description: The banner that reports the connection and the read-only calendar while offline.
 // Data: the demo seed, November 2026. Nothing is saved, so no data is changed.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { clearDays, paintDays } from "../fixtures/days.js";
 
 test.describe("Connection banners", () => {
   test("going offline shows a banner with no dismiss button and makes the calendar read-only (L2-045 AC1)", async ({
     goto,
     pages,
+    isMobile,
   }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: "member", month: "2026-11" });
     await pages.calendar.waitForReady();
     await expect(pages.connection.banner()).toHaveCount(0);
@@ -30,7 +32,8 @@ test.describe("Connection banners", () => {
     await expect(pages.calendar.paintOption("Clear")).toBeDisabled();
   });
 
-  test("selecting days does nothing while offline (L2-045 AC1)", async ({ goto, pages }) => {
+  test("selecting days does nothing while offline (L2-045 AC1)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: "member", month: "2026-11" });
     await pages.calendar.waitForReady();
     await pages.connection.goOffline();
@@ -46,7 +49,9 @@ test.describe("Connection banners", () => {
     goto,
     pages,
     connectionApi,
+    isMobile,
   }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: "member", month: "2026-11" });
     await pages.calendar.waitForReady();
     await pages.connection.goOffline();
@@ -62,7 +67,8 @@ test.describe("Connection banners", () => {
     release();
   });
 
-  test("a check that cannot reach Greenlit leaves the banner offline", async ({ goto, pages, connectionApi }) => {
+  test("a check that cannot reach Greenlit leaves the banner offline", async ({ goto, pages, connectionApi, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: "member", month: "2026-11" });
     await pages.calendar.waitForReady();
     await pages.connection.goOffline();
@@ -86,7 +92,9 @@ test.describe("Connection banners", () => {
     test("the banner says back online, leaves after 5 s, and painting works again (L2-045 AC3)", async ({
       goto,
       pages,
+      isMobile,
     }) => {
+      test.skip(isMobile, GRID_ONLY);
       await goto("calendar", { as: "member", month: "2026-11" });
       await pages.calendar.waitForReady();
       await pages.connection.goOffline();
@@ -107,7 +115,9 @@ test.describe("Connection banners", () => {
       goto,
       pages,
       request,
+      isMobile,
     }) => {
+      test.skip(isMobile, GRID_ONLY);
       await goto("calendar", { as: "member", month: "2026-11" });
       await pages.calendar.waitForReady();
       await expect(pages.calendar.cell("Ana Ruiz", "Mon 23 Nov")).toHaveAttribute("data-status", "empty");
@@ -152,7 +162,8 @@ test.describe("Connection banners", () => {
       await expect(pages.connection.banner()).toHaveCount(0);
     });
 
-    test("the unstable banner leaves when a request gets through again", async ({ goto, pages, connectionApi }) => {
+    test("the unstable banner leaves when a request gets through again", async ({ goto, pages, connectionApi, isMobile }) => {
+      test.skip(isMobile, GRID_ONLY);
       await goto("calendar", { as: "member", month: "2026-11" });
       await pages.calendar.waitForReady();
       await connectionApi.dropMonth();
