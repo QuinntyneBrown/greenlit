@@ -5,7 +5,7 @@
 //              which are confirmed. With it off, nothing about children shows.
 // Data: fresh accounts from fixtures/households.ts: Maya manages Chen family.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import {
   addChild,
   createTeam,
@@ -68,7 +68,9 @@ test.describe("Children on the sheet", () => {
     goto,
     page,
     pages,
+    isMobile,
   }) => {
+    test.skip(isMobile, GRID_ONLY);
     const maya = await chenFamily(page.request);
     const leo = await addChild(page.request, maya, "Leo Chen");
 
@@ -87,7 +89,8 @@ test.describe("Children on the sheet", () => {
     await expect(pages.person.noAllowanceNote()).toHaveText("Children have no yearly allowance.");
   });
 
-  test("the manager's paint on a login-less child is confirmed (L2-060 AC4)", async ({ goto, page, pages }) => {
+  test("the manager's paint on a login-less child is confirmed (L2-060 AC4)", async ({ goto, page, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     const maya = await chenFamily(page.request);
     await addChild(page.request, maya, "Leo Chen");
     await goto("calendar", { session: maya.token, month: "2026-11" });

@@ -4,7 +4,7 @@
 // Data: the demo seed, November 2026, minimum of 4 (seven people). Painting Ana, Cleo, Elif and Finn confirmed on
 //       24–26 Nov leaves three in (Ben's tentative days do not count): one run, as pages/calendar/phone-range. Each
 //       viewport's juggler manages a Design team of two with no minimum (Kit Brown is the other row); each viewport's
-//       founder manages a Studio team of one. Every test puts back what it painted.
+//       founder manages a Studio team of one, whose week shows only the founder's row. Every test puts back what it painted.
 //
 // Given a team of seven with a minimum of 4, when nobody is short, then the card says "Never below the minimum in
 //   November" and lists nothing, and no week tab carries a marker.
@@ -20,7 +20,7 @@
 import { test, expect } from "../fixtures/gl-test.js";
 import { setCoverageMinimum } from "../fixtures/coverage.js";
 import { clearDays, paintDays, weekdays } from "../fixtures/days.js";
-import { founderFor, jugglerFor } from "../fixtures/session.js";
+import { PEOPLE, founderFor, jugglerFor } from "../fixtures/session.js";
 import { resetTeams } from "../fixtures/teams.js";
 
 const RUN = weekdays("2026-11-24", "2026-11-26");
@@ -122,7 +122,9 @@ test.describe("Days short of people on a phone", () => {
     await goto("calendar", { month: "2026-11", as: founderFor(testInfo.project.name) });
     await pages.calendar.waitForReady();
 
-    await expect(pages.calendar.emptyState()).toBeVisible();
+    // A team of one is a full sheet (L2-057, L2-012 AC6): the week shows the manager's row, with no card.
+    await expect(pages.calendar.emptyState()).toHaveCount(0);
+    await expect(pages.calendar.weekMemberNames()).toHaveText([PEOPLE[founderFor(testInfo.project.name)].name]);
     await expect(pages.calendar.shortDaysCard()).toHaveCount(0);
   });
 });

@@ -3,14 +3,16 @@
 // Description: A person who is only a member of a team can set up another team and becomes its manager.
 // Data: fresh accounts from fixtures/households.ts.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { createTeam, freshMemberOf, freshPerson } from "../fixtures/households.js";
 
 test("a member of another team sets up a team of their own and manages it (L2-008 AC8, L2-055 AC1)", async ({
   goto,
   page,
   pages,
+  isMobile,
 }) => {
+  test.skip(isMobile, GRID_ONLY);
   const omar = await freshPerson(page.request, "Omar Haddad");
   await createTeam(page.request, omar, "Product team");
   const sam = await freshMemberOf(page.request, omar, "Sam Chen");
