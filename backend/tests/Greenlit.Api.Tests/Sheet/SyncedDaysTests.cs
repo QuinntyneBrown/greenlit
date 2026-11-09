@@ -235,6 +235,21 @@ public class SyncedDaysTests : IClassFixture<GreenlitApiFactory>
         (await _factory.ReadAsync(db => db.TimeOffDays.Count(d => rows.Contains(d.TeamMemberId) && d.IsSynced))).Should().Be(0);
     }
 
+    [Fact]
+    public async Task A_row_removed_from_its_team_keeps_its_days_and_no_longer_gives_or_receives_synced_days()
+    {
+        // L2-064 AC8, L2-011. Given Sam was removed from Chen family, when he marks a day in Product team, then nothing is
+        // synced to his removed row, and his days there stay as history.
+        var (product, family) = await SamOnTwoTeamsAsync();
+        await family.SetDayAsync("Sam Chen", new DateOnly(2026, 11, 20), DayStatus.Confirmed);
+        await _factory.WriteAsync(db => db.TeamMembers.Single(m => m.Id == family.MemberIdOf("Sam Chen")).RemovedUtc = DateTimeOffset.UtcNow);
+
+        (await SetAsync(product, "Sam Chen", "Sam Chen", ["2026-11-17"], "Tentative")).StatusCode.Should().Be(HttpStatusCode.OK);
+
+        (await StoredDaysAsync(family.MemberIdOf("Sam Chen"))).Should().Equal(new DateOnly(2026, 11, 20));
+        (await StoredDaysAsync(product.MemberIdOf("Sam Chen"))).Should().Equal(new DateOnly(2026, 11, 17));
+    }
+
     /// <summary>Sam Chen is a member of Product team (manager Omar Diaz) and of Chen family (manager Maya Chen).</summary>
     private async Task<(TestTeam Product, TestTeam Family)> SamOnTwoTeamsAsync()
     {

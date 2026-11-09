@@ -20,14 +20,15 @@ internal static class DaySync
         if (userId is null || dates.Count == 0) return;
 
         // The query filter leaves out removed rows: they neither give nor receive synced days (ADR-016).
-        var rows = await db.TeamMembers.AsNoTracking()
-            .Include(m => m.Team)
-            .Where(m => m.UserId == userId)
-            .ToListAsync(ct);
+        // A row the caller has just attached to the account (joining, L2-064 AC8) counts before it is saved.
+        var stored = await db.TeamMembers.AsNoTracking().Where(m => m.UserId == userId).ToListAsync(ct);
+        var tracked = db.TeamMembers.Local.Where(m => m.UserId == userId && m.RemovedUtc == null).ToList();
+        var rows = tracked.Concat(stored.Where(m => tracked.All(t => t.Id != m.Id))).ToList();
         if (rows.Count < 2) return;
 
         var rowIds = rows.Select(r => r.Id).ToList();
         var teamIds = rows.Select(r => r.TeamId).Distinct().ToList();
+        var teams = await db.Teams.AsNoTracking().Where(t => teamIds.Contains(t.Id)).ToDictionaryAsync(t => t.Id, ct);
         var dateList = dates.Distinct().ToList();
         var holidays = (await db.Holidays.AsNoTracking()
                 .Where(h => teamIds.Contains(h.TeamId) && dateList.Contains(h.Date))
@@ -54,7 +55,7 @@ internal static class DaySync
                 if (mine is { IsSynced: false }) continue;
 
                 var bookedElsewhere = onDate.Any(d => d.TeamMemberId != row.Id && !d.IsSynced);
-                var working = !WorkingDayRule.IsOffDay(date, WorkingDayRule.For(row.Team, row))
+                var working = !WorkingDayRule.IsOffDay(date, WorkingDayRule.For(teams[row.TeamId], row))
                     && !holidays.Contains((row.TeamId, date));
                 var wanted = bookedElsewhere && working;
 
