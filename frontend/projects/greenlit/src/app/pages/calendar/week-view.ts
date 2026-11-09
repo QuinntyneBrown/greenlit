@@ -340,3 +340,20 @@ export function markSheetView(sheet: SheetMonth, range: PhoneRange): MarkSheetVi
     dates,
   };
 }
+
+// ---- the holiday line under the legend (L2-063 AC13) ----
+
+/** "25 Dec is Christmas Day. It never counts as time off."; null when the week holds no holiday. */
+export function holidayNote(sheet: SheetMonth, week: MonthWeek): string | null {
+  const holidays = new Map<string, string>();
+  for (const cell of sheet.members.flatMap((m) => m.cells)) {
+    if (cell.kind === 'Holiday' && week.dates.includes(cell.date)) {
+      holidays.set(cell.date, cell.holidayName ?? 'a holiday');
+    }
+  }
+  if (holidays.size === 0) return null;
+  const said = [...holidays.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, name]) => `${dayLabel(date).split(' ').slice(1).join(' ')} is ${name}`);
+  return `${names(said)}. ${holidays.size === 1 ? 'It never counts' : 'They never count'} as time off.`;
+}

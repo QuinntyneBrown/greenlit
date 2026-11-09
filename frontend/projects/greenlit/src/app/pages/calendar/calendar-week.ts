@@ -10,6 +10,7 @@ import {
 
 import { SheetMonth } from 'api';
 import {
+  Legend,
   MarkSheet,
   SelectionAction,
   WeekStrip,
@@ -24,6 +25,7 @@ import {
   markSheetView,
   rangeDates,
   dayPanelView,
+  holidayNote,
   shortDates,
   shortDaysHeading,
   shortRuns,
@@ -47,7 +49,7 @@ export interface PhoneMark {
  */
 @Component({
   selector: 'app-calendar-week',
-  imports: [WeekTabs, WeekStrip, MarkSheet],
+  imports: [WeekTabs, WeekStrip, MarkSheet, Legend],
   template: `
     @if (heading(); as heading) {
       <section class="panel short-days" aria-label="Days short of people">
@@ -130,6 +132,12 @@ export interface PhoneMark {
         }
       </section>
     }
+    <div class="phone-legend">
+      <gl-legend [band]="true" />
+      @if (note(); as note) {
+        <p class="phone-legend__note">{{ note }}</p>
+      }
+    </div>
     @if (markView(); as mark) {
       <gl-mark-sheet
         [who]="mark.who"
@@ -162,6 +170,14 @@ export interface PhoneMark {
     }
     :host > * + * {
       margin-top: var(--space-3);
+    }
+    .phone-legend {
+      padding-inline: var(--space-1);
+    }
+    .phone-legend__note {
+      margin: var(--space-3) 0 0;
+      font: var(--text-body-sm);
+      color: var(--color-fg-muted);
     }
     .phone-hint {
       position: fixed;
@@ -376,6 +392,11 @@ export class CalendarWeek {
   protected readonly tabs = computed(() => weekTabs(this.weeks(), this.short()));
   protected readonly strip = computed(() =>
     weekStripView(this.sheet(), this.weeks()[this.week()] ?? this.weeks()[0], this.short()),
+  );
+
+  /** Names the holidays of the week shown (L2-063 AC13). */
+  protected readonly note = computed(() =>
+    holidayNote(this.sheet(), this.weeks()[this.week()] ?? this.weeks()[0]),
   );
 
   /** The panel of the open date (L2-063 AC6). */
