@@ -143,7 +143,9 @@
         "L2-059",
         "L2-060",
         "L2-061",
-        "L2-063"
+        "L2-063",
+        "L1-015",
+        "L2-064"
       ],
       "states": [
         "default",
@@ -166,7 +168,10 @@
         "phone-member",
         "phone-picking",
         "phone-range",
-        "phone-day"
+        "phone-day",
+        "member-synced",
+        "manager-synced",
+        "phone-synced"
       ],
       "route": "/"
     },
@@ -707,7 +712,9 @@
       "title": "Calendar toast",
       "requirements": [
         "L1-003",
-        "L1-004"
+        "L1-004",
+        "L1-015",
+        "L2-064"
       ],
       "states": [
         "info",
@@ -715,7 +722,8 @@
         "warning",
         "danger",
         "with-action",
-        "stacked"
+        "stacked",
+        "synced-locked"
       ],
       "opens_from": "calendar"
     },
