@@ -117,6 +117,7 @@ import {
         [over]="mark.over"
         [clash]="mark.clash"
         [canConfirm]="sheet().isManager"
+        (single)="finishRange(null)"
         (cancelled)="range.set(null)"
       />
     } @else {
@@ -381,7 +382,17 @@ export class CalendarWeek {
   /** A tap on a cell the person may change picks it as the first day, and closes an open day (L2-063 AC7). */
   protected tapCell(tap: WeekStripTap): void {
     this.openDate.set(null);
-    this.range.set({ memberId: tap.memberId, from: tap.date, to: null });
+    const range = this.range();
+    if (range && range.to === null && range.memberId === tap.memberId) {
+      this.finishRange(tap.date);
+    } else {
+      this.range.set({ memberId: tap.memberId, from: tap.date, to: null });
+    }
+  }
+
+  /** The second tap on the same row, in either order, ends the range; "Just this day" ends it on the first (AC8). */
+  protected finishRange(last: string | null): void {
+    this.range.update((range) => (range ? { ...range, to: last ?? range.from } : null));
   }
 
   /** A short-days run shows its week and opens its first day (L2-063 AC4). */
