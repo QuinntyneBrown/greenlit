@@ -1,5 +1,6 @@
 using Greenlit.Application.Abstractions;
 using Greenlit.Application.Auth;
+using Greenlit.Application.Sheet;
 using Greenlit.Application.Exceptions;
 using Greenlit.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,26 @@ internal static class InvitationMembership
         var tracked = await db.Users.SingleAsync(u => u.Id == user.Id, ct);
         if (tracked.DefaultTeamId is null || !await db.TeamMembers.AnyAsync(m => m.UserId == user.Id && m.TeamId == tracked.DefaultTeamId, ct))
             tracked.DefaultTeamId = open.Team.Id;
+        await SyncFutureDaysAsync(db, time, open, user.Id, ct);
         await db.SaveChangesAsync(ct);
         return await Sessions.IssueAsync(db, tokens, tracked, open.Member, ct);
+    }
+
+    /// <summary>
+    /// The person's days from today on, on every live row, are synced to each other row, the new one included
+    /// (L2-064 AC8, ADR-016). Past days are not copied.
+    /// </summary>
+    private static async Task SyncFutureDaysAsync(IAppDbContext db, TimeProvider time, OpenInvitation open, Guid userId, CancellationToken ct)
+    {
+        var zone = TimeZoneInfo.FindSystemTimeZoneById(open.Team.TimeZone);
+        var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(time.GetUtcNow(), zone).DateTime);
+        var rowIds = await db.TeamMembers.Where(m => m.UserId == userId).Select(m => m.Id).ToListAsync(ct);
+        rowIds.Add(open.Member.Id);
+        var dates = await db.TimeOffDays
+            .Where(d => rowIds.Contains(d.TeamMemberId) && !d.IsSynced && d.Date >= today)
+            .Select(d => d.Date)
+            .Distinct()
+            .ToListAsync(ct);
+        await DaySync.ReconcileAsync(db, userId, dates, time.GetUtcNow(), ct);
     }
 }
