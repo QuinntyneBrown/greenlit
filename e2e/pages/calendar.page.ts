@@ -145,6 +145,9 @@ export class CalendarPage extends BasePage {
   /** Chooses a paint colour: "Confirmed", "Requested", "Tentative" or "Clear". */
   async choosePaint(name: string): Promise<void> {
     await this.paintOption(name).click();
+    // The option is checked once the app has rendered the choice, which is also when the sheet has it; a key pressed
+    // on a cell before that render would find no paint, which no person can do.
+    await this.paintOption(name).and(this.page.locator('[aria-checked="true"]')).waitFor();
   }
 
   /** The line beside the legend that says how to paint. */
