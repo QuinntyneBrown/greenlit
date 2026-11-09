@@ -6,7 +6,7 @@
 //       Google is a stand-in (fixtures/google.ts) read by the e2e API's fake accounts reader (ADR-012).
 
 import { createTeam, freshMemberOf, freshPerson, inviteTo } from "../fixtures/households.js";
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { freshEmail, invite, join, paintDays } from "../fixtures/invitation.js";
 import { API_BASE_URL, PEOPLE, SESSION_KEY, inviterFor } from "../fixtures/session.js";
 import { ensureOwnTeam } from "../fixtures/team.js";
@@ -76,7 +76,9 @@ test.describe("Joining with Google", () => {
     page,
     pages,
     request,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const inviter = inviterFor(testInfo.project.name);
     const invitation = await invite(request, inviter, "Finn M", freshEmail("finn"));
     const day = nextWeekday(3);

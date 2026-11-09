@@ -5,7 +5,7 @@
 // Data: the demo seed, December 2026. Each test sends its own request for Ana, 21-22 Dec ("Winter break"),
 //       so the seeded 16-20 Nov request stays pending; Ana's 21-22 Dec days are cleared after each test.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { clearDays } from "../fixtures/days.js";
 import { sendOwnRequest } from "../fixtures/requests.js";
 
@@ -65,7 +65,8 @@ test.describe("Cancelling a request", () => {
     await expect(button).toBeFocused();
   });
 
-  test("confirming cancels it: the request moves to Past as Cancelled and its days turn blue (AC2)", async ({ goto, pages }) => {
+  test("confirming cancels it: the request moves to Past as Cancelled and its days turn blue (AC2)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("myRequests", { as: "member" });
     await pages.requests.waitForReady();
     await pages.requests.cancelRequest(pages.requests.myRequest("Upcoming", RANGE)).click();

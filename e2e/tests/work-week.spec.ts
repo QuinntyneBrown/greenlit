@@ -4,7 +4,7 @@
 // Data: each viewport's inviter (Uma, Vic, Wren) manages a team of their own with a teammate; every test
 //       puts the work week back to Mon-Fri when it is done, so the demo team and the other specs never see it.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { februaryFriday } from "../fixtures/dates.js";
 import { PEOPLE, inviterFor } from "../fixtures/session.js";
 import { ensureMember, ensureOwnTeam } from "../fixtures/team.js";
@@ -42,7 +42,9 @@ test.describe("The team's work week", () => {
   test("a saved work week is what Settings shows next time, and its off days are red on every row (L2-039 AC1, AC2)", async ({
     goto,
     pages,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const manager = inviterFor(testInfo.project.name);
     const friday = februaryFriday();
     await pages.settings.workingDay("Fri").click();

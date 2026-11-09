@@ -5,7 +5,7 @@
 //       viewport's inviter (Uma, Vic, Wren) manages a team of their own, made through the API. Inviting
 //       the same address again sends a new link, so a second run on the same database passes too.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { inviterFor } from "../fixtures/session.js";
 import { ensureOwnTeam } from "../fixtures/team.js";
 
@@ -67,7 +67,9 @@ test.describe("Inviting a member", () => {
   test("sending shows Sending…, then the invite is sent and the person is on the calendar (L2-010 AC3)", async ({
     membersApi,
     pages,
+    isMobile,
   }) => {
+    test.skip(isMobile, GRID_ONLY);
     await pages.settings.waitForReady();
     await pages.settings.openInviteDialog();
     const dialog = pages.inviteMember;

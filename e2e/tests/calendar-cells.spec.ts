@@ -3,8 +3,10 @@
 // Description: Every cell says its state in colour, glyph and accessible name; the Out row counts who is out.
 // Data: the demo seed (docs/mocks/README.md), November and December 2026.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 
+
+test.skip(({ isMobile }) => isMobile, GRID_ONLY);
 test.describe("Calendar cells", () => {
   test.beforeEach(async ({ goto, pages }) => {
     await goto("calendar", { month: "2026-11" });

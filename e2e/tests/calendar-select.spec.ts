@@ -3,8 +3,10 @@
 // Description: In Select mode a click or drag selects a range on one row and the selection bar names it.
 // Data: the demo seed, November 2026 (1 Nov is a Sunday). Nothing is changed by selecting.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 
+
+test.skip(({ isMobile }) => isMobile, GRID_ONLY);
 test.describe("Selecting days", () => {
   test("a drag selects the cells and the bar names the member, range and working days (L2-016 AC1)", async ({ goto, pages }) => {
     await goto("calendar", { as: "member", month: "2026-11" });

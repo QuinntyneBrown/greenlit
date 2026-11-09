@@ -5,7 +5,7 @@
 // Data: each viewport's juggler (Hana, Iris, Jude) manages Design team (default) and Product team; every test puts
 //       Design team back as the default and starts signed in on it. Maya (one team) and Ana (a member) are only read.
 
-import { test, expect, isPhone } from "../fixtures/gl-test.js";
+import { test, expect, isPhone, GRID_ONLY } from "../fixtures/gl-test.js";
 import { jugglerFor } from "../fixtures/session.js";
 import { resetTeams } from "../fixtures/teams.js";
 
@@ -121,7 +121,9 @@ test.describe("Switching from the header", () => {
     goto,
     page,
     pages,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: jugglerFor(testInfo.project.name) });
     await pages.calendar.waitForReady();
     await pages.teamSwitcher.button().focus();
@@ -152,7 +154,9 @@ test.describe("Switching from the header", () => {
   test("a person page belongs to one team, so a switch from it opens the calendar (AC11)", async ({
     goto,
     pages,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const juggler = jugglerFor(testInfo.project.name);
     await goto("person", { as: juggler, person: "Kit Brown" });
     await pages.person.waitForReady();
@@ -174,7 +178,8 @@ test.describe("Switching from the header", () => {
     await expect(pages.teamSwitcher.buttonName()).toHaveText("Design team");
   });
 
-  test("a failed switch says so and keeps the team (AC9)", async ({ goto, pages, teamsApi }, testInfo) => {
+  test("a failed switch says so and keeps the team (AC9)", async ({ goto, pages, teamsApi, isMobile }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { as: jugglerFor(testInfo.project.name) });
     await pages.calendar.waitForReady();
     await teamsApi.failSwitch();

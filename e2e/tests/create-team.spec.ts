@@ -2,7 +2,7 @@
 // Traces to: L2-008
 // Description: A signed-in person on no team sets up a team in one form and lands on its calendar.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { creatorFor, DEMO_PASSWORD, PEOPLE } from "../fixtures/session.js";
 
 test.describe("Creating a team, the form", () => {
@@ -185,7 +185,9 @@ test.describe("Creating a team, getting there", () => {
 test("a new manager creates Design team and finds its rows and UK holidays on the calendar (L2-008 AC5, AC7)", async ({
   goto,
   pages,
+  isMobile,
 }, testInfo) => {
+  test.skip(isMobile, GRID_ONLY);
   const creator = PEOPLE[creatorFor(testInfo.project.name)];
   await goto("createTeam", { as: creatorFor(testInfo.project.name) });
   await pages.createTeam.waitForReady();

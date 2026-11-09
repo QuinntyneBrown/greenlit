@@ -3,12 +3,13 @@
 // Description: The calendar shows one month for the whole team, laid out like the sheet it replaces.
 // Data: the demo seed is the mocks' cast (docs/mocks/README.md), November 2026 as pages/calendar/default.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 
 const CAST = ["Maya Chen", "Ana Ruiz", "Ben Okafor", "Cleo Park", "Dev Patel", "Elif Yılmaz", "Finn Murphy"];
 
 test.describe("Calendar month", () => {
-  test("the month is a grid of members by days with a Left column (L2-012 AC1)", async ({ goto, pages }) => {
+  test("the month is a grid of members by days with a Left column (L2-012 AC1)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { month: "2026-11" });
     await pages.calendar.waitForReady();
 
@@ -25,7 +26,8 @@ test.describe("Calendar month", () => {
     await expect(pages.calendar.memberNames()).toHaveText(CAST);
   });
 
-  test("without a month in the address the current month opens (L2-012 AC1)", async ({ goto, pages }) => {
+  test("without a month in the address the current month opens (L2-012 AC1)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar");
     await pages.calendar.waitForReady();
 
@@ -36,7 +38,8 @@ test.describe("Calendar month", () => {
     await expect(pages.calendar.grid()).toHaveAccessibleName(`Time off, ${current}`);
   });
 
-  test("the manager sees the team in its order (L2-012 AC2)", async ({ goto, pages }) => {
+  test("the manager sees the team in its order (L2-012 AC2)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { month: "2026-11", as: "manager" });
     await pages.calendar.waitForReady();
 
@@ -52,7 +55,8 @@ test.describe("Calendar month", () => {
     await expect(pages.calendar.mainNavLink("Calendar")).toHaveAttribute("aria-current", "page");
   });
 
-  test("a member's own row comes first, marked You (L2-012 AC2)", async ({ goto, pages }) => {
+  test("a member's own row comes first, marked You (L2-012 AC2)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("calendar", { month: "2026-11", as: "member" });
     await pages.calendar.waitForReady();
 

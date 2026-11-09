@@ -4,9 +4,11 @@
 //              selection bar with Tab and acts on the selection.
 // Data: the demo seed, November 2026. Ana's 23-30 Nov is blank and cleared after each test.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { clearDays } from "../fixtures/days.js";
 
+
+test.skip(({ isMobile }) => isMobile, GRID_ONLY);
 const ANA_DAYS = ["2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27", "2026-11-30"];
 
 test.describe("Selecting days from the keyboard", () => {

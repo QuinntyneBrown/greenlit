@@ -5,7 +5,7 @@
 //       through the API; every test puts Dev back on the team's work week when it is done, so the demo team
 //       and the other specs never see it.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { februaryFriday } from "../fixtures/dates.js";
 import { PEOPLE, inviterFor } from "../fixtures/session.js";
 import { ensureMember, ensureOwnTeam } from "../fixtures/team.js";
@@ -74,7 +74,9 @@ test.describe("A member's working days", () => {
     pages,
     request,
     workingDaysApi,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const manager = inviterFor(testInfo.project.name);
     const friday = februaryFriday();
     await setMemberDays(request, manager, "Dev Patel", MON_TO_FRI);

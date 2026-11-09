@@ -2,7 +2,7 @@
 // Traces to: L2-001
 // Description: Signing in opens the calendar, and guarded screens send a signed-out visitor to sign in and back.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { DEMO_PASSWORD, PEOPLE } from "../fixtures/session.js";
 
 test.describe("Signing in", () => {
@@ -28,7 +28,8 @@ test.describe("Signing in", () => {
     await expect(pages.calendar.mainNavLink("Calendar")).toHaveAttribute("aria-current", "page");
   });
 
-  test("Go to the calendar now opens it straight away (L2-001 AC4)", async ({ goto, pages }) => {
+  test("Go to the calendar now opens it straight away (L2-001 AC4)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("signIn");
     await pages.signIn.waitForReady();
     await pages.signIn.signIn(PEOPLE.member.email, DEMO_PASSWORD);

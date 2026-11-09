@@ -6,7 +6,7 @@
 //       the team wants 4 of 7 in. Every test puts Ana's request back to pending, clears the days it
 //       adds and so leaves the shared database as it found it.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { clearDays } from "../fixtures/days.js";
 import { confirmDays, emailsTo, logMark, memberId, reopenApproved } from "../fixtures/requests.js";
 
@@ -22,7 +22,8 @@ test.describe("Approving a request", () => {
     await clearDays(request, "Cleo Park", ["2026-11-18"]);
   });
 
-  test("approving from the list turns the days green, emails Ana and says so (L2-024 AC1, AC2)", async ({ goto, pages }) => {
+  test("approving from the list turns the days green, emails Ana and says so (L2-024 AC1, AC2)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     const mark = await logMark();
     await goto("requests");
     await pages.requests.waitForReady();
@@ -64,7 +65,8 @@ test.describe("Approving a request", () => {
     expect(requestsApi.approvals()).toBe(1);
   });
 
-  test("Undo puts the request back to pending and its days back to yellow (L2-024 AC3)", async ({ goto, pages }) => {
+  test("Undo puts the request back to pending and its days back to yellow (L2-024 AC3)", async ({ goto, pages, isMobile }) => {
+    test.skip(isMobile, GRID_ONLY);
     await goto("requests");
     await pages.requests.waitForReady();
     await pages.requests.approve("Ana Ruiz").click();

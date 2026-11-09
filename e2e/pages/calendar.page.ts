@@ -15,7 +15,7 @@ export class CalendarPage extends BasePage {
 
   /** The grid, the empty state or the error state: whichever the month resolves to. */
   protected readyAnchor(): Locator {
-    return this.page.locator(".team-grid:not([aria-busy='true']), .empty");
+    return this.page.locator(".team-grid:not([aria-busy='true']), .week-strip:not([aria-busy='true']), .empty");
   }
 
   /** The month title, e.g. "November 2026". */
@@ -279,6 +279,255 @@ export class CalendarPage extends BasePage {
   /** The polite status that says how many days are selected ("3 days selected"). */
   selectionAnnouncement(): Locator {
     return this.main.getByRole("status");
+  }
+
+  // ---- the calendar on a phone (docs/detailed-designs/sheet/phone-week) ----
+
+  /** The week tabs: a tab list labelled "Week". */
+  weekTabList(): Locator {
+    return this.main.getByRole("tablist", { name: "Week", exact: true });
+  }
+
+  /** The week tabs in order, named by their days in the month ("1", "2–8", …). */
+  weekTabs(): Locator {
+    return this.weekTabList().getByRole("tab");
+  }
+
+  /** The week tab whose days are `days`, e.g. "23–29". */
+  weekTab(days: string): Locator {
+    // A tab that holds a short day is also named by its marker ("23–29 Short of people this week").
+    return this.weekTabList().getByRole("tab", { name: new RegExp(`^${days}( |$)`) });
+  }
+
+  /** The selected week tab. */
+  selectedWeekTab(): Locator {
+    return this.weekTabList().getByRole("tab", { selected: true });
+  }
+
+  /** The marker on a week tab that holds a short day. */
+  shortWeekMarker(days: string): Locator {
+    return this.weekTab(days).getByRole("img", { name: "Short of people this week", exact: true });
+  }
+
+  /** Shows the week whose days are `days` ("23–29"). */
+  async showWeek(days: string): Promise<void> {
+    await this.weekTab(days).click();
+  }
+
+  /** The week card, labelled "Week of {days} {Mon}". */
+  weekCard(): Locator {
+    return this.main.locator(".week-strip");
+  }
+
+  /** The week card's date buttons, Monday to Sunday (placeholders outside the month included). */
+  weekDates(): Locator {
+    return this.weekCard().locator(".week-strip__date");
+  }
+
+  /** The date button for `day` ("Thu 26 Nov"). */
+  weekDate(day: string): Locator {
+    return this.weekCard().getByRole("button", { name: `See who is out ${day}`, exact: true });
+  }
+
+  /** Member names down the week card, in row order. */
+  weekMemberNames(): Locator {
+    return this.weekCard().locator(".week-strip__name");
+  }
+
+  /** The week card row of `member`. */
+  weekRow(member: string): Locator {
+    return this.weekCard()
+      .locator(".week-strip__rows > li")
+      .filter({ has: this.page.locator(".week-strip__name", { hasText: member }) });
+  }
+
+  /** A member's days left in the week card ("11 left"). */
+  weekDaysLeft(member: string): Locator {
+    return this.weekRow(member).locator(".week-strip__left");
+  }
+
+  /** The "You" mark in the week card. */
+  weekYou(): Locator {
+    return this.weekCard().locator(".week-strip__you");
+  }
+
+  /** The "You" mark on `member`'s row of the week card. */
+  weekYouOf(member: string): Locator {
+    return this.weekRow(member).locator(".week-strip__you");
+  }
+
+  /** The week card's cell for `member` on `day` ("Ana Ruiz", "Mon 23 Nov"). */
+  weekCell(member: string, day: string): Locator {
+    return this.weekCard().locator(".cell").and(this.page.locator(`[aria-label^="${member}, ${day}: "]`));
+  }
+
+  /** Blank placeholders for days of the week outside the month. */
+  weekBlanks(): Locator {
+    return this.weekCard().locator(".week-strip__blank");
+  }
+
+  /** The Out count under `day` ("Wed 18 Nov") in the week card, found by the day's column. */
+  async weekOutCell(day: string): Promise<Locator> {
+    return this.weekCard().locator(".week-strip__out > *").nth(await this.weekColumn(day)).locator(".cover");
+  }
+
+  /** The card "Days short of people" above the week tabs. */
+  shortDaysCard(): Locator {
+    return this.main.getByRole("region", { name: "Days short of people", exact: true });
+  }
+
+  /** The card's heading, e.g. "Below the minimum of 4 once in November". */
+  shortDaysHeading(): Locator {
+    return this.shortDaysCard().getByRole("heading");
+  }
+
+  /** The runs of short days, in date order. */
+  shortRuns(): Locator {
+    return this.shortDaysCard().locator(".short-days__run");
+  }
+
+  /** The run whose dates are `dates` ("Tue 24 – Thu 26 Nov"). */
+  shortRun(dates: string): Locator {
+    return this.shortRuns().filter({ has: this.page.locator(".short-days__dates", { hasText: dates }) });
+  }
+
+  /** Who is out in a run, each with their status in words ("Ben · tentative"). */
+  shortRunWho(dates: string): Locator {
+    return this.shortRun(dates).locator(".short-days__who > span");
+  }
+
+  /** The week card's band behind the column of `day` ("Tue 24 Nov"), found by the day's column. */
+  async weekBand(day: string): Promise<Locator> {
+    return this.weekCard().locator(".week-strip__band").nth(await this.weekColumn(day));
+  }
+
+  /** The index (Monday 0) of `day`'s column in the week shown. */
+  private async weekColumn(day: string): Promise<number> {
+    await this.weekDate(day).waitFor();
+    const labels = await this.weekDates().evaluateAll((dates) => dates.map((d) => d.getAttribute("aria-label")));
+    const column = labels.indexOf(`See who is out ${day}`);
+    if (column < 0) throw new Error(`No date "${day}" in the week shown.`);
+    return column;
+  }
+
+  /** Opens or closes the panel of `day` ("Thu 26 Nov") by pressing its date. */
+  async openDay(day: string): Promise<void> {
+    await this.weekDate(day).click();
+  }
+
+  /** The panel of an open date, labelled "Out on 26 Nov". */
+  dayPanel(): Locator {
+    return this.main.getByRole("region", { name: /^Out on / });
+  }
+
+  /** The open date's heading, e.g. "Thu 26 Nov". */
+  dayPanelHeading(): Locator {
+    return this.dayPanel().getByRole("heading");
+  }
+
+  /** Each member's name in the day panel, in row order. */
+  dayPanelNames(): Locator {
+    return this.dayPanel().locator(".day-panel__name");
+  }
+
+  /** `member`'s status in words in the day panel ("Confirmed", "Working", …). */
+  dayPanelState(member: string): Locator {
+    return this.dayPanel()
+      .locator(".day-panel__row")
+      .filter({ has: this.page.locator(".day-panel__name", { hasText: member }) })
+      .locator(".day-panel__state");
+  }
+
+  /** The one line a weekend or holiday shows instead of the members ("Christmas Day · not a working day"). */
+  dayPanelNote(): Locator {
+    return this.dayPanel().locator(".day-panel__off");
+  }
+
+  /** The day panel's "Close day" button. */
+  closeDay(): Locator {
+    return this.dayPanel().getByRole("button", { name: "Close day", exact: true });
+  }
+
+  /** Taps `member`'s cell on `day` ("Mon 23 Nov") in the week shown. */
+  async tapCell(member: string, day: string): Promise<void> {
+    await this.weekCell(member, day).click();
+  }
+
+  /** The week card's cells that show as selected. */
+  weekSelectedCells(): Locator {
+    return this.weekCard().locator('.cell[aria-pressed="true"]');
+  }
+
+  /** The non-modal panel "Selected days" at the foot of the screen. */
+  markSheet(): Locator {
+    return this.page.getByRole("region", { name: "Selected days", exact: true });
+  }
+
+  /** The member the marked days are for. */
+  markSheetWho(): Locator {
+    return this.markSheet().locator(".mark-sheet__who");
+  }
+
+  /** "From Mon 23 Nov" while picking, then the range ("Mon 23 – Thu 26 Nov"). */
+  markSheetRange(): Locator {
+    return this.markSheet().getByRole("heading");
+  }
+
+  /** "Now tap the last day. …" while picking, then the working days ("4 working days"). */
+  markSheetMeta(): Locator {
+    return this.markSheet().locator(".mark-sheet__meta");
+  }
+
+  /** The overage of L2-016 AC5 ("2 days over allowance"). */
+  markSheetWarning(): Locator {
+    return this.markSheet().locator(".mark-sheet__warn");
+  }
+
+  /** Who else is out on the range's days. */
+  markSheetClash(): Locator {
+    return this.markSheet().locator(".mark-sheet__clash");
+  }
+
+  /** A button of the mark sheet by its name ("Just this day", "Request these days", "Cancel", …). */
+  markSheetAction(name: string): Locator {
+    return this.markSheet().getByRole("button", { name, exact: true });
+  }
+
+  /** The names of the mark sheet's buttons, in order. */
+  markSheetButtons(): Locator {
+    return this.markSheet().getByRole("button");
+  }
+
+  /** The hint at the foot of the screen while nothing is selected. */
+  phoneHint(): Locator {
+    return this.page.locator(".phone-hint");
+  }
+
+  /** Every legend on the page (the phone shows one). */
+  legends(): Locator {
+    return this.main.getByRole("list", { name: "Legend", exact: true });
+  }
+
+  /** The line under the phone's legend naming the shown week's holidays. */
+  holidayNote(): Locator {
+    return this.main.locator(".phone-legend__note");
+  }
+
+  /**
+   * Presses Tab until `target` has focus, at most `limit` times; true when it got there. Proves a control is in the
+   * tab order without pinning how many stops come before it.
+   */
+  async tabTo(target: Locator, limit = 80): Promise<boolean> {
+    for (let i = 0; i < limit; i++) {
+      await this.page.keyboard.press("Tab");
+      if (await target.evaluate((el) => el === document.activeElement)) return true;
+    }
+    return false;
+  }
+
+  /** Whether the page scrolls sideways. */
+  async scrollsSideways(): Promise<boolean> {
+    return this.page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   }
 
   // ---- requesting time off (docs/detailed-designs/requests/send-request) ----

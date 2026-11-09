@@ -6,10 +6,12 @@
 // Data: each viewport's juggler (Hana, Iris, Jude) manages Design team (default) and Product team; the test puts
 //       Design team back as the default before and after.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { DEMO_PASSWORD, PEOPLE, jugglerFor } from "../fixtures/session.js";
 import { resetTeams } from "../fixtures/teams.js";
 
+
+test.skip(({ isMobile }) => isMobile, GRID_ONLY);
 test.describe("Running several teams end to end", () => {
   test.beforeEach(async ({ request }, testInfo) => {
     await resetTeams(request, jugglerFor(testInfo.project.name));

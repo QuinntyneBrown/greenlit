@@ -5,7 +5,7 @@
 // Data: removal is destructive, so each viewport's remover (Xavi, Yara, Zoe) manages a team of their own, made through
 //       the API; every test adds the members it removes, by names no other test uses, so the demo team is never touched.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { freshEmail, invite, join, trySignIn, tryWithSession } from "../fixtures/invitation.js";
 import { removerFor } from "../fixtures/session.js";
 import { ensureMember, ensureOwnTeam } from "../fixtures/team.js";
@@ -74,7 +74,9 @@ test.describe("Confirming a removal", () => {
     pages,
     removeMemberApi,
     request,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const manager = removerFor(testInfo.project.name);
     const email = freshEmail("finn");
     const invitation = await invite(request, manager, "Finn Murphy", email);
@@ -122,7 +124,9 @@ test.describe("A removal that fails", () => {
     pages,
     removeMemberApi,
     request,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const manager = removerFor(testInfo.project.name);
     await ensureMember(request, manager, "Dina Brandt");
     await goto("person", { as: manager, person: "Dina Brandt" });

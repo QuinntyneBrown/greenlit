@@ -3,8 +3,10 @@
 // Description: Escape and "Clear selection" clear a selection; the selection is announced.
 // Data: the demo seed, November 2026. Nothing is changed by selecting.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 
+
+test.skip(({ isMobile }) => isMobile, GRID_ONLY);
 test.describe("Clearing a selection", () => {
   test.beforeEach(async ({ goto, pages }) => {
     await goto("calendar", { as: "member", month: "2026-11" });

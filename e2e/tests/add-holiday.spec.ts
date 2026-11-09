@@ -5,7 +5,7 @@
 //       United Kingdom calendar for this year and next, and adds the day off in a month of their own
 //       (fixtures/dates.ts), so the demo team and the other viewports are never touched.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 import { christmas, offsiteFor, weekendFor } from "../fixtures/dates.js";
 import { PEOPLE, inviterFor } from "../fixtures/session.js";
 import { ensureMember, ensureOwnTeam } from "../fixtures/team.js";
@@ -69,7 +69,9 @@ test.describe("Adding a day off", () => {
     goto,
     holidaysApi,
     pages,
+    isMobile,
   }, testInfo) => {
+    test.skip(isMobile, GRID_ONLY);
     const day = offsiteFor(testInfo.project.name);
     await pages.settings.openAddHolidayDialog();
     const dialog = pages.addHoliday;

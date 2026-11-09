@@ -3,8 +3,10 @@
 // Description: The sheet is one tab stop and moves with the arrow keys, Home, End and the page keys.
 // Data: the demo seed, November and December 2026. 1 Nov is a Sunday, 25 Dec a holiday, nothing is changed.
 
-import { test, expect } from "../fixtures/gl-test.js";
+import { test, expect, GRID_ONLY } from "../fixtures/gl-test.js";
 
+
+test.skip(({ isMobile }) => isMobile, GRID_ONLY);
 test.describe("The keyboard on the sheet", () => {
   test.beforeEach(async ({ goto, pages }) => {
     await goto("calendar", { as: "member", month: "2026-11" });
