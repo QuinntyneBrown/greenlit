@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 /**
  * Legend (docs/design-system/components/legend.html): what each colour on the
- * sheet means. The swatches are decorative; the words carry the meaning.
+ * sheet means. The swatches are decorative; the words carry the meaning. With `band` it also explains the
+ * shading of a day short of people on the phone's week (L2-063 AC13).
  */
 @Component({
   selector: 'gl-legend',
@@ -21,6 +22,11 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
             <path d="M6 11.5V16c3.5 2.5 8.5 2.5 12 0v-4.5" />
           </svg>
           School closed
+        </li>
+      }
+      @if (band()) {
+        <li class="legend__item">
+          <span class="swatch swatch--band" aria-hidden="true"></span>Short of people
         </li>
       }
     </ul>
@@ -60,6 +66,11 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       flex: none;
       background: var(--status-bg);
     }
+    .swatch--band {
+      width: 1rem;
+      background: color-mix(in srgb, var(--color-fg-default) 7%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-fg-default) 10%, transparent);
+    }
     [data-status='confirmed'] {
       --status-bg: var(--color-status-confirmed);
     }
@@ -78,6 +89,10 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 export class Legend {
   /** The school calendar is on (L2-061 AC3): the legend adds "School closed" with the closure icon. */
   readonly schoolClosed = input<boolean>(false);
+
+  /** Adds "Short of people" for the band of a short day. */
+  readonly band = input<boolean>(false);
+
   protected readonly items = [
     { status: 'confirmed', label: 'Confirmed' },
     { status: 'requested', label: 'Requested' },
